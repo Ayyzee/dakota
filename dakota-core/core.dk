@@ -391,7 +391,7 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
   ssize-t klasses-count = 0;
   ssize-t methods-count = 0;
   for (ssize-t i = 0; i < klass-defns-table->count; i++) {
-    named-info-t* kls-info = *cast(named-info-t**)sorted-set-core::at(klass-defns-table, i);
+    named-info-t* kls-info = cast(named-info-t*)sorted-set-core::at(klass-defns-table, i);
     named-info-t* current-info = kls-info;
 
     do {
@@ -427,7 +427,7 @@ static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table) -> void 
   ostream::col-incr(ostrm);
 
   for (ssize-t i = 0; i < klass-defns-table->count; i++) {
-    named-info-t* kls-info = *cast(named-info-t**)sorted-set-core::at(klass-defns-table, i);
+    named-info-t* kls-info = cast(named-info-t*)sorted-set-core::at(klass-defns-table, i);
     named-info-t* current-info = kls-info;
 
     do {
