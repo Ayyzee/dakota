@@ -421,7 +421,7 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
   return;
 }
 # endif
-static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table) -> void {
+static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table, str-t only, bool-t exported-only) -> void {
   ostream-t ostrm = { .output = stdout, .col = 0 };
   ostream::print-format(ostrm, "{\n");
   ostream::col-incr(ostrm);
@@ -430,6 +430,10 @@ static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table) -> void 
     named-info-t* kls-info = cast(named-info-t*)sorted-set-core::at(klass-defns-table, i);
     named-info-t* current-info = kls-info;
 
+    if (exported-only && !klass-exported?(current-info))
+      continue;
+    if (only != nullptr && !dump?(current-info, only))
+      continue;
     do {
       symbol-t name =          name-from-info(current-info);
       symbol-t kls-name =      klass-name-from-info(current-info);
@@ -1506,8 +1510,11 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
   bool-t ctlg-exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
+  bool-t ctlg-recursive =     getenv-int("DAKOTA_CATALOG_RECURSIVE");
+  str-t  ctlg-output-path =   getenv("DAKOTA_CATALOG_OUTPUT");
+  str-t  ctlg-only =          getenv("DAKOTA_CATALOG_ONLY");
+  str-t  ctlg-arg =           getenv("DAKOTA_CATALOG_ARG");
   stream-t output = nullptr;
-  str-t ctlg-output-path = getenv("DAKOTA_CATALOG_OUTPUT");
   if (ctlg-output-path != nullptr) {
     if (ctlg-output-path[0] == NUL) // empty-string ("") means use default-value
       output = stdout;
@@ -1518,9 +1525,6 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     }
   }
   if (output != nullptr) {
-    bool-t ctlg-recursive = getenv-int("DAKOTA_CATALOG_RECURSIVE");
-    str-t ctlg-only = getenv("DAKOTA_CATALOG_ONLY");
-    str-t ctlg-arg =  getenv("DAKOTA_CATALOG_ARG");
     ostream-t ostrm = { .output = output, .col = 0 };
 
     symbol-t name = name-from-info(registration-info);
@@ -1552,7 +1556,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (!getenv-int("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
       if (getenv-int("DKT_JSON_DUMP_KLASSES"))
-        json-dump-klass-defns(gbl-klass-defns-table);
+        json-dump-klass-defns(gbl-klass-defns-table, ctlg-only, ctlg-exported-only);
       if (getenv-int("DKT_JSON_DUMP_RESOURCE_INFO"))
         json-dump-resource-info(gbl-klass-defns-table);
       last-user-code-before-main();
