@@ -187,7 +187,7 @@ klass x::stat {
 }
 // this is quick and dirty!!!!!!!!!!!!!!!!
 [[unused]] static func init-imported-klasses() -> void {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[]", __func__);
   symbol-t imported-kls-name;
   while ((imported-kls-name = cast(symbol-t)sorted-set-core::remove-last(gbl-imported-klasses-file-table)) != nullptr)
     dk-klass-for-name(imported-kls-name);
@@ -416,7 +416,7 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
     } while ((current-info = current-info->next) != nullptr);
   }
   ostream-t ostrm = { .output = stdout, .col = 0 };
-  ostream::print-format(ostrm, "{ 'klasses' : '%zi', 'selectors' : '%zi' 'methods' : '%zi' },\n",
+  ostream::print-format(ostrm, "{ \"klasses\": %zi, \"selectors\": %zi \"methods\": %zi },\n",
                         klasses-count, selector-count(), methods-count);
   return;
 }
@@ -438,20 +438,18 @@ static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table, str-t on
       symbol-t name =          name-from-info(current-info);
       symbol-t kls-name =      klass-name-from-info(current-info);
       symbol-t superkls-name = superklass-name-from-info(current-info);
-      ostream::print-format(ostrm, "'%s' :\n", name);
-      ostream::print-format(ostrm, "{\n");
+      ostream::print-format(ostrm, "\"%s\": {\n", name);
       ostream::col-incr(ostrm);
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(intptr-t)#klass);
-      ostream::print-format(ostrm, "'type' : '%s',\n", type);
+      ostream::print-format(ostrm, "\"type\": \"%s\",\n", type);
       if (kls-name != nullptr)
-        ostream::print-format(ostrm, "'klass' : '%s',\n",      kls-name);
+        ostream::print-format(ostrm, "\"klass\": \"%s\",\n",      kls-name);
       if (superkls-name != nullptr)
-        ostream::print-format(ostrm, "'superklass' : '%s',\n", superkls-name);
+        ostream::print-format(ostrm, "\"superklass\": \"%s\",\n", superkls-name);
 
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
       if (method-signatures != nullptr) {
-        ostream::print-format(ostrm, "'methods' :\n");
-        ostream::print-format(ostrm, "{\n");
+        ostream::print-format(ostrm, "\"methods\": {\n");
         ostream::col-incr(ostrm);
         const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method-addresses);
         ssize-t j = 0;
@@ -465,12 +463,12 @@ static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table, str-t on
               is-defined = true;
           }
           j++;
-          ostream::print-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'param-types' : '%s', 'is-defined' : '%zi' },\n",
+          ostream::print-format(ostrm, "\"%s(%s)\": { \"name\": \"%s\", \"param-types\": \"%s\", \"return-type\": \"%s\", \"is-defined\": %s },\n",
                                 method-signature->name, method-signature->param-types,
-                                method-signature->return-type,
                                 method-signature->name,
                                 method-signature->param-types,
-                                is-defined);
+                                method-signature->return-type,
+                                is-defined ? "true" : "false");
         }
         ostream::col-decr(ostrm);
         ostream::print-format(ostrm, "},\n");
@@ -600,7 +598,7 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
 }
 static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
   assert-valid-str(kls-name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, kls-name, cast(ptr-t)(node));
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\",\"%p\"]", __func__, kls-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { .name = kls-name, .node = node };
   result-t found-result = sorted-set-core::result-at(gbl-imported-klasses-table, &named-node);
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.item;
@@ -619,7 +617,7 @@ static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
   return;
 }
 static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%p']",
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\",\"%p\"]",
                         __func__,
                         cast(ptr-t)(kls-names),
                         cast(ptr-t)(kls-assoc));
@@ -642,7 +640,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
   named-info::sort(kls-info);
   symbol-t name = name-from-info(kls-info);
   assert-valid-str(name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(kls-info), name);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\"],\"klass-name\":\"%s\"", __func__, cast(ptr-t)(kls-info), name);
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(kls-info, #interpose-name);
   if (interpose-name != nullptr) {
@@ -667,7 +665,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
   return kls;
 }
 static func export-klasses(named-info-t* kls-info) -> void {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(ptr-t)(kls-info));
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\"]", __func__, cast(ptr-t)(kls-info));
   ssize-t i = 0;
 
   while (1) {
@@ -746,7 +744,7 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
 // null-singleton klass' klass is klass klass
 func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[]", __func__);
   if (!object::_klass_) {
     init-runtime-ds();
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
@@ -845,7 +843,7 @@ func dk-init-runtime() -> void {
 }
 /*LOCAL*/ func imported-klasses-for-klass(symbol-t kls-name) -> assoc-node-t* {
   assert-valid-str(kls-name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, kls-name);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\"]", __func__, kls-name);
   named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
   result-t node-result = sorted-set-core::result-at(gbl-imported-klasses-table, &named-node); // hackhack
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))node-result.item;
@@ -1599,7 +1597,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
         if (kls-assoc != nullptr) {
           object-t kls = *cast(object-t*)(kls-assoc->item);
           if (kls != nullptr) {
-            DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
+            DKT-LOG-INITIAL-FINAL("\"action\":\"%s\",\"args\":[\"%s\"],\"klass\":\"%s\",\"file\":\"%s\"",
                                   "finalize", "klass", kls-name,
                                   cast(symbol-t)named-info::at(kls-info, #file));
 
@@ -1611,7 +1609,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   }
   symbol-t name = name-from-info(registration-info);
   assert-valid-str(name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(registration-info), name);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\"],\"klass-name\":\"%s\"", __func__, cast(ptr-t)(registration-info), name);
   return;
 }
 static func klass-for-name-simple(symbol-t name) -> object-t {
@@ -1624,7 +1622,7 @@ static func klass-for-name-simple(symbol-t name) -> object-t {
 }
 static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   // for (ssize-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, name);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\"]", __func__, name);
   assert-valid-str(name);
   named-info-t* info-slots = info-for-name(name);
   assert(info-slots != nullptr);
@@ -1702,7 +1700,7 @@ func dk-intern-free(str-t key) -> symbol-t {
 func dk-intern(str-t key) -> symbol-t {
   assert(key != nullptr);
   assert(key[0] != NUL);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\"]", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
   bool-t is-ptr;
   static sorted-set-core-t* intern-array = sorted-set-core::create((4096/2)/sizeof(symbol-t),

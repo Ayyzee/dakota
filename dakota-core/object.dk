@@ -152,7 +152,7 @@ func dkt-dump(object-t obj) -> object-t {
 func dkt-unbox-check(object-t obj, object-t kls) -> void {
   assert(obj != nullptr);
   assert(kls != nullptr);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
+  DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\",\"%s::klass\"]",
                         __func__, cast(ptr-t)(obj), $name(kls));
   unless (object::instance-of?(obj, kls)) {
     str-t object-kls-name = name-of(klass-of(obj));
