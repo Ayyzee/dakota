@@ -1266,20 +1266,20 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
         continue;
       if (only != nullptr && !dump?(kls-info, only))
         continue;
-        if (1)
-          prev-module = dump-klass(ostrm, kls-info, prev-module);
-        if (output-dir != nullptr) {
-            char-t[255 + (1)] klass-file = "";
-            symbol-t kls-name = name-from-info(kls-info);
-            snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, kls-name);
-            ostream-t dostrm = ostream::fopen(klass-file);
-            dump-klass(dostrm, kls-info, nullptr);
+      if (1)
+        prev-module = dump-klass(ostrm, kls-info, prev-module);
+      if (output-dir != nullptr) {
+        char-t[255 + (1)] klass-file = "";
+        symbol-t kls-name = name-from-info(kls-info);
+        snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, kls-name);
+        ostream-t dostrm = ostream::fopen(klass-file);
+        dump-klass(dostrm, kls-info, nullptr);
 # if defined DKT-ENABLE-EXPORT-GROUP
-            ostream::col-decr(dostrm);
-            ostream::print-format(dostrm, "} // export\n"); // closes "export {" from dump-klass()
+        ostream::col-decr(dostrm);
+        ostream::print-format(dostrm, "} // export\n"); // closes "export {" from dump-klass()
 # endif
-            ostream::fclose(dostrm);
-        }
+        ostream::fclose(dostrm);
+      }
     }
 # if defined DKT-ENABLE-EXPORT-GROUP
     ostream::col-decr(ostrm);
