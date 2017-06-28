@@ -345,6 +345,46 @@ klass ostream {
     return s;
   }
 }
+static func klass-exported?(named-info-t* kls-info,
+                            bool-t*       is-exported-ptr =           nullptr,
+                            bool-t*       has-exported-state-ptr =    nullptr,
+                            bool-t*       has-exported-behavior-ptr = nullptr) -> bool-t {
+  bool-t is-exported =           cast(bool-t)named-info::at(kls-info, #is-exported);
+  bool-t has-exported-state =    cast(bool-t)named-info::at(kls-info, #has-exported-state);
+  bool-t has-exported-behavior = cast(bool-t)named-info::at(kls-info, #has-exported-behavior);
+
+  if (is-exported-ptr)
+    *is-exported-ptr = is-exported;
+  if (has-exported-state-ptr)
+    *has-exported-state-ptr = has-exported-state;
+  if (has-exported-behavior-ptr)
+    *has-exported-behavior-ptr = has-exported-behavior;
+
+  bool-t result = (is-exported || has-exported-state || has-exported-behavior);
+  return result;
+}
+static func dump?(named-info-t* kls-info, str-t only) -> bool-t {
+  assert(kls-info != nullptr);
+  assert-valid-str(only);
+  symbol-t name = name-from-info(kls-info);
+  assert-valid-str(name);
+
+  bool-t result = true;
+  ssize-t only-len = cast(ssize-t)safe-strlen(only);
+  if (only[0] == '*') {
+    ssize-t name-len = cast(ssize-t)safe-strlen(name);
+    if (name-len < (only-len - 1) || safe-strcmp(name + name-len - (only-len - 1), only + 1) != 0)
+      result = false;
+  }
+  else if (only[only-len - 1] == '*') {
+    if (safe-strncmp(name, only, cast(size-t)(only-len - 1)) != 0)
+      result = false;
+  } else {
+    if (safe-strcmp(name, only) != 0)
+      result = false;
+  }
+  return result;
+}
 # if 1
 extern sorted-set-core-t gbl-selectors-table;
 static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> void {
@@ -381,7 +421,6 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
   return;
 }
 # endif
-
 static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table) -> void {
   ostream-t ostrm = { .output = stdout, .col = 0 };
   ostream::print-format(ostrm, "{\n");
@@ -822,28 +861,6 @@ static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   }
   return;
 }
-static func dump?(named-info-t* kls-info, str-t only) -> bool-t {
-  assert(kls-info != nullptr);
-  assert-valid-str(only);
-  symbol-t name = name-from-info(kls-info);
-  assert-valid-str(name);
-
-  bool-t result = true;
-  ssize-t only-len = cast(ssize-t)safe-strlen(only);
-  if (only[0] == '*') {
-    ssize-t name-len = cast(ssize-t)safe-strlen(name);
-    if (name-len < (only-len - 1) || safe-strcmp(name + name-len - (only-len - 1), only + 1) != 0)
-      result = false;
-  }
-  else if (only[only-len - 1] == '*') {
-    if (safe-strncmp(name, only, cast(size-t)(only-len - 1)) != 0)
-      result = false;
-  } else {
-    if (safe-strcmp(name, only) != 0)
-      result = false;
-  }
-  return result;
-}
 static func remove-dir(str-t path) -> str-t {
   str-t result = strrchr(path, '/');
   if (result == nullptr)
@@ -982,24 +999,6 @@ static func dump-method(ostream-t ostrm, const signature-t* info, str-t attrs = 
                           info->param-types,
                           info->return-type);
   return;
-}
-static func klass-exported?(named-info-t* kls-info,
-                            bool-t*       is-exported-ptr =           nullptr,
-                            bool-t*       has-exported-state-ptr =    nullptr,
-                            bool-t*       has-exported-behavior-ptr = nullptr) -> bool-t {
-  bool-t is-exported =           cast(bool-t)named-info::at(kls-info, #is-exported);
-  bool-t has-exported-state =    cast(bool-t)named-info::at(kls-info, #has-exported-state);
-  bool-t has-exported-behavior = cast(bool-t)named-info::at(kls-info, #has-exported-behavior);
-
-  if (is-exported-ptr)
-    *is-exported-ptr = is-exported;
-  if (has-exported-state-ptr)
-    *has-exported-state-ptr = has-exported-state;
-  if (has-exported-behavior-ptr)
-    *has-exported-behavior-ptr = has-exported-behavior;
-
-  bool-t result = (is-exported || has-exported-state || has-exported-behavior);
-  return result;
 }
 static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-module) -> symbol-t {
   assert(ostrm.output != nullptr);
