@@ -42,8 +42,8 @@ klass named-info {
   }
   method init(object-t self) -> object-t {
     self = $init(super);
-    self.next =     nullptr;
-    self.count =    0;
+    self.next =  nullptr;
+    self.count = 0;
     self.items = nullptr;
     return self;
   }
