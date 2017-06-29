@@ -167,9 +167,9 @@ static FUNC create_empty_file(str_t path) -> int_t {
   assert(path[0] != NUL);
   int exit_value = 0;
   int fd = open(path, O_CREAT | O_TRUNC, 0644);
-  if (fd == -1) exit_fail_with_msg("ERROR:7 %s: \"%s\"\n", path, strerror(errno));
+  if (fd == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
   int n = close(fd);
-  if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:6 %s: \"%s\"\n", path, strerror(errno));
+  if (n == -1) exit_value = non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
   return 0;
 }
 // 1: try to spawn() path
@@ -185,7 +185,7 @@ FUNC main(int argc, char** argv) -> int {
   if (!opts.path_only) {
     if (opts.directory != nullptr) {
       int n = chdir(opts.directory);
-      if (n == -1) exit_fail_with_msg("ERROR:8 %s: \"%s\"\n", opts.directory, strerror(errno));
+      if (n == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", opts.directory, strerror(errno));
     }
     if (opts.output != nullptr) {
       if (strcmp(opts.output, dev_null) == 0) {
@@ -258,7 +258,7 @@ FUNC main(int argc, char** argv) -> int {
     if (strcmp(opts.output, tmp_output) != 0) {
       assert(tmp_output[0] != NUL);
       int n = rename(tmp_output, opts.output);
-      if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:1 %s: \"%s\"\n", opts.output, strerror(errno));
+      if (n == -1) exit_value = non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
     }
   }
   return exit_value;
