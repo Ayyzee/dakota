@@ -61,11 +61,10 @@ klass lexer {
 
     if (file != nullptr) {
       self.file = file;
+      errno = 0;
       stream = fopen(self.file, "r");
       if (stream == nullptr) {
-        str128-t buf = "";
-        strerror-r(errno, buf, sizeof(buf));
-        fprintf(stderr, "%s", buf);
+        fprintf(stderr, "%s", strerror(errno));
         throw $make(exception::klass(), #msg: "oops");
       }
       fseeko(stream, 0L, SEEK-END);

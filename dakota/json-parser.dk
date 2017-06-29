@@ -58,12 +58,11 @@ klass json-parser {
 
     if (file != nullptr) {
       self.file = file;
+      errno = 0;
       self.in =   fopen(self.file, "r");
 
       if (self.in == nullptr) {
-        str128-t buf = "";
-        strerror-r(errno, buf, sizeof(buf));
-        fprintf(stderr, "%s: %s", file, buf);
+        fprintf(stderr, "%s: %s", file, strerror(errno));
         throw $make(exception::klass(), #msg: "oops");
       }
     } else {

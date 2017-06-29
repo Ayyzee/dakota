@@ -252,9 +252,7 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
           break;
         }
       } else {
-        str128-t buf = "";
-        strerror-r(errno, buf, sizeof(buf));
-        fprintf(stderr, "%s:%i: INFO: %s: %s\n", __FILE__, __LINE__, file, buf);
+        fprintf(stderr, "%s:%i: ERROR: %s: %s\n", __FILE__, __LINE__, file, strerror(errno));
         throw $make(exception::klass(), #msg: "bummer");
       }
       j1++;
@@ -333,12 +331,14 @@ klass ostream {
   }
   static func fopen(str-t path) -> slots-t {
     slots-t s = { .output = nullptr, .col = 0 };
+    errno = 0;
     s.output = ::fopen(path, "w");
     if (s.output == nullptr)
       exit-fail-with-msg("ERROR: %s: \"%s\"", path, strerror(errno));
     return s;
   }
   static func fclose(const slots-t& s) -> const slots-t& {
+    errno = 0;
     int n = ::fclose(s.output);
     if (n == -1)
       non-exit-fail-with-msg("ERROR: %s: \"%s\"", "fclose", strerror(errno));
@@ -1540,6 +1540,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     if (ctlg-output-path[0] == NUL) // empty-string ("") means use default-value
       output = stdout;
     else {
+      errno = 0;
       output = fopen(ctlg-output-path, "a"); // ctlg-output-path is initially truncated by dakota-catalog
       if (output == nullptr)
         exit-fail-with-msg("ERROR: %s: \"%s\"", ctlg-output-path, strerror(errno));
