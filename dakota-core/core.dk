@@ -863,7 +863,7 @@ static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   }
   return;
 }
-static func remove-dir(str-t path) -> str-t {
+static func bname(str-t path) -> str-t {
   str-t result = strrchr(path, '/');
   if (result == nullptr)
     result = path;
@@ -1528,6 +1528,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
+  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#exe);
   bool-t ctlg-exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
   bool-t ctlg-recursive =     getenv-int("DAKOTA_CATALOG_RECURSIVE");
   bool-t ctlg-json =          getenv-int("DAKOTA_CATALOG_JSON");
@@ -1543,23 +1544,18 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (output == nullptr)
         exit-fail-with-msg("ERROR: %s: \"%s\"", ctlg-output-path, strerror(errno));
     }
-  }
-  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#exe);
-  if (output != nullptr) {
     ostream-t ostrm = { .output = output, .col = 0 };
-
     symbol-t name = name-from-info(registration-info);
     assert-valid-str(name);
-  //fprintf(stderr, "arg = %s\n",  ctlg-arg);
-  //fprintf(stderr, "name = %s\n", name);
-    str-t ctlg-arg-base =  remove-dir(ctlg-arg);
-    str-t name-base = remove-dir(name);
+    //fprintf(stderr, "arg = %s\n",  ctlg-arg);
+    //fprintf(stderr, "name = %s\n", name);
+    str-t ctlg-arg-base = bname(ctlg-arg);
+    str-t name-base =     bname(name);
     static symbol-t[] keys = {
       #klass-defns,
       #interposers,
       nullptr
     };
-
     if (!ctlg-json && (ctlg-recursive || (safe-strcmp(ctlg-arg-base, name-base) == 0))) {
       if (total-count-of(registration-info, keys)) {
         ostream::print-format(ostrm, "// -*- mode: c++; mode: dakota -*-\n");
@@ -1570,7 +1566,6 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       }
     }
   }
-
   switch (type) {
     case #lib:
       add-registration-info(registration-info);
@@ -1588,7 +1583,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (getenv-int("DKT_JSON_DUMP_RESOURCE_INFO"))
         json-dump-resource-info(gbl-klass-defns-table);
       last-user-code-before-main();
-      if (ctlg-json || getenv-int("DKT_EXIT_BEFORE_MAIN"))
+      if (ctlg-json || ctlg-output-path != nullptr || getenv-int("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
   }
   if (ctlg-output-path != nullptr && ctlg-output-path[0] != NUL && output != nullptr)
