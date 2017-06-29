@@ -156,11 +156,10 @@ inline FUNC getenv_int(str_t lhs) -> int_t {
     rhs = atoi(rhs_str);
   return rhs;
 }
-inline FUNC setenv_int(str_t lhs, int_t rhs) -> int_t { // allways overwrite
+inline FUNC setenv_int(str_t lhs, int_t rhs, int overwrite = 1) -> int_t { // overwrite by default
   char_t rhs_str[sizeof(int_t) * 3] = "";
   sprintf(rhs_str, "%i", rhs);
-  int_t overwrite;
-  return setenv(lhs, rhs_str, overwrite = 1);
+  return setenv(lhs, rhs_str, overwrite);
 }
 # if !defined USE
   # define    USE(v) cast(void)v
