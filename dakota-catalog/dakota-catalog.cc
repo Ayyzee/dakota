@@ -145,14 +145,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
 
 # include "spawn.cc"
 
-static FUNC setenv_bool(str_t name, bool value, int overwrite) -> int {
-  int result = 0;
-  if (value)
-    result = setenv(name, "1", overwrite);
-  else
-    unsetenv(name);
-  return result;
-}
 static FUNC file_exists(str_t path, int flags = O_RDONLY) -> bool {
   bool state;
   int fd = open(path, flags);
@@ -198,7 +190,7 @@ FUNC main(int argc, char** argv) -> int {
       }
     }
     if (opts.exported_only)
-      setenv_bool("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only, overwrite = 1);
+      setenv_int("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only);
 
     setenv("DAKOTA_CATALOG_OUTPUT", tmp_output, overwrite = 1); // may be empty-string ("")
 
@@ -207,7 +199,7 @@ FUNC main(int argc, char** argv) -> int {
     if (opts.only != nullptr)
       setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1); // should be space delimitted list
     if (opts.recursive)
-      setenv_bool("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
+      setenv_int("DAKOTA_CATALOG_RECURSIVE", opts.recursive);
   }
   int i = 0;
   str_t arg = nullptr;
