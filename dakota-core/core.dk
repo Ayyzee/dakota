@@ -329,15 +329,22 @@ klass ostream {
     va-end(args);
     return s;
   }
-  static func fopen(str-t path) -> slots-t {
-    slots-t s = { .output = nullptr, .col = 0 };
+  static func fopen(str-t path, str-t mode = "w") -> slots-t {
+    slots-t s = { .output = stdout, .col = 0 };
+    if (path == nullptr)
+      return s;
     errno = 0;
-    s.output = ::fopen(path, "w");
+    s.output = ::fopen(path, mode);
     if (s.output == nullptr)
       exit-fail-with-msg("ERROR: %s: \"%s\"", path, strerror(errno));
     return s;
   }
-  static func fclose(const slots-t& s) -> const slots-t& {
+  static func fclose(slots-t& s) -> slots-t& {
+    s.col = 0;
+    if (s.output == nullptr)
+      s.output = stdout;
+    if (s.output == stdout)
+      return s;
     errno = 0;
     int n = ::fclose(s.output);
     if (n == -1)
@@ -1535,17 +1542,12 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   str-t  ctlg-output-path =   getenv("DAKOTA_CATALOG_OUTPUT");
   str-t  ctlg-only =          getenv("DAKOTA_CATALOG_ONLY");
   str-t  ctlg-arg =           getenv("DAKOTA_CATALOG_ARG");
-  stream-t output = nullptr;
+  ostream-t ostrm = {};
   if (ctlg-output-path != nullptr) {
     if (ctlg-output-path[0] == NUL) // empty-string ("") means use default-value
-      output = stdout;
-    else {
-      errno = 0;
-      output = fopen(ctlg-output-path, "a"); // ctlg-output-path is initially truncated by dakota-catalog
-      if (output == nullptr)
-        exit-fail-with-msg("ERROR: %s: \"%s\"", ctlg-output-path, strerror(errno));
-    }
-    ostream-t ostrm = { .output = output, .col = 0 };
+      ostrm = { .output = stdout, .col = 0 };
+    else
+      ostrm = ostream::fopen(ctlg-output-path, "a"); // ctlg-output-path is initially truncated by dakota-catalog
     symbol-t name = name-from-info(registration-info);
     assert-valid-str(name);
     //fprintf(stderr, "arg = %s\n",  ctlg-arg);
@@ -1587,8 +1589,8 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (ctlg-json || ctlg-output-path != nullptr || getenv-int("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
   }
-  if (ctlg-output-path != nullptr && ctlg-output-path[0] != NUL && output != nullptr)
-    fclose(output);
+  if (ostrm.output != nullptr)
+    ostream::fclose(ostrm);
   return;
 }
 func dkt-deregister-info(named-info-t* registration-info) -> void {
