@@ -463,12 +463,12 @@ static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table, str-t on
               is-defined = true;
           }
           j++;
-          ostream::print-format(ostrm, "\"%s(%s)\": { \"name\": \"%s\", \"param-types\": \"%s\", \"return-type\": \"%s\", \"is-defined\": %s },\n",
+          ostream::print-format(ostrm, "\"%s(%s)\": { \"name\": \"%s\", \"param-types\": \"%s\", \"return-type\": \"%s\", \"is-defined\": %i },\n",
                                 method-signature->name, method-signature->param-types,
                                 method-signature->name,
                                 method-signature->param-types,
                                 method-signature->return-type,
-                                is-defined ? "true" : "false");
+                                is-defined ? 1 : 0);
         }
         ostream::col-decr(ostrm);
         ostream::print-format(ostrm, "},\n");
