@@ -40,6 +40,7 @@ enum {
   DAKOTA_CATALOG_OUTPUT_DIRECTORY,
   DAKOTA_CATALOG_PATH_ONLY,
   DAKOTA_CATALOG_RECURSIVE,
+  DAKOTA_CATALOG_JSON,
   DAKOTA_CATALOG_SILENT,
 };
 struct opts_t {
@@ -50,6 +51,7 @@ struct opts_t {
   char* output_directory; // path or "" for .
   bool  path_only;
   bool  recursive;
+  bool  json;
   bool  silent;
 };
 static opts_t opts = {};
@@ -95,6 +97,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
     { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
     { "path-only",        no_argument,       nullptr, DAKOTA_CATALOG_PATH_ONLY },
     { "recursive",        no_argument,       nullptr, DAKOTA_CATALOG_RECURSIVE },
+    { "json",             no_argument,       nullptr, DAKOTA_CATALOG_JSON },
     { "silent",           no_argument,       nullptr, DAKOTA_CATALOG_SILENT },
     { nullptr, 0, nullptr, 0 }
   };
@@ -126,6 +129,9 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         break;
       case DAKOTA_CATALOG_RECURSIVE:
         opts.recursive = true;
+        break;
+      case DAKOTA_CATALOG_JSON:
+        opts.json = true;
         break;
       case DAKOTA_CATALOG_SILENT:
         opts.silent = true;
@@ -200,6 +206,8 @@ FUNC main(int argc, char** argv) -> int {
       setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1); // should be space delimitted list
     if (opts.recursive)
       setenv_int("DAKOTA_CATALOG_RECURSIVE", opts.recursive);
+    if (opts.json)
+      setenv_int("DAKOTA_CATALOG_JSON", opts.json);
   }
   int i = 0;
   str_t arg = nullptr;
