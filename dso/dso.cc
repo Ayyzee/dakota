@@ -61,11 +61,11 @@ const dso_symbol_handle_t DSO_SYMBOL_HANDLE = {
 TYPEALIAS bool_t = bool;
 TYPEALIAS uint_t = unsigned int;
 
-static bool_t is_bit_set(int_t word, uint_t pos) {
+static FUNC is_bit_set(int_t word, uint_t pos) -> bool_t {
   bool_t state = word & (1 << pos);
   return state;
 }
-static bool_t is_bit_set(int_t word, int_t pos) {
+static FUNC is_bit_set(int_t word, int_t pos) -> bool_t {
   return is_bit_set(word, cast(uint_t)pos);
 }
 namespace dso_info {

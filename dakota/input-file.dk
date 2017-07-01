@@ -22,8 +22,7 @@
 
 module dakota;
 
-static bool-t
-space?(int-t c) {
+static func space?(int-t c) -> bool-t {
   return isspace(c);
 }
 
