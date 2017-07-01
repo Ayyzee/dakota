@@ -91,8 +91,8 @@ klass vector {
 
   method init(object-t   self,
               ssize-t    initial-capacity: $initial-capacity(klass-of(self)),
-              object-t   fill-item:     $fill-item(klass-of(self)),
-              object-t   items:         nullptr,
+              object-t   fill-item:        $fill-item(klass-of(self)),
+              object-t   items:            nullptr,
               object-t[] objects:          nullptr) -> object-t {
     // it IS legal to have the 'fill-item' value be nullptr
     // it is required for the hashed-set implementation
@@ -163,6 +163,7 @@ klass vector {
     self.iterator-state++;
     return self;
   }
+  // should be auto-generated!!!
   method remove-at(object-t self, object-t item) -> object-t {
     ssize-t index = ssize::unbox(item);
     object-t result = $remove-at(self, index);
@@ -222,6 +223,12 @@ klass vector {
   //     method replace-first(object-t self, object-t item) -> object-t;
   //     method replace-last(object-t self, object-t item) -> object-t;
 
+  // should be auto-generated!!!
+  method at(object-t self, object-t boxed-index, object-t default-result) -> object-t {
+    ssize-t index = ssize::unbox(boxed-index);
+    object-t result = $at(self, index, default-result);
+    return result;
+  }
   method at(object-t self, ssize-t index, object-t default-result) -> object-t {
     object-t item = default-result;
     if (self.count > index) {
@@ -232,9 +239,9 @@ klass vector {
     return item;
   }
   // should be auto-generated!!!
-  method at(object-t self, object-t boxed-index, object-t default-result) -> object-t {
+  method at(object-t self, object-t boxed-index) -> object-t {
     ssize-t index = ssize::unbox(boxed-index);
-    object-t result = $at(self, index, default-result);
+    object-t result = $at(self, index);
     return result;
   }
   method at(object-t self, ssize-t index) -> object-t {
@@ -243,22 +250,16 @@ klass vector {
       throw $make(exception::klass(), #msg: "oops");
     return item;
   }
-  // should be auto-generated!!!
-  method at(object-t self, object-t boxed-index) -> object-t {
-    ssize-t index = ssize::unbox(boxed-index);
-    object-t result = $at(self, index);
-    return result;
-  }
   method replace-at(object-t self, ssize-t index, object-t object) -> object-t {
     if (index >= self.capacity)
       throw $make(exception::klass(), #msg: "oops");
 
-    object-t rtn = self.items[index];
+    object-t result = self.items[index];
     self.items[index] = object;
 
     if (self.count < index + 1)
       self.count = index + 1;
-    return rtn;
+    return result;
   }
   method size(object-t self) -> ssize-t {
     return self.count;
@@ -271,7 +272,7 @@ klass vector {
       self.items = cast(object-t*)dkt::alloc(self.size * self.capacity, self.items);
     }
     memmove(self.items + 1, self.items, cast(size-t)(self.size * self.count));
-    self.items[0].object = nullptr; // for ref-counting
+    self.items[0].object = nullptr;
     self.items[0] = item;
     self.count++;
     self.iterator-state++;
