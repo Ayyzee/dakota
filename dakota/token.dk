@@ -109,11 +109,7 @@ klass token {
     return self;
   }
   method tokenid?(object-t self, tokenid-t tokenid) -> bool-t {
-    bool-t result;
-    if (self.tokenid == tokenid)
-      result = true;
-    else
-      result = false;
+    bool-t result = (self.tokenid == tokenid);
     return result;
   }
   method set-tokenid(object-t self, tokenid-t tokenid) -> object-t {
@@ -130,11 +126,7 @@ klass token {
     return self;
   }
   method leading-ws?(object-t self) -> bool-t {
-    bool-t result;
-    if (self.leading-ws == nullptr)
-      result = false;
-    else
-      result = true;
+    bool-t result = (self.leading-ws != nullptr);
     return result;
   }
   method leading-ws(object-t self) -> object-t {

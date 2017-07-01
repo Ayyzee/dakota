@@ -106,11 +106,7 @@ klass string {
   }
   method bool-value(object-t self) -> bool-t {
     uintmax-t uint-value = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
-    bool-t result;
-    if (uint-value == 0)
-      result = false;
-    else
-      result = true;
+    bool-t result = (uint-value != 0);
     return result;
   }
   // // sentinel method must be va:: and va-list-t (and be last)

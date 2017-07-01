@@ -408,11 +408,7 @@ klass deque-iterator {
   // }
   method next?(object-t self) -> bool-t {
     check-iterator-state(self);
-    bool-t result;
-    if (self.node != nullptr)
-      result = true;
-    else
-      result = false;
+    bool-t result = (self.node != nullptr);
     return result;
   }
   method next(object-t self) -> object-t {
