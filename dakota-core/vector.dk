@@ -353,10 +353,9 @@ klass vector-iterator {
 
   slots {
     object-t vector;
-    ssize-t count;
-    ssize-t index;
-
-    ssize-t iterator-state;
+    ssize-t  count;
+    ssize-t  index;
+    ssize-t  iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     const vector::slots-t& d = vector::unbox(self.vector);
@@ -367,11 +366,11 @@ klass vector-iterator {
   method init(object-t self, object-t collection:) -> object-t {
     self = $init(super);
     assert(collection != null);
-    const vector::slots-t& a = vector::unbox(collection);
-    self.vector = collection;
-    self.count = a.count;
-    self.index = vector::first-index(self.vector);
-    self.iterator-state = a.iterator-state;
+    const vector::slots-t& v = vector::unbox(collection);
+    self.vector =         collection;
+    self.count =          v.count;
+    self.index =          vector::first-index(self.vector);
+    self.iterator-state = v.iterator-state;
     return self;
   }
   method first?(object-t self) -> bool-t {

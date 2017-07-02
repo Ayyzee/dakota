@@ -91,12 +91,12 @@ klass collection {
   [[alias(iterator-func)]] method forward-iterator-func(object-t self) -> iterator-func-t {
     object-t iter = $forward-iterator(self);
     method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
-    return cast(iterator-func-t)[next,iter](){ return next(iter); };
+    return cast(iterator-func-t)[next, iter](){ return next(iter); };
   }
   method backward-iterator-func(object-t self) -> iterator-func-t {
     object-t iter = $backward-iterator(self);
     method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
-    return cast(iterator-func-t)[next,iter](){ return next(iter); };
+    return cast(iterator-func-t)[next, iter](){ return next(iter); };
   }
   // method iterator(object-t self) -> object-t;
   // method forward-iterator(object-t self) -> object-t;

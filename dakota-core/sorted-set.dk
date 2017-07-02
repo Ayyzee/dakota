@@ -190,16 +190,15 @@ klass sorted-set-iterator {
     object-t sorted-set;
     ssize-t  offset;
     symbol-t direction;
-
     ssize-t  iterator-state;
   }
   method init(object-t self, object-t collection:, symbol-t direction: #forward) -> object-t {
     self = $init(super);
     assert(klass-of(collection) == sorted-set::_klass_ || $instance-of?(collection, sorted-set::_klass_));
     const sorted-set::slots-t& ss = sorted-set::unbox(collection);
-    self.sorted-set = collection;
-    self.offset = 0;
-    self.direction = direction;
+    self.sorted-set =     collection;
+    self.offset =         0;
+    self.direction =      direction;
     self.iterator-state = ss.iterator-state;
     return self;
   }

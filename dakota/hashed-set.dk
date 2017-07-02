@@ -198,7 +198,6 @@ klass hashed-set-iterator {
     object-t hashed-set;
     object-t vector-iter; // set one time per instantiation
     object-t deque-iter;  // set many times per instantiation
-
     ssize-t  iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
@@ -212,10 +211,10 @@ klass hashed-set-iterator {
     self = $init(super);
     assert(collection != null);
     const hashed-set::slots-t& hs = hashed-set::unbox(collection);
-    self.hashed-set = collection;
-    self.vector-iter = $iterator(hs.buckets);
+    self.hashed-set =     collection;
+    self.vector-iter =    $iterator(hs.buckets);
+    self.deque-iter =     nullptr;
     self.iterator-state = hs.iterator-state;
-    self.deque-iter = nullptr;
     object-t deque = $next(self.vector-iter);
     if (deque != nullptr) {
       assert($size(deque) != 0);
