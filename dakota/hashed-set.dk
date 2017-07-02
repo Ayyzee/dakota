@@ -166,8 +166,8 @@ klass hashed-set {
     return self.size;
   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iterator = $make(hashed-set-iterator::klass(), #hashed-set: self);
-    return iterator;
+    object-t iter = $make(hashed-set-iterator::klass(), #collection: self);
+    return iter;
   }
   method dump(object-t self) -> object-t {
     $dump(super);
@@ -208,11 +208,11 @@ klass hashed-set-iterator {
       throw $make(exception::klass(), #msg: "oops");
     return;
   }
-  method init(object-t self, object-t hashed-set:) -> object-t {
+  method init(object-t self, object-t collection:) -> object-t {
     self = $init(super);
-    assert(hashed-set != null);
-    const hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);
-    self.hashed-set = hashed-set;
+    assert(collection != null);
+    const hashed-set::slots-t& hs = hashed-set::unbox(collection);
+    self.hashed-set = collection;
     self.vector-iter = $iterator(hs.buckets);
     self.iterator-state = hs.iterator-state;
     self.deque-iter = nullptr;

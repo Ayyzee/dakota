@@ -329,8 +329,8 @@ klass deque {
 //     return self;
 //   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iterator = $make(deque-iterator::klass(), #deque: self);
-    return iterator;
+    object-t iter = $make(deque-iterator::klass(), #collection: self);
+    return iter;
   }
   // method write-item(object-t self, object-t out, str-t name) -> object-t {
   //   if (out == null)
@@ -368,12 +368,12 @@ klass deque-iterator {
       throw $make(exception::klass(), #msg: "oops");
     return;
   }
-  method init(object-t self, object-t deque:) -> object-t {
+  method init(object-t self, object-t collection:) -> object-t {
     self = $init(super);
-    assert(klass-of(deque) == deque::_klass_ || $instance-of?(deque, deque::_klass_));
-    const deque::slots-t& d = deque::unbox(deque);
+    assert(klass-of(collection) == deque::_klass_ || $instance-of?(collection, deque::_klass_));
+    const deque::slots-t& d = deque::unbox(collection);
 
-    self.deque =          deque;
+    self.deque =          collection;
     self.node =           d.first;
     self.iterator-state = d.iterator-state;
     return self;
