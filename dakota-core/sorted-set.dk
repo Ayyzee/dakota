@@ -154,11 +154,11 @@ klass sorted-set {
     return self.ssc->count;
   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iter = $make(sorted-set-iterator::klass(), #collection: self, #direction: #forward);
+    object-t iter = $make(sorted-set-iterator::klass(), #collection: self, #backward?: false);
     return iter;
   }
   method backward-iterator(object-t self) -> object-t {
-    object-t iter = $make(sorted-set-iterator::klass(), #collection: self, #direction: #backward);
+    object-t iter = $make(sorted-set-iterator::klass(), #collection: self, #backward?: true);
     return iter;
   }
   method dump(object-t self) -> object-t {
@@ -189,16 +189,16 @@ klass sorted-set-iterator {
   slots {
     object-t sorted-set;
     ssize-t  offset;
-    symbol-t direction;
+    bool-t   backward?;
     ssize-t  iterator-state;
   }
-  method init(object-t self, object-t collection:, symbol-t direction: #forward) -> object-t {
+  method init(object-t self, object-t collection:, bool-t backward?: false) -> object-t {
     self = $init(super);
     assert(klass-of(collection) == sorted-set::_klass_ || $instance-of?(collection, sorted-set::_klass_));
     const sorted-set::slots-t& ss = sorted-set::unbox(collection);
     self.sorted-set =     collection;
     self.offset =         0;
-    self.direction =      direction;
+    self.backward? =      backward?;
     self.iterator-state = ss.iterator-state;
     return self;
   }
@@ -231,7 +231,7 @@ klass sorted-set-iterator {
     object-t item = nullptr;
     if ($next?(self)) {
       const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-      if (self.direction == #backward)
+      if (self.backward?)
         item = *(cast(object-t*)sorted-set-core::at(ss.ssc, ss.ssc->count - self.offset - 1));
       else
         item = *(cast(object-t*)sorted-set-core::at(ss.ssc, self.offset));
