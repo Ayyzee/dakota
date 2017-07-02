@@ -147,7 +147,7 @@ func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t*
   while ((key = va-arg(args, symbol-t)) != nullptr) {
     item = va-arg(args, intptr-t);
     if (props-capacity == count + 1) {
-      props-capacity *= 2;
+      props-capacity *= 2; // resize-factor should be consumer settable
       props = cast(property-t*)dkt::alloc(ssizeof(property-t) * props-capacity, props);
     }
     props[count].key =     key;

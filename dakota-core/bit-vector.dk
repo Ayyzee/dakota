@@ -69,7 +69,6 @@ klass bit-vector {
   //ssize-t   size; // 1 bit
   }
   static const ssize-t gbl-item-width = ssizeof(slots-t::items[0]) * 8;
-  static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const ssize-t gbl-default-initial-capacity = 6 * gbl-item-width; // shall never be 0
 
   method init(object-t self, ssize-t initial-capacity: gbl-default-initial-capacity) -> object-t {

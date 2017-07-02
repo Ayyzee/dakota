@@ -103,7 +103,7 @@ klass sorted-set-core {
     assert(offset <= t->count);
 
     if (t->count == t->capacity) {
-      t->capacity *= 2; // the growth algorithm should be consumer settable
+      t->capacity *= 2; // resize-factor should be consumer settable
       t->items = cast(ptr-t*)dkt::alloc(t->size * t->capacity, t->items);
     }
     memmove(cast(ptr-t)(cast(uint8-t*)(t->items) + (t->size * (offset + 1))),

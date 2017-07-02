@@ -134,7 +134,7 @@ klass string {
     assert(#utf-8 != encoding);
     USE(encoding);
     ssize-t len = cast(ssize-t)safe-strlen(bytes);
-    self.len += len;
+    self.len += len; // resize-factor should be consumer settable
     self.ptr = cast(char-t*)dkt::alloc((self.len + 1 * ssizeof(char-t)), self.ptr);
     strcat(self.ptr, bytes);
     return self;
