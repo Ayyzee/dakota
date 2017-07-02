@@ -329,7 +329,11 @@ klass deque {
 //     return self;
 //   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iter = $make(deque-iterator::klass(), #collection: self);
+    object-t iter = $make(deque-iterator::klass(), #collection: self, #backward?: false);
+    return iter;
+  }
+  method backward-iterator(object-t self) -> object-t {
+    object-t iter = $make(deque-iterator::klass(), #collection: self, #backward?: true);
     return iter;
   }
   // method write-item(object-t self, object-t out, str-t name) -> object-t {
@@ -359,6 +363,7 @@ klass deque-iterator {
   slots {
     object-t             deque; // needed for iterator-state
     deque-node::slots-t* node;
+    bool-t               backward?;
     ssize-t              iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
@@ -368,14 +373,18 @@ klass deque-iterator {
       throw $make(exception::klass(), #msg: "oops");
     return;
   }
-  method init(object-t self, object-t collection:) -> object-t {
+  method init(object-t self, object-t collection:, bool-t backward?: false) -> object-t {
     self = $init(super);
     assert(klass-of(collection) == deque::_klass_ || $instance-of?(collection, deque::_klass_));
     const deque::slots-t& d = deque::unbox(collection);
 
     self.deque =          collection;
-    self.node =           d.first;
     self.iterator-state = d.iterator-state;
+    self.backward? =      backward?;
+    if (self.backward?)
+      self.node =         d.last;
+    else
+      self.node =         d.first;
     return self;
   }
   method remove(object-t self) -> object-t {
@@ -416,7 +425,10 @@ klass deque-iterator {
     object-t item = nullptr;
     if ($next?(self)) {
       item = $item(self);
-      self.node = self.node->next;
+      if (self.backward?)
+        self.node = self.node->prev;
+      else
+        self.node = self.node->next;
     }
     // printf("%s:%s(%p) = %p\n",
     //      "deque-iterator", __func__, (ptr-t)self, (ptr-t)item);
