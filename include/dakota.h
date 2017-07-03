@@ -44,7 +44,7 @@
 
 # define typealias using
 
-# define cast(t) (t)
+# define cast(...) (__VA_ARGS__)
 
 // gcc has bug in code generation so the assembler omit the quotes
 # if defined __clang__

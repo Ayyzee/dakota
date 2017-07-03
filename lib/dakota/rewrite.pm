@@ -1096,7 +1096,6 @@ sub convert_dk_to_cc {
   $$filestr_ref =~ s|\$(make[^\w-])|$1|g; #hackhack
   &rewrite_declarations($filestr_ref);
 
-  $$filestr_ref =~ s/cast\(/\(/gs;
   $$filestr_ref =~ s/else[_-]if/else if/gs;
 
   $$filestr_ref =~ s/,(\s*\})/$1/gs; # remove harmless trailing comma
