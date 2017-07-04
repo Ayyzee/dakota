@@ -312,8 +312,12 @@ klass vector {
     assert(self.count != 0);
     return self.items[self.count - 1];
   }
+  method iterator-klass(object-t self) -> object-t {
+    USE(self);
+    return vector-iterator::klass();
+  }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iter = $make(vector-iterator::klass(), #collection: self);
+    object-t iter = $make($iterator-klass(self), #collection: self);
     return iter;
   }
   method write-slots(object-t self, object-t out) -> object-t {
@@ -349,7 +353,7 @@ klass vector {
   }
 }
 klass vector-iterator {
-  trait iterator;
+  superklass iterator;
 
   slots {
     object-t vector;

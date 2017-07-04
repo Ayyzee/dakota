@@ -22,7 +22,7 @@ module dakota-core;
 klass iterator-func {
   slots std::function<object-t ()>;
 }
-trait iterator {
+klass iterator {
   method next(object-t self) -> object-t;
   method next?(object-t self) -> bool-t;
   method item(object-t self) -> object-t;

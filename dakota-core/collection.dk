@@ -35,8 +35,6 @@ klass std-compare;
 klass collection {
   superklass object;
 
-  trait iterator;
-
   method write-lite(object-t self, object-t out) -> object-t {
     USE(out);
     return self;

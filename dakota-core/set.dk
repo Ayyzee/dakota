@@ -21,7 +21,7 @@ klass exception;
 klass collection;
 klass klass;
 
-trait iterator;
+klass iterator;
 
 trait set {
   require collection;

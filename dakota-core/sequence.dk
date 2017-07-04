@@ -19,7 +19,7 @@ include-for <functional> std::function;
 module dakota-core;
 
 klass vector;
-trait iterator;
+klass iterator;
 
 func map(object-t seq, std::function<object-t (object-t)> f) -> object-t {
   object-t result = $make(klass-of(seq));

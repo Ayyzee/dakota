@@ -165,8 +165,12 @@ klass hashed-set {
   method size(object-t self) -> ssize-t {
     return self.size;
   }
+  method iterator-klass(object-t self) -> object-t {
+    USE(self);
+    return hashed-set-iterator::klass();
+  }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iter = $make(hashed-set-iterator::klass(), #collection: self);
+    object-t iter = $make($iterator-klass(self), #collection: self);
     return iter;
   }
   method dump(object-t self) -> object-t {
@@ -192,7 +196,7 @@ klass hashed-set {
   }
 }
 klass hashed-set-iterator {
-  trait iterator;
+  superklass iterator;
 
   slots {
     object-t hashed-set;
