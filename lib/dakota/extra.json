@@ -47,6 +47,7 @@
     "hash"=> undef,
     "initialize-func"=> undef,
     "input-stream"=> undef, # std-input
+    "iterator" => undef,
     "iterator-func"=> undef,
     "keyword"=> undef,
     "klass"=> undef,
