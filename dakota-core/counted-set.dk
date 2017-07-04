@@ -45,3 +45,11 @@ trait counted-set {
     return current-last;
   }
 }
+trait counted-set-iterator {
+  method next(object-t self) -> object-t {
+    object-t result = $next(super);
+    if (result != nullptr)
+      result = $first(result); // first is item, last is count
+    return result;
+  }
+}

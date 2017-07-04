@@ -40,6 +40,7 @@ export dakota-core {
   const-info::slots-t;
   const-info;
   counted-set;
+  counted-set-iterator;
   deque;
   each-box-func::slots-t;
   each-box-func;

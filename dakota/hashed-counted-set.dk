@@ -19,4 +19,13 @@ module dakota;
 klass hashed-counted-set {
   superklass hashed-set;
   trait      counted-set;
+
+  method iterator-klass(object-t self) -> object-t {
+    USE(self);
+    return hashed-counted-set-iterator::klass();
+  }
+}
+klass hashed-counted-set-iterator {
+  superklass hashed-set-iterator; // wishwish: superklass $iterator-klass($superklass(hashed-counted-set::klass()));
+  trait      counted-set-iterator;
 }
