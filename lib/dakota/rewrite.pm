@@ -683,6 +683,15 @@ sub rewrite_for_in_replacement {
     } else {
       $first_stmt .= "$ws1\{$ws2$type $item = mutable-unbox(_item_); $stmt$ws3";
     }
+  } elsif ('auto' eq $type && $item =~ /^\[/) {
+    $result .= " object-t _item_ = _f();";
+    $result .= " /**/)";
+
+    if (!$open_brace) { # $ws2 will be undefined
+      $first_stmt .= "$ws1\{ $type $item = \$both(_item_); $stmt \}$ws3";
+    } else {
+      $first_stmt .= "$ws1\{ $type $item = \$both(_item_);$ws2$stmt$ws3";
+    }
   } elsif ($type =~ m|($tid)|) {
     my $klass_name = $1;
     $result .= " object-t _item_ = _f();";
@@ -704,6 +713,7 @@ sub rewrite_for_in {
   my ($filestr_ref) = @_;
   # for ( object-t xx : yy )
   # for ( pair-t& xx : yy )
+  $$filestr_ref =~ s=(?:for|loop)\s*(forward|backward)?\s*\(\s*(auto)\s*(\[.+?\])\s*in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_in_replacement($1, $2, $3, $4, $5, $6, $7, $8, $9)=gse;
   $$filestr_ref =~ s=(?:for|loop)\s*(forward|backward)?\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_in_replacement($1, $2, $4, $5, $6, $7, $8, $9, $10)=gse;
 }
 sub rewrite_slot_access {

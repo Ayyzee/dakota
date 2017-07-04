@@ -10,6 +10,7 @@
     "alloc"=> undef,
     "backward-iterator"=> undef,
     "backward-iterator-func"=> undef,
+    "both"=> undef,
     "dealloc"=> undef,
     "forward-iterator"=> undef,
     "forward-iterator-func"=> undef,
@@ -56,6 +57,7 @@
     "no-such-keyword-exception"=> undef, # kw-args processing funcs (throw)
     "object"=> undef,
     "output-stream"=> undef, # std-output, std-error
+    "pair"=> undef,
     "ptr"=> undef,
     "property"=> undef,
     "selector"=> undef,

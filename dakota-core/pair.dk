@@ -79,6 +79,9 @@ klass pair {
     hash-t result = $hash(first);
     return result;
   }
+  method both(object-t self) -> [object-t, object-t] {
+    return [self.first, self.last];
+  }
   method first(const slots-t* s) -> object-t {
     object-t result = s->first;
     return result;
