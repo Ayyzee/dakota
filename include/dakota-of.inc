@@ -60,7 +60,7 @@ inline FUNC name_of(object_t kls) -> symbol_t {
   return klass::unbox(kls).name;
 }
 inline FUNC klass_for_name(symbol_t name, object_t kls) -> object_t {
-  assert(name != nullptr);
+  assert(name != nullptr && name[0] != NUL);
   return kls ? kls : dk_klass_for_name(name);
 }
 FUNC $has_traitQ(object_t, symbol_t) -> bool_t;
