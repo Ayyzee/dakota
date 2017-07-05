@@ -1656,16 +1656,16 @@ sub generate_generic_func_defn {
     $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)));" . ' // one time initialization' . $nl;
     $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature);" . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = context);" . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = context.klass);" . $nl;
     } else {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = {nullptr, nullptr});" . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = nullptr);" . $nl;
     }
     $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $opt_name_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
     $return_type_str = &make_tuple_type($return_type_str);
     $$scratch_str_ref .= $col . $return_type_str . ' result = _func_(' . $list_names_str . ');' . $nl;
     $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = nullptr);" . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = {nullptr, nullptr});" . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = nullptr);" . $nl;
     }
     $$scratch_str_ref .= $col . 'return result;' . $nl;
     $col = &colout($col);

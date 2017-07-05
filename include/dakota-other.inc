@@ -231,7 +231,7 @@ inline FUNC uintstr(char_t c1, char_t c2, char_t c3, char_t c4,
 [[so_export]] extern object_t std_error;  // read-only?
 
 [[so_export]] extern thread_local const signature_t* dkt_current_signature;
-[[so_export]] extern thread_local super_t            dkt_current_context;
+[[so_export]] extern thread_local object_t           dkt_current_context_klass;
 
 # if    INT_MAX == INT32_MAX
   typealias  int_t =  int32_t; //  int :: =>  int32 :: / klass  int => klass  int32

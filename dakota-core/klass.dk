@@ -68,12 +68,17 @@ klass std-compare;
 klass symbol;
 klass vector;
 
-thread-local super-t            dkt-current-context =   {nullptr, nullptr};
-thread-local const signature-t* dkt-current-signature = nullptr;
+thread-local object-t           dkt-current-context-klass = nullptr;
+thread-local const signature-t* dkt-current-signature =     nullptr;
 
-[[so-export]] func dkt-null-method(object-t o) -> object_t {
-  throw $make(no-such-method-exception::klass(), #object: o, #context: &dkt-current-context, #signature: dkt-current-signature);
-  return o; // should never be reached, but code fails user -fsanitize=address when return type is 'void'
+[[so-export]] func dkt-null-method(object-t obj) -> object_t {
+  object-t           kls = dkt-current-context-klass; // DO NOT REMOVE!!
+  const signature-t* sig = dkt-current-signature;     // DO NOT REMOVE!!
+  throw $make(no-such-method-exception::klass(),
+              #object:    obj,
+              #klass:     kls,
+              #signature: sig);
+  return obj; // should never be reached, but code fails user -fsanitize=address when return type is 'void'
 }
 klass selector-pair-compare {
   slots (*)(const selector-pair-t*, const selector-pair-t*) -> cmp-t;
