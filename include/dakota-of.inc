@@ -19,9 +19,9 @@
 # include <dakota.h>
 
 # if !defined DKT_UNBOX_CHECK_ENABLED || 0 == DKT_UNBOX_CHECK_ENABLED
-  # define DKT_UNBOX_CHECK(object, kls)
+  # define DKT_UNBOX_CHECK(obj, kls)
 # else
-  # define DKT_UNBOX_CHECK(object, kls) dkt_unbox_check(object, kls)
+  # define DKT_UNBOX_CHECK(obj, kls) dkt_unbox_check(obj, kls)
 # endif
 
 # define THROW throw
@@ -47,9 +47,9 @@ KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t obj) -> const slots_
   const slots_t& s = *cast(slots_t*)(cast(intptr_t)obj + cast(intptr_t)sizeof(object::slots_t));
   return s;
 }}
-inline FUNC klass_of(object_t object) -> object_t {
-  assert(object != nullptr);
-  return object->klass;
+inline FUNC klass_of(object_t obj) -> object_t {
+  assert(obj != nullptr);
+  return obj->klass;
 }
 inline FUNC superklass_of(object_t kls) -> object_t {
   assert(kls != nullptr);
