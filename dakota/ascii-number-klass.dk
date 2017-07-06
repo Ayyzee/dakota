@@ -22,8 +22,6 @@ module dakota;
 klass ascii-number;
 klass named-info;
 
-static object-t gbl-base2-ascii-number-kls-info;
-
 klass ascii-number-klass {
   superklass klass;
 
@@ -31,9 +29,9 @@ klass ascii-number-klass {
     str-t digits;
   }
   method init(object-t self,
-                       object-t       info:   gbl-base2-ascii-number-kls-info,
-                       str-t digits: "01") -> object-t {
-    self = $init(super, #info: info);
+              symbol-t name:    #base2-ascii-number-klass,
+              str-t    digits: "01") -> object-t {
+    self = $init(super, #name: name);
     assert(digits != nullptr);
     self.digits = digits;
     // should confirm the digits are unique
@@ -44,12 +42,10 @@ klass ascii-number-klass {
     return digits;
   }
   klass func initialize(object-t) -> void {
-    gbl-base2-ascii-number-kls-info = dk-make-named-info(#base2-ascii-number-klass,
-                                                         #superklass-name, cast(intptr-t)#ascii-number,
-                                                         nullptr);
-    return;
-  }
-  klass func finalize(object-t) -> void {
+    named-info-t* info = dk-make-named-info(#base2-ascii-number-klass,
+                                            #superklass-name, cast(intptr-t)#ascii-number,
+                                            nullptr);
+    dk-register-klass(info);
     return;
   }
 }

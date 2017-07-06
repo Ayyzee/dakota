@@ -58,7 +58,7 @@ KLASS_NS object {
   METHOD instanceQ(object_t, object_t) -> bool_t; // instance?()
 }
 KLASS_NS klass {
-  METHOD init(object_t, named_info_t*) -> object_t;
+  METHOD core_init(object_t, symbol_t) -> object_t;
   METHOD subklassQ(object_t, object_t) -> bool_t; // subklass?()
 }
 KLASS_NS bit_vector {

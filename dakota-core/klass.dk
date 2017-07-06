@@ -721,10 +721,10 @@ klass klass {
     return;
   }
   // called from init-klass() from dk-init-runtime()
-  /*LOCAL*/ func init(object-t self, named-info-t* info) -> object-t {
-    assert(info != nullptr);
-    named-info::sort(info);
-    self.info = info;
+  func core-init(object-t self, symbol-t name) -> object-t {
+    assert(name != nullptr && name[0] != NUL);
+    self.info = info-for-name(name);
+    named-info::sort(self.info);
     self.name = name-from-info(self.info);
 //     printf("init(): kls-name: %s\n", self.name);
     assert(name-of(self) != nullptr);
@@ -775,23 +775,14 @@ klass klass {
     klass-initialize(self);
     dump-random(self);
     return self;
-  } // init(object-t self, named-info-t*)
-  method init(object-t      self,
-              named-info-t* info-slots: nullptr,
-              object-t      info:       nullptr) -> object-t {
+  } // core-init(object-t, symbol-t)
+  method init(object-t self, symbol-t name:) -> object-t {
     self = $init(super);
-    assert(!(info-slots == nullptr &&
-             info == nullptr));
-    named-info-t* tmp-info-slots;
-    if (info == nullptr)
-      tmp-info-slots = info-slots;
-    else
-      tmp-info-slots = &named-info::mutable-unbox(info);
-    object-t result = init(self, tmp-info-slots);
+    self = core-init(self, name);
 # if defined DEBUG
     echo-stuff(cast(object::slots-t*)self, "init", name-of(klass-of(self)), name-of(self));
 # endif
-    return result;
+    return self;
   }
   method subklass?(object-t self, object-t kls) -> bool-t {
     bool-t result = false;

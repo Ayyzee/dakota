@@ -293,9 +293,8 @@ static func alloc-klass(symbol-t name) -> object-t {
   return kls;
 }
 static func init-klass(object-t kls, symbol-t name) -> object-t {
-    named-info-t* info = info-for-name(name);
-    kls = klass::init(kls, info);
-    return kls;
+  kls = klass::core-init(kls, name); // calling to what $init() would resolve, but not doing super dispatch
+  return kls;
 }
 KLASS-NS ostream { [[format-va-printf(2)]] static func print-format(slots-t, str-t, va-list-t) -> slots-t; }
 klass ostream {
@@ -771,7 +770,7 @@ func dk-init-runtime() -> void {
     klass::mutable-unbox(object::_klass_).superklass = nullptr;
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
-    null = $make(null-klass);
+    null = $make(null-klass); // first generic function executed
     klass::mutable-unbox(object::_klass_).superklass = null;
     null.has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
 
@@ -1678,7 +1677,7 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   if (kls-klass != klass::_klass_ && !klass::subklass?(kls-klass, klass::_klass_)) // hardhard
     throw $make(illegal-klass-exception::klass());
 
-  kls = $make(kls-klass, #info-slots: info-slots);
+  kls = $make(kls-klass, #name: name);
   return kls;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {

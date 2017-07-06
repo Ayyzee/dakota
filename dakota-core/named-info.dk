@@ -130,7 +130,7 @@ klass named-info {
     return result;
   }
 }
-func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
+func dk-va-make-named-info(symbol-t name, va-list-t args) -> named-info-t* {
 //   assert(name != nullptr);
   symbol-t key;
   intptr-t item;
@@ -162,24 +162,12 @@ func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t*
   sort(info);
   return info;
 }
-func dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
-  named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
-  object-t info = box(info-slots);
-  return info;
-}
-[[sentinel]] func dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
+[[sentinel]] func dk-make-named-info(symbol-t name, ...) -> named-info-t* {
   va-list-t args;
   va-start(args, name);
-  named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
+  named-info-t* info-slots = dk-va-make-named-info(name, args);
   va-end(args);
   return info-slots;
-}
-[[sentinel]] func dk-make-named-info(symbol-t name, ...) -> object-t {
-  va-list-t args;
-  va-start(args, name);
-  object-t info = dk-va-make-named-info(name, args);
-  va-end(args);
-  return info;
 }
 func dkt-dump-named-info(const named-info-t* info) -> const named-info-t* {
   return named-info::dump(info);
