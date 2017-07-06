@@ -100,6 +100,8 @@ klass deque-node {
 klass deque {
   superklass sequence;
   trait      stack;
+  trait      forward-iterating;
+  trait      backward-iterating;
 
   slots {
     deque-node::slots-t* first; // if (first != nullptr)  first->prev = nullptr;
@@ -331,14 +333,6 @@ klass deque {
   method iterator-klass(object-t self) -> object-t {
     USE(self);
     return deque-iterator::klass();
-  }
-  [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iter = $make($iterator-klass(self), #collection: self);
-    return iter;
-  }
-  method backward-iterator(object-t self) -> object-t {
-    object-t iter = $make($iterator-klass(self), #collection: self, #backward?: true);
-    return iter;
   }
   // method write-item(object-t self, object-t out, str-t name) -> object-t {
   //   if (out == null)

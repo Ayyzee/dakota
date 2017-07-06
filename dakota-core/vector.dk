@@ -67,6 +67,7 @@ klass vector {
   superklass sequence;
   klass      vector-klass;
   trait      stack;
+  trait      forward-iterating;
 
   slots {
     object-t* items;
@@ -315,10 +316,6 @@ klass vector {
   method iterator-klass(object-t self) -> object-t {
     USE(self);
     return vector-iterator::klass();
-  }
-  [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
-    object-t iter = $make($iterator-klass(self), #collection: self);
-    return iter;
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
