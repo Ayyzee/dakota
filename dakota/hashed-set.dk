@@ -136,7 +136,7 @@ klass hashed-set {
     object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque != nullptr) {
-      for (object-t iterator = $iterator(deque);
+      for (object-t iterator = $forward-iterator(deque);
            object-t e = $next(iterator); /**/) {
         //printf("item: %s\n", $name(item));
         //printf("e: %s\n", $name(e));
@@ -213,13 +213,13 @@ klass hashed-set-iterator {
     assert(collection != null);
     const hashed-set::slots-t& hs = hashed-set::unbox(collection);
     self.hashed-set =     collection;
-    self.vector-iter =    $iterator(hs.buckets);
+    self.vector-iter =    $forward-iterator(hs.buckets);
     self.deque-iter =     nullptr;
     self.iterator-state = hs.iterator-state;
     object-t deque = $next(self.vector-iter);
     if (deque != nullptr) {
       assert($size(deque) != 0);
-      self.deque-iter = $iterator(deque);
+      self.deque-iter = $forward-iterator(deque);
     }
     return self;
   }
@@ -235,7 +235,7 @@ klass hashed-set-iterator {
     object-t deque-iter = nullptr;
     if (deque != nullptr) {
       assert($size(deque) != 0);
-      deque-iter = $iterator(deque);
+      deque-iter = $forward-iterator(deque);
     }
     return deque-iter;
   }

@@ -210,7 +210,7 @@ klass vector {
     return item;
   }
   method replace-all(object-t self, object-t object1, object-t object2) -> object-t {
-    for (object-t iterator = $iterator(self);
+    for (object-t iterator = $forward-iterator(self);
          $next?(iterator);
          $next(iterator)) {
       if ($equals?($item(iterator), object1))
