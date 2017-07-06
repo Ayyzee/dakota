@@ -186,7 +186,7 @@ klass x::stat {
   slots struct stat;
 }
 // this is quick and dirty!!!!!!!!!!!!!!!!
-[[unused]] static func init-imported-klasses() -> void {
+static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[]", __func__);
   symbol-t imported-kls-name;
   while ((imported-kls-name = cast(symbol-t)sorted-set-core::remove-last(gbl-imported-klasses-file-table)) != nullptr)
@@ -496,26 +496,13 @@ static named-info-t* gbl-registration-info-list;
 // }
 func dk-make-simple-klass(symbol-t name, symbol-t superkls-name, symbol-t kls-name) -> object-t {
   //fprintf(stderr, "%s(#%s, #%s, #%s)\n", __func__, name, superkls-name, kls-name);
-  assert(name != nullptr);
-  ssize-t num-kls-props = 1;
-  if (superkls-name != nullptr)
-    num-kls-props++;
-  if (kls-name != nullptr)
-    num-kls-props++;
-
-  property-t*   kls-props = cast(property-t*)  dkt::alloc(ssizeof(property-t) * num-kls-props);
-  named-info-t* kls-info =  cast(named-info-t*)dkt::alloc(ssizeof(named-info-t));
-
-  // need to be sorted
-  uint-t i = 0;
-  if (kls-name != nullptr)
-    kls-props[i++] = { .key = #klass-name,      .item = cast(intptr-t)kls-name     };
-  kls-props[i++] =   { .key = #name,            .item = cast(intptr-t)name         };
-  if (superkls-name != nullptr)
-    kls-props[i++] = { .key = #superklass-name, .item = cast(intptr-t)superkls-name};
-
-  *kls-info = { .next = nullptr, .count = num-kls-props, .items = kls-props};
-  object-t kls = dk-register-klass(kls-info);
+  assert(name          != nullptr);
+  assert(superkls-name != nullptr);
+  assert(kls-name      != nullptr);
+  object-t kls = dk-klass-for-name(dk-register-klass(dk-make-named-info(name,
+                                                                        #superklass-name, superkls-name,
+                                                                        #klass-name,      kls-name,
+                                                                        nullptr)));
   return kls;
 }
 klass each-box-func   { slots (*)(...) -> object-t; }
@@ -641,7 +628,7 @@ static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void
   }
   return;
 }
-func dk-register-klass(named-info-t* kls-info) -> object-t {
+func dk-register-klass(named-info-t* kls-info) -> symbol-t {
   //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(kls-info, #name));
   named-info::sort(kls-info);
   symbol-t name = name-from-info(kls-info);
@@ -665,12 +652,9 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
     found-kls-info->next = kls-info;
     kls-info->next = prev;
   }
-  object-t kls = nullptr;
-  if (object::_klass_)  // this is a late (post dk-init-runtime()) registration
-    kls = dk-klass-for-name(name);
-  return kls;
+  return name;
 }
-static func export-klasses(named-info-t* kls-info) -> void {
+static func register-klasses(named-info-t* kls-info) -> void {
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\"]", __func__, cast(ptr-t)(kls-info));
   ssize-t i = 0;
 
@@ -734,7 +718,7 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
   if (ri.imported-klass-ptrs != nullptr)
     import-klasses(ri.imported-klass-names, ri.imported-klass-ptrs);
   if (ri.klass-defns != nullptr)
-    export-klasses(ri.klass-defns);
+    register-klasses(ri.klass-defns);
   if (ri.interposers != nullptr)
     add-interposers(ri.interposers);
 
@@ -844,7 +828,8 @@ func dk-init-runtime() -> void {
     $dump(null);
 # endif
   }
-  //init-imported-klasses();
+  if (getenv-int("DK_INIT_ALL_KLASSES"))
+    init-imported-klasses();
   return;
 }
 /*LOCAL*/ func imported-klasses-for-klass(symbol-t kls-name) -> assoc-node-t* {
@@ -1647,7 +1632,7 @@ static func klass-for-name-simple(symbol-t name) -> object-t {
     kls = *cast(object-t*)(kls-assoc->item);
   return kls; // may be nullptr
 }
-static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
+static func klass-for-name-recursive(symbol-t name, ssize-t column = 0) -> object-t {
   // for (ssize-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\"]", __func__, name);
   assert-valid-str(name);
@@ -1663,13 +1648,13 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   symbol-t superkls-name;
   if ((superkls-name = superklass-name-from-info(info-slots)) != nullptr)
     if (klass-for-name-simple(superkls-name) == nullptr)
-      klass-for-name(superkls-name, column + 1); // recursive
+      klass-for-name-recursive(superkls-name, column + 1); // recursive
 
   symbol-t kls-name;
   object-t kls-klass;
   if ((kls-name = klass-name-from-info(info-slots)) != nullptr) {
     if ((kls-klass = klass-for-name-simple(kls-name)) == nullptr)
-      kls-klass = klass-for-name(kls-name, column + 1); // recursive
+      kls-klass = klass-for-name-recursive(kls-name, column + 1); // recursive
   }
   else
     kls-klass = klass::_klass_;
@@ -1682,7 +1667,7 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
 }
 func dk-klass-for-name(symbol-t name) -> object-t {
   ssize-t column;
-  object-t kls = klass-for-name(name, column = 0);
+  object-t kls = klass-for-name-recursive(name, column = 0);
   return kls;
 }
 /*LOCAL*/ func info-for-name(symbol-t kls-name) -> named-info-t* {

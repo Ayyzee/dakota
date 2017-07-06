@@ -270,7 +270,7 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 // [[so_export]]           FUNC dk-va-add-all(object-t self, va-list-t args) -> object-t;
 // [[so_export, sentinel]] FUNC dk-add-all(object-t self, ...)               -> object-t;
 
-[[so_export]] FUNC dk_register_klass(named_info_t*) -> object_t;
+[[so_export]] FUNC dk_register_klass(named_info_t*) -> symbol_t;
 [[so_export]] FUNC dk_init_runtime() -> void;
 [[so_export]] FUNC dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name) -> object_t;
 

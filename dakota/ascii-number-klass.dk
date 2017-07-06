@@ -42,10 +42,9 @@ klass ascii-number-klass {
     return digits;
   }
   klass func initialize(object-t) -> void {
-    named-info-t* info = dk-make-named-info(#base2-ascii-number-klass,
-                                            #superklass-name, cast(intptr-t)#ascii-number,
-                                            nullptr);
-    dk-register-klass(info);
+    dk-register-klass(dk-make-named-info(#base2-ascii-number-klass,
+                                         #superklass-name, cast(intptr-t)#ascii-number,
+                                         nullptr));
     return;
   }
 }
