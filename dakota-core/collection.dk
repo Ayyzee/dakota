@@ -16,7 +16,7 @@
 
 module dakota-core;
 
-klass iterator-func;
+klass iterator-next-lambda;
 klass std-compare;
 
 // func dk-va-add-all(object-t self, va-list-t args) -> object-t {
@@ -86,15 +86,15 @@ klass collection {
     bool-t result = ($size(self) == 0);
     return result;
   }
-  [[alias(iterator-func)]] method forward-iterator-func(object-t self) -> iterator-func-t {
+  [[alias(iterator-next-lambda)]] method forward-iterator-next-lambda(object-t self) -> iterator-next-lambda-t {
     object-t iter = $forward-iterator(self);
     method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
-    return cast(iterator-func-t)[next, iter](){ return next(iter); };
+    return cast(iterator-next-lambda-t)[next, iter](){ return next(iter); };
   }
-  method backward-iterator-func(object-t self) -> iterator-func-t {
+  method backward-iterator-next-lambda(object-t self) -> iterator-next-lambda-t {
     object-t iter = $backward-iterator(self);
     method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
-    return cast(iterator-func-t)[next, iter](){ return next(iter); };
+    return cast(iterator-next-lambda-t)[next, iter](){ return next(iter); };
   }
   // method iterator(object-t self) -> object-t;
   // method forward-iterator(object-t self) -> object-t;

@@ -18,8 +18,8 @@ include-for <functional> std::function;
 
 module dakota-core;
 
-// returned by $iterator-func(), $forward-iterator-func(), $backward-iterator-func()
-klass iterator-func {
+// returned by $iterator-next-lambda(), $forward-iterator-next-lambda(), $backward-iterator-next-lambda()
+klass iterator-next-lambda {
   slots std::function<object-t ()>;
 }
 klass iterator {
@@ -32,16 +32,16 @@ klass iterator {
 
 // for|loop [forward] ([object-t] i in s)
 // =>
-// for (iterator-func-t _f = $forward-iterator-func(s); object-t i = _f(); /**/)
+// for (iterator-next-lambda-t _f = $forward-iterator-next-lambda(s); object-t i = _f(); /**/)
 
 // for|loop backward ([object-t] i in s)
 // =>
-// for (iterator-func-t _f = $backward-iterator-func(s); object-t i = _f(); /**/)
+// for (iterator-next-lambda-t _f = $backward-iterator-next-lambda(s); object-t i = _f(); /**/)
 
 // s.each[-forward] { |[object-t] i| ... }
 // =>
-// for (iterator-func-t _f = $forward-iterator-func(s); object-t i = _f(); /**/) { ... }
+// for (iterator-next-lambda-t _f = $forward-iterator-next-lambda(s); object-t i = _f(); /**/) { ... }
 
 // s.each-backward { |[object-t] i| ... }
 // =>
-// for (iterator-func-t _f = $backward-iterator-func(s); object-t i = _f(); /**/) { ... }
+// for (iterator-next-lambda-t _f = $backward-iterator-next-lambda(s); object-t i = _f(); /**/) { ... }

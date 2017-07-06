@@ -656,15 +656,15 @@ sub rewrite_supers {
 #    $$filestr_ref =~ s/make\(([_a-z0-9:-]+)/\$init(\$alloc($1)/g;
 #}
 my $dir2method_name = {
-  'forward'  => 'forward-iterator-func',
-  'backward' => 'backward-iterator-func',
+  'forward'  => 'forward-iterator-next-lambda',
+  'backward' => 'backward-iterator-next-lambda',
 };
 sub rewrite_for_in_replacement {
   my ($dir, $type, $item, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
   $dir = 'forward' if !$dir;
   my $method_name = $$dir2method_name{$dir};
   my $first_stmt = '';
-  my $result = "for (iterator-func-t _f = \$$method_name($sequence);";
+  my $result = "for (iterator-next-lambda-t _f = \$$method_name($sequence);";
 
   if ('object-t' eq $type) {
     $result .= " object-t $item = _f();";
