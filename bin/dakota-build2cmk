@@ -109,9 +109,13 @@ sub scalar_to_file {
   if (!$original_state) {
     #$refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
   }
-  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-  flock FILE, 2; # LOCK_EX
-  truncate FILE, 0;
+  if ($file) {
+    open(FILE, '>', $file) or die __FILE__, ':', __LINE__, ": ERROR: $file: $!\n";
+    flock FILE, 2; # LOCK_EX
+    truncate FILE, 0;
+  } else {
+    *FILE = *STDOUT;
+  }
   print FILE '# -*- mode: cmake -*-' . $nl;
   foreach my $key (sort keys %$ref) {
     if ('ARRAY' eq ref($$ref{$key})) {
