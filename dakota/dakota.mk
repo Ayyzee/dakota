@@ -56,7 +56,22 @@ installcheck: check install
 goal-clean:
 	$(RM) $(RMFLAGS) $(target)
 
+distclean: clean
+	cd $(rootdir); ./configure-common
+
+precompile:
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
+
+uninstall:
+	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
+
+install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)}
 install-links :=
+
+$(install-dirs):
+	sudo $(MKDIR) $(MKDIRFLAGS) $@
+
+install: all $(install-dirs) $(install.files) $(install-links)
 
 clean: goal-clean | dakota.project
 	$(DAKOTA-BASE) --clean
@@ -65,19 +80,3 @@ clean: goal-clean | dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
 	$(RM) $(RMFLAGS) $(target).ctlg
-
-distclean: clean
-	cd $(rootdir); ./configure-common
-
-install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)}
-
-$(install-dirs):
-	sudo $(MKDIR) $(MKDIRFLAGS) $@
-
-install: all $(install-dirs) $(install.files) $(install-links)
-
-precompile:
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
-
-uninstall:
-	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)

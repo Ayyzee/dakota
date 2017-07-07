@@ -56,7 +56,22 @@ installcheck: check install
 goal-clean:
 	$(RM) $(RMFLAGS) $(target)
 
+distclean: clean
+	cd $(rootdir); ./configure-common
+
+precompile:
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
+
+uninstall:
+	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
+
+install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)}
 install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler $(DESTDIR)$(prefix)/lib/dakota/platform.json
+
+$(install-dirs):
+	sudo $(MKDIR) $(MKDIRFLAGS) $@
+
+install: all $(install-dirs) $(install.files) $(install-links)
 
 clean: goal-clean | dakota.project
 	$(DAKOTA-BASE) --clean
@@ -69,21 +84,5 @@ clean: goal-clean | dakota.project
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name-tbl.inc
 
-distclean: clean
-	cd $(rootdir); ./configure-common
-
-install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)}
-
-$(install-dirs):
-	sudo $(MKDIR) $(MKDIRFLAGS) $@
-
 $(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json
-$(DESTDIR)$(prefix)/lib/dakota/compiler: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)
-
-install: all $(install-dirs) $(install.files) $(install-links)
-
-precompile:
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
-
-uninstall:
-	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
+$(DESTDIR)$(prefix)/lib/dakota/compiler:      $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)
