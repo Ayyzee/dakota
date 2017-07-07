@@ -78,10 +78,7 @@ $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
 
 $(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json
-	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
-
 $(DESTDIR)$(prefix)/lib/dakota/compiler: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)
-	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
 install: all $(install-dirs) $(install.files) $(install-links)
 

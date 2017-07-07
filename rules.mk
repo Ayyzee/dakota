@@ -42,6 +42,12 @@ $(DESTDIR)$(prefix)/lib/dakota/%.json: $(srcdir)/../lib/dakota/%.json
 $(DESTDIR)$(prefix)/lib/dakota/%.pm: $(srcdir)/../lib/dakota/%.pm
 	sudo $(INSTALL_LIB) $< $(@D)
 
+$(DESTDIR)$(prefix)/lib/dakota/%.json: $(DESTDIR)$(prefix)/lib/dakota/%-$(platform).json
+	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
+
+$(DESTDIR)$(prefix)/lib/dakota/%: $(DESTDIR)$(prefix)/lib/dakota/%-$(compiler)
+	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
+
 $(DESTDIR)$(prefix)/lib/%.$(so_ext): $(srcdir)/%.$(so_ext)
 	sudo $(INSTALL_LIB) $< $(@D)
 
