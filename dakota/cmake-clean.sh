@@ -13,3 +13,4 @@ rm -fr CMakeFiles
 rm -f  dakota.cmk
 rm -f  dakota.project
 rm -fr $builddir # created by dakota
+rm -fr build
