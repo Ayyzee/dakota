@@ -2,7 +2,7 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
-export DKT_EXCLUDE_LIBS = 2
+export DKT_EXCLUDE_LIBDAKOTA = 1
 
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
@@ -42,7 +42,7 @@ check-exe: all
 	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
 	rm -f exe
-	DKT_EXCLUDE_LIBS=0 $(DAKOTA) --project exe.project
+	DKT_EXCLUDE_LIBDAKOTA_CORE=0 DKT_EXCLUDE_LIBDAKOTA=0 $(DAKOTA) --project exe.project
 	./exe
 
 check: all
