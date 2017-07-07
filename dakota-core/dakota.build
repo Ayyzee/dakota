@@ -73,7 +73,7 @@
       '$(srcdir)/vector.dk',
     ],
     'lib-dirs' => [ # cmd-line
-      '/usr/local/lib',
+      '$(INSTALL_LIBDIR)',
     ],
     'libs' => [ # cmd-line
       'dso',
@@ -81,7 +81,7 @@
     'include-dirs' => [ # cmd-line
       '$(srcdir)',
       '$(srcdir)/../include',
-      '/usr/local/include',
+      '$(INSTALL_INCLUDEDIR)',
     ],
     'macros' => [ # cmd-line
       #'DK_SRC_UNIQUE_HEADER=0',

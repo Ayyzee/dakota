@@ -5,14 +5,14 @@
       '$(srcdir)/dakota-find-library.$(cc_ext)',
     ],
     'lib-dirs' => [ # cmd-line
-      '/usr/local/lib',
+      '$(INSTALL_LIBDIR)',
     ],
     'libs' => [
       'dso',
     ],
     'include-dirs' => [
       '$(srcdir)/../include',
-      '/usr/local/include',
+      '$(INSTALL_INCLUDEDIR)',
     ],
     'target' => 'dakota-find-library',
     'install' => {
