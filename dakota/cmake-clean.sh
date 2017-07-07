@@ -1,5 +1,4 @@
 #!/bin/bash
-IFS=$'\t\n'
 set -o errexit -o nounset -o pipefail
 
 builddir=dkt
