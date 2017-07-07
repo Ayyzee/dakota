@@ -20,7 +20,7 @@
       '-rules' => [
       ],
       'files' =>   [ # install.files
-        '$(DESTDIR)$(prefix)/bin/dakota-catalog',
+        '$(DESTDIR)$(INSTALL_BINDIR)/dakota-catalog',
       ],
     }
 }

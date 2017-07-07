@@ -52,7 +52,7 @@
       '-rules' => [
       ],
       'files' => [ # install.files
-        '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)',
+        '$(DESTDIR)$(INSTALL_LIBDIR)/libdakota.$(so_ext)',
       ],
     }
 }

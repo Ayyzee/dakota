@@ -8,8 +8,10 @@ trap finish EXIT
 rootdir=..
 source $rootdir/common.sh
 source $rootdir/config.sh
-DEST=
-prefix=/usr/local
+DESTDIR=
+INSTALL_PREFIX=/usr/local
+INSTALL_BINDIR=$INSTALL_PREFIX/bin
+INSTALL_LIBDIR=$INSTALL_PREFIX/lib
 export OBJDIR=/tmp/installcheck
 rm -fr $OBJDIR
 
@@ -18,8 +20,8 @@ rm -f installcheck-o.o installcheck-util-o.o
 cat /dev/null > installcheck-o.dk
 cat /dev/null > installcheck-util-o.dk
 set -o verbose
-$DEST$prefix/bin/dakota --compile installcheck-o.dk
-$DEST$prefix/bin/dakota --compile installcheck-util-o.dk $DEST$prefix/lib/libdakota.$so_ext
+$DESTDIR$INSTALL_BINDIR/dakota --compile installcheck-o.dk
+$DESTDIR$INSTALL_BINDIR/dakota --compile installcheck-util-o.dk $DESTDIR$INSTALL_LIBDIR/libdakota.$so_ext
 set +o verbose
 rm -f installcheck-o.dk installcheck-util-o.dk
 
@@ -29,8 +31,8 @@ cat /dev/null > installcheck-so.dk
 cat /dev/null > installcheck-util-so.dk
 rm -f installcheck-so.so installcheck-util-so.so
 set -o verbose
-$DEST$prefix/bin/dakota --shared installcheck-so.dk
-$DEST$prefix/bin/dakota --shared installcheck-util-so.dk $DEST$prefix/lib/libdakota.$so_ext
+$DESTDIR$INSTALL_BINDIR/dakota --shared installcheck-so.dk
+$DESTDIR$INSTALL_BINDIR/dakota --shared installcheck-util-so.dk $DESTDIR$INSTALL_LIBDIR/libdakota.$so_ext
 dakota-catalog installcheck-so.so
 dakota-catalog installcheck-util-so.so
 set +o verbose
@@ -43,8 +45,8 @@ echo $src > installcheck.dk
 echo $src > installcheck-util.dk
 rm -f installcheck installcheck-util
 set -o verbose
-$DEST$prefix/bin/dakota installcheck.dk
-$DEST$prefix/bin/dakota installcheck-util.dk $DEST$prefix/lib/libdakota.$so_ext
+$DESTDIR$INSTALL_BINDIR/dakota installcheck.dk
+$DESTDIR$INSTALL_BINDIR/dakota installcheck-util.dk $DESTDIR$INSTALL_LIBDIR/libdakota.$so_ext
 ./installcheck
 ./installcheck-util
 set +o verbose

@@ -19,7 +19,7 @@
       '-rules' => [
       ],
       'files' => [
-        '$(DESTDIR)$(prefix)/bin/dakota-find-library',
+        '$(DESTDIR)$(INSTALL_BINDIR)/dakota-find-library',
       ],
     }
 }

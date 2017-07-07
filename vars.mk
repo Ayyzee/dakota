@@ -7,7 +7,11 @@ include $(rootdir)/makeflags.mk
 
 srcdir ?= .
 
-prefix ?= /usr/local
+INSTALL_PREFIX ?= /usr/local
+
+INSTALL_BINDIR ?=     $(INSTALL_PREFIX)/bin
+INSTALL_LIBDIR ?=     $(INSTALL_PREFIX)/lib
+INSTALL_INCLUDEDIR ?= $(INSTALL_PREFIX)/include
 
 h_ext := h
 cc_ext := cc

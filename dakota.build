@@ -12,8 +12,8 @@
     '-rules' => [
     ],
     'files' => [ # install.files
-      '$(DESTDIR)$(prefix)/include/dso.$(h_ext)',
-      '$(DESTDIR)$(prefix)/lib/libdso.$(so_ext)',
+      '$(DESTDIR)$(INSTALL_INCLUDEDIR)/dso.$(h_ext)',
+      '$(DESTDIR)$(INSTALL_LIBDIR)/libdso.$(so_ext)',
     ],
   }
 }

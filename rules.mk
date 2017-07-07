@@ -36,29 +36,29 @@ $(srcdir)/lib%.$(so_ext): $(srcdir)/%.dk
 	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(DAKOTA) --project dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --soname $(soname) --shared --output $@ $?
 
-$(DESTDIR)$(prefix)/lib/dakota/%.json: $(srcdir)/../lib/dakota/%.json
+$(DESTDIR)$(INSTALL_LIBDIR)/dakota/%.json: $(srcdir)/../lib/dakota/%.json
 	sudo $(INSTALL_DATA) $< $(@D)
 
-$(DESTDIR)$(prefix)/lib/dakota/%.pm: $(srcdir)/../lib/dakota/%.pm
+$(DESTDIR)$(INSTALL_LIBDIR)/dakota/%.pm: $(srcdir)/../lib/dakota/%.pm
 	sudo $(INSTALL_LIB) $< $(@D)
 
-$(DESTDIR)$(prefix)/lib/dakota/%.json: $(DESTDIR)$(prefix)/lib/dakota/%-$(platform).json
+$(DESTDIR)$(INSTALL_LIBDIR)/dakota/%.json: $(DESTDIR)$(INSTALL_LIBDIR)/dakota/%-$(platform).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-$(DESTDIR)$(prefix)/lib/dakota/%: $(DESTDIR)$(prefix)/lib/dakota/%-$(compiler)
+$(DESTDIR)$(INSTALL_LIBDIR)/dakota/%: $(DESTDIR)$(INSTALL_LIBDIR)/dakota/%-$(compiler)
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-$(DESTDIR)$(prefix)/lib/%.$(so_ext): $(srcdir)/%.$(so_ext)
+$(DESTDIR)$(INSTALL_LIBDIR)/%.$(so_ext): $(srcdir)/%.$(so_ext)
 	sudo $(INSTALL_LIB) $< $(@D)
 
-$(DESTDIR)$(prefix)/include/%: $(srcdir)/../include/%
+$(DESTDIR)$(INSTALL_INCLUDEDIR)/%: $(srcdir)/../include/%
 	sudo $(INSTALL_DATA) $< $(@D)
 
-$(DESTDIR)$(prefix)/include/%: $(srcdir)/%
+$(DESTDIR)$(INSTALL_INCLUDEDIR)/%: $(srcdir)/%
 	sudo $(INSTALL_DATA) $< $(@D)
 
-$(DESTDIR)$(prefix)/bin/%: $(srcdir)/../bin/%
+$(DESTDIR)$(INSTALL_BINDIR)/%: $(srcdir)/../bin/%
 	sudo $(INSTALL_PROGRAM) $< $(@D)
 
-$(DESTDIR)$(prefix)/bin/%: $(srcdir)/%
+$(DESTDIR)$(INSTALL_BINDIR)/%: $(srcdir)/%
 	sudo $(INSTALL_PROGRAM) $< $(@D)
