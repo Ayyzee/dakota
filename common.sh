@@ -86,6 +86,13 @@ MKDIRFLAGS="--parents"
 RM=rm
 RMFLAGS="--force --recursive"
 
+DESTDIR=
+
+INSTALL_PREFIX=/usr/local
+INSTALL_BINDIR=$INSTALL_PREFIX/bin
+INSTALL_LIBDIR=$INSTALL_PREFIX/lib
+INSTALL_INCLUDEDIR=$INSTALL_PREFIX/include
+
 so_ext=so
 
 if [[ "darwin" == "$(platform)" ]]; then

@@ -8,10 +8,6 @@ trap finish EXIT
 rootdir=..
 source $rootdir/common.sh
 source $rootdir/config.sh
-DESTDIR=
-INSTALL_PREFIX=/usr/local
-INSTALL_BINDIR=$INSTALL_PREFIX/bin
-INSTALL_LIBDIR=$INSTALL_PREFIX/lib
 export OBJDIR=/tmp/installcheck
 rm -fr $OBJDIR
 
