@@ -1,6 +1,5 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-IFS=$'\n\t'
 finish() {
   find $OBJDIR -type f | sort
 }
