@@ -29,7 +29,7 @@ clean:
 	$(RM) $(RMFLAGS) $(builddir)/build.mk
 	$(RM) $(RMFLAGS) $(builddir)
 
-install-dirs := $(DESTDIR)$(INSTALL_BINDIR) $(DESTDIR)$(INSTALL_INCLUDEDIR) $(DESTDIR)$(INSTALL_LIBDIR)
+install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@

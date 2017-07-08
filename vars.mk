@@ -3,14 +3,11 @@ SHELL := /bin/bash -o errexit -o nounset -o pipefail
 rootdir ?= .
 include $(rootdir)/makeflags.mk
 
-srcdir ?= .
+SOURCE_DIR ?= .
 
 DESTDIR ?=
 
 INSTALL_PREFIX ?= /usr/local
-INSTALL_BINDIR ?=     $(INSTALL_PREFIX)/bin
-INSTALL_LIBDIR ?=     $(INSTALL_PREFIX)/lib
-INSTALL_INCLUDEDIR ?= $(INSTALL_PREFIX)/include
 
 h_ext := h
 cc_ext := cc

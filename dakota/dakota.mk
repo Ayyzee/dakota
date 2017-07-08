@@ -1,6 +1,6 @@
 rootdir := ..
 
-srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
+SOURCE_DIR := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
@@ -63,7 +63,7 @@ precompile:
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
 
-install-dirs := $(DESTDIR)$(INSTALL_BINDIR) $(DESTDIR)$(INSTALL_INCLUDEDIR) $(DESTDIR)$(INSTALL_LIBDIR)/dakota/compiler-$(compiler)
+install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-$(compiler)
 install-links :=
 
 $(install-dirs):

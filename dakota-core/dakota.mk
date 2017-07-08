@@ -1,6 +1,6 @@
 rootdir := ..
 
-srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
+SOURCE_DIR := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
@@ -63,8 +63,8 @@ precompile:
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
 
-install-dirs :=  $(DESTDIR)$(INSTALL_BINDIR) $(DESTDIR)$(INSTALL_INCLUDEDIR) $(DESTDIR)$(INSTALL_LIBDIR)/dakota/compiler-$(compiler)
-install-links := $(DESTDIR)$(INSTALL_LIBDIR)/dakota/compiler $(DESTDIR)$(INSTALL_LIBDIR)/dakota/platform.json
+install-dirs :=  $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-$(compiler)
+install-links := $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform.json
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
@@ -78,9 +78,9 @@ clean: goal-clean | dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
 	$(RM) $(RMFLAGS) $(target).ctlg
-	$(RM) $(RMFLAGS) $(srcdir)/strerror-name-tbl.inc
+	$(RM) $(RMFLAGS) $(SOURCE_DIR)/strerror-name-tbl.inc
 
-$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name-tbl.inc
+$(SOURCE_DIR)/strerror-name.dk: $(SOURCE_DIR)/strerror-name-tbl.inc
 
-$(DESTDIR)$(INSTALL_LIBDIR)/dakota/platform.json: $(DESTDIR)$(INSTALL_LIBDIR)/dakota/platform-$(platform).json
-$(DESTDIR)$(INSTALL_LIBDIR)/dakota/compiler:      $(DESTDIR)$(INSTALL_LIBDIR)/dakota/compiler-$(compiler)
+$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform.json: $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform-$(platform).json
+$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler:      $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-$(compiler)

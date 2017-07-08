@@ -2,24 +2,24 @@
 {
     'builddir' => 'dkt',
     'srcs' => [
-      '$(srcdir)/dakota-find-library.$(cc_ext)',
+      '$(SOURCE_DIR)/dakota-find-library.$(cc_ext)',
     ],
     'lib-dirs' => [ # cmd-line
-      '$(INSTALL_LIBDIR)',
+      '$(INSTALL_PREFIX)/lib',
     ],
     'libs' => [
       'dso',
     ],
     'include-dirs' => [
-      '$(srcdir)/../include',
-      '$(INSTALL_INCLUDEDIR)',
+      '$(SOURCE_DIR)/../include',
+      '$(INSTALL_PREFIX)/include',
     ],
     'target' => 'dakota-find-library',
     'install' => {
       '-rules' => [
       ],
       'files' => [
-        '$(DESTDIR)$(INSTALL_BINDIR)/dakota-find-library',
+        '$(DESTDIR)$(INSTALL_PREFIX)/bin/dakota-find-library',
       ],
     }
 }

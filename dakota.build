@@ -2,18 +2,18 @@
 {
   'builddir' => 'dkt',
   'srcs' => [
-    '$(srcdir)/dso.$(cc_ext)',
+    '$(SOURCE_DIR)/dso.$(cc_ext)',
   ],
   'libs' => [
     'dl',
   ],
-  'target' => '$(srcdir)/libdso.$(so_ext)',
+  'target' => '$(SOURCE_DIR)/libdso.$(so_ext)',
   'install' => {
     '-rules' => [
     ],
     'files' => [ # install.files
-      '$(DESTDIR)$(INSTALL_INCLUDEDIR)/dso.$(h_ext)',
-      '$(DESTDIR)$(INSTALL_LIBDIR)/libdso.$(so_ext)',
+      '$(DESTDIR)$(INSTALL_PREFIX)/include/dso.$(h_ext)',
+      '$(DESTDIR)$(INSTALL_PREFIX)/lib/libdso.$(so_ext)',
     ],
   }
 }

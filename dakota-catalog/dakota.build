@@ -2,25 +2,25 @@
 {
     'builddir' => 'dkt',
     'srcs' => [ # cmd-line
-      '$(srcdir)/dakota-catalog.$(cc_ext)',
+      '$(SOURCE_DIR)/dakota-catalog.$(cc_ext)',
     ],
     'lib-dirs' => [ # cmd-line
-      '$(INSTALL_LIBDIR)',
+      '$(INSTALL_PREFIX)/lib',
     ],
     'libs' => [ # cmd-line
       'dso',
     ],
     'include-dirs' => [ # cmd-line
-      '$(srcdir)',
-      '$(srcdir)/../include',
-      '$(INSTALL_INCLUDEDIR)',
+      '$(SOURCE_DIR)',
+      '$(SOURCE_DIR)/../include',
+      '$(INSTALL_PREFIX)/include',
     ],
     'target' => 'dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [
       ],
       'files' =>   [ # install.files
-        '$(DESTDIR)$(INSTALL_BINDIR)/dakota-catalog',
+        '$(DESTDIR)$(INSTALL_PREFIX)/bin/dakota-catalog',
       ],
     }
 }

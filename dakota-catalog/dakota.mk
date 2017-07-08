@@ -1,6 +1,6 @@
 rootdir := ..
 
-srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
+SOURCE_DIR := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
@@ -47,7 +47,7 @@ clean: goal-clean
 distclean: clean
 	cd $(rootdir); ./configure-common
 
-install-dirs := $(DESTDIR)$(INSTALL_BINDIR)
+install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
