@@ -166,9 +166,6 @@ $$root_cmd{'opts'}{'found-library'} = $found_library;
 # m/0: many inputs, no  output
 # m/1: many inputs, one output (directory)
 
-my $dkt_exclude_libdakota_core = $ENV{'DKT_EXCLUDE_LIBDAKOTA_CORE'};
-my $dkt_exclude_libdakota =      $ENV{'DKT_EXCLUDE_LIBDAKOTA'};
-
 my $rel_argv = [map { &rel_path_canon($_) } @ARGV];
 my $inputs = &clean_paths($rel_argv);
 my $project;
@@ -422,13 +419,11 @@ sub use_project {
   if (! &is_exe($root_cmd)) {
     $$project{'is-lib'} = 1;
   }
-  #print STDERR "EXCLUDE-LIBDAKOTA-CORE=$dkt_exclude_libdakota_core\n";
-  if (! $dkt_exclude_libdakota_core) {
+  if (! $$project{'is-lib'} || $$project{'target'} ne 'dakota-core') {
     &add_last($$root_cmd{'inputs'}, &lib_from_lib_name('dakota-core'));
     &add_last($$project{'inputs'},  &lib_from_lib_name('dakota-core'));
 
-    #print STDERR "EXCLUDE-LIBDAKOTA=$dkt_exclude_libdakota\n";
-    if (! $dkt_exclude_libdakota) {
+    if (! $$project{'is-lib'} || $$project{'target'} ne 'dakota') {
       &add_last($$root_cmd{'inputs'}, &lib_from_lib_name('dakota'));
       &add_last($$project{'inputs'},  &lib_from_lib_name('dakota'));
     }
