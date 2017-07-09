@@ -1,13 +1,12 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-
-dir=$(cat cmake-build-dir.txt)
+binary_dir=$(cat cmake-binary-dir.txt)
 target=all
 if [[ 1 == $# ]]; then
   target=$1
 fi
 jobs=$(getconf _NPROCESSORS_ONLN)
 echo ++init++
-cmake --build $dir --target init
+cmake --build $binary_dir --target init
 echo ++default++
-cmake --build $dir --target $target -- --jobs $jobs
+cmake --build $binary_dir --target $target -- --jobs $jobs

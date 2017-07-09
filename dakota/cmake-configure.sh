@@ -1,9 +1,13 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-dir=.; if [[ $# == 1 ]]; then dir=$1; fi
-echo $dir > cmake-build-dir.txt
-rootdir=$HOME/dakota
-$rootdir/bin/dakota-build2project $dir/dakota.build   > $dir/dakota.project
-$rootdir/bin/dakota-build2cmk     $dir/dakota.project > $dir/dakota.cmk
+rel_source_dir=.
+binary_dir=$rel_source_dir; if [[ $# == 1 ]]; then binary_dir=$1; fi
+echo $binary_dir > cmake-binary-dir.txt
 extra_opts="-Wdev -Wdeprecated"
-cmake $extra_opts $dir
+
+if [[ $binary_dir != '.' ]]; then
+  mkdir -p $binary_dir
+  cd $binary_dir
+  rel_source_dir=..
+fi
+cmake $extra_opts $rel_source_dir

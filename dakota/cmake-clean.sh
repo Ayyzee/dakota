@@ -1,14 +1,13 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-dir=$(cat cmake-build-dir.txt)
-builddir=dkt
-if [[ -e dakota.mk ]]; then make -f dakota.mk clean || true; fi
-if [[ -e Makefile ]];  then make              clean || true; fi
-rm -f  $dir/cmake_install.cmake
-rm -f  $dir/install_manifest.txt
-rm -f  $dir/Makefile
-rm -f  $dir/CMakeCache.txt
-rm -fr $dir/CMakeFiles
-rm -f  $dir/dakota.cmk
-rm -f  $dir/dakota.project
-rm -fr $builddir # created by dakota
+binary_dir=$(cat cmake-binary-dir.txt)
+if [[ -e Makefile ]]; then make clean || true; fi
+if [[ $binary_dir != '.' ]]; then
+  rm -fr $binary_dir
+else
+  rm -f  $binary_dir/cmake_install.cmake
+  rm -f  $binary_dir/install_manifest.txt
+  rm -f  $binary_dir/Makefile
+  rm -f  $binary_dir/CMakeCache.txt
+  rm -fr $binary_dir/CMakeFiles
+fi
