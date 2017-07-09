@@ -144,29 +144,29 @@ static func symbol-str-compare(symbol-t s1, str-t s2) -> cmp-t {
   return result;
 }
 static func init-runtime-ds() -> void {
-  const ssize-t num-klasses = 256;
+  const ssize-t num-klses = 256;
 
   bool-t is-ptr;
   gbl-imported-klasses-table =
-    sorted-set-core::create(num-klasses,
+    sorted-set-core::create(num-klses,
                             ssizeof(named-assoc-node::slots-t),
                             cast(std-compare-t)
                             cast(named-assoc-node-compare-t)named-assoc-node::compare,
                             is-ptr = false);
   gbl-klass-defns-table =
-    sorted-set-core::create(num-klasses,
+    sorted-set-core::create(num-klses,
                             ssizeof(named-info::slots-t*),
                             cast(std-compare-t)
                             cast(named-info-compare-t)named-info::compare,
                             is-ptr = true);
   gbl-interposers-table =
-    sorted-set-core::create(num-klasses,
+    sorted-set-core::create(num-klses,
                             ssizeof(property::slots-t),
                             cast(std-compare-t)
                             cast(property-compare-t)property::compare,
                             is-ptr = false);
   gbl-imported-klasses-file-table =
-    sorted-set-core::create(num-klasses,
+    sorted-set-core::create(num-klses,
                             ssizeof(symbol-t),
                             cast(std-compare-t)
                             cast(symbol-compare-t)symbol-str-compare,
@@ -285,11 +285,11 @@ static func alloc-klass(symbol-t name) -> object-t {
   resource-usage::log-alloc(&gbl-ru, total-size, name);
 # endif
   object::slots-t* kls-slots = alloc-instance(total-size, kls-name, name); // instance-name
-  kls-slots->klass =     klass::_klass_;
+  kls-slots->kls =     klass::_klass_;
   kls-slots->ref-count = 0;
   object-t kls = object-t{kls-slots};
-  if (kls->klass == nullptr)
-    kls->klass = kls; // klass klass's klass is klass klass
+  if (kls->kls == nullptr)
+    kls->kls = kls; // klass klass's klass is klass klass
   return kls;
 }
 static func init-klass(object-t kls, symbol-t name) -> object-t {
@@ -394,7 +394,7 @@ static func dump?(named-info-t* kls-info, str-t only) -> bool-t {
 # if 1
 extern sorted-set-core-t gbl-selectors-table;
 static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> void {
-  ssize-t klasses-count = 0;
+  ssize-t klses-count = 0;
   ssize-t methods-count = 0;
   for (ssize-t i = 0; i < klass-defns-table->count; i++) {
     named-info-t* kls-info = cast(named-info-t*)sorted-set-core::at(klass-defns-table, i);
@@ -403,7 +403,7 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
     do {
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(intptr-t)#klass);
       if (type == #klass)
-        klasses-count++;
+        klses-count++;
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
 
       if (method-signatures != nullptr) {
@@ -423,7 +423,7 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
   }
   ostream-t ostrm = { .output = stdout, .col = 0 };
   ostream::print-format(ostrm, "{ \"klasses\": %zi, \"selectors\": %zi \"methods\": %zi },\n",
-                        klasses-count, selector-count(), methods-count);
+                        klses-count, selector-count(), methods-count);
   return;
 }
 # endif
@@ -751,11 +751,11 @@ func dk-init-runtime() -> void {
     object::_klass_ = init-klass(object::_klass_, #object); // must be first
     klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
-    klass::mutable-unbox(object::_klass_).superklass = nullptr;
+    klass::mutable-unbox(object::_klass_).superkls = nullptr;
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
     null = $make(null-klass); // first generic function executed
-    klass::mutable-unbox(object::_klass_).superklass = null;
+    klass::mutable-unbox(object::_klass_).superkls = null;
     null.has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
 
     // core runtime initialized
@@ -878,8 +878,8 @@ static func bname(str-t path) -> str-t {
 klass catalog-info {
   slots {
     symbol-t                  name;
-    symbol-t                  superklass-name;
-    symbol-t                  klass-name;
+    symbol-t                  superkls-name;
+    symbol-t                  kls-name;
 
     symbol-t                  modulee;
     symbol-t                  cat;
@@ -905,9 +905,9 @@ klass catalog-info {
 }
 static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* ci) -> void {
   *ci = {
-    .name =            name-from-info(ni),
-    .superklass-name = superklass-name-from-info(ni),
-    .klass-name =      klass-name-from-info(ni),
+    .name =          name-from-info(ni),
+    .superkls-name = superklass-name-from-info(ni),
+    .kls-name =      klass-name-from-info(ni),
 
     .modulee =                          cast(decltype(ci->modulee))                           named-info::at(ni, #module),
     .cat =                              cast(decltype(ci->cat))                               named-info::at(ni, #cat, cast(intptr-t)#struct),
@@ -1003,20 +1003,20 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 
   assert-valid-str(ci.type);
   assert-valid-str(ci.name);
-  assert(!(ci.interpose-name != nullptr && ci.superklass-name != nullptr));
+  assert(!(ci.interpose-name != nullptr && ci.superkls-name != nullptr));
 
   bool-t is-verbose = false;
 
   if (is-verbose) {
-    if (ci.superklass-name == nullptr)
-      ci.superklass-name = default-superklass-name();
-    if (ci.klass-name == nullptr)
-      ci.superklass-name = default-klass-name();
+    if (ci.superkls-name == nullptr)
+      ci.superkls-name = default-superklass-name();
+    if (ci.kls-name == nullptr)
+      ci.superkls-name = default-klass-name();
   } else {
-    if (default-superklass-name() == ci.superklass-name)
-      ci.superklass-name = nullptr;
-    if (default-klass-name() == ci.klass-name)
-      ci.klass-name = nullptr;
+    if (default-superklass-name() == ci.superkls-name)
+      ci.superkls-name = nullptr;
+    if (default-klass-name() == ci.kls-name)
+      ci.kls-name = nullptr;
   }
 # if defined DKT-ENABLE-EXPORT-GROUP
   if (prev-module != nullptr && prev-module != ci.modulee) {
@@ -1044,10 +1044,10 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 
   if (ci.interpose-name != nullptr)
     ostream::print-format(ostrm, "interpose %s;\n", ci.interpose-name);
-  if (ci.superklass-name != nullptr)
-    ostream::print-format(ostrm, "superklass %s;\n", ci.superklass-name);
-  if (ci.klass-name != nullptr)
-    ostream::print-format(ostrm, "klass %s;\n", ci.klass-name);
+  if (ci.superkls-name != nullptr)
+    ostream::print-format(ostrm, "superklass %s;\n", ci.superkls-name);
+  if (ci.kls-name != nullptr)
+    ostream::print-format(ostrm, "klass %s;\n", ci.kls-name);
   if (ci.traits != nullptr) {
     ssize-t index = 0;
 
@@ -1156,7 +1156,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
         fprintf(stderr, "%s:%i: ERROR: %s %s: exported slots without type or info\n", __FILE__, __LINE__, ci.type, ci.name);
     }
   } // if (has-exported-state)
-  if ((ci.superklass-name != nullptr || ci.klass-name != nullptr || ci.traits != nullptr || ci.requires != nullptr || ci.provides != nullptr)
+  if ((ci.superkls-name != nullptr || ci.kls-name != nullptr || ci.traits != nullptr || ci.requires != nullptr || ci.provides != nullptr)
       && ci.method-signatures != nullptr) {
     ostream::print-format(ostrm, "\n");
   }

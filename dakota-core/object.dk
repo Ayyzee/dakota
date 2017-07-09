@@ -38,8 +38,8 @@ static func echo-stuff-common(object::slots-t* instance, str-t action, symbol-t 
 }
 func echo-stuff(object::slots-t* instance, str-t action) -> void {
   if (getenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC"))
-    if (instance->klass != klass::_klass_) // not completely correct (should be !instance-of?())
-      echo-stuff-common(instance, action, name-of(instance->klass));
+    if (instance->kls != klass::_klass_) // not completely correct (should be !instance-of?())
+      echo-stuff-common(instance, action, name-of(instance->kls));
   return;
 }
 func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symbol-t instance-name) -> void {
@@ -50,7 +50,7 @@ func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symb
 # endif
 klass object {
   slots {
-    object-t                  klass;
+    object-t                  kls;
     std::atomic<int-fast32-t> ref-count; // for single threaded just use int-fast32-t
   }
 
@@ -62,7 +62,7 @@ klass object {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    self->klass = nullptr;
+    self->kls = nullptr;
     return nullptr;
   }
   method self(object-t self) -> object-t {

@@ -333,7 +333,7 @@ klass klass {
     ssize-t          offset; // first so its offset is 0
     methods-t        methods;
     ssize-t          size;
-    object-t         superklass;
+    object-t         superkls;
     symbol-t         name; // redundant but convenient
     const symbol-t*  traits; // redundant but convenient
     named-info-t*    info;
@@ -353,7 +353,7 @@ klass klass {
     resource-usage::log-alloc(&gbl-ru, self);
 # endif
     object::slots-t* instance-slots = alloc-instance(total-size, name-of(self));
-    instance-slots->klass =     self;
+    instance-slots->kls =     self;
     instance-slots->ref-count = 0;
     object-t instance = object-t{instance-slots};
     return instance;
@@ -697,8 +697,8 @@ klass klass {
     echo-stuff(cast(object::slots-t*)self, "dealloc", name-of(klass-of(self)));
 # endif
     self.methods.addrs = dkt::dealloc(self.methods.addrs);
-    self.superklass = nullptr;
-    self.behavior =   nullptr;
+    self.superkls = nullptr;
+    self.behavior = nullptr;
     return $dealloc(super);
   }
   static func set-all-klass-ptrs(object-t self) -> void {
@@ -732,13 +732,13 @@ klass klass {
     // fprintf(stderr, "%p { name=%s }\n", cast(ptr-t)self, name-of(self));
     self.offset = offset-from-info(self.info);
     self.size = size-from-info(self.info);
-    self.superklass = superklass-from-info(self.info, name-of(self)); // interposing
+    self.superkls = superklass-from-info(self.info, name-of(self)); // interposing
     if (superklass-of(self) == nullptr) {
       symbol-t superkls-name = superklass-name-from-info(self.info, name-of(self));
       if (superkls-name == nullptr)
-        self.superklass = default-superklass();
+        self.superkls = default-superklass();
       else
-        self.superklass = dk-klass-for-name(superkls-name);
+        self.superkls = dk-klass-for-name(superkls-name);
     }
     self.methods = { .addrs = nullptr, .count = 0 };
     self.behavior = nullptr;

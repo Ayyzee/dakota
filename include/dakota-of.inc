@@ -32,10 +32,10 @@ KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return object_t{arg};
 }}
 KLASS_NS object { inline FUNC unbox(object_t obj) -> const slots_t* {
-  return obj.object;
+  return obj.obj;
 }}
 KLASS_NS object { inline FUNC mutable_unbox(object_t obj) -> slots_t* {
-  return obj.object;
+  return obj.obj;
 }}
 KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC mutable_unbox(object_t obj) -> slots_t& {
   DKT_UNBOX_CHECK(obj, _klass_); // optional
@@ -49,11 +49,11 @@ KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t obj) -> const slots_
 }}
 inline FUNC klass_of(object_t obj) -> object_t {
   assert(obj != nullptr);
-  return obj->klass;
+  return obj->kls;
 }
 inline FUNC superklass_of(object_t kls) -> object_t {
   assert(kls != nullptr);
-  return klass::unbox(kls).superklass;
+  return klass::unbox(kls).superkls;
 }
 inline FUNC name_of(object_t kls) -> symbol_t {
   assert(kls != nullptr);

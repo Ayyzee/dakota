@@ -1526,7 +1526,7 @@ sub generate_generic_defn {
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
     $$scratch_str_ref .= $col . "static selector-t selector = selector($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
+      $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.kls)).methods.addrs[selector];" . $nl;
     } else {
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(obj)).methods.addrs[selector];" . $nl;
     }
@@ -1544,7 +1544,7 @@ sub generate_generic_defn {
     }
     $new_arg_names = &arg_type::names($new_arg_type);
     if (&is_super($generic)) {
-      &replace_first($new_arg_names, "context.object");
+      &replace_first($new_arg_names, "context.obj");
     }
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
@@ -1657,7 +1657,7 @@ sub generate_generic_func_defn {
     $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)));" . ' // one time initialization' . $nl;
     $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature);" . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = context.klass);" . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = context.kls);" . $nl;
     } else {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = nullptr);" . $nl;
     }

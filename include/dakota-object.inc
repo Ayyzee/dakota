@@ -17,7 +17,7 @@
 # pragma once
 
 struct [[_dkt_typeinfo_]] object_t {
-  object::slots_t* object;
+  object::slots_t* obj;
 
   REF_COUNTING_INLINE FUNC operator ->() const -> object::slots_t*;
   REF_COUNTING_INLINE FUNC operator *()  const -> object::slots_t&;

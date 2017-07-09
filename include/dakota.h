@@ -135,7 +135,7 @@ KLASS_NS ptr { typealias slots_t = void*; } typealias ptr_t = ptr::slots_t;
 
 static_assert(sizeof(weak_object_t) == sizeof(object_t),
               "The types weak-object-t and object-t are different sizes.");
-static_assert(offsetof(weak_object_t, object) == offsetof(object_t, object),
+static_assert(offsetof(weak_object_t, obj) == offsetof(object_t, obj),
               "The types weak-object-t and object-t have different layouts.");
 
 KLASS_NS boole        { typealias slots_t = bool_t;                                } typealias bool_t =         boole::slots_t;

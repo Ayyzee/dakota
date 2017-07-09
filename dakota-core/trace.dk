@@ -50,8 +50,8 @@ func dkt-va-trace-before(const signature-t* signature, method-t m, super-t conte
   if (getenv-int("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
                            signature->name, signature->param-types + sizeof("object-t") - 1,
-                           cast(ptr-t)(context.object), name-of(klass-of(context.object)),
-                           cast(ptr-t)(context.klass), name-of(context.klass),
+                           cast(ptr-t)(context.obj), name-of(klass-of(context.obj)),
+                           cast(ptr-t)(context.kls), name-of(context.kls),
                            cast(ptr-t)cast(size-t)(m));
     trace-column-in();
   }
@@ -76,8 +76,8 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, super-t contex
   if (getenv-int("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
                            signature->name, signature->param-types + sizeof("object-t") - 1,
-                           cast(ptr-t)(context.object), name-of(klass-of(context.object)),
-                           cast(ptr-t)(context.klass), name-of(context.klass),
+                           cast(ptr-t)(context.obj), name-of(klass-of(context.obj)),
+                           cast(ptr-t)(context.kls), name-of(context.kls),
                            cast(ptr-t)cast(size-t)(m));
   return result;
 }

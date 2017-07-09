@@ -29,10 +29,10 @@ klass object-output-stream {
   klass      klass;
 
   slots {
-    object-t objects;    // sorted-set (ptr) <objects already written>
-    object-t object-from-id; // sorted-table key=id, value=object <objects to be written>
+    object-t objs;        // sorted-set (ptr) <objects already written>
+    object-t obj-from-id; // sorted-table key=id, value=object <objects to be written>
     int64-t  id;
-    object-t id-from-object;        // sorted-table (ptr) key=object, value=id
+    object-t id-from-obj; // sorted-table (ptr) key=object, value=id
   }
   method init(object-t self, stream-t stream: stdout) -> object-t {
     self = $init(super, #slots: stream);
@@ -41,10 +41,10 @@ klass object-output-stream {
 //                                                         selector(equals?(object-t, object-t));
 //     compare-t compare = cast(compare-t)$method-for-selector(object::_klass_,
 //                                                             selector(compare(object-t, object-t));
-    self.objects =        $make(sorted-set::klass());
-    self.object-from-id = $make(sorted-table::klass());
-    self.id-from-object = $make(sorted-table::klass());
-    self.id =         0;
+    self.objs =        $make(sorted-set::klass());
+    self.obj-from-id = $make(sorted-table::klass());
+    self.id-from-obj = $make(sorted-table::klass());
+    self.id =          0;
     return self;
   }
   method write-slots-start(object-t self, object-t kls) -> object-t {
@@ -57,48 +57,48 @@ klass object-output-stream {
     $write-table-end(self);
     return self;
   }
-  method write(object-t self, object-t object) -> object-t {
+  method write(object-t self, object-t obj) -> object-t {
     $write-table-start(self, cast(str-t)nullptr);
-    $write-item-id(self, object);
+    $write-item-id(self, obj);
     $write-table-end(self);
     return self;
   }
-  method write-item-id(object-t self, object-t object) -> object-t {
-    unless ($in?(self.objects, object)) {
-      $add(self.objects, object); // only grows, never shrinks
-      object-t id = $at(self.id-from-object, object, nullptr);
+  method write-item-id(object-t self, object-t obj) -> object-t {
+    unless ($in?(self.objs, obj)) {
+      $add(self.objs, obj); // only grows, never shrinks
+      object-t id = $at(self.id-from-obj, obj, nullptr);
 
       if (id == nullptr) {
         id = int64::box(self.id);
-        $add(self.id-from-object, object, id);
+        $add(self.id-from-obj, obj, id);
         self.id++;
       }
-      $remove(self.object-from-id, id); // remove if present
+      $remove(self.obj-from-id, id); // remove if present
       $write-sequence-start(self, $str(id));
-//       object-t object-klass = klass-of(object);
-//       $write-item(self, $name(object-klass), "-klass");
+//       object-t obj-kls = klass-of(obj);
+//       $write-item(self, $name(obj-kls), "-klass");
 
-//       if ($instance-of?(object, klass::_klass_))
-//         $write-item(self, $name(object), "name");
+//       if ($instance-of?(obj, klass::_klass_))
+//         $write-item(self, $name(obj), "name");
 
-      $write-slots(object, self);
+      $write-slots(obj, self);
       $write-sequence-end(self);
 
-      while (object-t o = $remove-last(self.object-from-id))
+      while (object-t o = $remove-last(self.obj-from-id))
         $write-item-id(self, $first(o)); // recursive
     }
     return self;
   }
-  method write-item-idref(object-t self, object-t object, str-t key) -> object-t {
+  method write-item-idref(object-t self, object-t obj, str-t key) -> object-t {
     // bugbug: key == nullptr is valid
-    object-t id = $at(self.id-from-object, object, nullptr);
+    object-t id = $at(self.id-from-obj, obj, nullptr);
 
     if (id == nullptr) {
       id = int64::box(self.id);
-      $add(self.id-from-object, object, id);
+      $add(self.id-from-obj, obj, id);
       self.id++;
     }
-    $add(self.object-from-id, id, object);
+    $add(self.obj-from-id, id, obj);
 
     $write-table-start(self, key);
     $write-item(self, $str(id), "idref");

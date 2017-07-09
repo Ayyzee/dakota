@@ -24,9 +24,9 @@ klass no-such-method-exception {
   superklass exception;
 
   slots {
-    object-t           object;
-    object-t           klass;
-    const signature-t* signature;
+    object-t           obj;
+    object-t           kls;
+    const signature-t* sig;
   }
   method init(object-t           self,
               object-t           object:    nullptr,
@@ -35,34 +35,34 @@ klass no-such-method-exception {
               str-t              src-file:  nullptr,
               int-t              src-line:  0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
-    self.object =    object;
-    self.klass =     klass;
-    self.signature = signature;
+    self.obj = object;
+    self.kls = klass;
+    self.sig = signature;
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
     if (out == nullptr || out == null)
       out = std-error;
     $print(super, out);
-    if (self.object) {
+    if (self.obj) {
       str-t instance-name;
-      if ($instance-of?(self.object, klass::_klass_))
-        instance-name = name-of(self.object);
+      if ($instance-of?(self.obj, klass::_klass_))
+        instance-name = name-of(self.obj);
       else
-        instance-name = $str(self.object);
+        instance-name = $str(self.obj);
       object-t kls;
-      if (self.klass)
-        kls = superklass-of(self.klass);
+      if (self.kls)
+        kls = superklass-of(self.kls);
       else
-        kls = klass-of(self.object);
+        kls = klass-of(self.obj);
       $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\"",
                     instance-name,
                     name-of(kls));
     }
-    if (self.signature)
+    if (self.sig)
       $print-format(out, ", \"method\": \"%s(%s)\"",
-                    self.signature->name,
-                    self.signature->param-types);
+                    self.sig->name,
+                    self.sig->param-types);
     return self;
   }
 }

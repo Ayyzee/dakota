@@ -24,9 +24,9 @@ klass no-such-slot-exception {
   superklass exception;
 
   slots {
-    object-t     object;
+    object-t     obj;
     symbol-t     name;
-    signature-t* signature;
+    signature-t* sig;
   }
   method init(object-t     self,
               object-t     object:,
@@ -35,9 +35,9 @@ klass no-such-slot-exception {
               str-t        src-file: nullptr,
               int-t        src-line: 0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
-    self.object = object;
+    self.obj =  object;
     self.name = name;
-    self.signature = signature;
+    self.sig =  signature;
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
@@ -45,15 +45,15 @@ klass no-such-slot-exception {
       out = std-error;
     $print(super, out);
 
-    if ($instance-of?(self.object, klass::_klass_)) {
+    if ($instance-of?(self.obj, klass::_klass_)) {
       $print-format(out,
                     ", \"instance\": \"%s\""
                     ", \"klass\": \"%s\""
                     ", \"method\": \"%s(%s)\""
                     ", \"slot-name\": \"#%s\"",
-                    name-of(self.object),
-                    name-of(klass-of(self.object)),
-                    self.signature->name, self.signature->param-types,
+                    name-of(self.obj),
+                    name-of(klass-of(self.obj)),
+                    self.sig->name, self.sig->param-types,
                     self.name);
     } else {
       $print-format(out,
@@ -61,9 +61,9 @@ klass no-such-slot-exception {
                     ", \"klass\": \"%s\""
                     ", \"method\": \"%s(%s)\""
                     ", \"slot-name\": \"#%s\"",
-                    $str(self.object),
-                    name-of(klass-of(self.object)),
-                    self.signature->name, self.signature->param-types,
+                    $str(self.obj),
+                    name-of(klass-of(self.obj)),
+                    self.sig->name, self.sig->param-types,
                     self.name);
     }
     return self;

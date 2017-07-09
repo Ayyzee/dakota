@@ -287,7 +287,7 @@ klass vector {
       self.items = cast(object-t*)dkt::alloc(self.size * self.capacity, self.items);
     }
     memmove(self.items + 1, self.items, cast(size-t)(self.size * self.count));
-    self.items[0].object = nullptr;
+    self.items[0].obj = nullptr;
     self.items[0] = item;
     self.count++;
     self.iterator-state++;
@@ -299,7 +299,7 @@ klass vector {
       self.capacity *= $resize-factor(klass-of(self));
       self.items = cast(object-t*)dkt::alloc(self.size * self.capacity, self.items);
     }
-    self.items[self.count].object = nullptr; // for ref-counting
+    self.items[self.count].obj = nullptr; // for ref-counting
     self.items[self.count] = item;
     self.count++;
     self.iterator-state++;
