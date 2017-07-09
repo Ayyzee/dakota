@@ -34,7 +34,7 @@ foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
   list (APPEND link-libs ${lib-path})
-  list (APPEND found-libs --found-library ${lib}:${lib-path})
+  list (APPEND found-libs --found-library ${lib}=${lib-path})
 endforeach (lib)
 
 # phony target 'init'

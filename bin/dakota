@@ -147,7 +147,7 @@ if ($$root_cmd{'opts'}{'project'}) {
 
 my $found_library = { 'order' => [] };
 foreach my $pair (@{$$root_cmd{'opts'}{'found-library'}}) {
-  my ($s, $l) = split(':', $pair);
+  my ($s, $l) = split('=', $pair);
   &add_last($$found_library{'order'}, $s);
   my $m = &lib_from_lib_name($s);
   # $m could also be created by basename
