@@ -179,7 +179,7 @@ sub subst {
   while (my ($key, $element) = each %$var) {
     $string =~ s|\$$key\b|$element|g;   # support $ident   style variable
     $string =~ s|\$\($key\)|$element|g; # support $(ident) style variable
-   #$string =~ s|\$\{$key\}|$element|g; # support ${ident} style variable
+    $string =~ s|\$\{$key\}|$element|g; # support ${ident} style variable
   }
   return $string
 }
