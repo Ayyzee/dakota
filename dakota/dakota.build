@@ -2,41 +2,41 @@
 {
     'builddir' => 'dkt',
     'srcs' => [ # cmd-line
-      '$(SOURCE_DIR)/ascii-number-klass.dk',
-      '$(SOURCE_DIR)/ascii-number.dk',
-      '$(SOURCE_DIR)/dakota.dk',
-      '$(SOURCE_DIR)/dimension.dk',
-      '$(SOURCE_DIR)/float.dk',
-      '$(SOURCE_DIR)/hashed-counted-set.dk',
-      '$(SOURCE_DIR)/hashed-set.dk',
-      '$(SOURCE_DIR)/hashed-table.dk',
-      '$(SOURCE_DIR)/input-file.dk',
-      '$(SOURCE_DIR)/json-object-output-stream.dk',
-      '$(SOURCE_DIR)/json-parser.dk',
-      '$(SOURCE_DIR)/lexer.dk',
-      '$(SOURCE_DIR)/open-token.dk',
-      '$(SOURCE_DIR)/output-file.dk',
-      '$(SOURCE_DIR)/point.dk',
-      '$(SOURCE_DIR)/rect.dk',
-      '$(SOURCE_DIR)/slot-info.dk',
-      '$(SOURCE_DIR)/str-buffer.dk',
-      '$(SOURCE_DIR)/syntax-exception.dk',
-      '$(SOURCE_DIR)/text-output-stream.dk',
-      '$(SOURCE_DIR)/token.dk',
-      '$(SOURCE_DIR)/tokenid.dk',
-      '$(SOURCE_DIR)/type-func.dk',
-      '$(SOURCE_DIR)/xml-object-output-stream.dk',
+      '${SOURCE_DIR}/ascii-number-klass.dk',
+      '${SOURCE_DIR}/ascii-number.dk',
+      '${SOURCE_DIR}/dakota.dk',
+      '${SOURCE_DIR}/dimension.dk',
+      '${SOURCE_DIR}/float.dk',
+      '${SOURCE_DIR}/hashed-counted-set.dk',
+      '${SOURCE_DIR}/hashed-set.dk',
+      '${SOURCE_DIR}/hashed-table.dk',
+      '${SOURCE_DIR}/input-file.dk',
+      '${SOURCE_DIR}/json-object-output-stream.dk',
+      '${SOURCE_DIR}/json-parser.dk',
+      '${SOURCE_DIR}/lexer.dk',
+      '${SOURCE_DIR}/open-token.dk',
+      '${SOURCE_DIR}/output-file.dk',
+      '${SOURCE_DIR}/point.dk',
+      '${SOURCE_DIR}/rect.dk',
+      '${SOURCE_DIR}/slot-info.dk',
+      '${SOURCE_DIR}/str-buffer.dk',
+      '${SOURCE_DIR}/syntax-exception.dk',
+      '${SOURCE_DIR}/text-output-stream.dk',
+      '${SOURCE_DIR}/token.dk',
+      '${SOURCE_DIR}/tokenid.dk',
+      '${SOURCE_DIR}/type-func.dk',
+      '${SOURCE_DIR}/xml-object-output-stream.dk',
     ],
     'lib-dirs' => [ # cmd-line
-      '$(INSTALL_PREFIX)/lib',
+      '${INSTALL_PREFIX}/lib',
     ],
     'libs' => [ # cmd-line
       'dso',
       'dakota-core',
     ],
     'include-dirs' => [ # cmd-line
-      '$(SOURCE_DIR)/../include',
-      '$(INSTALL_PREFIX)/include',
+      '${SOURCE_DIR}/../include',
+      '${INSTALL_PREFIX}/include',
     ],
     'macros' => [ # cmd-line
       #'DK_SRC_UNIQUE_HEADER=0',
@@ -47,12 +47,12 @@
     'is-lib' => 1,
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
-    'soname' => 'libdakota.$(so_ext)', # cmd-line
+    'soname' => 'libdakota.${so_ext}', # cmd-line
     'install' => {
       '-rules' => [
       ],
       'files' => [ # install.files
-        '$(DESTDIR)$(INSTALL_PREFIX)/lib/libdakota.$(so_ext)',
+        '${DESTDIR}${INSTALL_PREFIX}/lib/libdakota.${so_ext}',
       ],
     }
 }
