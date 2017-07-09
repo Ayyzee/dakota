@@ -7,7 +7,7 @@ if (NOT DEFINED ${project-path})
   set (project-path dakota.project)
 endif ()
 
-string (REGEX REPLACE .project$ .cmk vars-path ${project-path})
+string (REGEX REPLACE .project$ .cmake vars-path ${project-path})
 include (${vars-path})
 
 if (NOT DEFINED ${cc-ext})
