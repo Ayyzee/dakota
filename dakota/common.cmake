@@ -7,7 +7,11 @@ if (NOT DEFINED ${project-path})
   set (project-path dakota.project)
 endif ()
 
-string (REGEX REPLACE .project$ .cmake vars-path ${project-path})
+string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
+# generate vars-path
+execute_process (
+  COMMAND dakota-build2cmake ${project-path} ${vars-path}
+)
 include (${vars-path})
 
 if (NOT DEFINED ${cc-ext})
@@ -33,10 +37,6 @@ foreach (lib ${libs})
   list (APPEND found-libs --found-library ${lib}:${lib-path})
 endforeach (lib)
 
-# generate project-path
-execute_process (
-  COMMAND dakota-cmake2project ${vars-path} ${project-path}
-)
 # phony target 'init'
 add_custom_target (
   init

@@ -17,24 +17,24 @@ opts =     $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) 
 %.inc: $(SOURCE_DIR)/%.pl
 	./$< > $@
 
-$(builddir)/%.project: %.build
+%.project: %.build
 	$(rootdir)/bin/dakota-build2project $< $@
 
 $(SOURCE_DIR)/lib%.$(so_ext): $(SOURCE_DIR)/%.$(cc_ext)
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) $(builddir)/dakota.project
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(cxx-opts) $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(SOURCE_DIR)/%: $(SOURCE_DIR)/%.$(cc_ext)
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) $(builddir)/dakota.project
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(cxx-opts) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(SOURCE_DIR)/%: $(SOURCE_DIR)/%.dk
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) $(builddir)/dakota.project
-	$(DAKOTA) --project $(builddir)/dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --output $@ $?
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
+	$(DAKOTA) --project dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --output $@ $?
 
 $(SOURCE_DIR)/lib%.$(so_ext): $(SOURCE_DIR)/%.dk
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) $(builddir)/dakota.project
-	$(DAKOTA) --project $(builddir)/dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --soname $(soname) --shared --output $@ $?
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
+	$(DAKOTA) --project dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --soname $(soname) --shared --output $@ $?
 
 $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%.json: $(SOURCE_DIR)/../lib/dakota/%.json
 	sudo $(INSTALL_DATA) $< $(@D)
