@@ -33,6 +33,10 @@ foreach (lib ${libs})
   list (APPEND found-libs --found-library ${lib}:${lib-path})
 endforeach (lib)
 
+# generate project-path
+execute_process (
+  COMMAND dakota-cmake2project ${vars-path} ${project-path}
+)
 # phony target 'init'
 add_custom_target (
   init
