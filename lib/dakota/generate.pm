@@ -1067,7 +1067,7 @@ sub generate_va_generic_defn {
 
     if (defined $$va_method{'return-type'}) {
       my $return_type = &arg::type($$va_method{'return-type'});
-      $$scratch_str_ref .= $col . "$return_type result =";
+      $$scratch_str_ref .= $col . "auto result =";
     } else {
       $$scratch_str_ref .= $col . "";
     }
@@ -1548,7 +1548,8 @@ sub generate_generic_defn {
     }
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= $col . "return _func_($$new_arg_names_list);" . $nl;
+    $$scratch_str_ref .= $col . "auto result = _func_($$new_arg_names_list);" . $nl;
+    $$scratch_str_ref .= $col . "return result;" . $nl;
     if ($big_generic) {
       if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
         my $result = 'result';
@@ -1623,7 +1624,7 @@ sub generate_generic_func_defn {
   my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
   $$generic{'param-types'}[0] = $tmp;
   my $list_names = &arg_type::names($$generic{'param-types'});
-  my $list_names_str =  &remove_extra_whitespace(join(', ', @$list_names));
+  my $list_names_str = join(', ', @$list_names);
   my $arg_list =  &arg_type::list_pair($$generic{'param-types'}, $list_names);
   my $return_type_str = &remove_extra_whitespace(join(' ', @{$$generic{'return-type'}}));
   my $in = &ident_comment($generic_name);
@@ -1662,7 +1663,7 @@ sub generate_generic_func_defn {
     }
     $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $opt_name_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
     $return_type_str = &make_tuple_type($return_type_str);
-    $$scratch_str_ref .= $col . $return_type_str . ' result = _func_(' . $list_names_str . ');' . $nl;
+    $$scratch_str_ref .= $col . 'auto result = _func_(' . $list_names_str . ');' . $nl;
     $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = nullptr);" . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context-klass = nullptr);" . $nl;
@@ -2123,7 +2124,7 @@ sub generate_klass_construct {
             $result .= $col . "klass $klass_name { func construct($pairs) -> slots-t {" . &ann(__FILE__, __LINE__) . $nl;
             $col = &colin($col);
             $result .=
-              $col . "slots-t result = cast(slots-t){ $names };" . $nl .
+              $col . "auto result = cast(slots-t){ $names };" . $nl .
               $col . "return result;" . $nl;
             $col = &colout($col);
             $result .= $col . "}} // $klass_name\::construct()" . $nl;
@@ -2396,7 +2397,7 @@ sub generate_object_method_defn {
 
     if (defined $$method{'return-type'}) {
       if ($non_object_return_type ne $return_type) {
-        $$scratch_str_ref .= $col . "$return_type result = box($method_name($$new_unboxed_arg_names_list));" . $nl;
+        $$scratch_str_ref .= $col . "$object_t result = box($method_name($$new_unboxed_arg_names_list));" . $nl;
       } else {
         $$scratch_str_ref .= $col . "$return_type result = $method_name($$new_unboxed_arg_names_list);" . $nl;
       }
@@ -3942,7 +3943,7 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .= $col . "static func $method_type_decl = $qualified_klass_name\::$method_name; //qualqual" . $nl;
   if ($$method{'return-type'}) {
     $$scratch_str_ref .=
-      $col . "$return_type _result_ = $func_name($args);" . $nl .
+      $col . "auto _result_ = $func_name($args);" . $nl .
       $col . "return _result_;" . $nl;
   } else {
     $$scratch_str_ref .=
