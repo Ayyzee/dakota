@@ -8,8 +8,6 @@ include $(rootdir)/common.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/dakota.mk dakota.build)
 target := lib$(target).$(so_ext)
 
-.PRECIOUS: %.project
-
 .PHONY:\
  all\
  check\
@@ -27,7 +25,7 @@ all: $(target)
 
 $(target): $(srcs)
 
-single: $(srcs) | dakota.project
+single: $(srcs) | $(builddir)/dakota.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) --compile --output $(builddir)/$$input.o $$input;\
@@ -71,10 +69,9 @@ $(install-dirs):
 
 install: all $(install-dirs) $(install.files) $(install-links)
 
-clean: goal-clean | dakota.project
+clean: goal-clean | $(builddir)/dakota.project
 	$(DAKOTA-BASE) --clean
-	$(RM) $(RMFLAGS) dakota.project
-	$(RM) $(RMFLAGS) exe exe.dk exe.project
+	$(RM) $(RMFLAGS) exe exe.dk
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
 	$(RM) $(RMFLAGS) $(target).ctlg

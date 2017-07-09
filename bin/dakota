@@ -82,7 +82,9 @@ $Data::Dumper::Indent    = 1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $default_project_path = 'dakota.project';
+my $builddir = &builddir();
+my $default_project_path = &builddir() . '/dakota.project';
+$default_project_path =~ s=^\./==; # remove leading ./ if present
 
 my $root_cmd = {
   'asts' => [],
