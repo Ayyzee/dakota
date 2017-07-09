@@ -1081,7 +1081,8 @@ sub out_of_date {
     my $infile_stat =  &path_stat($file_db, $infile,  '--inputs');
 
     if (!$$infile_stat{'mtime'}) {
-      die $0 . ': warning: no-such-file: ' . $infile . ' on which ' . $outfile . ' depends' . $nl;
+      my $cwd = &cwd();
+      die $0 . ': warning: no-such-file: ' . $cwd . ' / ' . $infile . ' on which ' . $outfile . ' depends' . $nl;
     }
     if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
       &add_last($result, $infile);
@@ -1228,7 +1229,8 @@ sub copy_no_dups {
   foreach my $str (@$strs) {
     if (! $$cmd_info{'opts'}{'precompile'} && ! -e $str) {
       if ($str eq &find_library($str)) {
-        print STDERR $0 . ': warning: no-such-file: ' . $str . $nl;
+        my $cwd = &cwd();
+        print STDERR $0 . ': warning: no-such-file: ' . $cwd . ' / ' . $str . $nl;
       }
     }
     if (&is_abs($str)) {
