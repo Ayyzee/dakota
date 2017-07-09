@@ -181,6 +181,7 @@ if (!$$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
   $$root_cmd{'opts'}{'project'} = &create_missing_project($root_cmd, $inputs);
 }
 if ($$root_cmd{'opts'}{'project'}) {
+  &convert_project($$root_cmd{'opts'}{'project'});
   ($project, $project_io) = &use_project($root_cmd);
 }
 if ($$root_cmd{'opts'}{'clean'}) {
@@ -369,6 +370,29 @@ sub create_missing_project {
   }
   &scalar_to_file($project_path, $project);
   return $project_path;
+}
+sub convert_project {
+  my ($project_path) = @_;
+  # some vars are actually scalar, but the conversion from cmake to project
+  # converts every var into an array so this conversion is required
+  my $project = &scalar_from_file($project_path);
+  my $did_change = 0;
+  foreach my $var ('builddir', 'is-lib', 'target') {
+    if (ref($$project{$var}) eq 'ARRAY') {
+      my $len = scalar(@{$$project{$var}});
+      if ($len == 0) {
+        $$project{$var} = undef;
+      } elsif ($len == 1) {
+        $$project{$var} = $$project{$var}[0];
+      } else {
+        die;
+      }
+      $did_change = 1;
+    }
+  }
+  if ($did_change) {
+    &scalar_to_file($project_path, $project);
+  }
 }
 sub project_base {
   my ($inputs) = @_;

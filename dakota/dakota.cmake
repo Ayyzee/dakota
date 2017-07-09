@@ -1,4 +1,4 @@
-set (builddir dkt)
+set (builddir build-dkt)
 set (include-dirs
   ../include
   ${INSTALL_PREFIX}/include
