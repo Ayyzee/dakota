@@ -427,7 +427,7 @@ sub out_path_from_in_path {
 
   my $result = &expand(&var_perl_from_make($path_in));
   if ($result =~ m|^$pattern_template$|) {
-    $result = sprintf($pattern_replacement, &rel_path_canon($1));
+    $result = sprintf($pattern_replacement, &relpath($1));
     $result = &expand($result);
   } else {
     print STDERR "warning: $pattern_name: $result !~ |^$pattern_template\$|\n";

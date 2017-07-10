@@ -152,7 +152,6 @@ our @EXPORT= qw(
                  project_io_from_file
                  project_io_remove
                  project_io_to_file
-                 rel_path_canon
                  relpath
                  remove_extra_whitespace
                  remove_first
@@ -1111,37 +1110,6 @@ sub longest_common_prefix {
   }
   return $path_prefix;
 }
-sub rel_path_canon {
-  my ($path1, $cwd) = @_;
-  my $result = $path1;
-
-  #if ($path1 =~ m/\.\./g) {
-    if (!$cwd) {
-      $cwd = &cwd();
-    }
-
-    my $path2 = $path1;
-    if (&use_abs_path()) {
-      $path2 = &Cwd::abs_path($path2);
-    }
-    Carp::confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
-    my $common_prefix = &longest_common_prefix($cwd, $path2);
-    my $adj_common_prefix = $common_prefix;
-    $adj_common_prefix =~ s|/[^/]+/$||g;
-    $result = $path2;
-    $result =~ s|^$adj_common_prefix/||;
-
-    if ($ENV{'DKT-DEBUG'}) {
-      print "$path1 = arg\n";
-      print "$cwd = cwd\n";
-      print $nl;
-      print "$path1 = $path1\n";
-      print "$result = $path1\n";
-      print "$result = result\n";
-    }
-  #}
-  return $result;
-}
 sub all_files {
   my ($dirs, $include_regex, $exclude_regex) = @_;
   if (!is_array($dirs)) {
@@ -1172,7 +1140,7 @@ sub all_files_recursive {
       } elsif (-e $path) {
         if (!defined $include_regex || $path =~ m{$include_regex}) {
           if (!defined $exclude_regex || $path !~ m{$exclude_regex}) {
-            my $rel_path_dir = &rel_path_canon($dir);
+            my $rel_path_dir = &relpath($dir);
             my $rel_path = $path =~ s=$rel_path_dir=$raw_dir=r;
             $rel_path = &canon_path($rel_path);
             $$files{$path} = $rel_path;
