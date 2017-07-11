@@ -1272,6 +1272,7 @@ sub realpath {
 sub relpath {
   my ($path, $base) = @_; # base is optional
   die if !$path;
+  return $path if ! &is_abs($path);
   $path = &realpath($path);
   if ($base) {
     $base = &realpath($base);
