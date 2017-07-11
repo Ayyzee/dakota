@@ -143,7 +143,6 @@ our @EXPORT= qw(
                  needs_hex_encoding
                  num_kw_args
                  num_kw_arg_names
-                 builddir
                  pann
                  param_types_str
                  project_io_add
@@ -714,6 +713,10 @@ sub global_project_target {
 sub set_global_project {
   my ($project_path) = @_;
   $global_project = &scalar_from_file($project_path);
+  my $dir = &dir_part(&relpath($project_path));
+  if ($dir ne '.') {
+    $$global_project{'dir'} = $dir;
+  }
   return $global_project;
 }
 my $target_srcs_ast;
@@ -1157,29 +1160,25 @@ sub dmp {
   print STDERR &Dumper($ref);
 }
 sub adjust_path {
-  my ($project_path, $input) = @_;
+  my ($dir, $input, $force) = @_;
+  $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {
     $rel_input = &relpath($input);
     #die if ! -e $rel_input;
     return $rel_input;
   }
-  my $rel_project_path = $project_path;
-  if (&is_abs($project_path)) {
-    $rel_project_path = &relpath($project_path);
-  }
-  my $dir = &dir_part($rel_project_path);
-  if (! -e $input && -e "$dir/$input") {
-    $rel_input = "$dir/$input";
+  if ($force || (! -e $input && -e "$dir/$input")) {
+    $rel_input = &relpath("$dir/$input");
   }
   #die if ! -e $rel_input;
   return $rel_input;
 }
 sub adjust_paths {
-  my ($project_path, $inputs) = @_;
+  my ($dir, $inputs, $force) = @_;
   my $rel_inputs = [];
   foreach my $input (@$inputs) {
-    my $rel_input = &adjust_path($project_path, $input);
+    my $rel_input = &adjust_path($dir, $input, $force);
     &add_last($rel_inputs, $rel_input);
   }
   return $rel_inputs;
