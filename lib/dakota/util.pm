@@ -1156,11 +1156,6 @@ sub dmp {
   my ($ref) = @_;
   print STDERR &Dumper($ref);
 }
-sub dirname {
-  my ($path) = @_;
-  my ($dir, $name, $ext) = &split_path($path);
-  return $dir;
-}
 sub adjust_path {
   my ($project_path, $input) = @_;
   my $rel_input = $input;
@@ -1173,7 +1168,7 @@ sub adjust_path {
   if (&is_abs($project_path)) {
     $rel_project_path = &relpath($project_path);
   }
-  my $dir = &dirname($rel_project_path);
+  my $dir = &dir_part($rel_project_path);
   if (! -e $input && -e "$dir/$input") {
     $rel_input = "$dir/$input";
   }
