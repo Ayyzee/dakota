@@ -1,5 +1,5 @@
 # -*- mode: cmake -*-
-#set (CMAKE_VERBOSE_MAKEFILE ON)
+set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 set (dakota dakota)
 set (dk-cxx-compiler clang++)
 
