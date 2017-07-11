@@ -4,7 +4,7 @@ set (dakota dakota)
 set (dk-cxx-compiler clang++)
 
 if (NOT DEFINED ${project-path})
-  set (project-path dakota.project)
+  set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
 endif ()
 
 string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})

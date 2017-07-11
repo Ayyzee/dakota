@@ -211,7 +211,7 @@ sub project_io_path_from_project_path {
   my $project = &dakota::util::scalar_from_file($project_path);
   my $builddir = 'dkt';
   $builddir = $$project{'builddir'} if $$project{'builddir'};
-  my $project_io_path = $builddir . '/' . $project_path;
+  my $project_io_path = $builddir . '/' . &relpath($project_path);
   $project_io_path =~ s/\.project$/.io/;
   return $project_io_path;
 }
