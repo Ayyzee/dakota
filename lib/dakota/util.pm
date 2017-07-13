@@ -713,9 +713,9 @@ sub global_project_target {
 sub set_global_project {
   my ($project_path) = @_;
   $global_project = &scalar_from_file($project_path);
-  my $dir = &dir_part(&relpath($project_path));
-  if ($dir ne '.') {
-    $$global_project{'dir'} = $dir;
+  my $source_dir = &dir_part(&relpath($project_path));
+  if ($source_dir ne '.') {
+    $$global_project{'source-dir'} = $source_dir;
   }
   return $global_project;
 }
@@ -1160,7 +1160,8 @@ sub dmp {
   print STDERR &Dumper($ref);
 }
 sub adjust_path {
-  my ($dir, $input, $force) = @_;
+  my ($source_dir, $input, $force) = @_;
+  return $input if $source_dir eq '.';
   $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {
@@ -1168,17 +1169,19 @@ sub adjust_path {
     #die if ! -e $rel_input;
     return $rel_input;
   }
-  if ($force || (! -e $input && -e "$dir/$input")) {
-    $rel_input = &relpath("$dir/$input");
+  my $path = $source_dir . '/' . $input;
+  if ($force || (! -e $input && -e $path)) {
+    $rel_input = &relpath($path);
   }
   #die if ! -e $rel_input;
   return $rel_input;
 }
 sub adjust_paths {
-  my ($dir, $inputs, $force) = @_;
+  my ($source_dir, $inputs, $force) = @_;
+  return $inputs if $source_dir eq '.';
   my $rel_inputs = [];
   foreach my $input (@$inputs) {
-    my $rel_input = &adjust_path($dir, $input, $force);
+    my $rel_input = &adjust_path($source_dir, $input, $force);
     &add_last($rel_inputs, $rel_input);
   }
   return $rel_inputs;
