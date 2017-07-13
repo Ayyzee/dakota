@@ -317,6 +317,8 @@ if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
     }
   }
 }
+#print STDERR 'root_cmd: ' . &Dumper($root_cmd);
+#print STDERR 'project: ' .  &Dumper($project);
 my $result = &dakota::dakota::start_cmd($root_cmd, $project);
 exit $result;
 
@@ -398,9 +400,19 @@ sub exe_from_exe_name {
   my ($name) = @_;
   return $name;
 }
+sub project_adjust_paths {
+  my ($project) = @_;
+  return if ! $$project{'source-dir'};
+  my $force;
+  $$project{'inputs'} =       &adjust_paths($$project{'source-dir'}, $$project{'inputs'});
+  $$project{'srcs'} =         &adjust_paths($$project{'source-dir'}, $$project{'srcs'});
+ #$$project{'include-dirs'} = &adjust_paths($$project{'source-dir'}, $$project{'include-dirs'}, $force = 1);
+ #$$project{'builddir'} =     &adjust_path( $$project{'source-dir'}, $$project{'builddir'}, $force = 1);
+}
 sub use_project {
   my ($root_cmd) = @_;
   my $project = &set_global_project($$root_cmd{'opts'}{'project'});
+  $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'project'}));
   if (! $$project{'builddir'}) {
     $$project{'builddir'} = &builddir();
   }
@@ -427,6 +439,10 @@ sub use_project {
       &add_last($$root_cmd{'inputs'}, &lib_from_lib_name('dakota'));
       &add_last($$project{'inputs'},  &lib_from_lib_name('dakota'));
     }
+  }
+  &project_adjust_paths($project);
+  if ($$project{'source-dir'}) {
+    $$root_cmd{'source-dir'} = $$project{'source-dir'}; # 'project.source-dir'?
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
