@@ -78,7 +78,6 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 is_dk_path
                  is_o_path
                  target_cc_path
                  rel_target_h_path
@@ -136,14 +135,6 @@ sub is_so_path {
 sub is_cc_path {
   my ($arg) = @_;
   if ($arg =~ m/\.$cc_ext$/) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_dk_path {
-  my ($arg) = @_;
-  if ($arg =~ m/\.dk$/) {
     return 1;
   } else {
     return 0;

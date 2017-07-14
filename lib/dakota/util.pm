@@ -105,6 +105,7 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  int_from_str
+                 is_dk_path
                  is_abs
                  is_array_type
                  is_box_type
@@ -1158,6 +1159,14 @@ sub all_files_recursive {
 sub dmp {
   my ($ref) = @_;
   print STDERR &Dumper($ref);
+}
+sub is_dk_path {
+  my ($arg) = @_;
+  if ($arg =~ m/\.dk$/) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 sub adjust_path {
   my ($source_dir, $input, $force) = @_;
