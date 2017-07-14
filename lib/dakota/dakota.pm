@@ -650,7 +650,7 @@ sub start_cmd {
     $$cmd_info{'opts'}{'compiler'} = $cxx;
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
-    my $cxxflags =       &var($gbl_compiler, 'CXXFLAGS', [ '-std=c++14', '--visibility=hidden' ]);
+    my $cxxflags =       &var($gbl_compiler, 'CXXFLAGS', [ '-std=c++1z', '--visibility=hidden' ]);
     my $extra_cxxflags = &var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
     $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
   }
