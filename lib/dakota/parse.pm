@@ -77,6 +77,7 @@ sub ast_path_from_o_path {
 }
 my $patterns = {
   'cc_path_from_dk_path' => '$(builddir)/%.$(cc_ext) : %.dk',
+  'inc_path_from_dk_path' => '$(builddir)/%.inc : %.dk',
 
   'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '%.$(cc_ext).$(o_ext) : %.$(cc_ext)',
@@ -352,10 +353,7 @@ sub str_from_cmd_info {
 }
 sub inc_path_from_dk_path {
   my ($path) = @_;
-  my ($dir, $name) = &split_path($path);
-  $name =~ s/\.dk$/.inc/;
-  my $inc_path = &builddir() . '/' . $dir . '/'. $name;
-  return &canon_path($inc_path);
+  return &out_path_from_in_path('inc_path_from_dk_path', $path);
 }
 sub o_path_from_dk_path {
   my ($path) = @_;
