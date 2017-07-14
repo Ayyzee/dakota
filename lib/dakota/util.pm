@@ -1272,6 +1272,14 @@ sub realpath {
   my $result = Cwd::realpath($path);
   return $result;
 }
+sub prepend_dot_slash {
+  my ($path) = @_;
+  return $path if &is_abs($path);
+  return $path if $path =~ /^\.\//;
+  return $path if $path =~ /^\.\.\//;
+  $path = './' . $path;
+  return $path;
+}
 sub relpath {
   my ($path, $base) = @_; # base is optional
   die if !$path;
