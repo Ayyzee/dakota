@@ -1161,7 +1161,7 @@ sub dmp {
 }
 sub adjust_path {
   my ($source_dir, $input, $force) = @_;
-  return $input if $source_dir eq '.';
+  return $input if ! $source_dir || ($source_dir eq '.');
   $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {
@@ -1178,7 +1178,7 @@ sub adjust_path {
 }
 sub adjust_paths {
   my ($source_dir, $inputs, $force) = @_;
-  return $inputs if $source_dir eq '.';
+  return $inputs if ! $source_dir || ($source_dir eq '.');
   my $rel_inputs = [];
   foreach my $input (@$inputs) {
     my $rel_input = &adjust_path($source_dir, $input, $force);

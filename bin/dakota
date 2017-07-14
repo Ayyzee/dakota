@@ -402,11 +402,11 @@ sub exe_from_exe_name {
 }
 sub project_adjust_paths {
   my ($project) = @_;
-  return if ! $$project{'source-dir'};
+  return if ! $$project{'source-dir'} || ($$project{'source-dir'} eq '.');
   my $force;
   $$project{'inputs'} =       &adjust_paths($$project{'source-dir'}, $$project{'inputs'});
   $$project{'srcs'} =         &adjust_paths($$project{'source-dir'}, $$project{'srcs'});
- #$$project{'include-dirs'} = &adjust_paths($$project{'source-dir'}, $$project{'include-dirs'}, $force = 1);
+  $$project{'include-dirs'} = &adjust_paths($$project{'source-dir'}, $$project{'include-dirs'}, $force = 1);
  #$$project{'builddir'} =     &adjust_path( $$project{'source-dir'}, $$project{'builddir'}, $force = 1);
 }
 sub use_project {
