@@ -82,12 +82,6 @@ sub path_opt {
   }
   return $pair;
 }
-sub cc_from_dk {
-  my ($path) = @_;
-  my $builddir = 'dkt';
-  $path =~ s=^([^\s]+\.dk)$=$builddir/$1.$cc_ext=;
-  return $path;
-}
 sub bname {
   my ($path) = @_;
   my $bname = $path =~ s=^(.*/)?([^\s]+?)\.[^\s]+$=$2=r;
@@ -209,11 +203,9 @@ sub detect_gcc_opts {
 sub project_io_path_from_project_path {
   my ($project_path) = @_;
   my $project = &dakota::util::scalar_from_file($project_path);
-  #print STDERR &Dumper($project);
   my $source_dir = &dir_part(&relpath($project_path));
-  #print STDERR "project_path: $project_path, source_dir: $source_dir\n";
-  my $builddir = $source_dir . '/dkt'; # adjust_path()
-  #$builddir = $$project{'builddir'} if $$project{'builddir'};
+  my $force;
+  my $builddir = &adjust_path($source_dir, $$project{'builddir'}, $force = 1);
   my $project_io_path = $builddir . '/dakota.io';
   return $project_io_path;
 }
