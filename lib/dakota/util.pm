@@ -146,6 +146,7 @@ our @EXPORT= qw(
                  num_kw_arg_names
                  pann
                  param_types_str
+                 prepend_dot_slash
                  project_io_add
                  project_io_append
                  project_io_assign
@@ -591,6 +592,7 @@ sub dir_part {
   my $parts = [split /\//, $path];
   &remove_last($parts);
   my $dir = join '/', @$parts;
+  $dir = '.' if $dir eq "";
   return $dir;
 }
 sub make_dir {
@@ -1170,7 +1172,7 @@ sub is_dk_path {
 }
 sub adjust_path {
   my ($source_dir, $input, $force) = @_;
-  return $input if ! $source_dir || ($source_dir eq '.');
+  return $input if $source_dir eq '.';
   $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {

@@ -30,6 +30,7 @@ use sort 'stable';
 
 my $gbl_compiler;
 my $gbl_used;
+my $source_dir;
 my $builddir;
 my $h_ext;
 my $cc_ext;
@@ -76,13 +77,13 @@ sub ast_path_from_o_path {
   return $out_path;
 }
 my $patterns = {
-  'cc_path_from_dk_path' => '$(builddir)/%.$(cc_ext) : %.dk',
-  'inc_path_from_dk_path' => '$(builddir)/%.inc : %.dk',
+  'cc_path_from_dk_path' => '$(builddir)/%.$(cc_ext) : $(source_dir)/%.dk',
+  'inc_path_from_dk_path' => '$(builddir)/%.inc : $(source_dir)/%.dk',
 
-  'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : %.dk',
+  'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(source_dir)/%.dk',
   'o_path_from_cc_path' =>  '%.$(cc_ext).$(o_ext) : %.$(cc_ext)',
 
-  'ast_path_from_dk_path' =>   '$(builddir)/%.ast      : %.dk',
+  'ast_path_from_dk_path' =>   '$(builddir)/%.ast      : $(source_dir)/%.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
   'ctlg_path_from_so_path' =>   '$(builddir)/%.ctlg : %.$(so_ext)',
@@ -395,6 +396,7 @@ sub var_perl_from_make { # convert variable syntax to perl from make
 }
 sub expand {
   my ($str) = @_;
+  $source_dir if 0;
   $builddir if 0;
   $cc_ext if 0;
   $o_ext  if 0;
@@ -413,9 +415,17 @@ sub expand_tbl_values {
   }
   return $tbl_out;
 }
+sub source_dir {
+  my $project = &global_project();
+  return $$project{'source-dir'};
+}
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
   $path_in = &canon_path($path_in);
+  if (&is_dk_path($path_in)) {
+    $path_in = &prepend_dot_slash($path_in);
+  }
+  $source_dir = &source_dir();
   $builddir = &builddir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic

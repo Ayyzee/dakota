@@ -319,6 +319,8 @@ if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
 }
 #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
 #print STDERR 'project: ' .  &Dumper($project);
+die if ! $$root_cmd{'source-dir'};
+die if ! $$project{'source-dir'};
 my $result = &dakota::dakota::start_cmd($root_cmd, $project);
 exit $result;
 
@@ -402,7 +404,7 @@ sub exe_from_exe_name {
 }
 sub project_adjust_paths {
   my ($project) = @_;
-  return if ! $$project{'source-dir'} || ($$project{'source-dir'} eq '.');
+  return if $$project{'source-dir'} eq '.';
   my $force;
   $$project{'inputs'} =       &adjust_paths($$project{'source-dir'}, $$project{'inputs'});
   $$project{'srcs'} =         &adjust_paths($$project{'source-dir'}, $$project{'srcs'});
@@ -441,9 +443,7 @@ sub use_project {
     }
   }
   &project_adjust_paths($project);
-  if ($$project{'source-dir'}) {
-    $$root_cmd{'source-dir'} = $$project{'source-dir'}; # 'project.source-dir'?
-  }
+  $$root_cmd{'source-dir'} = $$project{'source-dir'}; # 'project.source-dir'?
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
   $$root_cmd{'project.target'} = $$project{'target'};
