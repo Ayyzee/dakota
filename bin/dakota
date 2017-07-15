@@ -409,7 +409,7 @@ sub project_adjust_paths {
   $$project{'inputs'} =       &adjust_paths($$project{'source-dir'}, $$project{'inputs'});
   $$project{'srcs'} =         &adjust_paths($$project{'source-dir'}, $$project{'srcs'});
   $$project{'include-dirs'} = &adjust_paths($$project{'source-dir'}, $$project{'include-dirs'}, $force = 1);
- #$$project{'builddir'} =     &adjust_path( $$project{'source-dir'}, $$project{'builddir'}, $force = 1);
+  $$project{'builddir'} =     &adjust_path( $$project{'source-dir'}, $$project{'builddir'}, $force = 1);
 }
 sub use_project {
   my ($root_cmd) = @_;
@@ -447,7 +447,7 @@ sub use_project {
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
   $$root_cmd{'project.target'} = $$project{'target'};
-  $$root_cmd{'project.io'} = $$project{'builddir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
+  $$root_cmd{'project.io'} = $$project{'builddir'} . '/dakota.io';
   $project_io_path = $$root_cmd{'project.io'};
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
