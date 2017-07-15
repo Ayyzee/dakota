@@ -612,7 +612,7 @@ sub make_dir {
 sub make_dir_part {
   my ($path, $should_echo) = @_;
   my $dir_part = &dir_part($path);
-  if ('' ne $dir_part) {
+  if ('.' ne $dir_part) {
     &make_dir($dir_part, $should_echo);
   } elsif (0) {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;

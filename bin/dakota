@@ -418,9 +418,6 @@ sub use_project {
   if (! $$project{'builddir'}) {
     $$project{'builddir'} = &builddir();
   }
-  if (! -e $$project{'builddir'}) {
-    &make_dir($$project{'builddir'});
-  }
   if (! $$project{'inputs'} && $$project{'srcs'}) {
     $$project{'inputs'} = [ @{$$project{'srcs'}} ];
   }
@@ -443,6 +440,9 @@ sub use_project {
     }
   }
   &project_adjust_paths($project);
+  if (! -e $$project{'builddir'}) {
+    &make_dir($$project{'builddir'});
+  }
   $$root_cmd{'source-dir'} = $$project{'source-dir'}; # 'project.source-dir'?
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
