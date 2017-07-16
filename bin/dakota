@@ -457,8 +457,7 @@ sub use_project {
   }
   $project_io = &dakota::util::project_io_from_file($project_io_path);
   if (1) {
-    my $libs = [ map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
-    $$project_io{'link'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @$libs };
+    $$project_io{'link'} = { map { &canon_path($_) => &find_library(&lib_from_lib_name($_), $$root_cmd{'opts'}{'found-library'}) } @{$$project{'libs'}} };
   }
   if ($$project{'builddir'}) {
     $$project_io{'builddir'} = &canon_path($$project{'builddir'});
