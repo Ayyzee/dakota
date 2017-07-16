@@ -1057,7 +1057,7 @@ sub o_from_cc {
     $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
   }
   my $count = &outfile_from_infiles($o_cmd, $should_echo);
-  &project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
+  #&project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
   return $count;
 }
 sub target_h_from_ast {
