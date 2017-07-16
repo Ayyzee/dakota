@@ -56,7 +56,9 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
-$Data::Dumper::Indent    = 0; # default = 2
+$Data::Dumper::Useqq =     1;
+$Data::Dumper::Sortkeys =  1;
+$Data::Dumper::Indent    = 1; # default = 2
 
 sub path_opt {
   my ($cmd, $ir, $short, $long, $info) = @_;
