@@ -2,10 +2,7 @@
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 set (dakota dakota)
 set (dk-cxx-compiler clang++)
-
-if (NOT DEFINED ${project-path})
-  set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
-endif ()
+set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
 
 string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
 # generate vars-path
@@ -17,7 +14,7 @@ include (${vars-path})
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
-set (CMAKE_CXX_COMPILER dk)
+set (CMAKE_CXX_COMPILER dk) # must follow: project (<> LANGUAGES CXX)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
 list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${dk-cxx-compiler}")
