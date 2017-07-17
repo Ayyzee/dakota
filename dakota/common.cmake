@@ -14,10 +14,6 @@ execute_process (
 )
 include (${vars-path})
 
-if (NOT DEFINED ${cc-ext})
-  set (cc-ext cc)
-endif ()
-
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
