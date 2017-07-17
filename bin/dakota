@@ -475,10 +475,10 @@ sub project_clean {
       }
     }
     if (1) { # cmake writes .o files in its own build dir
-      if ($$root_cmd{'opts'}{'precompile'}) {
-        &project_clean_paths($project_io, 'precompile', 'target-cc');
+      if (! $$root_cmd{'opts'}{'precompile'}) {
+        &project_clean_paths($project_io, 'compile');
       }
-      &project_clean_paths($project_io, 'compile');
+      &project_clean_paths($project_io, 'precompile', 'target-cc');
     }
   }
 }
@@ -486,7 +486,7 @@ sub project_clean_paths {
   my ($project_io, $key, $extra_key) = @_;
   my $values = [values %{$$project_io{$key}}];
   $$project_io{$key} = {};
-  if ($extra_key) {
+  if ($extra_key && $$project_io{$extra_key}) {
     &add_last($values, $$project_io{$extra_key});
     delete $$project_io{$extra_key};
   }
@@ -497,7 +497,6 @@ sub project_clean_paths {
     }
   }
   &dakota::util::project_io_to_file($project_io_path, $project_io);
-
   foreach my $path (sort keys %$remove) {
     print "rm $path" . $nl;
     unlink $path;
