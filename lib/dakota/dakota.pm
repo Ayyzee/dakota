@@ -956,6 +956,7 @@ sub o_from_dk {
       if ($num_out_of_date_infiles) {
         &echo_output_path($outfile); # required by bin/dk
       }
+      &project_io_add($$cmd_info{'project.io'}, 'precompile', $input, $outfile);
     } else {
       my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$o_cmd{'inputs'} = [ $src_path ];
