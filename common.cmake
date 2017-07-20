@@ -21,12 +21,10 @@ list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${dk-cxx-compiler}
 
 include_directories (${include-dirs})
 
-set (link-libs)
 set (found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
-  list (APPEND link-libs ${lib-path})
   list (APPEND found-libs --found-library ${lib}=${lib-path})
 endforeach (lib)
 
@@ -62,4 +60,4 @@ install (TARGETS ${target} DESTINATION ${targets-install-dir})
 target_compile_definitions (${target} PRIVATE ${macros})
 target_compile_options (${target} PRIVATE --warn-no-multichar) # unfortunate
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-target_link_libraries (${target} ${link-libs})
+target_link_libraries (${target} ${libs})

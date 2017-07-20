@@ -32,4 +32,4 @@ install (TARGETS ${target} DESTINATION ${targets-install-dir})
 target_compile_definitions (${target} PRIVATE ${macros})
 target_compile_options (${target} PRIVATE --warn-no-multichar) # unfortunate
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-target_link_libraries (${target} ${link-libs})
+target_link_libraries (${target} ${libs})
