@@ -6,7 +6,5 @@ if [[ 1 == $# ]]; then
   target=$1
 fi
 jobs=$(getconf _NPROCESSORS_ONLN)
-echo ++init++
 cmake --build $binary_dir --target init
-echo ++$target++
 cmake --build $binary_dir --target $target -- --jobs $jobs
