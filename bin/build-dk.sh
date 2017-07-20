@@ -8,5 +8,5 @@ fi
 jobs=$(getconf _NPROCESSORS_ONLN)
 echo ++init++
 cmake --build $binary_dir --target init
-echo ++default++
+echo ++$target++
 cmake --build $binary_dir --target $target -- --jobs $jobs
