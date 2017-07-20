@@ -3,7 +3,7 @@ rootdir := ../..
 so_ext := dylib
 
 builddir := $(shell $(rootdir)/bin/dakota-build builddir --build dakota.project)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/dakota.mk dakota.project)
+include $(shell $(rootdir)/bin/dakota-build2mk --output dk-vars.mk dakota.project)
 target := lib$(target).$(so_ext)
 
 DAKOTA-BASE := $(rootdir)/bin/dakota
@@ -29,4 +29,5 @@ check: all
 
 clean:
 	$(RM) $(RMFLAGS) $(builddir)
+	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 	$(RM) $(RMFLAGS) $(target)

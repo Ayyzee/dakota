@@ -5,7 +5,7 @@ SOURCE_DIR := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/dakota.mk dakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output dk-vars.mk dakota.build)
 target := lib$(target).$(so_ext)
 
 .PRECIOUS: %.project
@@ -38,7 +38,7 @@ single: $(srcs) | dakota.project
 check-exe: all
 	echo "# include \"test.h\"" > exe.dk
 	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> exe.dk
-	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
+	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "build-dkt-exe" }' > exe.project
 	rm -f exe
 	$(DAKOTA) --project exe.project
 	./exe
@@ -75,5 +75,6 @@ clean: goal-clean | dakota.project
 	$(DAKOTA-BASE) --clean
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
-	$(RM) $(RMFLAGS) dkt-exe
+	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
+	$(RM) $(RMFLAGS) build-dkt-exe
 	$(RM) $(RMFLAGS) $(target).ctlg

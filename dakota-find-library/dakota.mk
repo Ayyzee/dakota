@@ -5,7 +5,7 @@ SOURCE_DIR := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk dakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output dk-vars.mk dakota.build)
 
 .PRECIOUS: %.project
 
@@ -43,6 +43,7 @@ goal-clean:
 clean: goal-clean
 	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
+	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 
 distclean: clean
 	cd $(rootdir); ./configure-common

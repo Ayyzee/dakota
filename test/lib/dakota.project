@@ -1,6 +1,6 @@
 # -*- mode: perl -*-
 {
-  'builddir' => 'dkt',
+  'builddir' => 'build-dkt',
   'srcs' => [
     'l1.dk',
     'l1-other.dk',

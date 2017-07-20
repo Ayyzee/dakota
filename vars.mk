@@ -33,7 +33,7 @@ else ifeq ($(compiler), gcc)
   debugger := gdb
 endif
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/compiler.mk\
+include $(shell $(rootdir)/bin/dakota-build2mk --output dk-compiler.mk\
  $(rootdir)/lib/dakota/compiler/command-line.json\
  $(rootdir)/lib/dakota/platform.json)\
 

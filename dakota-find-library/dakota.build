@@ -1,6 +1,6 @@
 # -*- mode: perl -*-
 {
-    'builddir' => 'dkt',
+    'builddir' => 'build-dkt',
     'srcs' => [
       '${SOURCE_DIR}/dakota-find-library.${cc_ext}',
     ],

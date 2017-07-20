@@ -3,7 +3,7 @@ rootdir := ..
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk dakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output dk-vars.mk dakota.build)
 target := lib$(target).$(so_ext)
 
 .PRECIOUS: %.project
@@ -25,9 +25,9 @@ check: all
 check-exe: all
 
 clean:
-	$(RM) $(RMFLAGS) $(target) $(target).$(cxx_debug_symbols_ext) dakota.project
-	$(RM) $(RMFLAGS) $(builddir)/build.mk
+	$(RM) $(RMFLAGS) $(target) $(target).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(builddir)
+	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 
 install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib
 
