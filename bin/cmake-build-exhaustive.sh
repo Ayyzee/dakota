@@ -6,4 +6,4 @@ rootdir=..
 $rootdir/bin/cmake-clean.sh
 $rootdir/bin/cmake-configure.sh $binary_dir # different from autoconf configure
 $rootdir/bin/build-clean.sh
-$rootdir/bin/build-all.sh
+time $rootdir/bin/build-all.sh
