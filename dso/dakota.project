@@ -1,0 +1,12 @@
+# -*- mode: perl -*-
+{
+  'builddir' => 'build-dkt',
+  'is-lib' => 1,
+  'libs' => [
+    'dl'
+  ],
+  'srcs' => [
+    'dso.cc'
+  ],
+  'target' => 'dso'
+}

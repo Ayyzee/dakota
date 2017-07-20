@@ -1,0 +1,19 @@
+# -*- mode: perl -*-
+{
+  'builddir' => 'build-dkt',
+  'include-dirs' => [
+    '.',
+    '../include',
+    '/usr/local/include'
+  ],
+  'lib-dirs' => [
+    '/usr/local/lib'
+  ],
+  'libs' => [
+    'dso'
+  ],
+  'srcs' => [
+    'dakota-catalog.cc'
+  ],
+  'target' => 'dakota-catalog'
+}
