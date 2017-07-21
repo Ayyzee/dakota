@@ -46,6 +46,36 @@ BEGIN {
     $so_ext = 'so'; # default dynamic shared object/library extension
   }
 };
+my $opts = { 'var' => { 'DEST' =>   '',
+                        'SOURCE_DIR' => '.',
+                        'so_ext' => $so_ext,
+                        'cc_ext' => 'cc',
+                      }
+           };
+sub add_array {
+  my ($build, $key, $result) = @_;
+  if ($$build{$key}) {
+    $$result{$key} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{$key}} ];
+  }
+}
+sub add_arrays {
+  my ($build, $keys, $result) = @_;
+  foreach my $key (@$keys) {
+    &add_array($build, $key, $result);
+  }
+}
+sub add_scalar {
+  my ($build, $key, $result) = @_;
+  if ($$build{$key}) {
+    $$result{$key} = &canon_path(&subst($$build{$key}, $$opts{'var'}));
+  }
+}
+sub add_scalars {
+  my ($build, $keys, $result) = @_;
+  foreach my $key (@$keys) {
+    &add_scalar($build, $key, $result);
+  }
+}
 sub start {
   my ($argv) = @_;
   my $build = &scalar_from_file($$argv[0]);
@@ -54,22 +84,23 @@ sub start {
     my $name = $$argv[2];
     $build = $$build{$name};
   }
-  my $opts = { 'var' => { 'DEST' =>   '',
-                          'SOURCE_DIR' => '.',
-                          'so_ext' => $so_ext,
-                        }
-            };
+  my $array_keys = [
+    'include-dirs',
+    'inputs',
+    'lib-dirs',
+    'libs',
+    'macros',
+    'srcs',
+  ];
+  my $scalar_keys = [
+    'builddir',
+    'is-lib',
+    'output',
+    'target',
+  ];
   my $result = {};
-  $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'inputs'}} ] if $$build{'inputs'};
-  $$result{'srcs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'srcs'}}   ] if $$build{'srcs'};
-  $$result{'libs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'libs'}}   ] if $$build{'libs'};
-  $$result{'lib-dirs'} =     [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'lib-dirs'}}     ] if $$build{'lib-dirs'};
-  $$result{'include-dirs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'include-dirs'}} ] if $$build{'include-dirs'};
-  $$result{'macros'} =       [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'macros'}}       ] if $$build{'macros'};
-  $$result{'builddir'} = &canon_path(&subst($$build{'builddir'}, $$opts{'var'})) if $$build{'builddir'};
-  $$result{'output'} =   &canon_path(&subst($$build{'output'},   $$opts{'var'})) if $$build{'output'};
-  $$result{'target'} =   &canon_path(&subst($$build{'target'},   $$opts{'var'})) if $$build{'target'};
-  $$result{'is-lib'} =   &canon_path(&subst($$build{'is-lib'},   $$opts{'var'})) if $$build{'is-lib'};
+  &add_arrays($build, $array_keys, $result);
+  &add_scalars($build, $scalar_keys, $result);
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);
 }
