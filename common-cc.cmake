@@ -5,7 +5,7 @@ set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
 string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
 # generate vars-path
 execute_process (
-  COMMAND dakota-build2cmake ${project-path} ${vars-path}
+  COMMAND ${dakota-project2cmake} ${project-path} ${vars-path}
 )
 include (${vars-path})
 

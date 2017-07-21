@@ -1,13 +1,15 @@
 # -*- mode: cmake -*-
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
-set (dakota dakota)
+set (ENV{PATH} "${CMAKE_SOURCE_DIR}/../bin:$ENV{PATH}")
+set (dakota               dakota)
+set (dakota-project2cmake dakota-project2cmake)
 set (dk-cxx-compiler clang++)
 set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
 
 string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
 # generate vars-path
 execute_process (
-  COMMAND dakota-build2cmake ${project-path} ${vars-path}
+  COMMAND ${dakota-project2cmake} ${project-path} ${vars-path}
 )
 include (${vars-path})
 
