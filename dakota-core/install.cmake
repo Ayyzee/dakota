@@ -1,8 +1,10 @@
 set (install-lib-dakota-files
   ../lib/dakota/compiler-command-line-clang.json
+  ../lib/dakota/compiler-command-line-gcc.json
   ../lib/dakota/extra.json
   ../lib/dakota/lang-user-data.json
   ../lib/dakota/platform-darwin.json
+  ../lib/dakota/platform-linux.json
   ../lib/dakota/used.json
   ../lib/dakota/dakota.pm
   ../lib/dakota/generate.pm
