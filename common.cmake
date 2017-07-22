@@ -1,9 +1,9 @@
 # -*- mode: cmake -*-
-set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
-set (ENV{PATH} "${CMAKE_SOURCE_DIR}/../bin:$ENV{PATH}")
-set (dakota               dakota)
 set (dakota-project2cmake dakota-project2cmake)
-set (dk-cxx-compiler clang++)
+set (dakota               dakota)
+set (root-dir ${CMAKE_SOURCE_DIR}/..)
+set (ENV{PATH} "${root-dir}/bin:$ENV{PATH}")
+set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
 
 string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
@@ -12,17 +12,18 @@ execute_process (
   COMMAND ${dakota-project2cmake} ${project-path} ${vars-path}
 )
 include (${vars-path})
+include (${root-dir}/warn.cmake)
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
-set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
+
+set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
+set (cxx-compiler clang++)
+set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
-list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${dk-cxx-compiler}")
-
-include_directories (${include-dirs})
-
+list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${cxx-compiler}")
 set (found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
@@ -58,8 +59,10 @@ else ()
   set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
 
+include_directories (${include-dirs})
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
+install (FILES ${install-include-files} DESTINATION /usr/local/include)
 target_compile_definitions (${target} PRIVATE ${macros})
-target_compile_options (${target} PRIVATE --warn-no-multichar) # unfortunate
+target_compile_options (${target} PRIVATE ${cxx-compiler-warning-flags})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 target_link_libraries (${target} ${libs})
