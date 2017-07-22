@@ -25,7 +25,7 @@ check: all
 check-exe: all
 
 clean:
-	$(RM) $(RMFLAGS) $(target) $(target).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(target) $(target).$(cxx_debug_symbols_ext) dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 

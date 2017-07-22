@@ -41,7 +41,7 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target)
 
 clean: goal-clean
-	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 

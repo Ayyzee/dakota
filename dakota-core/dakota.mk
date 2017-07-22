@@ -72,8 +72,8 @@ $(install-dirs):
 install: all $(install-dirs) $(install.files) $(install-links)
 
 clean: goal-clean | dakota.project
-	$(DAKOTA-BASE) --clean
-	$(RM) $(RMFLAGS) exe exe.dk exe.project
+	$(DAKOTA-BASE) --project dakota.project --clean
+	$(RM) $(RMFLAGS) exe exe.dk exe.project dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 	$(RM) $(RMFLAGS) build-dkt-exe
