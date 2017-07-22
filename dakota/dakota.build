@@ -31,7 +31,7 @@
       '${INSTALL_PREFIX}/lib',
     ],
     'libs' => [ # cmd-line
-      'dso',
+      'dakota-dso',
       'dakota-core',
     ],
     'include-dirs' => [ # cmd-line

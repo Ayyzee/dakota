@@ -27,7 +27,7 @@
 
 # include <cassert>
 
-# include "dso.h"
+# include "dakota-dso.h"
 
 # define cast(t) (t)
 

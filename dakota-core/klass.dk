@@ -21,7 +21,7 @@
 
 # include "config.h"
 # include "dakota-rt-private.h"
-# include "dso.h" // dso-symbol-for-address()
+# include "dakota-dso.h" // dso-symbol-for-address()
 # include "private.h"
 # include "safe-str.h"
 # include "sorted-set-core.h"

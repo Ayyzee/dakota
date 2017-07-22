@@ -8,7 +8,7 @@
       '${INSTALL_PREFIX}/lib',
     ],
     'libs' => [
-      'dso',
+      'dakota-dso',
     ],
     'include-dirs' => [
       '${SOURCE_DIR}/../include',

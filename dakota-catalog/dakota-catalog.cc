@@ -28,7 +28,7 @@
 # include "dummy.h"
 # include "dakota-other.inc" // format_printf(), format_va_printf()
 
-# include "dso.h"
+# include "dakota-dso.h"
 
 const str_t dev_null = "/dev/null";
 enum {

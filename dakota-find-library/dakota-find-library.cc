@@ -17,7 +17,7 @@
 # include <cstdio>  // printf(), fprintf(), stderr
 # include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
 
-# include "dso.h"
+# include "dakota-dso.h"
 
 static str_t progname;
 

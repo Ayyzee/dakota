@@ -76,7 +76,7 @@
       '${INSTALL_PREFIX}/lib',
     ],
     'libs' => [ # cmd-line
-      'dso',
+      'dakota-dso',
     ],
     'include-dirs' => [ # cmd-line
       '${SOURCE_DIR}',

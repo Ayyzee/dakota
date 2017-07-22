@@ -2,7 +2,7 @@ SHELL := /bin/bash -o errexit -o nounset -o pipefail
 
 rootdir ?= .
 include $(rootdir)/makeflags.mk
-dirs-cc := dso dakota-catalog dakota-find-library
+dirs-cc := dakota-dso dakota-catalog dakota-find-library
 dirs-dk := dakota-core dakota
 dirs := $(dirs-cc) $(dirs-dk)
 
@@ -10,7 +10,7 @@ dirs := $(dirs-cc) $(dirs-dk)
 # dakota-core:         dakota-catalog
 #                      dakota-find-library
 # dakota-catalog
-# dakota-find-library: dso
+# dakota-find-library: dakota-dso
 
 .PHONY: \
  all \

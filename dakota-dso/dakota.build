@@ -2,25 +2,25 @@
 {
   'builddir' => 'build-dkt',
   'srcs' => [
-    '${SOURCE_DIR}/dso.${cc_ext}',
+    '${SOURCE_DIR}/dakota-dso.${cc_ext}',
   ],
   'libs' => [
     'dl',
   ],
-  'target' => 'dso',
+  'target' => 'dakota-dso',
   'include-dirs' => [
     '${SOURCE_DIR}/../include',
   ],
   'install-include-files' => [
-    '${SOURCE_DIR}/../include/dso.${h_ext}',
+    '${SOURCE_DIR}/../include/dakota-dso.${h_ext}',
   ],
   'is-lib' => 1,
   'install' => {
     '-rules' => [
     ],
     'files' => [ # install.files
-      '${DESTDIR}${INSTALL_PREFIX}/include/dso.${h_ext}',
-      '${DESTDIR}${INSTALL_PREFIX}/lib/libdso.${so_ext}',
+      '${DESTDIR}${INSTALL_PREFIX}/include/dakota-dso.${h_ext}',
+      '${DESTDIR}${INSTALL_PREFIX}/lib/libdakota-dso.${so_ext}',
     ],
   }
 }
