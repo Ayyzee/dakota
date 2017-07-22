@@ -31,6 +31,7 @@ my $gbl_prefix;
 my $gbl_compiler;
 my $so_ext;
 my $o_ext;
+my $cc_ext;
 my $nl = "\n";
 
 sub dk_prefix {
@@ -71,6 +72,7 @@ $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler-command-line.json"
   }
   $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
   $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', 'o'); # could be .bc or .lto
+  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', 'cc');
 }
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -98,6 +100,232 @@ my $root_cmd = {
     'var' => {},
   }
 };
+sub path_opt {
+  my ($cmd, $ir, $short, $long, $info) = @_;
+  $short = 'no-such-short-opt' if !$short;
+  my $arg = $$cmd[$$ir];
+  my $pair;
+  if (0) {
+  } elsif ($arg =~ /^(-$short|--$long=)([^\s]+)$/) {
+    $pair = [$$ir, $2];
+  } elsif ($arg =~ /^-$short|--$long$/) {
+    $pair = [$$ir + 1, $$cmd[$$ir + 1]];
+    $$ir++;
+  }
+  if ($pair) {
+    if (exists $$info{$long} && 'ARRAY' ne ref($$info{$long})) {
+      $$info{$long} = $pair;
+    } else {
+      if (!defined $$info{$long}) {
+        $$info{$long} = [];
+      }
+      &add_last($$info{$long}, $pair);
+    }
+  }
+  return $pair;
+}
+sub bname {
+  my ($path) = @_;
+  my $bname = $path =~ s=^(.*/)?([^\s]+?)\.[^\s]+$=$2=r;
+  return $bname;
+}
+sub check_paths {
+  my ($dk_path, $cc_path) = @_;
+  if (&bname($dk_path) ne &bname($cc_path)) {
+    die $0 . ': error: ' . $cc_path . ' does not correspond to ' . $dk_path . $nl;
+  }
+}
+sub translate_dk_to_cc {
+  my ($cmd, $cc_paths) = @_;
+  for (my $i = 1; $i < @$cmd; $i++) {
+    my $arg = $$cmd[$i];
+    die if ! $arg || '' eq $arg;
+    if ($arg =~ /\.dk$/) {
+      my $cc_path = &remove_first($cc_paths);
+      die if ! $cc_path || '' eq $cc_path;
+      &check_paths($arg, $cc_path);
+      $$cmd[$i] = $cc_path;
+    }
+  }
+}
+sub build_precompile_cmd {
+  my ($dakota_opts, $info, $ordered_input_args) = @_;
+  my $project = $$dakota_opts{'project'};
+  my $cmd = [ 'dakota' ];
+  if ($project) {
+    &add_last($cmd, ('--project', $project));
+  }
+  if ($$info{'define-macro'}) {
+    foreach my $macro (@{$$info{'define-macro'}}) {
+      &add_last($cmd, ('--define-macro', $$macro[1]));
+    }
+  }
+  &add_last($cmd, '--precompile');
+  if ($$info{'major-mode'}) {
+    &add_last($cmd, '--' . $$info{'major-mode'}[1]);
+  }
+  &add_last($cmd, ('--output', $$info{'output'}[1]));
+  &add_last($cmd, (@$ordered_input_args));
+  return $cmd;
+}
+sub get_dakota_opts {
+  my ($cmd) = @_;
+  my $var4opt = { 'project' => 'DK_PROJECT',
+                  'cxx'     => 'DK_CXX' };
+  my $info = {};
+  my $to_remove = [];
+  for (my $i = 0; $i < @$cmd; ) {
+    my $arg = $$cmd[$i];
+    foreach my $opt (keys %$var4opt) {
+      $$info{$opt} = undef if !exists $$info{$opt};
+      if ($arg =~ /^--$opt$/) {
+        $$info{$opt} = $$cmd[$i + 1];
+        &add_first($to_remove, $i);
+        &add_first($to_remove, $i + 1);
+        last;
+      }
+    }
+    $i++;
+  }
+  foreach my $i (@$to_remove) {
+    splice @$cmd, $i, 1;
+  }
+  foreach my $opt (keys %$var4opt) {
+    if (!$$info{$opt}) {
+      if ($ENV{$$var4opt{$opt}}) {
+        $$info{$opt} = $ENV{$$var4opt{$opt}};
+      } else {
+        die $0 . ': error: option --' . $opt .
+          ' not used, so environment variable ' .
+          $$var4opt{$opt} . ' required' . $nl;
+      }
+    }
+  }
+  return $info;
+}
+my $major_mode_tbl = {
+  '-c'        => 'compile',
+  '--compile' => 'compile',
+  '-shared'   => 'shared',
+  '--shared'  => 'shared',
+  '-dynamic'  => 'dynamic',
+  '--dynamic' => 'dynamic',
+};
+sub detect_gcc_opts {
+  my ($cmd, $info) = @_;
+  my $num_dk_files = 0;
+  $$info{'output'} = undef;
+  $$info{'inputs'} = [];
+  my $ordered_input_args = [];
+  for (my $i = 1; $i < @$cmd; $i++) {
+    my $arg = $$cmd[$i];
+    my $pair;
+    if (0) {
+    } elsif ($$major_mode_tbl{$arg}) {
+      $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
+    #} elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
+    #  &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
+    #} elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
+    #  &add_last($ordered_input_args, ('--library', $$pair[1]));
+    } elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
+    } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
+    } elsif ($arg !~ /^-/) {
+      if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
+        $pair = [$i, $arg];
+        &add_last($$info{'inputs'}, $pair);
+        &add_last($ordered_input_args, $$pair[1]);
+        if ($arg =~ /\.dk$/) {
+          $num_dk_files++;
+        }
+      }
+    }
+  }
+  return ($num_dk_files, $ordered_input_args);
+}
+sub project_io_path_from_project_path {
+  my ($project_path) = @_;
+  my $project = &dakota::util::scalar_from_file($project_path);
+  my $source_dir = &dir_part(&relpath($project_path));
+  my $force;
+  my $builddir = &adjust_path($source_dir, $$project{'builddir'}, $force = 1);
+  my $project_io_path = $builddir . '/dakota.io';
+  return $project_io_path;
+}
+sub is_so_path {
+  my ($name) = @_;
+  # linux and darwin so-regexs are combined
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
+  #my $libname = $2 . ".$so_ext";
+  return $result;
+}
+my $verbose = $ENV{'DK_VERBOSE'};
+sub convert_and_exec_cmd {
+  my ($argv) = @_;
+  my $cmd = [$0, @$argv];
+  if ($verbose) {
+    print '# 1/3 ' . join(' ', @$cmd) . $nl;
+  }
+  my $dakota_opts = &get_dakota_opts($cmd);
+  my $gcc_cmd = [@$cmd];
+  $$gcc_cmd[0] = $$dakota_opts{'cxx'};
+  my $info = {};
+  my ($num_dk_files, $ordered_input_args) = &detect_gcc_opts($gcc_cmd, $info);
+  my $cc_paths;
+  if ($num_dk_files) {
+    my $precompile_cmd = &build_precompile_cmd($dakota_opts, $info, $ordered_input_args);
+    my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
+    if ($verbose) {
+      print '# 2/3 ' . $precompile_cmd_str . $nl;
+    }
+    my $outstr = `$precompile_cmd_str`;
+    my $val = $? >> 8;
+    if (0 != $val) {
+      print $outstr;
+      exit $val;
+    }
+    if (!defined $outstr) {
+      die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
+    }
+    $cc_paths = [split /\s+/, $outstr];
+  } else {
+    if ($verbose) {
+      print '# 2/3 (skipped)' . $nl;
+    }
+    $cc_paths = [];
+  }
+  if (0 != @$cc_paths) {
+    &translate_dk_to_cc($gcc_cmd, $cc_paths);
+  }
+  if ($verbose) {
+    print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
+  }
+  my $exit_val = system @$gcc_cmd;
+  if (!$exit_val) {
+    my $inputs = [];
+    my $output = $$info{'output'}[1];
+    foreach my $pair (@{$$info{'inputs'}}) {
+      my $input = &relpath($$pair[1]);
+      if ($input =~ /\.(dk|$cc_ext)$/) {
+        &add_last($inputs, $input);
+      }
+    }
+    if (0 != @$inputs && !&is_so_path($output)) {
+      my $project_io_path = &project_io_path_from_project_path($$dakota_opts{'project'});
+      &dakota::util::project_io_add($project_io_path, 'compile', $inputs, $output);
+    }
+  }
+  return $exit_val;
+}
+sub has_cxx_opt {
+  my ($argv) = @_;
+  foreach my $arg (@$argv) {
+    return 1 if $arg eq '--cxx';
+  }
+  return 0;
+}
+if (&has_cxx_opt(\@ARGV)) {
+  exit &convert_and_exec_cmd(\@ARGV);
+}
 &GetOptions($$root_cmd{'opts'},
             'define-macro=s',       # gcc-like
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)

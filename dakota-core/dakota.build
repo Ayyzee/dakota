@@ -131,7 +131,6 @@
         '${DESTDIR}${INSTALL_PREFIX}/bin/dakota-project2cmake',
         '${DESTDIR}${INSTALL_PREFIX}/bin/dakota-build2mk',
         '${DESTDIR}${INSTALL_PREFIX}/bin/dakota-build2project',
-        '${DESTDIR}${INSTALL_PREFIX}/bin/dk',
       ],
       '-home' => [ # install.home
         '${SOURCE_DIR}/home/.dakota/.bashrc',

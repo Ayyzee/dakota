@@ -16,7 +16,7 @@ include (${vars-path})
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
-set (CMAKE_CXX_COMPILER dk) # must follow: project (<> LANGUAGES CXX)
+set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
 list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${dk-cxx-compiler}")
