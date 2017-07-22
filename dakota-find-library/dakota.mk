@@ -48,18 +48,18 @@ clean: goal-clean
 distclean: clean
 	cd $(rootdir); ./configure-common
 
-install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota
+install-dirs := $(INSTALL_PREFIX)/bin $(INSTALL_PREFIX)/include $(INSTALL_PREFIX)/lib/dakota
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
 
-$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform.json:              $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform-$(platform).json
+$(INSTALL_PREFIX)/lib/dakota/platform.json:              $(INSTALL_PREFIX)/lib/dakota/platform-$(platform).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json: $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-command-line-$(compiler).json
+$(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json: $(INSTALL_PREFIX)/lib/dakota/compiler-command-line-$(compiler).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-install-links := $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform.json
+install-links := $(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json $(INSTALL_PREFIX)/lib/dakota/platform.json
 
 install: all $(install-dirs) $(install.files) $(install-links)
 

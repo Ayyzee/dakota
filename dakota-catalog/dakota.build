@@ -2,7 +2,7 @@
 {
     'builddir' => 'build-dkt',
     'srcs' => [ # cmd-line
-      '${SOURCE_DIR}/dakota-catalog.${cc_ext}',
+      'dakota-catalog.${cc_ext}',
     ],
     'lib-dirs' => [ # cmd-line
       '${INSTALL_PREFIX}/lib',
@@ -20,7 +20,7 @@
       '-rules' => [
       ],
       'files' =>   [ # install.files
-        '${DESTDIR}${INSTALL_PREFIX}/bin/dakota-catalog',
+        '${INSTALL_PREFIX}/bin/dakota-catalog',
       ],
     }
 }

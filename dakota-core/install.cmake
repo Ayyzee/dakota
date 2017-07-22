@@ -28,11 +28,10 @@ set (install-include-files
 set (install-bin-files
   ../bin/dakota
   ../bin/dakota-build
-  ../bin/dakota-project2cmake
+  ../bin/dakota-build2cmake
   ../bin/dakota-build2mk
   ../bin/dakota-build2project
   ../bin/dakota-fixup-stderr
-  ../bin/dk
 )
 install (
   FILES ${install-lib-dakota-files}

@@ -2,7 +2,7 @@
 {
     'builddir' => 'build-dkt',
     'srcs' => [
-      '${SOURCE_DIR}/dakota-find-library.${cc_ext}',
+      'dakota-find-library.${cc_ext}',
     ],
     'lib-dirs' => [ # cmd-line
       '${INSTALL_PREFIX}/lib',
@@ -19,7 +19,7 @@
       '-rules' => [
       ],
       'files' => [
-        '${DESTDIR}${INSTALL_PREFIX}/bin/dakota-find-library',
+        '${INSTALL_PREFIX}/bin/dakota-find-library',
       ],
     }
 }

@@ -29,7 +29,7 @@ clean:
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 
-install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib
+install-dirs := $(INSTALL_PREFIX)/bin $(INSTALL_PREFIX)/include $(INSTALL_PREFIX)/lib
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@

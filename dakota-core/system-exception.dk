@@ -40,7 +40,7 @@ klass system-exception {
     self = $init(super, #src-file: src-file, #src-line: src-line);
     assert(errnum != 0);
     self.errnum = errnum;
-    self.name = strerror-name(self.errnum);
+    self.name = "strerror-name(self.errnum)"; // = strerror-name(self.errnum);
     strerror-r(self.errnum, self.strerror, sizeof(self.strerror));
     return self;
   }

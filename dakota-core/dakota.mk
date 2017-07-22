@@ -63,8 +63,8 @@ precompile:
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
 
-install-dirs :=  $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota
-install-links := $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform.json
+install-dirs :=  $(INSTALL_PREFIX)/bin $(INSTALL_PREFIX)/include $(INSTALL_PREFIX)/lib/dakota
+install-links := $(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json $(INSTALL_PREFIX)/lib/dakota/platform.json
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
@@ -82,5 +82,5 @@ clean: goal-clean | dakota.project
 
 $(SOURCE_DIR)/strerror-name.dk: $(SOURCE_DIR)/strerror-name-tbl.inc
 
-$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform.json:              $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/platform-$(platform).json
-$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json: $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/compiler-command-line-$(compiler).json
+$(INSTALL_PREFIX)/lib/dakota/platform.json:              $(INSTALL_PREFIX)/lib/dakota/platform-$(platform).json
+$(INSTALL_PREFIX)/lib/dakota/compiler-command-line.json: $(INSTALL_PREFIX)/lib/dakota/compiler-command-line-$(compiler).json

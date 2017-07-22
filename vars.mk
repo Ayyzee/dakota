@@ -5,8 +5,6 @@ include $(rootdir)/makeflags.mk
 
 SOURCE_DIR ?= .
 
-DESTDIR ?=
-
 INSTALL_PREFIX ?= /usr/local
 
 h_ext := h

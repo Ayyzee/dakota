@@ -48,7 +48,7 @@ clean: goal-clean
 distclean: clean
 	cd $(rootdir); ./configure-common
 
-install-dirs := $(DESTDIR)$(INSTALL_PREFIX)/bin
+install-dirs := $(INSTALL_PREFIX)/bin
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@

@@ -2,7 +2,7 @@
 {
   'builddir' => 'build-dkt',
   'srcs' => [
-    '${SOURCE_DIR}/dakota-dso.${cc_ext}',
+    'dakota-dso.${cc_ext}',
   ],
   'libs' => [
     'dl',
@@ -19,8 +19,8 @@
     '-rules' => [
     ],
     'files' => [ # install.files
-      '${DESTDIR}${INSTALL_PREFIX}/include/dakota-dso.${h_ext}',
-      '${DESTDIR}${INSTALL_PREFIX}/lib/libdakota-dso.${so_ext}',
+      '${INSTALL_PREFIX}/include/dakota-dso.${h_ext}',
+      '${INSTALL_PREFIX}/lib/libdakota-dso.${so_ext}',
     ],
   }
 }

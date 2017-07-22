@@ -14,6 +14,10 @@ execute_process (
   COMMAND ${dakota-build2project} ${dakota-build-path} ${dakota-project-path}
   COMMAND ${dakota-build2cmake}   ${dakota-build-path} ${dakota-cmake-path}
 )
+set (SOURCE_DIR     ${CMAKE_SOURCE_DIR})
+set (BINARY_DIR     ${CMAKE_BINARY_DIR})
+set (INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+
 include (${dakota-cmake-path})
 include (${root-dir}/warn.cmake)
 

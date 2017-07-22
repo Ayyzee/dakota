@@ -86,8 +86,6 @@ MKDIRFLAGS="--parents"
 RM=rm
 RMFLAGS="--force --recursive"
 
-DESTDIR=
-
 INSTALL_PREFIX=/usr/local
 
 so_ext=so

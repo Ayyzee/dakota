@@ -63,7 +63,7 @@ precompile:
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
 
-install-dirs :=  $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(INSTALL_PREFIX)/include $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota
+install-dirs :=  $(INSTALL_PREFIX)/bin $(INSTALL_PREFIX)/include $(INSTALL_PREFIX)/lib/dakota
 install-links :=
 
 $(install-dirs):
