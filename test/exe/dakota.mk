@@ -22,7 +22,7 @@ $(target-base).dk:
 	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> $@
 
 dakota.project: $(target-base).dk
-	$(DAKOTA-BASE) --create-project $@ --output $(target) $^
+	$(DAKOTA-BASE) --create-project $@ --output $(target) --library ssl $^ libpcap.dylib
 
 $(target): $(target-base).dk | dakota.project
 	$(DAKOTA-BASE) --project dakota.project $^
