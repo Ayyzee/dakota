@@ -1,5 +1,5 @@
 # -*- mode: cmake -*-
-set (dakota-project2cmake dakota-project2cmake)
+set (dakota-build2cmake dakota-build2cmake)
 set (dakota               dakota)
 set (root-dir ${CMAKE_SOURCE_DIR}/..)
 set (ENV{PATH} "${root-dir}/bin:$ENV{PATH}")
@@ -9,7 +9,7 @@ set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
 string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
 # generate vars-path
 execute_process (
-  COMMAND ${dakota-project2cmake} ${project-path} ${vars-path}
+  COMMAND ${dakota-build2cmake} ${project-path} ${vars-path}
 )
 include (${vars-path})
 include (${root-dir}/warn.cmake)
