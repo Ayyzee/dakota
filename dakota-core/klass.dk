@@ -37,6 +37,9 @@ func alloc-instance(ssize-t total-size, symbol-t kls-name, symbol-t instance-nam
   object::slots-t* instance = cast(object::slots-t*)dkt::alloc(total-size);
 # if defined DEBUG
   echo-stuff(instance, "alloc", kls-name, instance-name);
+# else
+  USE(kls-name);
+  USE(instance-name);
 # endif
   return instance;
 }
