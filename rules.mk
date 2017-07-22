@@ -45,7 +45,7 @@ $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%.pm: $(SOURCE_DIR)/../lib/dakota/%.pm
 $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%.json: $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%-$(platform).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%: $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%-$(compiler)
+$(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%.json: $(DESTDIR)$(INSTALL_PREFIX)/lib/dakota/%-$(compiler).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
 $(DESTDIR)$(INSTALL_PREFIX)/lib/%.$(so_ext): $(SOURCE_DIR)/%.$(so_ext)

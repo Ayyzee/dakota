@@ -34,7 +34,7 @@ else ifeq ($(compiler), gcc)
 endif
 
 include $(shell $(rootdir)/bin/dakota-build2mk --output dk-compiler.mk\
- $(rootdir)/lib/dakota/compiler/command-line.json\
+ $(rootdir)/lib/dakota/compiler-command-line.json\
  $(rootdir)/lib/dakota/platform.json)\
 
 INSTALL := install

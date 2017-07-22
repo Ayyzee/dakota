@@ -60,8 +60,8 @@ use dakota::util;
 my ( $id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
-$gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
-  or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!" . $nl;
+$gbl_compiler = do "$gbl_prefix/lib/dakota/compiler-command-line.json"
+  or die "do $gbl_prefix/lib/dakota/compiler-command-line.json failed: $!" . $nl;
 {
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
     or die "do $gbl_prefix/lib/dakota/platform.json failed: $!" . $nl;

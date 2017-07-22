@@ -95,8 +95,8 @@ BEGIN {
   unshift @INC, "$prefix/lib";
   use dakota::sst;
   use dakota::util;
-  $gbl_compiler = &do_json("$prefix/lib/dakota/compiler/command-line.json")
-    or die "&do_json(\"$prefix/lib/dakota/compiler/command-line.json\") failed: $!\n";
+  $gbl_compiler = &do_json("$prefix/lib/dakota/compiler-command-line.json")
+    or die "&do_json(\"$prefix/lib/dakota/compiler-command-line.json\") failed: $!\n";
   my $platform = &do_json("$prefix/lib/dakota/platform.json")
     or die "&do_json(\"$prefix/lib/dakota/platform.json\") failed: $!\n";
   my ($key, $values);

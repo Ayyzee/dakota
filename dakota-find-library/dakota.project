@@ -12,7 +12,7 @@
     'dso'
   ],
   'srcs' => [
-    'dakota-find-library.cc'
+    'dakota-find-library.${cc_ext}'
   ],
   'target' => 'dakota-find-library'
 }

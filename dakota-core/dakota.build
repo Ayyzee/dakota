@@ -97,7 +97,7 @@
       '-rules' => [
       ],
       'files' => [ # install.files
-        '${DESTDIR}${INSTALL_PREFIX}/lib/dakota/compiler-${compiler}/command-line.json',
+        '${DESTDIR}${INSTALL_PREFIX}/lib/dakota/compiler-command-line-${compiler}.json',
         '${DESTDIR}${INSTALL_PREFIX}/lib/dakota/extra.json',
         '${DESTDIR}${INSTALL_PREFIX}/lib/dakota/platform-${platform}.json',
         '${DESTDIR}${INSTALL_PREFIX}/lib/dakota/lang-user-data.json',
