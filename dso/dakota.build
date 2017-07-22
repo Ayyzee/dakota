@@ -8,6 +8,12 @@
     'dl',
   ],
   'target' => 'dso',
+  'include-dirs' => [
+    '${SOURCE_DIR}/../include',
+  ],
+  'install-include-files' => [
+    '${SOURCE_DIR}/../include/dso.${h_ext}',
+  ],
   'is-lib' => 1,
   'install' => {
     '-rules' => [
