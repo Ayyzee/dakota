@@ -54,7 +54,7 @@ sub start {
     my $name = $$argv[2];
     $build = $$build{$name};
   }
-  my $opts = { 'var' => { 'DEST' =>   '',
+  my $opts = { 'var' => { 'DESTDIR' =>   '',
                           'SOURCE_DIR' => '.',
                           'INSTALL_PREFIX' => '/usr/local',
                           'so_ext' => $so_ext,

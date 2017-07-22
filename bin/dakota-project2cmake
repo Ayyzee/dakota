@@ -46,10 +46,12 @@ BEGIN {
     $so_ext = 'so'; # default dynamic shared object/library extension
   }
 };
-my $opts = { 'var' => { 'DEST' =>   '',
+my $opts = { 'var' => { 'DESTDIR' =>   '',
                         'SOURCE_DIR' => '.',
+                        'INSTALL_PREFIX' => '/usr/local',
                         'so_ext' => $so_ext,
                         'cc_ext' => 'cc',
+                        'h_ext' => 'h',
                       }
            };
 sub add_array {
@@ -84,23 +86,35 @@ sub start {
     my $name = $$argv[2];
     $build = $$build{$name};
   }
-  my $array_keys = [
-    'include-dirs',
-    'inputs',
-    'lib-dirs',
-    'libs',
-    'macros',
-    'srcs',
-  ];
-  my $scalar_keys = [
-    'builddir',
-    'is-lib',
-    'output',
-    'target',
-  ];
+  my $array_keys = {
+    'install-include-files' => 1,
+    'include-dirs' => 1,
+    'inputs' => 1,
+    'lib-dirs' => 1,
+    'libs' => 1,
+    'macros' => 1,
+    'srcs' => 1,
+  };
+  my $scalar_keys = {
+    'builddir' => 1,
+    'is-lib' => 1,
+    'output' => 1,
+    'target' => 1,
+  };
+  foreach my $key (keys %$build) {
+    my $val = $$build{$key};
+    my $type = ref($val);
+    $type = ref(\$val) if $type eq '';
+    if (0) {
+    } elsif ($type eq 'ARRAY') {
+      $$array_keys{$key} = 1;
+    } elsif ($type eq 'SCALAR') {
+      $$scalar_keys{$key} = 1;
+    }
+  }
   my $result = {};
-  &add_arrays($build, $array_keys, $result);
-  &add_scalars($build, $scalar_keys, $result);
+  &add_arrays( $build, [keys %$array_keys],  $result);
+  &add_scalars($build, [keys %$scalar_keys], $result);
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);
 }
