@@ -1,17 +1,20 @@
 # -*- mode: cmake -*-
-set (dakota-build2cmake dakota-build2cmake)
+set (dakota-build2project dakota-build2project)
+set (dakota-build2cmake   dakota-build2cmake)
 set (dakota               dakota)
 set (root-dir ${CMAKE_SOURCE_DIR}/..)
 set (ENV{PATH} "${root-dir}/bin:$ENV{PATH}")
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
-set (project-path ${CMAKE_SOURCE_DIR}/dakota.project)
+set (dakota-build-path ${CMAKE_SOURCE_DIR}/dakota.build)
 
-string (REGEX REPLACE "\.project$" ".cmake" vars-path ${project-path})
-# generate vars-path
+string (REGEX REPLACE "\.build$" ".project" dakota-project-path ${dakota-build-path})
+string (REGEX REPLACE "\.build$" ".cmake"   dakota-cmake-path   ${dakota-build-path})
+# generate dakota-cmake-path
 execute_process (
-  COMMAND ${dakota-build2cmake} ${project-path} ${vars-path}
+  COMMAND ${dakota-build2project} ${dakota-build-path} ${dakota-project-path}
+  COMMAND ${dakota-build2cmake}   ${dakota-build-path} ${dakota-cmake-path}
 )
-include (${vars-path})
+include (${dakota-cmake-path})
 include (${root-dir}/warn.cmake)
 
 set (project ${target})
@@ -23,7 +26,7 @@ set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 set (cxx-compiler clang++)
 set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
-list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${cxx-compiler}")
+list (APPEND CMAKE_CXX_FLAGS "--project ${dakota-project-path} --cxx ${cxx-compiler}")
 set (found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
@@ -34,17 +37,17 @@ endforeach (lib)
 # phony target 'init'
 add_custom_target (
   init
-  COMMAND ${dakota} --project ${project-path} --init ${found-libs}
+  COMMAND ${dakota} --project ${dakota-project-path} --init ${found-libs}
   VERBATIM)
 # get target-cc path
 execute_process (
-  COMMAND ${dakota} --project ${project-path} --target --path-only
+  COMMAND ${dakota} --project ${dakota-project-path} --target --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-cc
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --project ${project-path} --target
+  COMMAND ${dakota} --project ${dakota-project-path} --target
   VERBATIM)
 list (APPEND srcs ${target-src})
 
