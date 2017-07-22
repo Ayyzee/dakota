@@ -83,10 +83,10 @@ my $patterns = {
   'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(source_dir)/%.dk',
   'o_path_from_cc_path' =>  '%.$(cc_ext).$(o_ext) : %.$(cc_ext)',
 
-  'ast_path_from_dk_path' =>   '$(builddir)/%.ast      : $(source_dir)/%.dk',
+  'ast_path_from_dk_path' =>   '$(builddir)/%.dk.ast      : $(source_dir)/%.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
-  'ctlg_path_from_so_path' =>   '$(builddir)/%.ctlg : %.$(so_ext)',
+  'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
