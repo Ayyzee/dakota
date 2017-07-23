@@ -71,7 +71,7 @@
   # define so_export ms::dllexport
 # else
   # define so_import
-  # define so_hidden gnu::visibility("hidden")
+//# define so_hidden gnu::visibility("hidden")
   # define so_export gnu::visibility("default")
 # endif
 
@@ -145,7 +145,7 @@ KLASS_NS generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t;     
 KLASS_NS str          { typealias slots_t = const char_t*;                         } typealias str_t =          str::slots_t;
 KLASS_NS symbol       { typealias slots_t = str_t;                                 } typealias symbol_t =       symbol::slots_t;
 
-struct [[so_hidden]] __ddl_t {
+struct __ddl_t {
   FUNC (*_final)() -> void;
 
   __ddl_t(const __ddl_t&) = default;
