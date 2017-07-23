@@ -1,6 +1,7 @@
 # -*- mode: perl -*-
 {
     'builddir' => 'build-dkt',
+    'warn-opts-file' => '../warn.opts',
     'srcs' => [ # cmd-line
       'ascii-number-klass.dk',
       'ascii-number.dk',
