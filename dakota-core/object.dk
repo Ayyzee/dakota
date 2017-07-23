@@ -150,7 +150,7 @@ func dkt-dump(object-t obj) -> object-t {
   return $dump(obj);
 }
 func dkt-unbox-check(object-t obj, object-t kls) -> void {
-  if (object::_klass_)
+  if (object::_klass_) // runtime already initiated
     return;
   assert(obj != nullptr);
   assert(kls != nullptr);

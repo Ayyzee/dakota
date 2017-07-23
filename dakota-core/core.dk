@@ -735,99 +735,99 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
 func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[]", __func__);
-  if (!object::_klass_) {
-    init-runtime-ds();
-    each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
+  if (object::_klass_) // runtime already initiated
+    return;
+  init-runtime-ds();
+  each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
 # if 0
-    setenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC", 1);
+  setenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC", 1);
 # endif
 
-    // alloc
-    klass::_klass_ =  alloc-klass(#klass); // must be first
-    object::_klass_ = alloc-klass(#object);
+  // alloc
+  klass::_klass_ =  alloc-klass(#klass); // must be first
+  object::_klass_ = alloc-klass(#object);
 
-    // init()
-    object::_klass_ = init-klass(object::_klass_, #object); // must be first
-    klass::_klass_ =  init-klass(klass::_klass_,  #klass);
+  // init()
+  object::_klass_ = init-klass(object::_klass_, #object); // must be first
+  klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
-    klass::mutable-unbox(object::_klass_).superkls = nullptr;
+  klass::mutable-unbox(object::_klass_).superkls = nullptr;
 
-    object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
-    null = $make(null-klass); // first generic function executed
-    klass::mutable-unbox(object::_klass_).superkls = null;
-    null.has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
+  object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
+  null = $make(null-klass); // first generic function executed
+  klass::mutable-unbox(object::_klass_).superkls = null;
+  null.has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
 
-    // core runtime initialized
+  // core runtime initialized
 
-    // core runtime klasses are setup
-    // klasses: object, klass, singleton-klass, null
-    // and (null)
+  // core runtime klasses are setup
+  // klasses: object, klass, singleton-klass, null
+  // and (null)
 
-    // instantiation hier:
-    //   klass <- klass
-    //   klass <- object
-    //   klass <- singleton-klass <- null <- (null)
-    // inheritance hier:
-    //   (null) <- object <- klass <- singleton-klass
-    //   (null) <- object <- null
+  // instantiation hier:
+  //   klass <- klass
+  //   klass <- object
+  //   klass <- singleton-klass <- null <- (null)
+  // inheritance hier:
+  //   (null) <- object <- klass <- singleton-klass
+  //   (null) <- object <- null
 
-    assert(klass::_klass_           == klass-of(klass::_klass_));
-    assert(klass::_klass_           == klass-of(singleton-klass::_klass_));
-    assert(klass::_klass_           == klass-of(object::_klass_));
-    assert(singleton-klass::_klass_ == klass-of(null-klass));
-    assert(null-klass               == klass-of(null));
+  assert(klass::_klass_           == klass-of(klass::_klass_));
+  assert(klass::_klass_           == klass-of(singleton-klass::_klass_));
+  assert(klass::_klass_           == klass-of(object::_klass_));
+  assert(singleton-klass::_klass_ == klass-of(null-klass));
+  assert(null-klass               == klass-of(null));
 
-    assert(null            == superklass-of(object::_klass_));
-    assert(object::_klass_ == superklass-of(klass::_klass_));
-    assert(object::_klass_ == superklass-of(null-klass));
-    assert(klass::_klass_  == superklass-of(singleton-klass::_klass_));
-    assert(object::_klass_ == superklass-of(klass-of(null)));
+  assert(null            == superklass-of(object::_klass_));
+  assert(object::_klass_ == superklass-of(klass::_klass_));
+  assert(object::_klass_ == superklass-of(null-klass));
+  assert(klass::_klass_  == superklass-of(singleton-klass::_klass_));
+  assert(object::_klass_ == superklass-of(klass-of(null)));
 
 # if !defined DKT-OMIT-BEHAVIOR
-    $behavior(object::_klass_);
-    $behavior(klass::_klass_);
-    $behavior(singleton-klass::_klass_);
-    $behavior(null-klass);
-    $behavior(bit-vector::_klass_);
+  $behavior(object::_klass_);
+  $behavior(klass::_klass_);
+  $behavior(singleton-klass::_klass_);
+  $behavior(null-klass);
+  $behavior(bit-vector::_klass_);
 # endif
 
 # if 0
-    setenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC", 1);
+  setenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC", 1);
 # endif
 
-    std-input =  $make(input-stream::klass(),  #slots: stdin);
-    std-output = $make(output-stream::klass(), #slots: stdout);
-    std-error =  $make(output-stream::klass(), #slots: stderr);
-    std-input.has-exit-time-dtor();  // hackhack: to prevent dealloc on exit()
-    std-output.has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
-    std-error.has-exit-time-dtor();  // hackhack: to prevent dealloc on exit()
+  std-input =  $make(input-stream::klass(),  #slots: stdin);
+  std-output = $make(output-stream::klass(), #slots: stdout);
+  std-error =  $make(output-stream::klass(), #slots: stderr);
+  std-input.has-exit-time-dtor();  // hackhack: to prevent dealloc on exit()
+  std-output.has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
+  std-error.has-exit-time-dtor();  // hackhack: to prevent dealloc on exit()
 
-    set-read-write();
-    each(gbl-registration-info-list,
-         cast(named-info-func-t)cast(func (*)(named-info-t*, str-box-func-t) -> void)each-str,
-         cast(each-box-func-t)cast(str-box-func-t)str::box);
-    each(gbl-registration-info-list,
-         cast(named-info-func-t)cast(func (*)(named-info-t*, int-box-func-t) -> void)each-int,
-         cast(each-box-func-t)cast(int-box-func-t)intmax::box);
-    set-read-only();
+  set-read-write();
+  each(gbl-registration-info-list,
+       cast(named-info-func-t)cast(func (*)(named-info-t*, str-box-func-t) -> void)each-str,
+       cast(each-box-func-t)cast(str-box-func-t)str::box);
+  each(gbl-registration-info-list,
+       cast(named-info-func-t)cast(func (*)(named-info-t*, int-box-func-t) -> void)each-int,
+       cast(each-box-func-t)cast(int-box-func-t)intmax::box);
+  set-read-only();
 
 # if 0
-    $dump(object::_klass_);
-    fprintf(stderr, "---\n");
-    $dump(klass::_klass_);
-    fprintf(stderr, "---\n");
-    $dump(singleton-klass::_klass_);
-    fprintf(stderr, "---\n");
-    $dump(null-klass);
+  $dump(object::_klass_);
+  fprintf(stderr, "---\n");
+  $dump(klass::_klass_);
+  fprintf(stderr, "---\n");
+  $dump(singleton-klass::_klass_);
+  fprintf(stderr, "---\n");
+  $dump(null-klass);
 # if !defined DKT-OMIT-BEHAVIOR
-    fprintf(stderr, "---\n");
-    $dump(bit-vector::_klass_);
+  fprintf(stderr, "---\n");
+  $dump(bit-vector::_klass_);
 # endif
-    fprintf(stderr, "---\n");
-    $dump(null);
+  fprintf(stderr, "---\n");
+  $dump(null);
 # endif
-  }
   if (getenv-int("DK_INIT_ALL_KLASSES"))
     init-imported-klasses();
   return;
