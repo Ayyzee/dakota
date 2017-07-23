@@ -150,7 +150,8 @@ struct [[so_hidden]] __ddl_t {
 
   __ddl_t(const __ddl_t&) = default;
 
-  inline __ddl_t(FUNC (*initial)() -> void, FUNC (*final)() -> void)  {
+  inline __ddl_t(FUNC (*initial)() -> void,
+                 FUNC (*final  )() -> void)  {
     this->_final = final;
     initial();
   }
