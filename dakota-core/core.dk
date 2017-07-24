@@ -1519,6 +1519,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
+  named-info::sort(registration-info); // REQUIRED since symbols address are not known at compile time
   symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#exe);
   bool-t ctlg-exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
   bool-t ctlg-recursive =     getenv-int("DAKOTA_CATALOG_RECURSIVE");
