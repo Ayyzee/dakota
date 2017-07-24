@@ -629,10 +629,10 @@ static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void
   return;
 }
 static func sort-kls-info(named-info-t* kls-info) -> void {
-  named-info::sort(kls-info); // REQUIRED since symbols address are not known at compile time
+  named-info::sort(kls-info);
   named-info-t* slots-info = cast(named-info-t*)named-info::at(kls-info, #slots-info);
   if (slots-info) {
-    int-t i = 0;
+    ssize-t i = 0;
     while (slots-info[i].items)
       named-info::sort(&slots-info[i++]);
   }
@@ -642,14 +642,9 @@ static func sort-reg-info(named-info-t* reg-info) -> void {
   named-info::sort(reg-info);
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(reg-info, #klass-defns);
   if (klass-defns) {
-    size-t i = 0;
-    while (1) {
-      named-info-t* kls-info = &klass-defns[i++];
-      assert(kls-info);
-      if (! kls-info->items)
-        break;
-      sort-kls-info(kls-info);
-    }
+    ssize-t i = 0;
+    while (klass-defns[i].items)
+      sort-kls-info(&klass-defns[i++]);
   }
   return;
 }
