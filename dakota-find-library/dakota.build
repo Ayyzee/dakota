@@ -1,6 +1,7 @@
 # -*- mode: perl -*-
 {
     'builddir' => 'build-dkt',
+    'warn-opts-file' => '../warn.opts',
     'srcs' => [
       'dakota-find-library.${cc_ext}',
     ],
