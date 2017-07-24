@@ -101,7 +101,7 @@ klass named-info {
             fprintf(stderr, "  #%s,",    cast(symbol-t)item);
             break;
           default:
-            ;
+            fprintf(stderr, "  %p,",    cast(ptr-t)item);
         }
         fprintf(stderr, "\n");
       }
