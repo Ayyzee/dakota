@@ -81,7 +81,7 @@ $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1; # default = 2
 
-use Getopt::Long;
+use Getopt::Long qw(GetOptionsFromArray);
 $Getopt::Long::ignorecase = 0;
 
 my $default_project_path = 'dakota.project';
@@ -137,7 +137,7 @@ sub translate_dk_to_cc {
 sub build_precompile_cmd {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
   my $project = $$dakota_opts{'project'};
-  my $cmd = [ 'dakota' ];
+  my $cmd = [ $0 ];
   if ($project) {
     &add_last($cmd, ('--project', $project));
   }
@@ -259,20 +259,12 @@ sub convert_and_exec_cmd {
   my $cc_paths;
   if ($num_dk_files) {
     my $precompile_cmd = &build_precompile_cmd($dakota_opts, $info, $ordered_input_args);
-    my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
     if ($verbose) {
-      print '# 2/3 ' . $precompile_cmd_str . $nl;
+      print '# 2/3 ' . join(' ', @$precompile_cmd) . $nl;
     }
-    my $outstr = `$precompile_cmd_str`;
-    my $val = $? >> 8;
-    if (0 != $val) {
-      print $outstr;
-      exit $val;
-    }
-    if (!defined $outstr) {
-      die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
-    }
-    $cc_paths = [split /\s+/, $outstr];
+    my $exit_val;
+    my $prog = shift @$precompile_cmd;
+    ($exit_val, $cc_paths) = &start_core($precompile_cmd);
   } else {
     if ($verbose) {
       print '# 2/3 (skipped)' . $nl;
@@ -506,7 +498,7 @@ sub default_target {
   }
   return $output;
 }
-sub start {
+sub start_core {
   my ($argv) = @_;
   my $root_cmd = {
     'asts' => [],
@@ -525,7 +517,7 @@ sub start {
   if (&has_cxx_opt($argv)) {
     exit &convert_and_exec_cmd($argv);
   }
-  &GetOptions($$root_cmd{'opts'},
+  &GetOptionsFromArray($argv, $$root_cmd{'opts'},
               'define-macro=s', # gcc-like
               'include-directory=s', # gcc-like (--include-directory=<> OR -I<>)
               'library-directory=s', # gcc-like (--library-directory=<> OR -L<>)
@@ -747,7 +739,12 @@ sub start {
   #print STDERR 'project: ' .  &Dumper($project);
   die if ! $$root_cmd{'source-dir'};
   die if ! $$project{'source-dir'};
-  my $result = &dakota::dakota::start_cmd($root_cmd, $project);
-  exit $result;
+  my ($exit_val, $cc_files) = &dakota::dakota::start_cmd($root_cmd, $project);
+  return ($exit_val, $cc_files);
+}
+sub start {
+  my ($argv) = @_;
+  my ($exit_val, $cc_files) = &start_core($argv);
+  exit $exit_val;
 }
 &start(\@ARGV);

@@ -620,9 +620,20 @@ sub add_target_o_path_to_inputs {
   &add_first($$cmd_info{'inputs'}, $target_o_path);
   $$cmd_info{'inputs'} = &clean_paths($$cmd_info{'inputs'});
 }
+sub cc_files {
+  my ($seq) = @_;
+  my $cc_files = [];
+  foreach my $cc_file (@$seq) {
+    if ($cc_file =~ /\.$cc_ext$/) {
+      &add_last($cc_files, $cc_file);
+    }
+  }
+  return $cc_files;
+}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info, $project) = @_;
+  my $cc_files = [];
   $root_cmd = $cmd_info;
   my $is_exe = &is_exe($cmd_info, $project);
   if ($is_exe) {
@@ -634,7 +645,7 @@ sub start_cmd {
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
     print $target_cc_path . $nl;
-    return $exit_status;
+    return ($exit_status, $cc_files);
   }
   if (!$$cmd_info{'opts'}{'compiler'}) {
     my $cxx = &var($gbl_compiler, 'CXX', 'g++');
@@ -687,7 +698,7 @@ sub start_cmd {
       close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
       unlink $lock_file;
     }
-    return $exit_status;
+    return ($exit_status, $cc_files);
   }
   &set_target_srcs_ast($target_srcs_ast_path);
 
@@ -715,11 +726,13 @@ sub start_cmd {
     }
     if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
+      $cc_files = &cc_files($$cmd_info{'inputs'});
     }
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
     if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
+      $cc_files = &cc_files($$cmd_info{'inputs'});
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
@@ -753,7 +766,7 @@ sub start_cmd {
       die __FILE__, ":", __LINE__, ": error:\n";
     }
   }
-  return $exit_status;
+  return ($exit_status, $cc_files);
 }
 sub ast_from_so {
   my ($cmd_info, $arg) = @_;
@@ -953,9 +966,6 @@ sub o_from_dk {
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
-      if ($num_out_of_date_infiles) {
-        &echo_output_path($outfile); # required by bin/dk
-      }
       &project_io_add($$cmd_info{'project.io'}, 'precompile', $input, $outfile);
     } else {
       my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
