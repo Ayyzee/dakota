@@ -630,7 +630,6 @@ sub generate_target_runtime {
   #$col = &colin($col);
 
   my $info_tbl = {
-                  "\#file" => '__FILE__',
                   "\#generic-func-ptrs" => 'generic-func-ptrs',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                   "\#imported-klass-names" => 'imported-klass-names',
@@ -3661,7 +3660,6 @@ sub dk_generate_cc_footer_klass {
   if ($$klass_ast{'module'}) {
     $$tbbl{'#module'} = "\#$$klass_ast{'module'}";
   }
-  $$tbbl{'#file'} = '__FILE__';
   $$scratch_str_ref .=
     $col . "$klass_type @$klass_name { " . &generate_target_runtime_property_tbl('__klass-props', $tbbl, $col, $symbols, __LINE__) .
     $col . " }" . $nl;
