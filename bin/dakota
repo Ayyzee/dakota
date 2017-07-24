@@ -86,20 +86,6 @@ $Getopt::Long::ignorecase = 0;
 
 my $default_project_path = 'dakota.project';
 
-my $root_cmd = {
-  'asts' => [],
-  'inputs' => [],
-  'opts' => {
-    'define-macro' => [],
-    'include-directory' => [ "$gbl_prefix/include" ],
-    'library-directory' => [],
-    'library' => [],
-
-    'directory' => [],
-    'found-library' => [],
-    'var' => {},
-  }
-};
 sub path_opt {
   my ($cmd, $ir, $short, $long, $info) = @_;
   $short = 'no-such-short-opt' if !$short;
@@ -323,242 +309,13 @@ sub has_cxx_opt {
   }
   return 0;
 }
-if (&has_cxx_opt(\@ARGV)) {
-  exit &convert_and_exec_cmd(\@ARGV);
-}
-&GetOptions($$root_cmd{'opts'},
-            'define-macro=s',       # gcc-like
-            'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
-            'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
-            'library=s',            # --library libssl.so equivalent to -lssl (or better -l:libssl.so on linux)
-            'output=s',             # gcc-like
-
-            'compile',              # gcc-like
-            'dynamic',              # gcc-like
-            'shared',               # gcc-like
-
-            'init',
-            'parse',
-            'path-only',
-            'precompile',           # gcc-ish (--compile)
-            'project=s',
-            'target',
-
-            'clean',                # make target like
-            'create-project=s',
-            'directory=s',          # make-like
-            'echo-inputs',          #
-            'found-library=s',
-            'keep-going',           # make-like
-            'silent',               #
-            'soname=s',             # ld-like (-soname <>)
-            'var=s',                # for env vars like MAKEFLAGS, etc.
-           #'compiler-flags=s',     # similiar to env vars CXXFLAGS & EXTRA_CXXFLAGS
-           #'compiler=s',           # similiar to env var CXX
-           #'environment-overrides' # make-like
-           #'for-compiler=s',       # gcc-like (--for-linker <>)
-           #'for-linker=s',         # gcc-like
-           #'jobs'                  # make-like
-           #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
-           #'linker=s',             # similiar to env var LD
-           #'pie'                   # ld-like
-           #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
-           #'touch'                 # make-like
-           );
-$$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
-if ($$root_cmd{'opts'}{'project'}) {
-  $$root_cmd{'opts'}{'project'} = &relpath($$root_cmd{'opts'}{'project'});
-} elsif (-e $default_project_path) {
-  $$root_cmd{'opts'}{'project'} = $default_project_path;
-}
-&set_root_cmd($root_cmd);
-
-my $found_library = { 'order' => [] };
-foreach my $pair (@{$$root_cmd{'opts'}{'found-library'}}) {
-  my ($s, $l) = split('=', $pair);
-  &add_last($$found_library{'order'}, $s);
-  my $m = &lib_from_lib_name($s);
-  # $m could also be created by basename
-  # but the soname aspect comes into play
-  $$found_library{'S2M'}{$s} = $m;
-  $$found_library{'M2L'}{$m} = $l;
-}
-$$root_cmd{'opts'}{'found-library'} = $found_library;
-
-# --quiet
-# --help
-# --verbose
-
-# 1/1: one  input,  one output
-# 1/0: one  input,  no  output
-# m/0: many inputs, no  output
-# m/1: many inputs, one output (directory)
-
-my $rel_argv = [map { &relpath($_) } @ARGV];
-my $inputs = &clean_paths($rel_argv);
-my $project;
-my $project_io;
-my $project_io_path;
-
-if ($$root_cmd{'opts'}{'create-project'}) {
-  &create_missing_project($root_cmd, $inputs);
-  exit;
-}
-# create default project file when missing (when linking)
-if (!$$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
-  $$root_cmd{'opts'}{'project'} = &create_missing_project($root_cmd, $inputs);
-}
-if ($$root_cmd{'opts'}{'project'}) {
-  ($project, $project_io) = &use_project($root_cmd);
-}
-if ($$root_cmd{'opts'}{'clean'}) {
-  &project_clean($root_cmd, $project, $project_io);
-  exit 0;
-}
-if ($project) {
-  if (!$$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
-    if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
-      my $o_path = &o_path_from_dk_path($$inputs[0]);
-      $$root_cmd{'opts'}{'output'} = $o_path; # setting default output (compile) path for single .dk input path
-    }
-  }
-  if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
-    if (1 == scalar @$inputs && &is_dk_path($$inputs[0]) && !$$root_cmd{'opts'}{'precompile'}) {
-      &dakota::util::project_io_add($$root_cmd{'project.io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
-      my $original_state;
-      &dakota::util::project_io_to_file($project_io_path, $project_io);
-    }
-  }
-}
-if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
-  &dakota::util::project_io_remove($project_io, 'compile', $inputs);
-  &add_last($inputs, values %{$$project_io{'compile'}});
-  foreach my $input (@{$$project{'inputs'}}) {
-    if ($input =~ /\.$so_ext$/) { # is_so_path()
-      &add_last($inputs, $input);
-    }
-  }
-}
-$inputs = &clean_paths($inputs);
-
-if (0) {
-  my $stuff = {};
-  $$stuff{'cwd'} = &getcwd();
-  $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'project'});
-  $$stuff{'rel-dir'} = &relpath($$stuff{'project-dir'}, $$stuff{'cwd'});
-  #&dmp($stuff);
-  my $dir = $$stuff{'rel-dir'};
-  if (! $dir) {
-    $dir = &getcwd();
-  } elsif (! &is_abs($dir)) {
-    $dir = &getcwd() . '/' . $dir;
-  }
-  for (my $i = 0; $i < @{$$root_cmd{'project.inputs'}}; $i++) {
-    my $project_input = $$root_cmd{'project.inputs'}[$i];
-    if (! &is_abs($project_input)) {
-      my $input = $dir . '/' . $project_input;
-      if (! -e $input) {
-        print STDERR $0 . ": error: no-such-file: $input" . $nl;
-      }
-      $$root_cmd{'project.inputs'}[$i] = $input;
-    }
-  }
-}
-if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
-  if (1 >= scalar $$root_cmd{'project.inputs'}) {
-    die "$0: error: inputs are requried either in the project file or the command line." . $nl;
-  } else {
-    $inputs = $$root_cmd{'project.inputs'};
-    $$root_cmd{'inputs'} = [];
-  }
-}
-# should only reorder the .o files (between .so files) leaving the .so files in their
-# original position so the inputs should be split into separate sublist (and then sorted).
-# its OK to sort the .dk files, but we must link using the original positions.
-if (1) {
-  if (!$$root_cmd{'opts'}{'precompile'}) {
-    $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
-  }
-}
-$$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-# dakota --compile --output <> {dk}+
-# dakota --shared  --output <> {o}+ [build/+rt/<>.o] {so}*
-# dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
-
-if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-  if ($$project{'target'} =~ /\.$so_ext$/) { # is_so_path()
-    $$root_cmd{'opts'}{'output'} = $$project{'target'};
-  } elsif ($$project{'is-lib'}) {
-    $$root_cmd{'opts'}{'output'} = &lib_from_lib_name($$project{'target'});
-  } else {
-    $$root_cmd{'opts'}{'output'} = &exe_from_exe_name($$project{'target'});
-  }
-}
-if ($$root_cmd{'opts'}{'output'}) {
-  $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
-}
-if ($$root_cmd{'opts'}{'soname'}) {
-  $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
-}
-$ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
-
-&clean_paths($root_cmd, 'inputs');
-&clean_paths($$root_cmd{'opts'}, 'include-directory');
-&clean_paths($$root_cmd{'opts'}, 'library-directory');
-
-my $gcc_from_dakota = {
-  '--include-directory' => '--include-directory', # yep, the same
-  '--define-macro' =>      '--define-macro',      # yep, the same
-};
-
-if ($$root_cmd{'opts'}{'include-directory'}) {
-  my $flags = '';
-  foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}}) {
-    $flags .= ' ' . $$gcc_from_dakota{'--include-directory'} . '=' . $dir;
-  }
-  $ENV{'CXXFLAGS'} .= $flags;
-}
-my $env_vars = { 'DK_SRC_UNIQUE_HEADER' => undef,
-                 'DK_INLINE_GENERIC_FUNCS' => undef,
-                 'DK_INLINE_KLASS_FUNCS' => undef,
-               };
-if ($$root_cmd{'opts'}{'define-macro'}) {
-  my $flags = '';
-  foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
-    $flags .= ' ' . $$gcc_from_dakota{'--define-macro'} . '=' . $mcr;
-    my ($lhs, $rhs) = split(/=/, $mcr);
-    if (exists $$env_vars{$lhs}) {
-      $ENV{$lhs} = $rhs;
-    }
-  }
-  $ENV{'CXXFLAGS'} .= $flags;
-}
-if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
-  my $initial_workdir = &getcwd();
-  foreach my $dir (@{$$root_cmd{'opts'}{'directory'}}) {
-    if ($dir ne '.' &&
-        $dir ne './') {
-      chdir $dir;
-      my $current_workdir = &getcwd();
-      my $reldir = File::Spec->abs2rel($current_workdir, $initial_workdir);
-      $ENV{'DKT_DIR'} = $reldir;
-    }
-  }
-}
-#print STDERR 'root_cmd: ' . &Dumper($root_cmd);
-#print STDERR 'project: ' .  &Dumper($project);
-die if ! $$root_cmd{'source-dir'};
-die if ! $$project{'source-dir'};
-my $result = &dakota::dakota::start_cmd($root_cmd, $project);
-exit $result;
-
 sub create_missing_project {
   my ($root_cmd, $inputs) = @_;
   if (0 == scalar @$inputs) {
     die "error: missing both --project <file> and input files; at least one is required.";
   }
-  $project = { 'target' => undef, 'inputs' => [], 'libs' => [],
-               'builddir' => &builddir() };
+  my $project = { 'target' => undef, 'inputs' => [], 'libs' => [],
+                  'builddir' => &builddir() };
   foreach my $library (@{$$root_cmd{'opts'}{'library'}}) {
     &add_last($$project{'libs'}, $library);
   }
@@ -679,14 +436,14 @@ sub use_project {
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
   $$root_cmd{'project.target'} = $$project{'target'};
   $$root_cmd{'project.io'} = $$project{'builddir'} . '/dakota.io';
-  $project_io_path = $$root_cmd{'project.io'};
+  my $project_io_path = $$root_cmd{'project.io'};
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_project_io = { 'compile' => {},
                                'builddir' => undef };
     &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
-  $project_io = &dakota::util::project_io_from_file($project_io_path);
+  my $project_io = &dakota::util::project_io_from_file($project_io_path);
   if (1) {
     $$project_io{'link'} = { map { &canon_path($_) => &find_library(&lib_from_lib_name($_), $$root_cmd{'opts'}{'found-library'}) } @{$$project{'libs'}} };
   }
@@ -697,7 +454,7 @@ sub use_project {
   return ($project, $project_io);
 } # use_project
 sub project_clean {
-  my ($root_cmd, $project, $project_io) = @_;
+  my ($root_cmd, $project, $project_io, $project_io_path) = @_;
   if ($project_io) {
     if (0) {
       if ($$project_io{'builddir'} && $$project_io{'builddir'} ne '.') {
@@ -707,14 +464,14 @@ sub project_clean {
     }
     if (1) { # cmake writes .o files in its own build dir
       if (! $$root_cmd{'opts'}{'precompile'}) {
-        &project_clean_paths($project_io, 'compile');
+        &project_clean_paths($project_io, $project_io_path, 'compile');
       }
-      &project_clean_paths($project_io, 'precompile', 'target-cc');
+      &project_clean_paths($project_io, $project_io_path, 'precompile', 'target-cc');
     }
   }
 }
 sub project_clean_paths {
-  my ($project_io, $key, $extra_key) = @_;
+  my ($project_io, $project_io_path, $key, $extra_key) = @_;
   my $values = [values %{$$project_io{$key}}];
   $$project_io{$key} = {};
   if ($extra_key && $$project_io{$extra_key}) {
@@ -749,3 +506,248 @@ sub default_target {
   }
   return $output;
 }
+sub start {
+  my ($argv) = @_;
+  my $root_cmd = {
+    'asts' => [],
+    'inputs' => [],
+    'opts' => {
+      'define-macro' => [],
+      'include-directory' => [ "$gbl_prefix/include" ],
+      'library-directory' => [],
+      'library' => [],
+
+      'directory' => [],
+      'found-library' => [],
+      'var' => {},
+    }
+  };
+  if (&has_cxx_opt($argv)) {
+    exit &convert_and_exec_cmd($argv);
+  }
+  &GetOptions($$root_cmd{'opts'},
+              'define-macro=s', # gcc-like
+              'include-directory=s', # gcc-like (--include-directory=<> OR -I<>)
+              'library-directory=s', # gcc-like (--library-directory=<> OR -L<>)
+              'library=s', # --library libssl.so equivalent to -lssl (or better -l:libssl.so on linux)
+              'output=s',  # gcc-like
+
+              'compile',        # gcc-like
+              'dynamic',        # gcc-like
+              'shared',         # gcc-like
+
+              'init',
+              'parse',
+              'path-only',
+              'precompile',     # gcc-ish (--compile)
+              'project=s',
+              'target',
+
+              'clean',          # make target like
+              'create-project=s',
+              'directory=s',    # make-like
+              'echo-inputs',    #
+              'found-library=s',
+              'keep-going',     # make-like
+              'silent',         #
+              'soname=s',       # ld-like (-soname <>)
+              'var=s',          # for env vars like MAKEFLAGS, etc.
+              #'compiler-flags=s',     # similiar to env vars CXXFLAGS & EXTRA_CXXFLAGS
+              #'compiler=s',           # similiar to env var CXX
+              #'environment-overrides' # make-like
+              #'for-compiler=s',       # gcc-like (--for-linker <>)
+              #'for-linker=s',         # gcc-like
+              #'jobs'                  # make-like
+              #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
+              #'linker=s',             # similiar to env var LD
+              #'pie'                   # ld-like
+              #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
+              #'touch'                 # make-like
+            );
+  $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
+  if ($$root_cmd{'opts'}{'project'}) {
+    $$root_cmd{'opts'}{'project'} = &relpath($$root_cmd{'opts'}{'project'});
+  } elsif (-e $default_project_path) {
+    $$root_cmd{'opts'}{'project'} = $default_project_path;
+  }
+  &set_root_cmd($root_cmd);
+
+  my $found_library = { 'order' => [] };
+  foreach my $pair (@{$$root_cmd{'opts'}{'found-library'}}) {
+    my ($s, $l) = split('=', $pair);
+    &add_last($$found_library{'order'}, $s);
+    my $m = &lib_from_lib_name($s);
+    # $m could also be created by basename
+    # but the soname aspect comes into play
+    $$found_library{'S2M'}{$s} = $m;
+    $$found_library{'M2L'}{$m} = $l;
+  }
+  $$root_cmd{'opts'}{'found-library'} = $found_library;
+
+  # --quiet
+  # --help
+  # --verbose
+
+  # 1/1: one  input,  one output
+  # 1/0: one  input,  no  output
+  # m/0: many inputs, no  output
+  # m/1: many inputs, one output (directory)
+
+  my $rel_argv = [map { &relpath($_) } @ARGV];
+  my $inputs = &clean_paths($rel_argv);
+  my ($project, $project_io);
+
+  if ($$root_cmd{'opts'}{'create-project'}) {
+    &create_missing_project($root_cmd, $inputs);
+    exit;
+  }
+  # create default project file when missing (when linking)
+  if (!$$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
+    $$root_cmd{'opts'}{'project'} = &create_missing_project($root_cmd, $inputs);
+  }
+  if ($$root_cmd{'opts'}{'project'}) {
+    ($project, $project_io) = &use_project($root_cmd);
+  }
+  my $project_io_path = &project_io_path_from_project_path($$root_cmd{'opts'}{'project'});
+  if ($$root_cmd{'opts'}{'clean'}) {
+    &project_clean($root_cmd, $project, $project_io, $project_io_path);
+    exit 0;
+  }
+  if ($project) {
+    if (!$$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
+      if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
+        my $o_path = &o_path_from_dk_path($$inputs[0]);
+        $$root_cmd{'opts'}{'output'} = $o_path; # setting default output (compile) path for single .dk input path
+      }
+    }
+    if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
+      if (1 == scalar @$inputs && &is_dk_path($$inputs[0]) && !$$root_cmd{'opts'}{'precompile'}) {
+        &dakota::util::project_io_add($$root_cmd{'project.io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
+        my $original_state;
+        &dakota::util::project_io_to_file($project_io_path, $project_io);
+      }
+    }
+  }
+  if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
+    &dakota::util::project_io_remove($project_io, 'compile', $inputs);
+    &add_last($inputs, values %{$$project_io{'compile'}});
+    foreach my $input (@{$$project{'inputs'}}) {
+      if ($input =~ /\.$so_ext$/) { # is_so_path()
+        &add_last($inputs, $input);
+      }
+    }
+  }
+  $inputs = &clean_paths($inputs);
+
+  if (0) {
+    my $stuff = {};
+    $$stuff{'cwd'} = &getcwd();
+    $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'project'});
+    $$stuff{'rel-dir'} = &relpath($$stuff{'project-dir'}, $$stuff{'cwd'});
+    #&dmp($stuff);
+    my $dir = $$stuff{'rel-dir'};
+    if (! $dir) {
+      $dir = &getcwd();
+    } elsif (! &is_abs($dir)) {
+      $dir = &getcwd() . '/' . $dir;
+    }
+    for (my $i = 0; $i < @{$$root_cmd{'project.inputs'}}; $i++) {
+      my $project_input = $$root_cmd{'project.inputs'}[$i];
+      if (! &is_abs($project_input)) {
+        my $input = $dir . '/' . $project_input;
+        if (! -e $input) {
+          print STDERR $0 . ": error: no-such-file: $input" . $nl;
+        }
+        $$root_cmd{'project.inputs'}[$i] = $input;
+      }
+    }
+  }
+  if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
+    if (1 >= scalar $$root_cmd{'project.inputs'}) {
+      die "$0: error: inputs are requried either in the project file or the command line." . $nl;
+    } else {
+      $inputs = $$root_cmd{'project.inputs'};
+      $$root_cmd{'inputs'} = [];
+    }
+  }
+  # should only reorder the .o files (between .so files) leaving the .so files in their
+  # original position so the inputs should be split into separate sublist (and then sorted).
+  # its OK to sort the .dk files, but we must link using the original positions.
+  if (1) {
+    if (!$$root_cmd{'opts'}{'precompile'}) {
+      $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
+    }
+  }
+  $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
+  # dakota --compile --output <> {dk}+
+  # dakota --shared  --output <> {o}+ [build/+rt/<>.o] {so}*
+  # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
+
+  if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
+    if ($$project{'target'} =~ /\.$so_ext$/) { # is_so_path()
+      $$root_cmd{'opts'}{'output'} = $$project{'target'};
+    } elsif ($$project{'is-lib'}) {
+      $$root_cmd{'opts'}{'output'} = &lib_from_lib_name($$project{'target'});
+    } else {
+      $$root_cmd{'opts'}{'output'} = &exe_from_exe_name($$project{'target'});
+    }
+  }
+  if ($$root_cmd{'opts'}{'output'}) {
+    $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
+  }
+  if ($$root_cmd{'opts'}{'soname'}) {
+    $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
+  }
+  $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
+
+  &clean_paths($root_cmd, 'inputs');
+  &clean_paths($$root_cmd{'opts'}, 'include-directory');
+  &clean_paths($$root_cmd{'opts'}, 'library-directory');
+
+  my $gcc_from_dakota = {
+    '--include-directory' => '--include-directory', # yep, the same
+    '--define-macro' =>      '--define-macro',      # yep, the same
+  };
+
+  if ($$root_cmd{'opts'}{'include-directory'}) {
+    my $flags = '';
+    foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}}) {
+      $flags .= ' ' . $$gcc_from_dakota{'--include-directory'} . '=' . $dir;
+    }
+    $ENV{'CXXFLAGS'} .= $flags;
+  }
+  my $env_vars = { 'DK_SRC_UNIQUE_HEADER' => undef,
+                   'DK_INLINE_GENERIC_FUNCS' => undef,
+                   'DK_INLINE_KLASS_FUNCS' => undef,
+                 };
+  if ($$root_cmd{'opts'}{'define-macro'}) {
+    my $flags = '';
+    foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
+      $flags .= ' ' . $$gcc_from_dakota{'--define-macro'} . '=' . $mcr;
+      my ($lhs, $rhs) = split(/=/, $mcr);
+      if (exists $$env_vars{$lhs}) {
+        $ENV{$lhs} = $rhs;
+      }
+    }
+    $ENV{'CXXFLAGS'} .= $flags;
+  }
+  if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
+    my $initial_workdir = &getcwd();
+    foreach my $dir (@{$$root_cmd{'opts'}{'directory'}}) {
+      if ($dir ne '.' &&
+            $dir ne './') {
+        chdir $dir;
+        my $current_workdir = &getcwd();
+        my $reldir = File::Spec->abs2rel($current_workdir, $initial_workdir);
+        $ENV{'DKT_DIR'} = $reldir;
+      }
+    }
+  }
+  #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
+  #print STDERR 'project: ' .  &Dumper($project);
+  die if ! $$root_cmd{'source-dir'};
+  die if ! $$project{'source-dir'};
+  my $result = &dakota::dakota::start_cmd($root_cmd, $project);
+  exit $result;
+}
+&start(\@ARGV);
