@@ -80,11 +80,10 @@ klass sorted-set-core {
       const void* p = cast(const void*)(cast(uint8-t*)(t->items) + (i * t->size));
       cmp = t->compare(deref(t, p), key);
 
-      if (0 < cmp) {
+      if (cmp > 0) {
         should-increment = false;
         u = i;
-      }
-      else if (0 > cmp) {
+      } else if (cmp < 0) {
         should-increment = true;
         l = i + 1;
       } else {
