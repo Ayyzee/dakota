@@ -86,26 +86,26 @@ klass named-info {
   method dump(const slots-t* s) -> const slots-t* {
     const slots-t* current = s;
     while (current != nullptr) {
-      printf("{\n");
+      fprintf(stderr, "{\n");
       for (int64-t i = 0; i < current->count; i++) {
         symbol-t key =  current->items[i].key;
         intptr-t item = current->items[i].item;
-        printf("  #%s: %p", key, cast(ptr-t)item);
+        fprintf(stderr, "  %p  #%s:", cast(ptr-t)key, key);
 
         switch (key) {
           case #file:
-            printf("  \"%s\",", cast(str-t)(item));
+            fprintf(stderr, "  \"%s\",", cast(str-t)item);
             break;
           case #name:
           case #type:
-            printf("  #%s,",    cast(symbol-t)(item));
+            fprintf(stderr, "  #%s,",    cast(symbol-t)item);
             break;
           default:
             ;
         }
-        printf("\n");
+        fprintf(stderr, "\n");
       }
-      printf("},\n");
+      fprintf(stderr, "},\n");
       current = current->next;
     }
     return s;
