@@ -628,9 +628,34 @@ static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void
   }
   return;
 }
+static func sort-kls-info(named-info-t* kls-info) -> void {
+  named-info::sort(kls-info); // REQUIRED since symbols address are not known at compile time
+  named-info-t* slots-info = cast(named-info-t*)named-info::at(kls-info, #slots-info);
+  if (slots-info) {
+    int-t i = 0;
+    while (slots-info[i].items)
+      named-info::sort(&slots-info[i++]);
+  }
+  return;
+}
+static func sort-reg-info(named-info-t* reg-info) -> void {
+  named-info::sort(reg-info);
+  named-info-t* klass-defns = cast(named-info-t*)named-info::at(reg-info, #klass-defns);
+  if (klass-defns) {
+    size-t i = 0;
+    while (1) {
+      named-info-t* kls-info = &klass-defns[i++];
+      assert(kls-info);
+      if (! kls-info->items)
+        break;
+      sort-kls-info(kls-info);
+    }
+  }
+  return;
+}
 func dk-register-klass(named-info-t* kls-info) -> symbol-t {
   //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(kls-info, #name));
-  named-info::sort(kls-info);
+  sort-kls-info(kls-info); // REQUIRED since symbols address are not known at compile time
   symbol-t name = name-from-info(kls-info);
   assert-valid-str(name);
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\"],\"klass-name\":\"%s\"", __func__, cast(ptr-t)(kls-info), name);
@@ -1519,7 +1544,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
-  named-info::sort(registration-info); // REQUIRED since symbols address are not known at compile time
+  sort-reg-info(registration-info); // REQUIRED since symbols address are not known at compile time
   symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#exe);
   bool-t ctlg-exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
   bool-t ctlg-recursive =     getenv-int("DAKOTA_CATALOG_RECURSIVE");
@@ -1587,7 +1612,6 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       getenv-int("DKT_NO_INIT_RUNTIME") ||
       !null)
     return;
-  named-info::sort(registration-info);
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
 
   if (klass-defns != nullptr) { // this should be done in reverse
