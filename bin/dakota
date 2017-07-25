@@ -231,6 +231,9 @@ sub detect_gcc_opts {
 sub project_io_path_from_project_path {
   my ($project_path) = @_;
   my $project = &dakota::util::scalar_from_file($project_path);
+  if (! $$project{'builddir'}) {
+    $$project{'builddir'} = &builddir();
+  }
   my $source_dir = &dir_part(&relpath($project_path));
   my $force;
   my $builddir = &adjust_path($source_dir, $$project{'builddir'}, $force = 1);
