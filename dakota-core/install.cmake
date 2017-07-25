@@ -35,13 +35,13 @@ set (install-bin-files
 )
 install (
   FILES ${install-lib-dakota-files}
-  DESTINATION /usr/local/lib/dakota
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/dakota
 )
 install (
   FILES ${install-include-files}
-  DESTINATION /usr/local/include
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include
 )
 install (
   PROGRAMS ${install-bin-files}
-  DESTINATION /usr/local/bin
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )

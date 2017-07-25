@@ -5,6 +5,10 @@ set (dakota               dakota)
 set (root-dir ${CMAKE_SOURCE_DIR}/..)
 set (ENV{PATH} "${root-dir}/bin:$ENV{PATH}")
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
+set (CMAKE_INSTALL_PREFIX $ENV{CMAKE_INSTALL_PREFIX})
+if (NOT DEFINED CMAKE_INSTALL_PREFIX)
+  set (CMAKE_INSTALL_PREFIX $ENV{HOME})
+endif ()
 set (dakota-build-path ${CMAKE_SOURCE_DIR}/dakota.build)
 
 string (REGEX REPLACE "\.build$" ".project" dakota-project-path ${dakota-build-path})
@@ -31,17 +35,20 @@ set (cxx-compiler clang++)
 set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
 list (APPEND CMAKE_CXX_FLAGS "--project ${dakota-project-path} --cxx ${cxx-compiler}")
+set (CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 set (found-libs)
+set (dk-found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
-  list (APPEND found-libs --found-library ${lib}=${lib-path})
+  list (APPEND found-libs ${lib-path})
+  list (APPEND dk-found-libs --found-library ${lib}=${lib-path})
 endforeach (lib)
 
 # phony target 'init'
 add_custom_target (
   init
-  COMMAND ${dakota} --project ${dakota-project-path} --init ${found-libs}
+  COMMAND ${dakota} --project ${dakota-project-path} --init ${dk-found-libs}
   VERBATIM)
 # get target-cc path
 execute_process (
@@ -68,8 +75,8 @@ endif ()
 
 include_directories (${include-dirs})
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
-install (FILES ${install-include-files} DESTINATION /usr/local/include)
+install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_compile_options (${target} PRIVATE @${CMAKE_SOURCE_DIR}/${warn-opts-file})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-target_link_libraries (${target} ${libs})
+target_link_libraries (${target} ${found-libs})
