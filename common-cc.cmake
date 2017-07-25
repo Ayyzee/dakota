@@ -1,7 +1,6 @@
 # -*- mode: cmake -*-
 set (dakota-build2project dakota-build2project)
 set (dakota-build2cmake   dakota-build2cmake)
-set (dakota               dakota)
 set (root-dir ${CMAKE_SOURCE_DIR}/..)
 set (ENV{PATH} "${root-dir}/bin:$ENV{PATH}")
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
