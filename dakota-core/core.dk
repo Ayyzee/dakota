@@ -628,24 +628,22 @@ static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void
   }
   return;
 }
-static func sort-kls-info(named-info-t* kls-info) -> void {
-  named-info::sort(kls-info);
-  named-info-t* slots-info = cast(named-info-t*)named-info::at(kls-info, #slots-info);
-  if (slots-info) {
+static func sort-named-info-array(named-info-t* info, symbol-t key) -> void {
+  named-info::sort(info);
+  named-info-t* sub-info = cast(named-info-t*)named-info::at(info, key);
+  if (sub-info) {
     ssize-t i = 0;
-    while (slots-info[i].items)
-      named-info::sort(&slots-info[i++]);
+    while (sub-info[i].items)
+      named-info::sort(&sub-info[i++]);
   }
   return;
 }
-static func sort-reg-info(named-info-t* reg-info) -> void {
-  named-info::sort(reg-info);
-  named-info-t* klass-defns = cast(named-info-t*)named-info::at(reg-info, #klass-defns);
-  if (klass-defns) {
-    ssize-t i = 0;
-    while (klass-defns[i].items)
-      sort-kls-info(&klass-defns[i++]);
-  }
+static func sort-kls-info(named-info-t* info) -> void {
+  sort-named-info-array(info, #slots-info);
+  return;
+}
+static func sort-reg-info(named-info-t* info) -> void {
+  sort-named-info-array(info, #klass-defns);
   return;
 }
 func dk-register-klass(named-info-t* kls-info) -> symbol-t {
