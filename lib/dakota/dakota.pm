@@ -1213,20 +1213,7 @@ sub exec_cmd {
   else {
     open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die "$!";
   }
-  my $exit_val = system($cmd_str);
-  if (0 != $exit_val >> 8) {
-    my $tmp_exit_status = $exit_val >> 8;
-    if ($exit_status < $tmp_exit_status) { # similiar to behavior of gnu make
-      $exit_status = $tmp_exit_status;
-    }
-    if (!$$root_cmd{'opts'}{'keep-going'}) {
-      if (!(&is_debug() || $global_should_echo || $should_echo)) {
-        print STDERR "  $cmd_str\n";
-      }
-      die "exit value from system() was $exit_val\n" if $exit_status == 0;
-      exit $exit_status;
-    }
-  }
+  system($cmd_str) == 0 or die $0 . ': error: ' . $cmd_str . $nl;
 }
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;

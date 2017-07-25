@@ -268,6 +268,7 @@ sub convert_and_exec_cmd {
     my $exit_val;
     my $prog = shift @$precompile_cmd;
     ($exit_val, $cc_paths) = &start_core($precompile_cmd);
+    exit $exit_val if $exit_val;
   } else {
     if ($verbose) {
       print '# 2/3 (skipped)' . $nl;
@@ -280,8 +281,7 @@ sub convert_and_exec_cmd {
   if ($verbose) {
     print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
   }
-  my $exit_val = system @$gcc_cmd;
-  if (!$exit_val) {
+  system(@$gcc_cmd) == 0 or die $0 . ': error: ' . @$gcc_cmd . $nl;
     my $inputs = [];
     my $output = $$info{'output'}[1];
     foreach my $pair (@{$$info{'inputs'}}) {
@@ -294,8 +294,7 @@ sub convert_and_exec_cmd {
       my $project_io_path = &project_io_path_from_project_path($$dakota_opts{'project'});
       &dakota::util::project_io_add($project_io_path, 'compile', $inputs, $output);
     }
-  }
-  return $exit_val;
+  return 0;
 }
 sub has_cxx_opt {
   my ($argv) = @_;
@@ -543,7 +542,6 @@ sub start_core {
               'directory=s',    # make-like
               'echo-inputs',    #
               'found-library=s',
-              'keep-going',     # make-like
               'silent',         #
               'soname=s',       # ld-like (-soname <>)
               'var=s',          # for env vars like MAKEFLAGS, etc.

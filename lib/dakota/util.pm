@@ -49,7 +49,7 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
@@ -603,10 +603,7 @@ sub make_dir {
       print STDERR $0 . ': info: make_dir(' . $path . ')' . $nl;
     }
     my $cmd = ['mkdir', '-p', $path];
-    my $exit_val = system(@$cmd);
-    if (0 != $exit_val) {
-      die $0 . ': error: make_dir(' . $path .')' . $nl;
-    }
+    system(@$cmd) == 0 or die $0 . ': error: ' . @$cmd . $nl;
   }
 }
 sub make_dir_part {
