@@ -6,5 +6,5 @@ if [[ $# == 1 ]]; then
 fi
 rm -f  $INSTALL_PREFIX/include/dakota*
 rm -f  $INSTALL_PREFIX/lib/libdakota*
-rm -fr $INSTALL_PREFIX/lib/dakota
+rm -fr $INSTALL_PREFIX/lib/dakota/*
 rm -f  $INSTALL_PREFIX/bin/dakota*
