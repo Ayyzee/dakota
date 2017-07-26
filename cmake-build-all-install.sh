@@ -52,7 +52,7 @@ if false; then
 fi
 #exit
 
-sudo ./bin/dakota-build-uninstall.sh $INSTALL_PREFIX
+./bin/dakota-build-uninstall.sh $INSTALL_PREFIX
 
 # dakota-dso dakota-catalog dakota-find-library
 # dakota-core dakota
