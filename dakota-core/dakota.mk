@@ -38,7 +38,7 @@ single: $(srcs) | dakota.project
 check-exe: all
 	echo "# include \"test.h\"" > exe.dk
 	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> exe.dk
-	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "build-dkt-exe" }' > exe.project
+	echo '{ "srcs" => [ "exe.dk" ], "lib-dirs" => [ "\$${INSTALL_PREFIX}/lib" ], "builddir" => "build-dkt-exe" }' > exe.project
 	rm -f exe
 	$(DAKOTA) --project exe.project
 	./exe

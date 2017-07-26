@@ -1169,6 +1169,21 @@ sub library_names_add_first {
     }
   }
 }
+sub lib_dirs {
+  my ($dirs, $project) = @_;
+  return '' if ! $dirs;
+  my $str = '';
+  foreach my $dir (@$dirs) {
+    $str .= " --library-directory $dir ";
+  }
+  foreach my $dir (@{$$project{'lib-dirs'}}) {
+    my $install_prefix = $ENV{'INSTALL_PREFIX'};
+    $install_prefix = '/usr/local' if ! $install_prefix;
+    $dir =~ s/\$\{INSTALL_PREFIX\}/$install_prefix/;
+    $str .= " --library-directory $dir ";
+  }
+  return $str;
+}
 sub linked_output_from_o {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
   my $cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -1177,6 +1192,7 @@ sub linked_output_from_o {
   my $extra_ldflags = &var($gbl_compiler, 'EXTRA_LDFLAGS', '');
   my $opts = '';
   $opts .= $mode_flags . $nl if $mode_flags;
+  $opts .= &lib_dirs($$cmd_info{'opts'}{'library-directory'}, &global_project()) . $nl;
   $opts .=
     $ldflags . $nl .
     $extra_ldflags . $nl .
