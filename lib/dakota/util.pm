@@ -1235,12 +1235,6 @@ sub copy_no_dups {
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
-    if (! $$cmd_info{'opts'}{'precompile'} && ! -e $str) {
-      if ($str eq &find_library($str)) {
-        my $cwd = &cwd();
-        print STDERR $0 . ': warning: no-such-file: ' . $cwd . ' / ' . $str . $nl;
-      }
-    }
     if (&is_abs($str)) {
       $str = &canon_path($str);
     } else {
