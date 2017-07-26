@@ -1,7 +1,6 @@
 SHELL := /bin/bash -o errexit -o nounset -o pipefail
 
 rootdir ?= .
-include $(rootdir)/makeflags.mk
 dirs-cc := dakota-dso dakota-catalog dakota-find-library
 dirs-dk := dakota-core dakota
 dirs := $(dirs-cc) $(dirs-dk)
@@ -29,10 +28,10 @@ all: all-install
 
 all-install:
 	sudo true # so password prompt is immediate
-	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir all install; done
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; ./make.sh all install; popd; done
 
 uninstall:
-	for dir in $(dirs); do $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@; done
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; ./make.sh $@; popd; done
 
 check \
 check-exe \
@@ -43,4 +42,4 @@ goal-clean \
 install \
 installcheck \
 precompile:
-	for dir in $(dirs) test; do $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@; done
+	for dir in $(dirs) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; ./make.sh $@; popd; done
