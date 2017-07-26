@@ -13,6 +13,7 @@ dirs := $(dirs-cc) $(dirs-dk)
 
 .PHONY: \
  all \
+ all-install \
  check \
  check-exe \
  clean \
@@ -27,19 +28,23 @@ dirs := $(dirs-cc) $(dirs-dk)
 all: all-install
 
 all-install:
-	#sudo true # so password prompt is immediate
+	sudo true # so password prompt is immediate
 	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME} ./make.sh all install; popd; done
 
 uninstall:
-	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME} ./make.sh $@; popd; done
+	for dir in $(dirs-dk) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME} ./make.sh $@; popd; done
+	echo warning: did not uninstall in dirs: $(dirs-cc)
 
 check \
 check-exe \
-clean \
 dist \
 distclean \
 goal-clean \
-install \
 installcheck \
 precompile:
-	for dir in $(dirs) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME} ./make.sh $@; popd; done
+	for dir in $(dirs-dk) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME} ./make.sh $@; popd; done
+
+all \
+clean \
+install:
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME} ./make.sh $@; popd; done

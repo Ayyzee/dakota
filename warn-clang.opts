@@ -16,7 +16,3 @@
 --warn-no-padded
 --warn-no-unknown-warning-option
 --warn-no-unused-command-line-argument
---optimize=0
---debug=3
---define-macro DEBUG
--dllvm

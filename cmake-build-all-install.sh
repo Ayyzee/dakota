@@ -10,13 +10,24 @@ fi
 export CMAKE_INSTALL_PREFIX
 INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX
 
+remove-binary-dir() {
+  if [[ -e cmake-binary-dir.txt ]]; then
+    binary_dir=$(cat cmake-binary-dir.txt)
+  else
+    binary_dir=build-cmk
+  fi
+  rm -fr $binary_dir
+}
 build() {
   dir=$1
   pushd $dir
   echo cwd=$dir
   rootdir=..
+  $rootdir/bin/build-uninstall.sh
+  remove-binary-dir
+  rm -fr build-dkt
   $rootdir/bin/cmake-configure.sh
-  $rootdir/bin/build.sh clean
+  #$rootdir/bin/build.sh clean
   $rootdir/bin/build.sh ###
   $rootdir/bin/build.sh install
   popd
@@ -26,8 +37,11 @@ build-all() {
   pushd $dir
   echo cwd=$dir
   rootdir=..
+  $rootdir/bin/build-uninstall.sh
+  remove-binary-dir
+  rm -fr build-dkt
   $rootdir/bin/cmake-configure.sh
-  $rootdir/bin/build.sh clean
+  #$rootdir/bin/build.sh clean
   $rootdir/bin/build-all.sh ###
   $rootdir/bin/build.sh install
   popd

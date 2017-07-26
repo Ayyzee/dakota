@@ -21,6 +21,3 @@
 --warn-no-missing-field-initializers
 --warn-no-cast-qual
 --warn-no-switch-default
---optimize=0
---debug=3
---define-macro DEBUG
