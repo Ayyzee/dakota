@@ -1180,6 +1180,8 @@ sub lib_dirs {
     my $install_prefix = $ENV{'INSTALL_PREFIX'};
     $install_prefix = '/usr/local' if ! $install_prefix;
     $dir =~ s/\$\{INSTALL_PREFIX\}/$install_prefix/;
+    $dir =~ s/\$\(INSTALL_PREFIX\)/$install_prefix/;
+    $dir =~ s/\$INSTALL_PREFIX/$install_prefix/;
     $str .= " --library-directory $dir ";
   }
   return $str;

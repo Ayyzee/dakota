@@ -308,8 +308,11 @@ sub create_missing_project {
   if (0 == scalar @$inputs) {
     die "error: missing both --project <file> and input files; at least one is required.";
   }
-  my $project = { 'target' => undef, 'inputs' => [], 'libs' => [],
+  my $project = { 'target' => undef, 'inputs' => [], 'lib-dirs' => [], 'libs' => [],
                   'builddir' => &builddir() };
+  foreach my $lib_dir (@{$$root_cmd{'opts'}{'library-directory'}}) {
+    &add_last($$project{'lib-dirs'}, $lib_dir);
+  }
   foreach my $library (@{$$root_cmd{'opts'}{'library'}}) {
     &add_last($$project{'libs'}, $library);
   }
