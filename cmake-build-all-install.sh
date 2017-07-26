@@ -10,30 +10,26 @@ fi
 export CMAKE_INSTALL_PREFIX
 INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX
 
-build-all-install() {
+build() {
   dir=$1
   pushd $dir
   echo cwd=$dir
   rootdir=..
-  $rootdir/bin/cmake-clean.sh
-  #
   $rootdir/bin/cmake-configure.sh
-  $rootdir/bin/build-clean.sh
-  $rootdir/bin/build-all.sh ###
-  $rootdir/bin/build-install.sh
+  $rootdir/bin/build.sh clean
+  $rootdir/bin/build.sh ###
+  $rootdir/bin/build.sh install
   popd
 }
-build-all-install-dk() {
+build-all() {
   dir=$1
   pushd $dir
   echo cwd=$dir
   rootdir=..
-  $rootdir/bin/cmake-clean.sh
-  rm -f dakota.cmake # hackhack
   $rootdir/bin/cmake-configure.sh
-  $rootdir/bin/build-clean.sh
-  $rootdir/bin/build-all-dk.sh ###
-  $rootdir/bin/build-install.sh
+  $rootdir/bin/build.sh clean
+  $rootdir/bin/build-all.sh ###
+  $rootdir/bin/build.sh install
   popd
 }
 
@@ -57,15 +53,15 @@ fi
 # dakota-dso dakota-catalog dakota-find-library
 # dakota-core dakota
 
-build-all-install    dakota-dso
-build-all-install    dakota-catalog
-build-all-install    dakota-find-library
+build dakota-dso
+build dakota-catalog
+build dakota-find-library
 
-build-all-install-dk dakota-core
+build-all dakota-core
 
 pushd $INSTALL_PREFIX/lib/dakota
 ln -fs compiler-command-line-$compiler.json compiler-command-line.json
 ln -fs platform-$platform.json platform.json
 popd
 
-build-all-install-dk dakota
+build-all dakota
