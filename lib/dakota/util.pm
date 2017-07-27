@@ -1040,14 +1040,6 @@ sub find_library {
   if ($found_library) {
     $result = $$found_library{'M2L'}{&canon_path($name)};
   }
-  if (! $result) {
-    $result = `dakota-find-library $name 2>/dev/null`;
-    if (0 == $?) {
-      $result =~ s/\s+$//;
-    } else {
-      $result = $name;
-    }
-  }
   return $result;
 }
 sub digsig {
