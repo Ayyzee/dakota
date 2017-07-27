@@ -600,7 +600,7 @@ sub start_core {
   # m/0: many inputs, no  output
   # m/1: many inputs, one output (directory)
 
-  my $rel_argv = [map { &relpath($_) } @ARGV];
+  my $rel_argv = [map { &relpath($_) } @$argv];
   my $inputs = &clean_paths($rel_argv);
   my ($project, $project_io);
 
