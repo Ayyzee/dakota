@@ -11,7 +11,7 @@ if [[ $# == 1 ]]; then
 fi
 export INSTALL_PREFIX
 
-build() {
+build-install() {
   dir=$1
   cd $dir
   cwd=$(pwd)
@@ -31,21 +31,21 @@ mkdir -p $INSTALL_PREFIX/{bin,include,lib/dakota}
 # dakota-dso dakota-catalog dakota-find-library
 # dakota-core dakota
 
-build dakota-dso
-build dakota-catalog
-build dakota-find-library
+build-install dakota-dso
+build-install dakota-catalog
+build-install dakota-find-library
 
-build dakota-core
+build-install dakota-core
 
 pushd $INSTALL_PREFIX/lib/dakota
 ln -fs compiler-command-line-$compiler.json compiler-command-line.json
 ln -fs platform-$platform.json platform.json
 popd
 
-build dakota
+build-install dakota
 
-glob='/opt/local/bin/dakota* /opt/local/lib/libdakota* /opt/local/include/dakota*'
+glob='/usr/local/bin/dakota* /usr/local/lib/libdakota* /usr/local/include/dakota*'
 match=$(echo $glob)
-if [[ $INSTALL_PREFIX != "/opt/local" && "$glob" != "$match" ]]; then
-  echo $(basename $0): warning: installation also in /opt/local >&2
+if [[ $INSTALL_PREFIX != "/usr/local" && "$glob" != "$match" ]]; then
+  echo $(basename $0): warning: installation also in /usr/local >&2
 fi
