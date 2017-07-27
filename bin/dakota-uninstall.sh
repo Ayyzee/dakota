@@ -1,6 +1,6 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-INSTALL_PREFIX=$HOME/opt
+INSTALL_PREFIX=/usr/local
 if [[ $# == 1 ]]; then
   INSTALL_PREFIX=$1
 fi

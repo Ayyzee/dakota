@@ -5,7 +5,7 @@ include $(rootdir)/makeflags.mk
 
 SOURCE_DIR ?= .
 
-INSTALL_PREFIX := $(HOME)/opt
+INSTALL_PREFIX ?= /usr/local
 
 h_ext := h
 cc_ext := cc

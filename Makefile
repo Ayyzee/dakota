@@ -1,4 +1,5 @@
 SHELL := /bin/bash -o errexit -o nounset -o pipefail
+INSTALL_PREFIX ?= /usr/local
 
 rootdir ?= .
 dirs-cc := dakota-dso dakota-catalog dakota-find-library
@@ -29,10 +30,10 @@ all: all-install
 
 all-install:
 	sudo true # so password prompt is immediate
-	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME/opt} ./make.sh all install; popd; done
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$(INSTALL_PREFIX) ./make.sh all install; popd; done
 
 uninstall:
-	for dir in $(dirs-dk) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME/opt} ./make.sh $@; popd; done
+	for dir in $(dirs-dk) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$(INSTALL_PREFIX) ./make.sh $@; popd; done
 	echo warning: did not uninstall in dirs: $(dirs-cc)
 
 check \
@@ -42,9 +43,9 @@ distclean \
 goal-clean \
 installcheck \
 precompile:
-	for dir in $(dirs-dk) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME/opt} ./make.sh $@; popd; done
+	for dir in $(dirs-dk) test; do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$(INSTALL_PREFIX) ./make.sh $@; popd; done
 
 all \
 clean \
 install:
-	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$${INSTALL_PREFIX-$$HOME/opt} ./make.sh $@; popd; done
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) pushd $$dir; INSTALL_PREFIX=$(INSTALL_PREFIX) ./make.sh $@; popd; done

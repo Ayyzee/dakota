@@ -3,12 +3,13 @@ set -o errexit -o nounset -o pipefail
 source common.sh
 compiler=$(compiler)
 platform=$(platform)
-CMAKE_INSTALL_PREFIX=$HOME/opt
-if [[ $# == 1 ]]; then
-  CMAKE_INSTALL_PREFIX=$1
+if [[ -z ${INSTALL_PREFIX+x} ]]; then
+  INSTALL_PREFIX=/usr/local
 fi
-export CMAKE_INSTALL_PREFIX
-INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX
+if [[ $# == 1 ]]; then
+  INSTALL_PREFIX=$1
+fi
+export INSTALL_PREFIX
 
 build() {
   dir=$1

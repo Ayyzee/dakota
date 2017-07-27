@@ -86,8 +86,6 @@ MKDIRFLAGS="--parents"
 RM=rm
 RMFLAGS="--force --recursive"
 
-INSTALL_PREFIX=/usr/local
-
 so_ext=so
 
 if [[ "darwin" == "$(platform)" ]]; then
