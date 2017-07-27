@@ -3,7 +3,7 @@ set -o errexit -o nounset -o pipefail
 source common.sh
 compiler=$(compiler)
 platform=$(platform)
-CMAKE_INSTALL_PREFIX=$HOME
+CMAKE_INSTALL_PREFIX=$HOME/opt
 if [[ $# == 1 ]]; then
   CMAKE_INSTALL_PREFIX=$1
 fi
@@ -23,12 +23,9 @@ build() {
 export PATH=$INSTALL_PREFIX/bin:$PATH
 export CMAKE_VERBOSE_MAKEFILE=ON
 
+mkdir -p $INSTALL_PREFIX/{bin,include,lib/dakota}
+
 ./bin/build-uninstall.sh $INSTALL_PREFIX
-warning=
-if [[ $INSTALL_PREFIX != "/usr/local" && -e /usr/local/bin/dakota ]]; then
-  warning="$(basename $0): warning: installation also in /usr/local"
-  echo $warning
-fi
 
 # dakota-dso dakota-catalog dakota-find-library
 # dakota-core dakota
@@ -45,4 +42,9 @@ ln -fs platform-$platform.json platform.json
 popd
 
 build dakota
-echo $warning
+
+glob='/opt/local/bin/dakota* /opt/local/lib/libdakota* /opt/local/include/dakota*'
+match=$(echo $glob)
+if [[ $INSTALL_PREFIX != "/opt/local" && "$glob" != "$match" ]]; then
+  echo $(basename $0): warning: installation also in /opt/local >&2
+fi

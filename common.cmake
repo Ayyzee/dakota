@@ -7,7 +7,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   elseif (DEFINED ENV{INSTALL_PREFIX})
     set (CMAKE_INSTALL_PREFIX $ENV{INSTALL_PREFIX})
   else ()
-    set (CMAKE_INSTALL_PREFIX $ENV{HOME})
+    set (CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
   endif ()
 endif()
 
@@ -39,8 +39,6 @@ set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 set (cxx-compiler clang++)
 set (CMAKE_CXX_VISIBILITY_PRESET hidden)
-# unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
-list (APPEND CMAKE_CXX_FLAGS "--project ${dakota-project-path} --cxx ${cxx-compiler}")
 set (CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 set (found-libs)
 set (dk-found-libs)
@@ -48,23 +46,23 @@ foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
   list (APPEND found-libs ${lib-path})
-  list (APPEND dk-found-libs --found-library ${lib}=${lib-path})
+  list (APPEND dk-found-libs --found-library=${lib}=${lib-path})
 endforeach (lib)
 
 # phony target 'init'
 add_custom_target (
   init
-  COMMAND ${dakota} --project ${dakota-project-path} --init ${dk-found-libs}
+  COMMAND ${dakota} --project=${dakota-project-path} --init ${dk-found-libs}
   VERBATIM)
 # get target-cc path
 execute_process (
-  COMMAND ${dakota} --project ${dakota-project-path} --target --path-only
+  COMMAND ${dakota} --project=${dakota-project-path} --target --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-cc
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --project ${dakota-project-path} --target
+  COMMAND ${dakota} --project=${dakota-project-path} --target ${dk-found-libs}
   VERBATIM)
 list (APPEND srcs ${target-src})
 
@@ -84,6 +82,13 @@ include_directories (${include-dirs})
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 target_compile_definitions (${target} PRIVATE ${macros})
-target_compile_options (${target} PRIVATE @${CMAKE_SOURCE_DIR}/${warn-opts-file} ${sanitize-opts})
+target_compile_options (${target} PRIVATE
+  --project=${dakota-project-path} --cxx=${cxx-compiler} ${dk-found-libs}
+  ${sanitize-opts}
+  @${CMAKE_SOURCE_DIR}/${warn-opts-file}
+)
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-target_link_libraries (${target} ${found-libs} ${sanitize-opts})
+target_link_libraries (${target}
+  --project=${dakota-project-path} --cxx=${cxx-compiler} ${found-libs}
+  ${sanitize-opts}
+)

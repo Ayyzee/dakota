@@ -769,7 +769,7 @@ sub start_cmd {
   return ($exit_status, $cc_files);
 }
 sub ast_from_so {
-  my ($cmd_info, $arg) = @_;
+  my ($cmd_info, $arg, $qual_arg) = @_;
   if (!$arg) {
     $arg = $$cmd_info{'input'};
   }
@@ -781,7 +781,7 @@ sub ast_from_so {
     my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
     $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
   }
-  $$ctlg_cmd{'inputs'} = [ $arg ];
+  $$ctlg_cmd{'inputs'} = [ $qual_arg ];
   &ctlg_from_so($ctlg_cmd);
   my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
   &check_path($ast_path);
@@ -798,9 +798,11 @@ sub ast_from_so {
 sub loop_ast_from_so {
   my ($cmd_info) = @_;
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+  my $found_library = $$cmd_info{'opts'}{'found-library'};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
-      &ast_from_so($cmd_info, $input);
+      my $qual_input = $$found_library{'M2L'}{$input};
+      &ast_from_so($cmd_info, $input, $qual_input);
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
       $input = &canon_path($input);

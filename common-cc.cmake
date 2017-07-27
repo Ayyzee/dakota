@@ -7,7 +7,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   elseif (DEFINED ENV{INSTALL_PREFIX})
     set (CMAKE_INSTALL_PREFIX $ENV{INSTALL_PREFIX})
   else ()
-    set (CMAKE_INSTALL_PREFIX $ENV{HOME})
+    set (CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
   endif ()
 endif()
 
@@ -47,6 +47,9 @@ include_directories (${include-dirs})
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 target_compile_definitions (${target} PRIVATE ${macros})
-target_compile_options (${target} PRIVATE @${CMAKE_SOURCE_DIR}/${warn-opts-file} ${sanitize-opts})
+target_compile_options (${target} PRIVATE
+  ${sanitize-opts}
+  @${CMAKE_SOURCE_DIR}/${warn-opts-file}
+)
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 target_link_libraries (${target} ${found-libs} ${sanitize-opts})
