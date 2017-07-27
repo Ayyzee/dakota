@@ -32,14 +32,16 @@ if [[ $targets =~ $init_re ]]; then
     for arg in $args; do # sub-optimal
       if [[ "$arg" == "all" ]]; then
         ee "make --directory $binary_dir init"
-        fi
-      ee "make --directory $binary_dir --jobs $jobs $arg"
+        ee "make --directory $binary_dir --jobs $jobs all"
+      else
+        ee "make --directory $binary_dir $arg"
+      fi
     done
   else
-    ee "make --directory $binary_dir --jobs $jobs $args"
+    ee "make --directory $binary_dir $args"
   fi
 else
-  ee "make --directory $binary_dir --jobs $jobs $args"
+  ee "make --directory $binary_dir $args"
 fi
 
 # This could be done better. The for loop labeled sub-optimal should be
