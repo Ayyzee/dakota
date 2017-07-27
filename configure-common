@@ -29,7 +29,9 @@ $LN $LNFLAGS config-$sysname.h config.h
 popd > /dev/null 2>&1
 
 canon_compiler=$(compiler $compiler)
+$LN $LNFLAGS warn-$canon_compiler.opts warn.opts
+$LN $LNFLAGS warn-$canon_compiler.cmake warn.cmake
 pushd lib/dakota > /dev/null 2>&1
-$LN $LNFLAGS compiler-$canon_compiler compiler
+$LN $LNFLAGS compiler-command-line-$canon_compiler.json compiler-command-line.json
 $LN $LNFLAGS platform-$sysname.json   platform.json
 popd > /dev/null 2>&1
