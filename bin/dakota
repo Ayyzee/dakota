@@ -183,6 +183,7 @@ sub get_dakota_opts {
   foreach my $i (@$to_remove) {
     splice @$cmd, $i, 1;
   }
+  if (0) {
   # delete the non-required ones
   delete $$var4opt{'found-library'};
   foreach my $opt (keys %$var4opt) {
@@ -195,6 +196,7 @@ sub get_dakota_opts {
           $$var4opt{$opt} . ' required' . $nl;
       }
     }
+  }
   }
   return $info;
 }
