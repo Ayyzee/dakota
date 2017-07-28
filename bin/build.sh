@@ -20,7 +20,11 @@ ee() {
   echo $1
   eval $1
 }
-binary_dir=$(cat cmake-binary-dir.txt)
+if [[ -e ../cmake-binary-dir.txt ]]; then
+  binary_dir=$(cat ../cmake-binary-dir.txt)
+else
+  binary_dir=build-cmk
+fi
 jobs=$(getconf _NPROCESSORS_ONLN)
 targets=$(cmake --build $binary_dir --target help)
 targets=$(echo $targets)

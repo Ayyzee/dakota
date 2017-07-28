@@ -28,9 +28,6 @@ mkdir -p $INSTALL_PREFIX/{bin,include,lib/dakota}
 
 ./bin/build-uninstall.sh $INSTALL_PREFIX
 
-# dakota-dso dakota-catalog dakota-find-library
-# dakota-core dakota
-
 build-install dakota-dso
 build-install dakota-catalog
 build-install dakota-find-library

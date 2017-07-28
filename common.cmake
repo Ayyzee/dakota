@@ -27,30 +27,30 @@ set (BINARY_DIR     ${CMAKE_BINARY_DIR})
 set (INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
 include (${dakota-cmake-path})
-include (${root-dir}/warn.cmake)
+#include (${root-dir}/warn.cmake)
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
+set (CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 set (cxx-compiler clang++)
 set (CMAKE_CXX_VISIBILITY_PRESET hidden)
-set (CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+
 set (found-libs)
-set (dk-found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
-  list (APPEND found-libs ${lib-path})
-  list (APPEND dk-found-libs --found-library=${lib}=${lib-path})
+  # check for error here
+  list (APPEND found-libs --found-library=${lib}=${lib-path})
 endforeach (lib)
 
 # phony target 'init'
 add_custom_target (
   init
-  COMMAND ${dakota} --project=${dakota-project-path} --init ${dk-found-libs}
+  COMMAND ${dakota} --project=${dakota-project-path} --init ${found-libs}
   VERBATIM)
 # get target-cc path
 execute_process (
@@ -60,13 +60,14 @@ execute_process (
 # generate target-cc
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --project=${dakota-project-path} --target ${dk-found-libs}
+  COMMAND ${dakota} --project=${dakota-project-path} --target ${found-libs}
   VERBATIM)
 list (APPEND srcs ${target-src})
 
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 
+set (sanitize-opts -fsanitize=address)
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
   set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/lib)
@@ -75,18 +76,19 @@ else ()
   set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
 
-set (sanitize-opts -fsanitize=address)
 include_directories (${include-dirs})
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 target_compile_definitions (${target} PRIVATE ${macros})
+set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
+target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
-  --project=${dakota-project-path} --cxx=${cxx-compiler} ${dk-found-libs}
+  --project=${dakota-project-path} --cxx=${cxx-compiler} ${found-libs}
   ${sanitize-opts}
   @${CMAKE_SOURCE_DIR}/${warn-opts-file}
 )
-set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-target_link_libraries (${target}
-  --project=${dakota-project-path} --cxx=${cxx-compiler} ${found-libs}
-  ${sanitize-opts}
+string (CONCAT link-flags
+  " --project=${dakota-project-path} --cxx=${cxx-compiler}"
+  " ${sanitize-opts}"
 )
+set_target_properties(${target} PROPERTIES LINK_FLAGS ${link-flags})

@@ -594,7 +594,9 @@ sub update_target_srcs_ast_from_all_inputs {
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
   &check_path($target_srcs_ast_path);
-  $cmd_info = &loop_ast_from_so($cmd_info);
+  $cmd_info = &loop_ast_from_so($cmd_info,
+                                $$cmd_info{'link'},
+                                $$cmd_info{'opts'}{'library-directory'});
   $cmd_info = &loop_ast_from_inputs($cmd_info);
   die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
   &add_visibility_file($target_srcs_ast_path);
@@ -796,12 +798,11 @@ sub ast_from_so {
   }
 }
 sub loop_ast_from_so {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $link, $library_directory) = @_;
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
-  my $found_library = $$cmd_info{'opts'}{'found-library'};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
-      my $qual_input = $$found_library{'M2L'}{$input};
+      my $qual_input = &find_library($input, $link, $library_directory);
       &ast_from_so($cmd_info, $input, $qual_input);
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
@@ -1241,7 +1242,9 @@ sub outfile_from_infiles {
   &make_dir_part($outfile, $should_echo);
   if ($outfile =~ m|^$builddir/$builddir/|) { die "found double builddir/builddir: $outfile"; } # likely a double $builddir prepend
   my $file_db = {};
-  my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile, $file_db);
+  my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile,
+                             $$cmd_info{'link'},
+                             $$cmd_info{'library-directory'}, $file_db);
   my $num_out_of_date_infiles = scalar @$infiles;
   if (0 != $num_out_of_date_infiles) {
     #print STDERR "outfile=$outfile, infiles=[ " . join(' ', @$infiles) . ' ]' . $nl;

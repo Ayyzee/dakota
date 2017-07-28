@@ -1035,10 +1035,19 @@ sub path_stat {
   return $stat;
 }
 sub find_library {
-  my ($name, $found_library) = @_;
-  my $result;
-  if ($found_library) {
-    $result = $$found_library{'M2L'}{&canon_path($name)};
+  my ($name, $link, $library_directory) = @_;
+  my $result = $name;
+  if ($$link{'M2L'}{$name}) {
+    $result = $$link{'M2L'}{$name};
+    die if ! -e $result;
+  } else {
+    foreach my $dir (@$library_directory) {
+      my $qual_lib = "$dir/$name";
+      if (-e $qual_lib) {
+        $result = $qual_lib;
+        last;
+      }
+    }
   }
   return $result;
 }
@@ -1051,13 +1060,13 @@ sub digsig {
   return $sig;
 }
 sub is_out_of_date {
-  my ($infiles, $outfile, $file_db) = @_;
-  my $files = &out_of_date($infiles, $outfile, $file_db);
+  my ($infiles, $outfile, $link, $library_directory, $file_db) = @_;
+  my $files = &out_of_date($infiles, $outfile, $link, $library_directory, $file_db);
   my $result = scalar @$files;
   return $result;
 }
 sub out_of_date {
-  my ($infiles, $outfile, $file_db) = @_;
+  my ($infiles, $outfile, $link, $library_directory, $file_db) = @_;
   my $result = [];
   $file_db = {} if ! defined $file_db;
   if (!&is_array($infiles)) {
@@ -1069,7 +1078,7 @@ sub out_of_date {
   }
   foreach my $infile (@$infiles) {
     if (! -e $infile) {
-      my $tmp_infile = &find_library($infile);
+      my $tmp_infile = &find_library($infile, $link, $library_directory);
       if ($tmp_infile) {
         $infile = $tmp_infile;
       }
