@@ -134,32 +134,32 @@ sub translate_dk_to_cc {
     }
   }
 }
-sub build_precompile_argv {
+sub build_precompile_root_cmd {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
-  my $project = $$dakota_opts{'project'}[0];
-  my $cmd = [ $0 ];
-  if ($project) {
-    &add_last($cmd, ('--project', $project));
-  }
-  if ($$info{'define-macro'}) {
-    foreach my $macro (@{$$info{'define-macro'}}) {
-      &add_last($cmd, ('--define-macro', $$macro[1]));
-    }
+  my $root_cmd = {
+    'opts'=> {
+      'found-library' => [],
+      'output' => undef,
+    },
+    'inputs' => [],
+  };
+  $$root_cmd{'opts'}{'precompile'} = 1;
+  $$root_cmd{'args'} = $ordered_input_args;
+  if ($$dakota_opts{'project'}[0]) {
+    $$root_cmd{'opts'}{'project'} = $$dakota_opts{'project'}[0];
   }
   if ($$dakota_opts{'found-library'}) {
-    foreach my $found_library (@{$$dakota_opts{'found-library'}}) {
-      &add_last($cmd, ('--found-library', $found_library));
-    }
+    $$root_cmd{'opts'}{'found-library'} = $$dakota_opts{'found-library'}; # deep_copy
   }
-  &add_last($cmd, '--precompile');
-  if ($$info{'major-mode'}) {
-    &add_last($cmd, '--' . $$info{'major-mode'}[1]);
+  if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
+    $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
   }
-  &add_last($cmd, ('--output', $$info{'output'}[1]));
-  &add_last($cmd, (@$ordered_input_args));
-  return $cmd;
+  if ($$info{'output'} && $$info{'output'}[1]) {
+    $$root_cmd{'opts'}{'output'} = $$info{'output'}[1];
+  }
+  return $root_cmd;
 }
-sub get_dakota_opts {
+sub extract_dakota_opts {
   my ($cmd) = @_;
   my $var4opt = { 'project'       => 'DK_PROJECT',
                   'cxx'           => 'DK_CXX',
@@ -212,7 +212,7 @@ sub detect_gcc_opts {
   my ($cmd, $info) = @_;
   my $num_dk_files = 0;
   $$info{'output'} = undef;
-  $$info{'inputs'} = [];
+  $$info{'input-pairs'} = [];
   my $ordered_input_args = [];
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
@@ -224,12 +224,12 @@ sub detect_gcc_opts {
     #  &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
     #} elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
     #  &add_last($ordered_input_args, ('--library', $$pair[1]));
-    } elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
+    #} elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
       if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
         $pair = [$i, $arg];
-        &add_last($$info{'inputs'}, $pair);
+        &add_last($$info{'input-pairs'}, $pair);
         &add_last($ordered_input_args, $$pair[1]);
         if ($arg =~ /\.dk$/) {
           $num_dk_files++;
@@ -265,20 +265,21 @@ sub convert_and_exec_cmd {
   if ($verbose) {
     print '# 1/3 ' . join(' ', @$cmd) . $nl;
   }
-  my $dakota_opts = &get_dakota_opts($cmd);
+  my $dakota_opts = &extract_dakota_opts($cmd);
   my $gcc_cmd = [@$cmd];
   $$gcc_cmd[0] = $$dakota_opts{'cxx'}[0];
   my $info = {};
   my ($num_dk_files, $ordered_input_args) = &detect_gcc_opts($gcc_cmd, $info);
   my $cc_paths;
   if ($num_dk_files) {
-    my $precompile_argv = &build_precompile_argv($dakota_opts, $info, $ordered_input_args);
+    my $precompile_root_cmd = &build_precompile_root_cmd($dakota_opts, $info, $ordered_input_args);
     if ($verbose) {
-      print '# 2/3 ' . join(' ', @$precompile_argv) . $nl;
+      $Data::Dumper::Indent = 0;
+      print '# 2/3 ' . &Dumper($precompile_root_cmd) . $nl;
+      $Data::Dumper::Indent = 1;
     }
     my $exit_val;
-    my $prog = shift @$precompile_argv;
-    ($exit_val, $cc_paths) = &start_core(&root_cmd_from_argv($precompile_argv));
+    ($exit_val, $cc_paths) = &start_core($precompile_root_cmd);
     exit $exit_val if $exit_val;
   } else {
     if ($verbose) {
@@ -295,7 +296,7 @@ sub convert_and_exec_cmd {
   system(@$gcc_cmd) == 0 or die $0 . ': error: ' . @$gcc_cmd . $nl;
     my $inputs = [];
     my $output = $$info{'output'}[1];
-    foreach my $pair (@{$$info{'inputs'}}) {
+    foreach my $pair (@{$$info{'input-pairs'}}) {
       my $input = &relpath($$pair[1]);
       if ($input =~ /\.(dk|$cc_ext)$/) {
         &add_last($inputs, $input);
@@ -754,7 +755,7 @@ sub start_core {
     }
     $ENV{'CXXFLAGS'} .= $flags;
   }
-  if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
+  if ($$root_cmd{'opts'}{'directory'} && scalar @{$$root_cmd{'opts'}{'directory'}}) {
     my $initial_workdir = &getcwd();
     foreach my $dir (@{$$root_cmd{'opts'}{'directory'}}) {
       if ($dir ne '.' &&

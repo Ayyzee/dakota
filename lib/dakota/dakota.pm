@@ -598,10 +598,14 @@ sub update_target_srcs_ast_from_all_inputs {
                                 $$cmd_info{'link'},
                                 $$cmd_info{'opts'}{'library-directory'});
   $cmd_info = &loop_ast_from_inputs($cmd_info);
-  die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
+  if ($$cmd_info{'asts'}) {
+    die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
+  }
   &add_visibility_file($target_srcs_ast_path);
 
-  &update_kw_arg_generics($$cmd_info{'asts'});
+  if ($$cmd_info{'asts'}) {
+    &update_kw_arg_generics($$cmd_info{'asts'});
+  }
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'output'} = $$orig{'output'};
   $$cmd_info{'opts'} =   $$orig{'opts'};

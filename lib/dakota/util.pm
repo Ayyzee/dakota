@@ -1199,7 +1199,7 @@ sub clean_paths {
   my ($in, $key) = @_;
   die if !defined $in;
   if ($key && !exists $$in{$key}) {
-    die &Dumper($in);
+    return $in;
   }
   my $items_in = $in;
   if ($key) {
