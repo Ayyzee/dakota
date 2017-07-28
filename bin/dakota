@@ -134,7 +134,7 @@ sub translate_dk_to_cc {
     }
   }
 }
-sub build_precompile_cmd {
+sub build_precompile_argv {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
   my $project = $$dakota_opts{'project'}[0];
   my $cmd = [ $0 ];
@@ -272,13 +272,13 @@ sub convert_and_exec_cmd {
   my ($num_dk_files, $ordered_input_args) = &detect_gcc_opts($gcc_cmd, $info);
   my $cc_paths;
   if ($num_dk_files) {
-    my $precompile_cmd = &build_precompile_cmd($dakota_opts, $info, $ordered_input_args);
+    my $precompile_argv = &build_precompile_argv($dakota_opts, $info, $ordered_input_args);
     if ($verbose) {
-      print '# 2/3 ' . join(' ', @$precompile_cmd) . $nl;
+      print '# 2/3 ' . join(' ', @$precompile_argv) . $nl;
     }
     my $exit_val;
-    my $prog = shift @$precompile_cmd;
-    ($exit_val, $cc_paths) = &start_core($precompile_cmd);
+    my $prog = shift @$precompile_argv;
+    ($exit_val, $cc_paths) = &start_core(&root_cmd_from_argv($precompile_argv));
     exit $exit_val if $exit_val;
   } else {
     if ($verbose) {
@@ -515,8 +515,11 @@ sub default_target {
   }
   return $output;
 }
-sub start_core {
+sub root_cmd_from_argv {
   my ($argv) = @_;
+  if (&has_cxx_opt($argv)) {
+    exit &convert_and_exec_cmd($argv);
+  }
   my $root_cmd = {
     'asts' => [],
     'inputs' => [],
@@ -531,9 +534,6 @@ sub start_core {
       'var' => {},
     }
   };
-  if (&has_cxx_opt($argv)) {
-    exit &convert_and_exec_cmd($argv);
-  }
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
               'define-macro=s', # gcc-like
               'include-directory=s', # gcc-like (--include-directory=<> OR -I<>)
@@ -572,6 +572,11 @@ sub start_core {
               #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
               #'touch'                 # make-like
             );
+  $$root_cmd{'args'} = $argv;
+  return $root_cmd;
+}
+sub start_core {
+  my ($root_cmd) = @_;
   $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
   if ($$root_cmd{'opts'}{'project'}) {
     $$root_cmd{'opts'}{'project'} = &relpath($$root_cmd{'opts'}{'project'});
@@ -611,7 +616,7 @@ sub start_core {
   # m/0: many inputs, no  output
   # m/1: many inputs, one output (directory)
 
-  my $rel_argv = [map { &relpath($_) } @$argv];
+  my $rel_argv = [map { &relpath($_) } @{$$root_cmd{'args'}}];
   my $inputs = &clean_paths($rel_argv);
   my ($project, $project_io);
 
@@ -778,7 +783,7 @@ sub start {
       &add_last($canon_argv, $arg);
     }
   }
-  my ($exit_val, $cc_files) = &start_core($canon_argv);
+  my ($exit_val, $cc_files) = &start_core(&root_cmd_from_argv($canon_argv));
   exit $exit_val;
 }
 &start(\@ARGV);
