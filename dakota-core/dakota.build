@@ -1,7 +1,7 @@
 # -*- mode: perl -*-
 {
     'builddir' => 'build-dkt',
-    'warn-opts-file' => '../warn.opts',
+    'compiler-opts-file' => '../lib/dakota/compiler.opts',
     'srcs' => [ # cmd-line
       'bit-vector.dk',
       'boole.dk',

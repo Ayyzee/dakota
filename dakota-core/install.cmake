@@ -1,6 +1,11 @@
 set (install-lib-dakota-files
+  ../lib/dakota/base.cmake
+  ../lib/dakota/compiler-clang.cmake
+  ../lib/dakota/compiler-clang.opts
   ../lib/dakota/compiler-command-line-clang.json
   ../lib/dakota/compiler-command-line-gcc.json
+  ../lib/dakota/compiler-gcc.cmake
+  ../lib/dakota/compiler-gcc.opts
   ../lib/dakota/extra.json
   ../lib/dakota/lang-user-data.json
   ../lib/dakota/platform-darwin.json

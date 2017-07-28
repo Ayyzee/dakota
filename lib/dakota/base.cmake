@@ -27,7 +27,7 @@ set (BINARY_DIR     ${CMAKE_BINARY_DIR})
 set (INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
 include (${dakota-cmake-path})
-#include (${root-dir}/warn.cmake)
+#include (${root-dir}/compiler.cmake)
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
@@ -85,7 +85,7 @@ target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   --project=${dakota-project-path} --cxx=${cxx-compiler} ${found-libs}
   ${sanitize-opts}
-  @${CMAKE_SOURCE_DIR}/${warn-opts-file}
+  @${CMAKE_SOURCE_DIR}/${compiler-opts-file}
 )
 string (CONCAT link-flags
   " --project=${dakota-project-path} --cxx=${cxx-compiler}"

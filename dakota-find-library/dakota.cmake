@@ -1,5 +1,6 @@
 # -*- mode: cmake -*-
 set (builddir build-dkt)
+set (compiler-opts-file ../lib/dakota/compiler.opts)
 set (include-dirs
   ${SOURCE_DIR}/../include
   ${INSTALL_PREFIX}/include
@@ -14,4 +15,3 @@ set (srcs
   dakota-find-library.cc
 )
 set (target dakota-find-library)
-set (warn-opts-file ../warn.opts)

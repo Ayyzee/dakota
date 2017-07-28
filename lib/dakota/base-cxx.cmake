@@ -14,7 +14,7 @@ set (BINARY_DIR     ${CMAKE_BINARY_DIR})
 set (INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 
 include (${CMAKE_SOURCE_DIR}/dakota.cmake)
-#include (${root-dir}/warn.cmake)
+#include (${root-dir}/compiler.cmake)
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
@@ -43,7 +43,7 @@ set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-stan
 target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   ${sanitize-opts}
-  @${CMAKE_SOURCE_DIR}/${warn-opts-file}
+  @${CMAKE_SOURCE_DIR}/${compiler-opts-file}
 )
 string (CONCAT link-flags
   " ${sanitize-opts}"

@@ -1,5 +1,6 @@
 # -*- mode: cmake -*-
 set (builddir build-dkt)
+set (compiler-opts-file ../lib/dakota/compiler.opts)
 set (include-dirs
   ${SOURCE_DIR}
   ${SOURCE_DIR}/../include
@@ -15,4 +16,4 @@ set (srcs
   dakota-catalog.cc
 )
 set (target dakota-catalog)
-set (warn-opts-file ../warn.opts)
+

@@ -5,6 +5,6 @@ config.mk
 config.sh
 dakota-core/config.h
 lib/dakota/compiler-command-line.json
+lib/dakota/compiler.cmake
+lib/dakota/compiler.opts
 lib/dakota/platform.json 
-warn.cmake
-warn.opts

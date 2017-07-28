@@ -1,5 +1,6 @@
 # -*- mode: cmake -*-
 set (builddir build-dkt)
+set (compiler-opts-file ../lib/dakota/compiler.opts)
 set (include-dirs
   ${SOURCE_DIR}/../include
 )
@@ -14,4 +15,3 @@ set (srcs
   dakota-dso.cc
 )
 set (target dakota-dso)
-set (warn-opts-file ../warn.opts)
