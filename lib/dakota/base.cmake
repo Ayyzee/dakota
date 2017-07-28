@@ -34,10 +34,9 @@ project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
-
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
+#list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 set (cxx-compiler clang++)
-set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set (found-libs)
 foreach (lib ${libs})
@@ -64,23 +63,23 @@ add_custom_command (
   VERBATIM)
 list (APPEND srcs ${target-src})
 
-set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
-set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-
 set (sanitize-opts -fsanitize=address)
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
-  set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/lib)
+  install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 else ()
   add_executable (${target} ${srcs})
-  set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/bin)
+  install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
 
-include_directories (${include-dirs})
-install (TARGETS ${target} DESTINATION ${targets-install-dir})
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-target_compile_definitions (${target} PRIVATE ${macros})
+set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
+set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
+set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
+#set (CMAKE_CXX_VISIBILITY_PRESET hidden)
+target_compile_definitions (${target} PRIVATE ${macros})
+target_include_directories (${target} PRIVATE ${include-dirs})
 target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   --project=${dakota-project-path} --cxx=${cxx-compiler} ${found-libs}
