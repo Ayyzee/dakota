@@ -389,8 +389,8 @@ sub target_o_path {
   my ($cmd_info, $target_cc_path) = @_;
   my $target_o_path;
   my $project_io = &project_io_from_file($$cmd_info{'project.io'});
-  if ($$project_io{'target-cc'} && $$project_io{'compile'}{$$project_io{'target-cc'}}) {
-    $target_o_path = $$project_io{'compile'}{$$project_io{'target-cc'}};
+  if ($$project_io{'target-src'} && $$project_io{'compile'}{$$project_io{'target-src'}}) {
+    $target_o_path = $$project_io{'compile'}{$$project_io{'target-src'}};
   } else {
     $target_o_path = &o_path_from_cc_path($target_cc_path);
     #print STDERR "target_o_path=$target_o_path not in project.io" . $nl;
@@ -1125,7 +1125,7 @@ sub target_from_ast {
 
   if ($is_defn) {
     &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
-    &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
+    &project_io_assign($$cmd_info{'project.io'}, 'target-src', $target_cc_path);
   } else {
     &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
   }

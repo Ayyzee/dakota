@@ -475,7 +475,7 @@ sub project_clean {
       if (! $$root_cmd{'opts'}{'precompile'}) {
         &project_clean_paths($project_io, $project_io_path, 'compile');
       }
-      &project_clean_paths($project_io, $project_io_path, 'precompile', 'target-cc');
+      &project_clean_paths($project_io, $project_io_path, 'precompile', 'target-src');
     }
   }
 }

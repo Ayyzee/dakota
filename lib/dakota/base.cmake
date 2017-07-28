@@ -52,12 +52,12 @@ add_custom_target (
   init
   COMMAND ${dakota} --project=${dakota-project-path} --init ${found-libs}
   VERBATIM)
-# get target-cc path
+# get target-src path
 execute_process (
   COMMAND ${dakota} --project=${dakota-project-path} --target --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
-# generate target-cc
+# generate target-src
 add_custom_command (
   OUTPUT ${target-src}
   COMMAND ${dakota} --project=${dakota-project-path} --target ${found-libs}
