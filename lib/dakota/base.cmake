@@ -49,17 +49,17 @@ endforeach (lib)
 # phony target 'init'
 add_custom_target (
   init
-  COMMAND ${dakota} --project=${dakota-project-path} --init ${found-libs}
+  COMMAND ${dakota} --project ${dakota-project-path} --init ${found-libs}
   VERBATIM)
 # get target-src path
 execute_process (
-  COMMAND ${dakota} --project=${dakota-project-path} --target --path-only
+  COMMAND ${dakota} --project ${dakota-project-path} --target --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --project=${dakota-project-path} --target ${found-libs}
+  COMMAND ${dakota} --project ${dakota-project-path} --target ${found-libs}
   VERBATIM)
 list (APPEND srcs ${target-src})
 
@@ -82,12 +82,12 @@ target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
 target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
-  --project=${dakota-project-path} --cxx=${cxx-compiler} ${found-libs}
+  --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-libs}
   ${sanitize-opts}
   @${CMAKE_SOURCE_DIR}/${compiler-opts-file}
 )
 string (CONCAT link-flags
-  " --project=${dakota-project-path} --cxx=${cxx-compiler}"
+  " --project ${dakota-project-path} --cxx ${cxx-compiler}"
   " ${sanitize-opts}"
 )
 set_target_properties(${target} PROPERTIES LINK_FLAGS ${link-flags})

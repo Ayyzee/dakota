@@ -161,42 +161,52 @@ sub build_precompile_root_cmd {
 }
 sub extract_dakota_opts {
   my ($cmd) = @_;
-  my $var4opt = { 'project'       => 'DK_PROJECT',
-                  'cxx'           => 'DK_CXX',
-                  'found-library' => 'DK_FOUND_LIBRARY',
-                };
+  #  $var4opt_pat: rhs/value == 0 means do not extract
+  my $var4opt_pat = { 'project=s' => 1,
+                      'cxx=s' => 1,
+                      'found-library=s' => 1,
+                    };
+  my $var4opt = {};
+  foreach my $opt_pat (keys %$var4opt_pat) {
+    if ($opt_pat =~ /^(.+?)=s$/) {
+      $$var4opt{$1} = 1;
+    } else {
+      $$var4opt{$opt_pat} = 0;
+    }
+  }
   my $info = {};
   my $to_remove = [];
+  my $cmd_len = scalar @$cmd;
   for (my $i = 0; $i < @$cmd; ) {
-    my $arg = $$cmd[$i];
-    foreach my $opt (keys %$var4opt) {
-      if ($arg =~ /^--$opt$/) {
+    my $opt = $$cmd[$i] =~ s/^--(.+?)(=.*)?$/$1/r;
+    if (exists $$var4opt{$opt}) {
+      my $opt_has_rhs = $$var4opt{$opt};
+      if (0) {
+      } elsif ($$cmd[$i] =~ /^--$opt=(.*)$/) { # --opt=rhs
+        my $rhs = $1;
+        die if ! $opt_has_rhs;
+        die if $rhs eq '';
         $$info{$opt} = [] if !exists $$info{$opt};
-        &add_last($$info{$opt}, $$cmd[$i + 1]);
+        &add_last($$info{$opt}, $rhs);
         &add_first($to_remove, $i);
-        &add_first($to_remove, $i + 1);
-        last;
+      } elsif ($$cmd[$i] =~ /^--$opt$/) {
+        $$info{$opt} = [] if !exists $$info{$opt};
+        if ($opt_has_rhs) { # --opt rhs
+          die if ! ($i + 1 < $cmd_len);
+          # todo: check for rhs with leading - or --
+          die if $$cmd[$i +1] =~ /^-/;
+          &add_last($$info{$opt}, $$cmd[$i + 1]);
+          &add_first($to_remove, $i);
+          &add_first($to_remove, $i + 1);
+        } else { # --opt
+          &add_first($to_remove, $i);
+        }
       }
     }
     $i++;
   }
   foreach my $i (@$to_remove) {
     splice @$cmd, $i, 1;
-  }
-  if (0) {
-  # delete the non-required ones
-  delete $$var4opt{'found-library'};
-  foreach my $opt (keys %$var4opt) {
-    if (scalar @{$$info{$opt}} == 0) {
-      if ($ENV{$$var4opt{$opt}}) {
-        $$info{$opt} = [ $ENV{$$var4opt{$opt}} ];
-      } else {
-        die $0 . ': error: option --' . $opt .
-          ' not used, so environment variable ' .
-          $$var4opt{$opt} . ' required' . $nl;
-      }
-    }
-  }
   }
   return $info;
 }
@@ -311,7 +321,7 @@ sub convert_and_exec_cmd {
 sub has_cxx_opt {
   my ($argv) = @_;
   foreach my $arg (@$argv) {
-    return 1 if $arg eq '--cxx';
+    return 1 if $arg =~ /^--cxx(=.*)?$/;
   }
   return 0;
 }
@@ -776,15 +786,7 @@ sub start_core {
 }
 sub start {
   my ($argv) = @_;
-  my $canon_argv = [];
-  foreach my $arg (@$argv) {
-    if ($arg =~ /^(--(project|cxx|found-library))=(.+)$/) {
-      &add_last($canon_argv, ($1, $3));
-    } else {
-      &add_last($canon_argv, $arg);
-    }
-  }
-  my ($exit_val, $cc_files) = &start_core(&root_cmd_from_argv($canon_argv));
+  my ($exit_val, $cc_files) = &start_core(&root_cmd_from_argv($argv));
   exit $exit_val;
 }
 &start(\@ARGV);
