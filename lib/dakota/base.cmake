@@ -71,6 +71,7 @@ else ()
   add_executable (${target} ${srcs})
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
+add_dependencies (${target} init)
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
