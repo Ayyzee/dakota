@@ -372,7 +372,7 @@ sub sig1 {
 }
 sub target_srcs_ast_path {
   my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_builddir() . '/srcs.ast';
+  my $target_srcs_ast_path = &target_builddir() . '/target.ast';
   return $target_srcs_ast_path;
 }
 sub target_h_path {
