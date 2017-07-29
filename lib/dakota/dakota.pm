@@ -648,9 +648,15 @@ sub start_cmd {
     $dk_exe_type = '#lib';
   }
   $builddir = &builddir();
-  if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
-    my $target_cc_path = &target_cc_path($cmd_info);
-    print $target_cc_path . $nl;
+  if ($$cmd_info{'opts'}{'path-only'}) {
+    if (0) {
+    } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
+      my $target_h_path = &target_h_path($cmd_info);
+      print $target_h_path . $nl;
+    } elsif ($$cmd_info{'opts'}{'target-src'}) {
+      my $target_cc_path = &target_cc_path($cmd_info);
+      print $target_cc_path . $nl;
+    }
     return ($exit_status, $cc_files);
   }
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -726,27 +732,27 @@ sub start_cmd {
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
-      if (!$$cmd_info{'opts'}{'init'}) {
+      if (!$$cmd_info{'opts'}{'target-hdr'}) {
           &gen_target_o($cmd_info, $is_exe);
       }
     }
-    if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
+    if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
       $cc_files = &cc_files($$cmd_info{'inputs'});
     }
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
-    if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
+    if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
       $cc_files = &cc_files($$cmd_info{'inputs'});
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
-      if (!$$cmd_info{'opts'}{'init'}) {
+      if (!$$cmd_info{'opts'}{'target-hdr'}) {
           &gen_target_o($cmd_info, $is_exe);
       }
     }
   }
-  if (!$$cmd_info{'opts'}{'precompile'} && !$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
+  if (!$$cmd_info{'opts'}{'precompile'} && !$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
       if ($want_separate_precompile_pass) {
         &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);

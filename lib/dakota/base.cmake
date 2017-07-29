@@ -46,20 +46,20 @@ foreach (lib ${libs})
   list (APPEND found-libs --found-library=${lib}=${lib-path})
 endforeach (lib)
 
-# phony target 'init'
+# phony target 'target-hdr'
 add_custom_target (
-  init
-  COMMAND ${dakota} --project ${dakota-project-path} --init ${found-libs}
+  target-hdr
+  COMMAND ${dakota} --project ${dakota-project-path} ${found-libs} --target-hdr
   VERBATIM)
 # get target-src path
 execute_process (
-  COMMAND ${dakota} --project ${dakota-project-path} --target --path-only
+  COMMAND ${dakota} --project ${dakota-project-path} --target-src --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --project ${dakota-project-path} --target ${found-libs}
+  COMMAND ${dakota} --project ${dakota-project-path} ${found-libs} --target-src
   VERBATIM)
 list (APPEND srcs ${target-src})
 
@@ -71,7 +71,7 @@ else ()
   add_executable (${target} ${srcs})
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
-add_dependencies (${target} init)
+add_dependencies (${target} target-hdr)
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
