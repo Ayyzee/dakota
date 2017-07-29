@@ -531,10 +531,10 @@ sub cmd_info_from_argv {
               'dynamic',        # gcc-like
               'shared',         # gcc-like
 
-              'parse',
               'path-only',
               'precompile',     # gcc-ish (--compile)
               'project=s',
+              'target-ast',
               'target-hdr',
               'target-src',
 

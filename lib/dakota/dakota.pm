@@ -642,15 +642,14 @@ sub start_cmd {
     $dk_exe_type = '#lib';
   }
   $builddir = &builddir();
-  if ($$cmd_info{'opts'}{'path-only'}) {
-    if (0) {
-    } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
-      my $target_h_path = &target_h_path($cmd_info);
-      print $target_h_path . $nl;
-    } elsif ($$cmd_info{'opts'}{'target-src'}) {
-      my $target_cc_path = &target_cc_path($cmd_info);
-      print $target_cc_path . $nl;
-    }
+  if (0) {
+  } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-hdr'}) {
+    my $target_h_path = &target_h_path($cmd_info);
+    print $target_h_path . $nl;
+    return ($exit_status, $cc_files);
+  } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-src'}) {
+    my $target_cc_path = &target_cc_path($cmd_info);
+    print $target_cc_path . $nl;
     return ($exit_status, $cc_files);
   }
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -696,9 +695,12 @@ sub start_cmd {
     open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     flock LOCK_FILE, LOCK_EX or die;
   }
-  $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
-  if ($$cmd_info{'opts'}{'parse'}) {
+  if ($$cmd_info{'opts'}{'target-ast'} && $$cmd_info{'opts'}{'path-only'}) {
     print $target_srcs_ast_path . $nl;
+    return ($exit_status, $cc_files);
+  }
+  $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
+  if ($$cmd_info{'opts'}{'target-ast'}) {
     if ($should_lock) {
       flock LOCK_FILE, LOCK_UN or die;
       close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";

@@ -46,20 +46,26 @@ foreach (lib ${libs})
   list (APPEND found-libs --found-library=${lib}=${lib-path})
 endforeach (lib)
 
+# phony target 'target-ast'
+add_custom_target (
+  target-ast
+  COMMAND ${dakota} --target-ast --project ${dakota-project-path} ${found-libs}
+  VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
   target-hdr
-  COMMAND ${dakota} --project ${dakota-project-path} ${found-libs} --target-hdr
+  DEPENDS target-ast
+  COMMAND ${dakota} --target-hdr --project ${dakota-project-path} ${found-libs}
   VERBATIM)
 # get target-src path
 execute_process (
-  COMMAND ${dakota} --project ${dakota-project-path} --target-src --path-only
+  COMMAND ${dakota} --target-src --path-only --project ${dakota-project-path}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --project ${dakota-project-path} ${found-libs} --target-src
+  COMMAND ${dakota} --target-src --project ${dakota-project-path} ${found-libs}
   VERBATIM)
 list (APPEND srcs ${target-src})
 
