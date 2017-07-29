@@ -80,7 +80,7 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  is_o_path
                  target_cc_path
-                 rel_target_h_path
+                 target_h_path
                  target_klass_func_decls_path
                  target_klass_func_defns_path
                  target_generic_func_decls_path
@@ -401,12 +401,6 @@ sub default_cmd_info {
   my $cmd_info = { 'project.target' => &global_project_target() };
   return $cmd_info;
 }
-sub rel_target_h_path {
-  my ($cmd_info) = @_;
-  $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$h_ext=r;
-  return $result;
-}
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
@@ -497,7 +491,7 @@ sub loop_cc_from_dk {
     &src::add_extra_klass_decls($file_ast);
     &src::add_extra_keywords($file_ast);
     &src::add_extra_generics($file_ast);
-    my $rel_target_h_path = &rel_target_h_path($cmd_info);
+    my $rel_target_h_path = &relpath(&target_h_path($cmd_info));
 
     &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path);
     &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path); # rel_target_h_path not used
@@ -911,7 +905,7 @@ sub gen_target {
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
-    my $target_h_path = &builddir() . '/' . &rel_target_h_path($cmd_info);
+    my $target_h_path =  &target_h_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
       my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
       print $target_dk_path . $nl;
@@ -1098,8 +1092,8 @@ sub target_from_ast {
   my ($cmd_info, $other, $is_exe, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
-  my $target_cc_path =  &target_cc_path($cmd_info);
-  my $target_h_path = &builddir() . '/' . &rel_target_h_path($cmd_info);
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $target_h_path =  &target_h_path($cmd_info);
   &check_path($target_srcs_ast_path);
   my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
 
