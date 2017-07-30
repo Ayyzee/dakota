@@ -26,6 +26,7 @@ package dakota::dakota;
 
 use strict;
 use warnings;
+use Cwd;
 use Fcntl qw(:DEFAULT :flock);
 use sort 'stable';
 
@@ -645,11 +646,11 @@ sub start_cmd {
   if (0) {
   } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-hdr'}) {
     my $target_h_path = &target_h_path($cmd_info);
-    print $target_h_path . $nl;
+    print &cwd . '/' . $target_h_path . $nl;
     return ($exit_status, $cc_files);
   } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-src'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
-    print $target_cc_path . $nl;
+    print &cwd . '/' . $target_cc_path . $nl;
     return ($exit_status, $cc_files);
   }
   if (!$$cmd_info{'opts'}{'compiler'}) {

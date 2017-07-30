@@ -524,7 +524,7 @@ sub cmd_info_from_argv {
               'define-macro=s', # gcc-like
               'include-directory=s', # gcc-like (--include-directory=<> OR -I<>)
               'library-directory=s', # gcc-like (--library-directory=<> OR -L<>)
-              'library=s', # --library libssl.so equivalent to -lssl (or better -l:libssl.so on linux)
+              'library=s', # gcc-like (--library ssl equivalent to -lssl)
               'output=s',  # gcc-like
 
               'compile',        # gcc-like

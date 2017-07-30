@@ -33,7 +33,6 @@ install: all $(install-dirs) $(install.files) $(install-links)
 
 clean: | dakota.project
 	$(DAKOTA-BASE) --project dakota.project --clean
-	$(RM) $(RMFLAGS) dakota.project
 	$(RM) $(RMFLAGS) $(target)
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk

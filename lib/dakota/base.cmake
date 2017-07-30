@@ -1,5 +1,4 @@
 # -*- mode: cmake -*-
-set (root-dir ${CMAKE_SOURCE_DIR}/..)
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   if (DEFINED ENV{INSTALL_PREFIX})
@@ -9,25 +8,20 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif()
 
-set (ENV{PATH} "${root-dir}/bin:$ENV{PATH}")
-find_program (dakota dakota)
-find_program (dakota-build2project dakota-build2project)
-find_program (dakota-build2cmake   dakota-build2cmake)
-set (dakota-build-path ${CMAKE_SOURCE_DIR}/dakota.build)
-string (REGEX REPLACE "\.build$" ".project" dakota-project-path ${dakota-build-path})
-string (REGEX REPLACE "\.build$" ".cmake"   dakota-cmake-path   ${dakota-build-path})
-# generate dakota-cmake-path
-execute_process (
-  COMMAND ${dakota-build2project} ${dakota-build-path} ${dakota-project-path}
-  COMMAND ${dakota-build2cmake}   ${dakota-build-path} ${dakota-cmake-path}
-)
+set (ENV{PATH} "$ENV{HOME}/dakota/bin:$ENV{PATH}")
+find_program (cxx-compiler   clang++)
+find_program (dakota         dakota)
+find_program (dakota-catalog dakota-catalog)
+set (dakota-project-path ${CMAKE_CURRENT_SOURCE_DIR}/dakota.project)
+set (dakota-cmake-path   ${CMAKE_CURRENT_SOURCE_DIR}/dakota.cmake)
 
-set (SOURCE_DIR     ${CMAKE_SOURCE_DIR})
-set (BINARY_DIR     ${CMAKE_BINARY_DIR})
-set (INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+set (SOURCE_DIR         ${CMAKE_SOURCE_DIR})
+set (BINARY_DIR         ${CMAKE_BINARY_DIR})
+set (CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set (CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set (INSTALL_PREFIX     ${CMAKE_INSTALL_PREFIX})
 
 include (${dakota-cmake-path})
-#include (${root-dir}/compiler.cmake)
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
@@ -36,7 +30,6 @@ set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 #list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
-set (cxx-compiler clang++)
 
 set (found-libs)
 foreach (lib ${libs})
@@ -48,13 +41,13 @@ endforeach (lib)
 
 # phony target 'target-ast'
 add_custom_target (
-  target-ast
+  ${target-ast}
   COMMAND ${dakota} --target-ast --project ${dakota-project-path} ${found-libs}
   VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
-  target-hdr
-  DEPENDS target-ast
+  ${target-hdr}
+  DEPENDS ${target-ast}
   COMMAND ${dakota} --target-hdr --project ${dakota-project-path} ${found-libs}
   VERBATIM)
 # get target-src path
@@ -77,10 +70,10 @@ else ()
   add_executable (${target} ${srcs})
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
-add_dependencies (${target} target-hdr)
+add_dependencies (${target} ${target-hdr})
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
+set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/${builddir})
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
@@ -91,7 +84,7 @@ target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-libs}
   ${sanitize-opts}
-  @${CMAKE_SOURCE_DIR}/${compiler-opts-file}
+  @${compiler-opts-file}
 )
 string (CONCAT link-flags
   " --project ${dakota-project-path} --cxx ${cxx-compiler}"
