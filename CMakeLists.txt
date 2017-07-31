@@ -3,25 +3,14 @@ cmake_minimum_required (VERSION 3.9)
 
 project (dk)
 
-string (CONCAT CMAKE_PREFIX_PATH
-  ":${CMAKE_SOURCE_DIR}/dakota-dso"
-  ":${CMAKE_SOURCE_DIR}/dakota-catalog"
-  ":${CMAKE_SOURCE_DIR}/dakota-core"
-  ":${CMAKE_SOURCE_DIR}/dakota"
-  ":${CMAKE_SOURCE_DIR}"
-)
-string (CONCAT CMAKE_LIBRARY_PATH
-  ":${CMAKE_SOURCE_DIR}/dakota-dso/lib"
-  ":${CMAKE_SOURCE_DIR}/dakota-core/lib"
-  ":${CMAKE_SOURCE_DIR}/dakota/lib"
-)
-string (CONCAT CMAKE_PROGRAM_PATH
-  ":${CMAKE_SOURCE_DIR}/bin"
-  ":${CMAKE_SOURCE_DIR}/dakota-catalog/bin"
-)
-string (CONCAT CMAKE_INCLUDE_PATH
-  ":${CMAKE_SOURCE_DIR}/include"
-)
+set (root-dir ${CMAKE_SOURCE_DIR})
+
+set (CMAKE_PREFIX_PATH  ${root-dir})
+
+set (CMAKE_INCLUDE_PATH ${root-dir}/include)
+set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
+set (CMAKE_PROGRAM_PATH ${root-dir}/bin)
+
 add_subdirectory (dakota-dso)
 add_subdirectory (dakota-catalog)
 add_subdirectory (dakota-core)

@@ -21,7 +21,8 @@ build-install() {
   $rootdir/bin/build.sh install
   cd ..
 }
-export PATH=$INSTALL_PREFIX/bin:$PATH
+export PATH=$HOME/dakota/bin:$INSTALL_PREFIX/bin:$PATH
+export DAKOTA_VERBOSE=1
 export CMAKE_VERBOSE_MAKEFILE=ON
 
 mkdir -p $INSTALL_PREFIX/{bin,include,lib/dakota}
