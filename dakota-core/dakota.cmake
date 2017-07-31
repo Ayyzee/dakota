@@ -1,15 +1,14 @@
 # -*- mode: cmake -*-
 set (builddir ${CMAKE_CURRENT_SOURCE_DIR}/build-dkt)
-set (compiler-opts @${CMAKE_CURRENT_SOURCE_DIR}/../lib/dakota/compiler.opts)
-set (linker-opts   @${CMAKE_CURRENT_SOURCE_DIR}/../lib/dakota/linker.opts)
+set (compiler-opts @${root-source-dir}/lib/dakota/compiler.opts)
+set (linker-opts   @${root-source-dir}/lib/dakota/linker.opts)
 set (include-dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../include
-  ${CMAKE_INSTALL_PREFIX}/include
+  ${root-source-dir}/include
 )
 set (is-lib 1)
 set (lib-dirs
-  ${CMAKE_INSTALL_PREFIX}/lib
+  ${root-source-dir}/lib
 )
 set (libs
   dakota-dso
