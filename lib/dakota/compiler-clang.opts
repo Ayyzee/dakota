@@ -16,3 +16,4 @@
 --warn-no-padded
 --warn-no-unknown-warning-option
 --warn-no-unused-command-line-argument
+-fsanitize=address

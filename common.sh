@@ -78,7 +78,7 @@ CP=cp
 CPFLAGS="--force --recursive"
 
 LN=ln
-LNFLAGS="--force --symbolic"
+LNFLAGS="--force --symbolic --verbose"
 
 MKDIR=mkdir
 MKDIRFLAGS="--parents"
@@ -90,7 +90,7 @@ so_ext=so
 
 if [[ "darwin" == "$(platform)" ]]; then
     CPFLAGS="-fr"
-    LNFLAGS="-fs"
+    LNFLAGS="-fsv"
     MKDIRFLAGS="-p"
     RMFLAGS="-fr"
     so_ext=dylib

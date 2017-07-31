@@ -21,3 +21,4 @@
 --warn-no-missing-field-initializers
 --warn-no-cast-qual
 --warn-no-switch-default
+-fsanitize=address

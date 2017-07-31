@@ -38,7 +38,6 @@ foreach (lib ${libs})
   list (APPEND found-libs ${lib-path})
 endforeach (lib)
 
-set (sanitize-opts -fsanitize=address)
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-dir}/lib)
@@ -59,10 +58,9 @@ target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
 target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
-  ${sanitize-opts}
   ${compiler-opts}
 )
 string (CONCAT link-flags
-  " ${sanitize-opts}"
+  " ${linker-opts}"
 )
 set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-flags})

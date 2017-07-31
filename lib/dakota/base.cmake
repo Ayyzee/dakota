@@ -68,7 +68,6 @@ add_custom_command (
   VERBATIM)
 list (APPEND srcs ${target-src})
 
-set (sanitize-opts -fsanitize=address)
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-dir}/lib)
@@ -91,11 +90,10 @@ target_include_directories (${target} PRIVATE ${include-dirs})
 target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
   --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-lib-pairs}
-  ${sanitize-opts}
   ${compiler-opts}
 )
 string (CONCAT link-flags
   " --project ${dakota-project-path} --cxx ${cxx-compiler}"
-  " ${sanitize-opts}"
+  " ${linker-opts}"
 )
 set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-flags})
