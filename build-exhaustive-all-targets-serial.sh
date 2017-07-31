@@ -6,6 +6,8 @@ export CMAKE_VERBOSE_MAKEFILE=ON
 
 rm -fr {dakota-dso,dakota-catalog,dakota-core,dakota}/build-{dkt,cmk}
 rm -fr build-dkt build-cmk
+#rm -fr bin/dakota-catalog
+#rm -fr lib/lib{dakota-dso,dakota-core,dakota}.dylib
 rm -f jobs.txt
 
 build-exhaustive-in-dir() {

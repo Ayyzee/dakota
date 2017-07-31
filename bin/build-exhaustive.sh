@@ -13,5 +13,5 @@ $rootdir/bin/build-uninstall.sh
 remove-binary-dir
 rm -fr build-dkt
 $rootdir/bin/cmake-configure.sh
-$rootdir/bin/build.sh clean
 $rootdir/bin/build.sh
+$rootdir/bin/build.sh $@
