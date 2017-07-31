@@ -33,6 +33,12 @@ set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 #list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 
+# get target-src path
+execute_process (
+  COMMAND ${dakota} --target-src --path-only --project ${dakota-project-path}
+  OUTPUT_VARIABLE target-src
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 set (found-lib-pairs)
 set (found-libs)
 foreach (lib ${libs})
@@ -54,11 +60,6 @@ add_custom_target (
   DEPENDS ${target-ast}
   COMMAND ${dakota} --target-hdr --project ${dakota-project-path} ${found-lib-pairs}
   VERBATIM)
-# get target-src path
-execute_process (
-  COMMAND ${dakota} --target-src --path-only --project ${dakota-project-path}
-  OUTPUT_VARIABLE target-src
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
