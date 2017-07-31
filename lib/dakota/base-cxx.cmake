@@ -14,10 +14,6 @@ endif ()
 
 set (CMAKE_PREFIX_PATH  ${root-dir})
 
-set (CMAKE_INCLUDE_PATH ${root-dir}/include)
-set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
-set (CMAKE_PROGRAM_PATH ${root-dir}/bin)
-
 find_program (cxx-compiler   clang++)
 set (dakota-cmake-path   ${CMAKE_CURRENT_SOURCE_DIR}/dakota.cmake)
 
