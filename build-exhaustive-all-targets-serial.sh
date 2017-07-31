@@ -4,7 +4,10 @@ export PATH=$HOME/dakota/bin:$PATH
 export DAKOTA_VERBOSE=1
 export CMAKE_VERBOSE_MAKEFILE=ON
 
-build-exhaustive() {
+rm -fr {dakota-dso,dakota-catalog,dakota-core,dakota}/build-{dkt,cmk}
+rm -fr build-dkt build-cmk
+
+build-exhaustive-in-dir() {
   dir=$1
   cd $dir
   cwd=$(pwd)
@@ -14,10 +17,7 @@ build-exhaustive() {
   cd ..
 }
 
-./bin/dakota-uninstall.sh /usr/local
-./bin/build-uninstall.sh
-
-build-exhaustive dakota-dso
-build-exhaustive dakota-catalog
-build-exhaustive dakota-core
-build-exhaustive dakota
+build-exhaustive-in-dir dakota-dso
+build-exhaustive-in-dir dakota-catalog
+build-exhaustive-in-dir dakota-core
+build-exhaustive-in-dir dakota
