@@ -1039,7 +1039,7 @@ sub find_library {
   my $result = $name;
   if ($$link{'M2L'}{$name}) {
     $result = $$link{'M2L'}{$name};
-    die if ! -e $result;
+    die "error: perl: find_library($name, ...): $!\n" if ! -e $result;
   } else {
     foreach my $dir (@$library_directory) {
       my $qual_lib = "$dir/$name";

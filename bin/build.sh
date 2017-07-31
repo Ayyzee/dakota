@@ -6,4 +6,5 @@ else
   binary_dir=build-cmk
 fi
 jobs=$(getconf _NPROCESSORS_ONLN)
+#jobs=1
 make --directory $binary_dir --jobs $jobs $@

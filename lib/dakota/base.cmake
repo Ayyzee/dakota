@@ -8,6 +8,10 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif ()
 
+if (NOT root-dir)
+  set (root-dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
+endif ()
+
 set (cxx-compiler   clang++)
 set (dakota         dakota)
 set (dakota-project-path ${CMAKE_CURRENT_SOURCE_DIR}/dakota.project)
@@ -19,28 +23,30 @@ set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-set (CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}:${CMAKE_INSTALL_PREFIX}/lib)
+set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 #list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 
+set (found-lib-pairs)
 set (found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
   # check for error here
-  list (APPEND found-libs --found-library=${lib}=${lib-path})
+  list (APPEND found-libs ${lib-path})
+  list (APPEND found-lib-pairs --found-library=${lib}=${lib-path})
 endforeach (lib)
 
 # phony target 'target-ast'
 add_custom_target (
   ${target-ast}
-  COMMAND ${dakota} --target-ast --project ${dakota-project-path} ${found-libs}
+  COMMAND ${dakota} --target-ast --project ${dakota-project-path} ${found-lib-pairs}
   VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
   DEPENDS ${target-ast}
-  COMMAND ${dakota} --target-hdr --project ${dakota-project-path} ${found-libs}
+  COMMAND ${dakota} --target-hdr --project ${dakota-project-path} ${found-lib-pairs}
   VERBATIM)
 # get target-src path
 execute_process (
@@ -50,13 +56,9 @@ execute_process (
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${dakota} --target-src --project ${dakota-project-path} ${found-libs}
+  COMMAND ${dakota} --target-src --project ${dakota-project-path} ${found-lib-pairs}
   VERBATIM)
 list (APPEND srcs ${target-src})
-
-if (NOT root-dir)
-  set (root-dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
-endif ()
 
 set (sanitize-opts -fsanitize=address)
 if (${is-lib})
@@ -78,9 +80,9 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_link_libraries (${target} ${libs})
+target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
-  --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-libs}
+  --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-lib-pairs}
   ${sanitize-opts}
   @${compiler-opts-file}
 )

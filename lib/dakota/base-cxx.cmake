@@ -8,6 +8,10 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif ()
 
+if (NOT root-dir)
+  set (root-dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
+endif ()
+
 set (cxx-compiler   clang++)
 set (dakota-cmake-path   ${CMAKE_CURRENT_SOURCE_DIR}/dakota.cmake)
 
@@ -17,12 +21,16 @@ set (project ${target})
 project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-set (CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}:${CMAKE_INSTALL_PREFIX}/lib)
+set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
 set (CMAKE_CXX_COMPILER ${cxx-compiler}) # must follow: project (<> LANGUAGES CXX)
 
-if (NOT root-dir)
-  set (root-dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
-endif ()
+set (found-libs)
+foreach (lib ${libs})
+  set (lib-path lib-path-NOTFOUND)
+  find_library (lib-path ${lib})
+  # check for error here
+  list (APPEND found-libs ${lib-path})
+endforeach (lib)
 
 set (sanitize-opts -fsanitize=address)
 if (${is-lib})
@@ -43,7 +51,7 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_link_libraries (${target} ${libs})
+target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
   ${sanitize-opts}
   @${compiler-opts-file}
