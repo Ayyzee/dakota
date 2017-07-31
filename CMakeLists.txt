@@ -5,12 +5,6 @@ project (dk)
 
 set (root-dir ${CMAKE_SOURCE_DIR})
 
-set (CMAKE_PREFIX_PATH  ${root-dir})
-
-set (CMAKE_INCLUDE_PATH ${root-dir}/include)
-set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
-set (CMAKE_PROGRAM_PATH ${root-dir}/bin)
-
 add_subdirectory (dakota-dso)
 add_subdirectory (dakota-catalog)
 add_subdirectory (dakota-core)

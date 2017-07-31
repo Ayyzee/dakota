@@ -12,8 +12,14 @@ if (NOT root-dir)
   set (root-dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
 endif ()
 
-set (cxx-compiler   clang++)
-set (dakota         dakota)
+set (CMAKE_PREFIX_PATH  ${root-dir})
+
+set (CMAKE_INCLUDE_PATH ${root-dir}/include)
+set (CMAKE_LIBRARY_PATH ${root-dir}/lib)
+set (CMAKE_PROGRAM_PATH ${root-dir}/bin)
+
+find_program (cxx-compiler   clang++)
+find_program (dakota         dakota)
 set (dakota-project-path ${CMAKE_CURRENT_SOURCE_DIR}/dakota.project)
 set (dakota-cmake-path   ${CMAKE_CURRENT_SOURCE_DIR}/dakota.cmake)
 
@@ -56,6 +62,7 @@ execute_process (
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
+  DEPENDS ${target-ast}
   COMMAND ${dakota} --target-src --project ${dakota-project-path} ${found-lib-pairs}
   VERBATIM)
 list (APPEND srcs ${target-src})
