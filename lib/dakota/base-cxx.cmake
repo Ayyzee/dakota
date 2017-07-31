@@ -60,7 +60,7 @@ target_include_directories (${target} PRIVATE ${include-dirs})
 target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
   ${sanitize-opts}
-  @${compiler-opts-file}
+  ${compiler-opts}
 )
 string (CONCAT link-flags
   " ${sanitize-opts}"

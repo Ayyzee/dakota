@@ -1,6 +1,6 @@
 # -*- mode: cmake -*-
 set (builddir ${CMAKE_CURRENT_SOURCE_DIR}/build-dkt)
-set (compiler-opts-file ${root-dir}/lib/dakota/compiler.opts)
+set (compiler-opts @${root-dir}/lib/dakota/compiler.opts)
 set (include-dirs
   ${root-dir}/include
 )

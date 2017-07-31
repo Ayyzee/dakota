@@ -92,7 +92,7 @@ target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
   --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-lib-pairs}
   ${sanitize-opts}
-  @${compiler-opts-file}
+  ${compiler-opts}
 )
 string (CONCAT link-flags
   " --project ${dakota-project-path} --cxx ${cxx-compiler}"
