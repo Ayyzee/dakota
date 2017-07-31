@@ -19,6 +19,5 @@ build-exhaustive() {
 
 build-exhaustive dakota-dso
 build-exhaustive dakota-catalog
-build-exhaustive dakota-find-library
 build-exhaustive dakota-core
 build-exhaustive dakota
