@@ -1,5 +1,9 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
+finish() {
+  rm -f jobs.txt
+}
+trap finish EXIT
 export PATH=$HOME/dakota/bin:$PATH
 export DAKOTA_VERBOSE=1
 export CMAKE_VERBOSE_MAKEFILE=ON
