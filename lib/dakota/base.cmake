@@ -43,7 +43,7 @@ foreach (lib ${libs})
   # check for error here
   list (APPEND found-libs ${lib-path})
   list (APPEND found-lib-pairs --found-library=${lib}=${lib-path})
-endforeach (lib)
+endforeach ()
 
 # phony target 'target-ast'
 add_custom_target (

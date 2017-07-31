@@ -32,7 +32,7 @@ foreach (lib ${libs})
   find_library (lib-path ${lib})
   # check for error here
   list (APPEND found-libs ${lib-path})
-endforeach (lib)
+endforeach ()
 
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
