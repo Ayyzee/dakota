@@ -16,7 +16,7 @@ set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
 find_program (cxx-compiler   clang++)
 find_program (dakota         dakota)
-set (dakota-project-path ${CMAKE_CURRENT_SOURCE_DIR}/dakota.project)
+set (dakota-project-path ${CMAKE_CURRENT_SOURCE_DIR}/dakota.yaml)
 set (dakota-cmake-path   ${CMAKE_CURRENT_SOURCE_DIR}/dakota.cmake)
 
 include (${dakota-cmake-path})
