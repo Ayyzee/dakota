@@ -139,19 +139,19 @@ sub build_precompile_cmd_info {
   my $project = &dakota::util::project_from_yaml_file($$dakota_opts{'project'}[0]);
   my $root_cmd = {
     'opts'=> {
-      'found-library' => [],
       'output' => undef,
     },
     'inputs' => [],
+    'libs' => [],
+    'found-libs' => [],
   };
   $$root_cmd{'opts'}{'precompile'} = 1;
   $$root_cmd{'args'} = $ordered_input_args;
   if ($$dakota_opts{'project'}[0]) {
     $$root_cmd{'opts'}{'project'} = $$dakota_opts{'project'}[0];
   }
-  if ($$project{'found-libs'}) {
-    $$root_cmd{'opts'}{'found-library'} = $$project{'found-libs'};
-  }
+  $$root_cmd{'libs'} =       $$project{'libs'};
+  $$root_cmd{'found-libs'} = $$project{'found-libs'};
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
   }
@@ -342,18 +342,16 @@ sub project_adjust_paths {
 }
 sub use_project {
   my ($root_cmd) = @_;
+  &check_libs_vs_found_libs($root_cmd);
   my $project = &set_global_project($$root_cmd{'opts'}{'project'});
   $$project{'srcs'} = [] if ! $$project{'srcs'};
+  $$project{'libs'} = [] if ! $$project{'libs'};
+  $$project{'found-libs'} = [] if ! $$project{'found-libs'};
   $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'project'}));
   if (! $$project{'builddir'}) {
     $$project{'builddir'} = &builddir();
   }
-  if (! $$project{'inputs'} && $$project{'srcs'}) {
-    $$project{'inputs'} = [ @{$$project{'srcs'}} ];
-  }
-  if ($$project{'found-libs'}) { # remove lhs= so only fully qualified path remains
-    $$project{'inputs'} = [ @{$$project{'inputs'}}, map { $_ =~ s/^.+?=(.+)$/$1/r } @{$$project{'found-libs'}} ];
-  }
+  $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'found-libs'}} ];
   if (! $$project{'target'}) {
     $$project{'target'} = &canon_path(&default_target($root_cmd, $project, $$project{'inputs'}));
   }
@@ -445,6 +443,8 @@ sub cmd_info_from_argv {
   my $root_cmd = {
     'asts' => [],
     'inputs' => [],
+    'libs' => [],
+    'found-libs' => [],
     'opts' => {
       'define-macro' => [],
       'include-directory' => [ "$gbl_prefix/include" ],
@@ -452,7 +452,6 @@ sub cmd_info_from_argv {
       'library' => [],
 
       'directory' => [],
-      'found-library' => [],
       'var' => {},
     }
   };
@@ -507,8 +506,10 @@ sub exec_cmd_info {
   &set_root_cmd($root_cmd);
 
   my $link = { 'order' => [] };
-  foreach my $pair (@{$$root_cmd{'opts'}{'found-library'}}) {
-    my ($s, $l) = split('=', $pair);
+  &check_libs_vs_found_libs($root_cmd);
+  for (my $i = 0; $i < scalar @{$$root_cmd{'libs'}}; $i++) {
+    my $s = $$root_cmd{'libs'}[$i];
+    my $l = $$root_cmd{'found-libs'}[$i];
     &add_last($$link{'order'}, $s);
     my $m = &lib_from_lib_name($s);
     # $m could also be created by basename

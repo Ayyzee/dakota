@@ -73,6 +73,7 @@ our @EXPORT= qw(
                  at
                  builddir
                  canon_path
+                 check_libs_vs_found_libs
                  clean_paths
                  colin
                  colout
@@ -1263,7 +1264,9 @@ sub is_exe {
   if (! $is_exe && ! $$project{'is-lib'}) {
     print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'project'} . $nl;
   }
-  return !$$project{'is-lib'};
+  my $is_lib = 0;
+  $is_lib = 1 if $$project{'is-lib'};
+  return !$is_lib;
 }
 sub is_abs {
   my ($path) = @_;
@@ -1463,6 +1466,11 @@ sub scalar_from_file {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
   }
   return $result;
+}
+sub check_libs_vs_found_libs {
+  my ($cmd_info) = @_;
+  die if !$$cmd_info{'libs'} || !$$cmd_info{'found-libs'};
+  die if scalar @{$$cmd_info{'libs'}} != scalar @{$$cmd_info{'found-libs'}};
 }
 sub project_from_yaml_file {
   my ($file) = @_;

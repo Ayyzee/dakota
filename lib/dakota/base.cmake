@@ -39,19 +39,19 @@ execute_process (
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set (found-lib-pairs)
 set (found-libs)
 foreach (lib ${libs})
   set (lib-path lib-path-NOTFOUND)
   find_library (lib-path ${lib})
   # check for error here
   list (APPEND found-libs ${lib-path})
-  list (APPEND found-lib-pairs "${lib}=${lib-path}")
 endforeach ()
 
 file (APPEND ${dakota-project-path} "cxx: ${cxx-compiler}\n")
-string (REPLACE ";" "\n  - " str-found-lib-pairs "${found-lib-pairs}")
-file (APPEND ${dakota-project-path} "found-libs:\n  - ${str-found-lib-pairs}\n")
+string (REPLACE ";" "\n  - " str-libs "${libs}")
+file (APPEND ${dakota-project-path} "libs:\n  - ${str-libs}\n")
+string (REPLACE ";" "\n  - " str-found-libs "${found-libs}")
+file (APPEND ${dakota-project-path} "found-libs:\n  - ${str-found-libs}\n")
 string (REPLACE ";" "\n  - " str-srcs "${srcs}")
 file (APPEND ${dakota-project-path} "srcs:\n  - ${str-srcs}\n")
 
@@ -78,6 +78,7 @@ if (${is-lib})
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-source-dir}/lib)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+  file (APPEND ${dakota-project-path} "is-lib: 1\n")
 else ()
   add_executable (${target} ${srcs})
   set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)

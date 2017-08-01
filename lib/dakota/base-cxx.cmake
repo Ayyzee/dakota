@@ -9,7 +9,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif ()
 
 if (NOT root-source-dir)
-  set (root-source-dir "${CMAKE_CURRENT_SOURCE_DIR}/..")
+  set (root-source-dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
 endif ()
 
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
