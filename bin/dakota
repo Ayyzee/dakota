@@ -136,6 +136,7 @@ sub translate_dk_to_cc {
 }
 sub build_precompile_cmd_info {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
+  my $project = &dakota::util::project_from_yaml_file($$dakota_opts{'project'}[0]);
   my $root_cmd = {
     'opts'=> {
       'found-library' => [],
@@ -148,8 +149,8 @@ sub build_precompile_cmd_info {
   if ($$dakota_opts{'project'}[0]) {
     $$root_cmd{'opts'}{'project'} = $$dakota_opts{'project'}[0];
   }
-  if ($$dakota_opts{'found-library'}) {
-    $$root_cmd{'opts'}{'found-library'} = $$dakota_opts{'found-library'}; # deep_copy
+  if ($$project{'found-libs'}) {
+    $$root_cmd{'opts'}{'found-library'} = $$project{'found-libs'};
   }
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
@@ -164,7 +165,6 @@ sub extract_dakota_opts {
   #  $var4opt_pat: rhs/value == 0 means do not extract
   my $var4opt_pat = { 'project=s' => 1,
                       'cxx=s' => 1,
-                      'found-library=s' => 1,
                     };
   my $var4opt = {};
   foreach my $opt_pat (keys %$var4opt_pat) {
@@ -250,7 +250,7 @@ sub detect_cxx_opts {
 }
 sub project_io_path_from_project_path {
   my ($project_path) = @_;
-  my $project = &dakota::util::scalar_from_file($project_path);
+  my $project = &dakota::util::project_from_yaml_file($project_path);
   if (! $$project{'builddir'}) {
     $$project{'builddir'} = &builddir();
   }
@@ -399,6 +399,7 @@ sub project_adjust_paths {
 sub use_project {
   my ($root_cmd) = @_;
   my $project = &set_global_project($$root_cmd{'opts'}{'project'});
+  $$project{'srcs'} = [] if ! $$project{'srcs'};
   $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'project'}));
   if (! $$project{'builddir'}) {
     $$project{'builddir'} = &builddir();
@@ -406,23 +407,14 @@ sub use_project {
   if (! $$project{'inputs'} && $$project{'srcs'}) {
     $$project{'inputs'} = [ @{$$project{'srcs'}} ];
   }
-  if ($$project{'libs'}) {
-    $$project{'inputs'} = [ @{$$project{'inputs'}}, map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
+  if ($$project{'found-libs'}) { # remove lhs= so only fully qualified path remains
+    $$project{'inputs'} = [ @{$$project{'inputs'}}, map { $_ =~ s/^.+?=(.+)$/$1/r } @{$$project{'found-libs'}} ];
   }
   if (! $$project{'target'}) {
     $$project{'target'} = &canon_path(&default_target($root_cmd, $project, $$project{'inputs'}));
   }
   if (! &is_exe($root_cmd)) {
     $$project{'is-lib'} = 1;
-  }
-  if (! $$project{'is-lib'} || $$project{'target'} ne 'dakota-core') {
-    &add_last($$root_cmd{'inputs'}, &lib_from_lib_name('dakota-core'));
-    &add_last($$project{'inputs'},  &lib_from_lib_name('dakota-core'));
-
-    if (! $$project{'is-lib'} || $$project{'target'} ne 'dakota') {
-      &add_last($$root_cmd{'inputs'}, &lib_from_lib_name('dakota'));
-      &add_last($$project{'inputs'},  &lib_from_lib_name('dakota'));
-    }
   }
   &project_adjust_paths($project);
   if (! -e $$project{'builddir'}) {
@@ -542,7 +534,6 @@ sub cmd_info_from_argv {
               'create-project=s',
               'directory=s',    # make-like
               'echo-inputs',    #
-              'found-library=s',
               'silent',         #
               'soname=s',       # ld-like (-soname <>)
               'var=s',          # for env vars like MAKEFLAGS, etc.

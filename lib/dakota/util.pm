@@ -147,6 +147,7 @@ our @EXPORT= qw(
                  pann
                  param_types_str
                  prepend_dot_slash
+                 project_from_yaml_file
                  project_io_add
                  project_io_append
                  project_io_assign
@@ -712,7 +713,7 @@ sub global_project_target {
 }
 sub set_global_project {
   my ($project_path) = @_;
-  $global_project = &scalar_from_file($project_path);
+  $global_project = &project_from_yaml_file($project_path);
   my $source_dir = &dir_part(&relpath($project_path));
   if ($source_dir ne '.') {
     $$global_project{'source-dir'} = $source_dir;
@@ -1257,7 +1258,7 @@ sub is_exe {
     $is_exe = 0;
   }
   if (!$project && $$cmd_info{'opts'}{'project'}) {
-    $project = &scalar_from_file($$cmd_info{'opts'}{'project'});
+    $project = &project_from_yaml_file($$cmd_info{'opts'}{'project'});
   }
   if (! $is_exe && ! $$project{'is-lib'}) {
     print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'project'} . $nl;
@@ -1460,6 +1461,21 @@ sub scalar_from_file {
   }
   if ($fail_count == 0) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
+  }
+  return $result;
+}
+sub project_from_yaml_file {
+  my ($file) = @_;
+  die if ! -e $file;
+  my $result = {};
+  my $filestr = &filestr_from_file($file);
+  $filestr =~ s/\n\s+-\s+/ /gs;
+  while ($filestr =~ /^([\w-]+):\s+(.+?)$/gms) {
+    my ($lhs, $rhs) = ($1, $2);
+    $$result{$lhs} = [split /\s+/, $rhs];
+  }
+  foreach my $lhs ('builddir', 'cxx', 'target') {
+    $$result{$lhs} = $$result{$lhs}[0];
   }
   return $result;
 }

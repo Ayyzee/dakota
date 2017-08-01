@@ -29,6 +29,10 @@ set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 #list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 
+file (WRITE  ${dakota-project-path} "")
+file (APPEND ${dakota-project-path} "target: ${target}\n") # hackhack
+file (APPEND ${dakota-project-path} "builddir: ${builddir}\n")
+
 # get target-src path
 execute_process (
   COMMAND ${dakota} --target-src --path-only --project ${dakota-project-path}
@@ -42,25 +46,31 @@ foreach (lib ${libs})
   find_library (lib-path ${lib})
   # check for error here
   list (APPEND found-libs ${lib-path})
-  list (APPEND found-lib-pairs --found-library=${lib}=${lib-path})
+  list (APPEND found-lib-pairs "${lib}=${lib-path}")
 endforeach ()
+
+file (APPEND ${dakota-project-path} "cxx: ${cxx-compiler}\n")
+string (REPLACE ";" "\n  - " str-found-lib-pairs "${found-lib-pairs}")
+file (APPEND ${dakota-project-path} "found-libs:\n  - ${str-found-lib-pairs}\n")
+string (REPLACE ";" "\n  - " str-srcs "${srcs}")
+file (APPEND ${dakota-project-path} "srcs:\n  - ${str-srcs}\n")
 
 # phony target 'target-ast'
 add_custom_target (
   ${target-ast}
-  COMMAND ${dakota} --target-ast --project ${dakota-project-path} ${found-lib-pairs}
+  COMMAND ${dakota} --target-ast --project ${dakota-project-path}
   VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
   DEPENDS ${target-ast}
-  COMMAND ${dakota} --target-hdr --project ${dakota-project-path} ${found-lib-pairs}
+  COMMAND ${dakota} --target-hdr --project ${dakota-project-path}
   VERBATIM)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
   DEPENDS ${target-ast}
-  COMMAND ${dakota} --target-src --project ${dakota-project-path} ${found-lib-pairs}
+  COMMAND ${dakota} --target-src --project ${dakota-project-path}
   VERBATIM)
 list (APPEND srcs ${target-src})
 
@@ -85,7 +95,7 @@ target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
 target_link_libraries (${target} ${found-libs})
 target_compile_options (${target} PRIVATE
-  --project ${dakota-project-path} --cxx ${cxx-compiler} ${found-lib-pairs}
+  --project ${dakota-project-path} --cxx ${cxx-compiler}
   ${compiler-opts}
 )
 string (CONCAT link-flags
