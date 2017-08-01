@@ -87,7 +87,7 @@ endif ()
 add_dependencies (${target} ${target-hdr})
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/${builddir})
+set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
