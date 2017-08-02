@@ -15,7 +15,7 @@ endif ()
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
 find_program (cxx-compiler clang++)
-find_program (dakota       dakota)
+find_program (dakota       dakota PATHS ${bin-dirs})
 set (parts      ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
 set (build-vars ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake)
 
@@ -23,7 +23,7 @@ include (${build-vars})
 
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
+#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 #list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 
@@ -39,8 +39,8 @@ execute_process (
 
 set (found-libs)
 foreach (lib ${libs})
-  set (lib-path lib-path-NOTFOUND)
-  find_library (lib-path ${lib})
+  set (lib-path ${lib}-NOTFOUND)
+  find_library (lib-path ${lib} PATHS ${lib-dirs})
   # check for error here
   list (APPEND found-libs ${lib-path})
 endforeach ()

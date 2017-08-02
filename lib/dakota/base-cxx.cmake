@@ -21,13 +21,13 @@ include (${build-vars})
 
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
+#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 set (CMAKE_CXX_COMPILER ${cxx-compiler}) # must follow: project (<> LANGUAGES CXX)
 
 set (found-libs)
 foreach (lib ${libs})
-  set (lib-path lib-path-NOTFOUND)
-  find_library (lib-path ${lib})
+  set (lib-path ${lib}-NOTFOUND)
+  find_library (lib-path ${lib} PATHS ${lib-dirs})
   # check for error here
   list (APPEND found-libs ${lib-path})
 endforeach ()
