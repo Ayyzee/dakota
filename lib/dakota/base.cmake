@@ -17,11 +17,11 @@ find_program (cxx-compiler clang++)
 find_program (dakota       dakota PATHS ${bin-dirs})
 set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
 set (CMAKE_CXX_COMPILER ${dakota})
-file (WRITE ${parts} "build-dir: ${build-dir}") # dummy parts created here
+file (WRITE ${parts} "build-dir: ${build-dir}") # dummy ${parts} created here
 
 # get target-src path
 execute_process (
-  COMMAND ${dakota} --target-src --path-only --parts ${parts} # dummy parts
+  COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
