@@ -2,7 +2,13 @@
 set (builddir ${CMAKE_CURRENT_SOURCE_DIR}/build-dkt)
 set (compiler-opts @${root-source-dir}/lib/dakota/compiler.opts)
 set (linker-opts   @${root-source-dir}/lib/dakota/linker.opts)
+set (macros
+)
+set (bin-dirs
+  ${root-source-dir}/bin
+)
 set (include-dirs
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${root-source-dir}/include
 )
 set (is-lib 1)
@@ -13,8 +19,7 @@ set (libs
   dakota-dso
   dakota-core
 )
-set (macros
-)
+set (target dakota)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/ascii-number-klass.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/ascii-number.dk
@@ -41,4 +46,3 @@ set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/type-func.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/xml-object-output-stream.dk
 )
-set (target dakota)

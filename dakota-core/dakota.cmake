@@ -2,6 +2,11 @@
 set (builddir ${CMAKE_CURRENT_SOURCE_DIR}/build-dkt)
 set (compiler-opts @${root-source-dir}/lib/dakota/compiler.opts)
 set (linker-opts   @${root-source-dir}/lib/dakota/linker.opts)
+set (macros
+)
+set (bin-dirs
+  ${root-source-dir}/bin
+)
 set (include-dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${root-source-dir}/include
@@ -13,8 +18,7 @@ set (lib-dirs
 set (libs
   dakota-dso
 )
-set (macros
-)
+set (target dakota-core)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/bit-vector.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/boole.dk
@@ -85,4 +89,3 @@ set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/unbox-illegal-klass-exception.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/vector.dk
 )
-set (target dakota-core)
