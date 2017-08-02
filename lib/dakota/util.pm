@@ -148,6 +148,7 @@ our @EXPORT= qw(
                  num_kw_arg_names
                  pann
                  param_types_str
+                 path_only
                  prepend_dot_slash
                  project_from_yaml_file
                  project_io_add
@@ -182,6 +183,9 @@ our @EXPORT= qw(
                  str_from_seq
                  suffix
                  target_build_dir
+                 target_srcs_ast_path
+                 target_h_path
+                 target_cc_path
                  use_abs_path
                  var
                  var_array
@@ -647,6 +651,38 @@ sub build_dir {
 }
 sub target_build_dir {
   return &build_dir() . '/x';
+}
+sub target_srcs_ast_path {
+  my ($cmd_info) = @_;
+  my $target_srcs_ast_path = &target_build_dir() . '/target.ast';
+  return $target_srcs_ast_path;
+}
+sub target_h_path {
+  my ($cmd_info) = @_;
+  my $target_h_path = &target_build_dir() . '/target.' . $h_ext;
+  return $target_h_path;
+}
+sub target_cc_path {
+  my ($cmd_info) = @_;
+  my $target_cc_path = &target_build_dir() . '/target.' . $cc_ext;
+  return $target_cc_path;
+}
+sub path_only {
+  my ($cmd_info) = @_;
+  if ($$cmd_info{'opts'}{'path-only'}) {
+    if (0) {
+    } elsif ($$cmd_info{'opts'}{'target-ast'}) {
+      print &target_srcs_ast_path($cmd_info) . $nl;
+    } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
+      print &cwd . '/' . &target_h_path($cmd_info) . $nl;
+    } elsif ($$cmd_info{'opts'}{'target-src'}) {
+      print &cwd . '/' . &target_cc_path($cmd_info) . $nl;
+    } else {
+      die;
+    }
+    my $exit_status = 0;
+    exit $exit_status;
+  }
 }
 
 # 1. cmd line

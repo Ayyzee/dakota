@@ -371,21 +371,6 @@ sub sig1 {
   $result .= ')';
   return $result;
 }
-sub target_srcs_ast_path {
-  my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_build_dir() . '/target.ast';
-  return $target_srcs_ast_path;
-}
-sub target_h_path {
-  my ($cmd_info) = @_;
-  my $target_h_path = &target_build_dir() . '/target.' . $h_ext;
-  return $target_h_path;
-}
-sub target_cc_path {
-  my ($cmd_info) = @_;
-  my $target_cc_path = &target_build_dir() . '/target.' . $cc_ext;
-  return $target_cc_path;
-}
 sub target_o_path {
   my ($cmd_info, $target_cc_path) = @_;
   my $target_o_path;
@@ -643,16 +628,7 @@ sub start_cmd {
     $dk_exe_type = '#lib';
   }
   $build_dir = &build_dir();
-  if (0) {
-  } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-hdr'}) {
-    my $target_h_path = &target_h_path($cmd_info);
-    print &cwd . '/' . $target_h_path . $nl;
-    return ($exit_status, $cc_files);
-  } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-src'}) {
-    my $target_cc_path = &target_cc_path($cmd_info);
-    print &cwd . '/' . $target_cc_path . $nl;
-    return ($exit_status, $cc_files);
-  }
+  &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};
   if (!$$cmd_info{'opts'}{'compiler'}) {
     my $cxx = &var($gbl_compiler, 'CXX', 'g++');
     $$cmd_info{'opts'}{'compiler'} = $cxx;
@@ -696,10 +672,7 @@ sub start_cmd {
     open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     flock LOCK_FILE, LOCK_EX or die;
   }
-  if ($$cmd_info{'opts'}{'target-ast'} && $$cmd_info{'opts'}{'path-only'}) {
-    print $target_srcs_ast_path . $nl;
-    return ($exit_status, $cc_files);
-  }
+  &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};
   $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
   if ($$cmd_info{'opts'}{'target-ast'}) {
     if ($should_lock) {

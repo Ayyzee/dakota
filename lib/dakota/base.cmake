@@ -24,7 +24,7 @@ file (APPEND ${parts} "build-dir: ${build-dir}\n")
 
 # get target-src path
 execute_process (
-  COMMAND ${dakota} --target-src --path-only --parts ${parts}
+  COMMAND ${dakota} --target-src --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
