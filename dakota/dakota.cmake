@@ -11,7 +11,6 @@ set (include-dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${root-source-dir}/include
 )
-set (is-lib 1)
 set (lib-dirs
   ${root-source-dir}/lib
 )
@@ -19,6 +18,7 @@ set (libs
   dakota-dso
   dakota-core
 )
+set (is-lib 1)
 set (target dakota)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/ascii-number-klass.dk
