@@ -39,10 +39,13 @@ execute_process (
 
 set (found-libs)
 foreach (lib ${libs})
-  set (lib-path ${lib}-NOTFOUND)
-  find_library (lib-path ${lib} PATHS ${lib-dirs})
-  # check for error here
-  list (APPEND found-libs ${lib-path})
+  set (found-lib NOTFOUND) # found-lib-NOTFOUND
+  find_library (found-lib ${lib} PATHS ${lib-dirs})
+  if (NOT found-lib)
+    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
+  endif ()
+  #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib}")
+  list (APPEND found-libs ${found-lib})
 endforeach ()
 
 file (APPEND ${parts} "cxx: ${cxx-compiler}\n")
