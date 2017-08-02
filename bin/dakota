@@ -142,16 +142,16 @@ sub build_precompile_cmd_info {
       'output' => undef,
     },
     'inputs' => [],
+    'lib-names' => [],
     'libs' => [],
-    'found-libs' => [],
   };
   $$root_cmd{'opts'}{'precompile'} = 1;
   $$root_cmd{'args'} = $ordered_input_args;
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
-  $$root_cmd{'libs'} =       $$project{'libs'};
-  $$root_cmd{'found-libs'} = $$project{'found-libs'};
+  $$root_cmd{'lib-names'} =       $$project{'lib-names'};
+  $$root_cmd{'libs'} = $$project{'libs'};
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
   }
@@ -342,16 +342,16 @@ sub project_adjust_paths {
 }
 sub use_project {
   my ($root_cmd) = @_;
-  &check_libs_vs_found_libs($root_cmd);
+  &check_lib_names_vs_libs($root_cmd);
   my $project = &set_global_project($$root_cmd{'opts'}{'parts'});
   $$project{'srcs'} = [] if ! $$project{'srcs'};
+  $$project{'lib-names'} = [] if ! $$project{'lib-names'};
   $$project{'libs'} = [] if ! $$project{'libs'};
-  $$project{'found-libs'} = [] if ! $$project{'found-libs'};
   $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'parts'}));
   if (! $$project{'build-dir'}) {
     $$project{'build-dir'} = &build_dir();
   }
-  $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'found-libs'}} ];
+  $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'libs'}} ];
   if (! $$project{'target'}) {
     $$project{'target'} = &canon_path(&default_target($root_cmd, $project, $$project{'inputs'}));
   }
@@ -443,8 +443,8 @@ sub cmd_info_from_argv {
   my $root_cmd = {
     'asts' => [],
     'inputs' => [],
+    'lib-names' => [],
     'libs' => [],
-    'found-libs' => [],
     'opts' => {
       'define-macro' => [],
       'include-directory' => [ "$gbl_prefix/include" ],
@@ -506,10 +506,10 @@ sub exec_cmd_info {
   &set_root_cmd($root_cmd);
 
   my $link = { 'order' => [] };
-  &check_libs_vs_found_libs($root_cmd);
-  for (my $i = 0; $i < scalar @{$$root_cmd{'libs'}}; $i++) {
-    my $s = $$root_cmd{'libs'}[$i];
-    my $l = $$root_cmd{'found-libs'}[$i];
+  &check_lib_names_vs_libs($root_cmd);
+  for (my $i = 0; $i < scalar @{$$root_cmd{'lib-names'}}; $i++) {
+    my $s = $$root_cmd{'lib-names'}[$i];
+    my $l = $$root_cmd{'libs'}[$i];
     &add_last($$link{'order'}, $s);
     my $m = &lib_from_lib_name($s);
     # $m could also be created by basename
@@ -522,7 +522,7 @@ sub exec_cmd_info {
   foreach my $name (@{$$root_cmd{'opts'}{'library'}}) {
     foreach my $lib_dir (@{$$root_cmd{'opts'}{'library-directory'}}) {
       # use &find_library() to resolve --library=<> that are not resolved in
-      # 'found-library' above. Always use the above info over anything we do
+      # 'lib-names'/'libs' above. Always use the above info over anything we do
       # here since that comes from cmake and cmake will be building the link
       # cmd so its best if we use what it gives us.
     }

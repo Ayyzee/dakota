@@ -7,3 +7,6 @@ if (NOT root-source-dir)
 endif ()
 include (${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake)
 include (${root-source-dir}/lib/dakota/base-cxx.cmake)
+
+add_dependencies (     dakota-catalog dakota-dso)
+target_link_libraries (dakota-catalog dakota-dso)

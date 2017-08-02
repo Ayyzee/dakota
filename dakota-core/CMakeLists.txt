@@ -10,3 +10,6 @@ endif ()
 include (${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake)
 include (${root-source-dir}/lib/dakota/base.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/install.cmake)
+
+add_dependencies (     dakota-core dakota-dso dakota-catalog)
+target_link_libraries (dakota-core dakota-dso)

@@ -9,7 +9,3 @@ add_subdirectory (dakota-dso)
 add_subdirectory (dakota-catalog)
 add_subdirectory (dakota-core)
 add_subdirectory (dakota)
-
-add_dependencies (dakota-catalog dakota-dso)
-add_dependencies (dakota-core    dakota-dso dakota-catalog)
-add_dependencies (dakota         dakota-dso dakota-catalog dakota-core)

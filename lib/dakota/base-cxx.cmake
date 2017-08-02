@@ -16,15 +16,15 @@ set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 find_program (cxx-compiler clang++)
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
 
-set (found-libs)
-foreach (lib ${libs})
-  set (found-lib NOTFOUND) # found-lib-NOTFOUND
-  find_library (found-lib ${lib} PATHS ${lib-dirs})
-  if (NOT found-lib)
-    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
+set (libs)
+foreach (lib-name ${lib-names})
+  set (lib NOTFOUND) # lib-NOTFOUND
+  find_library (lib ${lib-name} PATHS ${lib-dirs})
+  if (NOT lib)
+    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib-name}")
   endif ()
-  #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib}")
-  list (APPEND found-libs ${found-lib})
+  #message ( "info: target: ${target}: find_library(): ${lib} => ${lib-name}")
+  list (APPEND libs ${lib})
 endforeach ()
 
 if (${is-lib})
@@ -45,7 +45,7 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_link_libraries (${target} ${found-libs})
+target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   ${compiler-opts}
 )

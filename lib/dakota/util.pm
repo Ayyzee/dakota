@@ -74,7 +74,7 @@ our @EXPORT= qw(
                  basename
                  build_dir
                  canon_path
-                 check_libs_vs_found_libs
+                 check_lib_names_vs_libs
                  clean_paths
                  colin
                  colout
@@ -1473,10 +1473,10 @@ sub scalar_from_file {
   }
   return $result;
 }
-sub check_libs_vs_found_libs {
+sub check_lib_names_vs_libs {
   my ($cmd_info) = @_;
-  die if !$$cmd_info{'libs'} || !$$cmd_info{'found-libs'};
-  die if scalar @{$$cmd_info{'libs'}} != scalar @{$$cmd_info{'found-libs'}};
+  die if !$$cmd_info{'lib-names'} || !$$cmd_info{'libs'};
+  die if scalar @{$$cmd_info{'lib-names'}} != scalar @{$$cmd_info{'libs'}};
 }
 sub project_from_yaml_file {
   my ($file) = @_;

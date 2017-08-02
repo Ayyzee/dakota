@@ -17,7 +17,6 @@ find_program (cxx-compiler clang++)
 find_program (dakota       dakota PATHS ${bin-dirs})
 set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
 set (CMAKE_CXX_COMPILER ${dakota})
-#list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 
 file (WRITE  ${parts} "")
 file (APPEND ${parts} "target: ${target}\n") # hackhack
@@ -29,22 +28,34 @@ execute_process (
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-set (found-libs)
-foreach (lib ${libs})
-  set (found-lib NOTFOUND) # found-lib-NOTFOUND
-  find_library (found-lib ${lib} PATHS ${lib-dirs})
-  if (NOT found-lib)
-    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
+set (libs)
+foreach (lib-name ${lib-names})
+  set (lib NOTFOUND) # lib-NOTFOUND
+  find_library (lib ${lib-name} PATHS ${lib-dirs})
+  if (NOT lib)
+    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib-name}")
   endif ()
-  #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib}")
-  list (APPEND found-libs ${found-lib})
+  #message ( "info: target: ${target}: find_library(): ${lib} => ${lib-name}")
+  list (APPEND libs ${lib})
 endforeach ()
 
+set (target-libs)
+foreach (lib-name ${target-lib-names})
+  set (target-lib ${root-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib-name}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  list (APPEND target-libs ${target-lib})
+endforeach ()
+
+set (all-lib-names ${lib-names}  ${target-lib-names})
+set (all-libs      ${libs}       ${target-libs})
+
 file (APPEND ${parts} "cxx: ${cxx-compiler}\n")
-string (REPLACE ";" "\n  - " str-libs "${libs}")
+
+string (REPLACE ";" "\n  - " str-lib-names "${all-lib-names}")
+file (APPEND ${parts} "lib-names:\n  - ${str-lib-names}\n")
+
+string (REPLACE ";" "\n  - " str-libs "${all-libs}")
 file (APPEND ${parts} "libs:\n  - ${str-libs}\n")
-string (REPLACE ";" "\n  - " str-found-libs "${found-libs}")
-file (APPEND ${parts} "found-libs:\n  - ${str-found-libs}\n")
+
 string (REPLACE ";" "\n  - " str-srcs "${srcs}")
 file (APPEND ${parts} "srcs:\n  - ${str-srcs}\n")
 
@@ -87,7 +98,7 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_link_libraries (${target} ${found-libs})
+target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   --parts ${parts} --cxx ${cxx-compiler}
   ${compiler-opts}

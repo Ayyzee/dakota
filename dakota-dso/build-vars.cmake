@@ -13,8 +13,10 @@ set (install-include-files
 set (lib-dirs
   ${root-source-dir}/lib
 )
-set (libs
+set (lib-names
   dl
+)
+set (target-lib-names
 )
 set (is-lib 1)
 set (target dakota-dso)
