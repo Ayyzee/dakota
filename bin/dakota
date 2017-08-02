@@ -136,7 +136,7 @@ sub translate_dk_to_cc {
 }
 sub build_precompile_cmd_info {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
-  my $project = &dakota::util::project_from_yaml_file($$dakota_opts{'project'}[0]);
+  my $project = &dakota::util::project_from_yaml_file($$dakota_opts{'parts'}[0]);
   my $root_cmd = {
     'opts'=> {
       'output' => undef,
@@ -147,8 +147,8 @@ sub build_precompile_cmd_info {
   };
   $$root_cmd{'opts'}{'precompile'} = 1;
   $$root_cmd{'args'} = $ordered_input_args;
-  if ($$dakota_opts{'project'}[0]) {
-    $$root_cmd{'opts'}{'project'} = $$dakota_opts{'project'}[0];
+  if ($$dakota_opts{'parts'}[0]) {
+    $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
   $$root_cmd{'libs'} =       $$project{'libs'};
   $$root_cmd{'found-libs'} = $$project{'found-libs'};
@@ -163,7 +163,7 @@ sub build_precompile_cmd_info {
 sub extract_dakota_opts {
   my ($cmd) = @_;
   #  $var4opt_pat: rhs/value == 0 means do not extract
-  my $var4opt_pat = { 'project=s' => 1,
+  my $var4opt_pat = { 'parts=s' => 1,
                       'cxx=s' => 1,
                     };
   my $var4opt = {};
@@ -284,7 +284,7 @@ sub cxx_argv_from_argv {
       $Data::Dumper::Indent = 1;
     }
     my $exit_val;
-   #if ($$precompile_cmd_info{'opts'}{'project'}) {
+   #if ($$precompile_cmd_info{'opts'}{'parts'}) {
    #  my ($project, $project_io) = &use_project($precompile_cmd_info);
    #}
    #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info, $project);
@@ -343,11 +343,11 @@ sub project_adjust_paths {
 sub use_project {
   my ($root_cmd) = @_;
   &check_libs_vs_found_libs($root_cmd);
-  my $project = &set_global_project($$root_cmd{'opts'}{'project'});
+  my $project = &set_global_project($$root_cmd{'opts'}{'parts'});
   $$project{'srcs'} = [] if ! $$project{'srcs'};
   $$project{'libs'} = [] if ! $$project{'libs'};
   $$project{'found-libs'} = [] if ! $$project{'found-libs'};
-  $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'project'}));
+  $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'parts'}));
   if (! $$project{'build-dir'}) {
     $$project{'build-dir'} = &build_dir();
   }
@@ -468,7 +468,7 @@ sub cmd_info_from_argv {
 
               'path-only',
               'precompile',     # gcc-ish (--compile)
-              'project=s',
+              'parts=s',
               'target-ast',
               'target-hdr',
               'target-src',
@@ -498,10 +498,10 @@ sub cmd_info_from_argv {
 sub exec_cmd_info {
   my ($root_cmd) = @_;
   $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target-src'};
-  if ($$root_cmd{'opts'}{'project'}) {
-    $$root_cmd{'opts'}{'project'} = &relpath($$root_cmd{'opts'}{'project'});
+  if ($$root_cmd{'opts'}{'parts'}) {
+    $$root_cmd{'opts'}{'parts'} = &relpath($$root_cmd{'opts'}{'parts'});
   } elsif (-e $default_project_path) {
-    $$root_cmd{'opts'}{'project'} = $default_project_path;
+    $$root_cmd{'opts'}{'parts'} = $default_project_path;
   }
   &set_root_cmd($root_cmd);
 
@@ -542,10 +542,10 @@ sub exec_cmd_info {
   my $inputs = &clean_paths($rel_argv);
   my ($project, $project_io);
 
-  if ($$root_cmd{'opts'}{'project'}) {
+  if ($$root_cmd{'opts'}{'parts'}) {
     ($project, $project_io) = &use_project($root_cmd);
   }
-  my $project_io_path = &project_io_path_from_project_path($$root_cmd{'opts'}{'project'});
+  my $project_io_path = &project_io_path_from_project_path($$root_cmd{'opts'}{'parts'});
   if ($$root_cmd{'opts'}{'clean'}) {
     &project_clean($root_cmd, $project, $project_io, $project_io_path);
     exit 0;
@@ -579,7 +579,7 @@ sub exec_cmd_info {
   if (0) {
     my $stuff = {};
     $$stuff{'cwd'} = &getcwd();
-    $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'project'});
+    $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'parts'});
     $$stuff{'rel-dir'} = &relpath($$stuff{'project-dir'}, $$stuff{'cwd'});
     #&dmp($stuff);
     my $dir = $$stuff{'rel-dir'};

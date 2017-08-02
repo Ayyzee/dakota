@@ -14,13 +14,11 @@ endif ()
 
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
-find_program (cxx-compiler   clang++)
-set (dakota-cmake-path   ${CMAKE_CURRENT_SOURCE_DIR}/dakota.cmake)
+find_program (cxx-compiler clang++)
+set (build-vars ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake)
 
-include (${dakota-cmake-path})
+include (${build-vars})
 
-set (project ${target})
-project (${project} LANGUAGES CXX)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)

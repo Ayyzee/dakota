@@ -1264,11 +1264,11 @@ sub is_exe {
   if ($$cmd_info{'opts'}{'dynamic'} || $$cmd_info{'opts'}{'shared'}) {
     $is_exe = 0;
   }
-  if (!$project && $$cmd_info{'opts'}{'project'}) {
-    $project = &project_from_yaml_file($$cmd_info{'opts'}{'project'});
+  if (!$project && $$cmd_info{'opts'}{'parts'}) {
+    $project = &project_from_yaml_file($$cmd_info{'opts'}{'parts'});
   }
   if (! $is_exe && ! $$project{'is-lib'}) {
-    print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'project'} . $nl;
+    print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'parts'} . $nl;
   }
   my $is_lib = 0;
   $is_lib = 1 if $$project{'is-lib'};
