@@ -13,5 +13,6 @@ export CMAKE_VERBOSE_MAKEFILE=ON
 
 echo 1 > jobs.txt
 
+#rm -fr $(cat cmake-binary-dir.txt)
 bin/cmake-configure.sh
 bin/build.sh $@

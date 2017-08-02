@@ -2,6 +2,7 @@
 cmake_minimum_required (VERSION 3.9)
 set (project dakota-core-project)
 project (${project} LANGUAGES CXX)
+set (parts-yaml dakota-core-parts-yaml)
 set (target-ast dakota-core-target-ast)
 set (target-hdr dakota-core-target-hdr)
 if (NOT root-source-dir)

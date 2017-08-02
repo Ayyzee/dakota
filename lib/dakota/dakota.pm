@@ -80,8 +80,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  is_o_path
-                 target_cc_path
-                 target_h_path
                  target_klass_func_decls_path
                  target_klass_func_defns_path
                  target_generic_func_decls_path

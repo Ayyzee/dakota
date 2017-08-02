@@ -17,14 +17,11 @@ find_program (cxx-compiler clang++)
 find_program (dakota       dakota PATHS ${bin-dirs})
 set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
 set (CMAKE_CXX_COMPILER ${dakota})
-
-file (WRITE  ${parts} "")
-file (APPEND ${parts} "target: ${target}\n") # hackhack
-file (APPEND ${parts} "build-dir: ${build-dir}\n")
+file (WRITE ${parts} "build-dir: ${build-dir}") # dummy parts created here
 
 # get target-src path
 execute_process (
-  COMMAND ${dakota} --target-src --path-only
+  COMMAND ${dakota} --target-src --path-only --parts ${parts} # dummy parts
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -45,23 +42,26 @@ foreach (lib-name ${target-lib-names})
   list (APPEND target-libs ${target-lib})
 endforeach ()
 
-set (all-lib-names ${lib-names}  ${target-lib-names})
-set (all-libs      ${libs}       ${target-libs})
+if (NOT is-lib)
+  set (is-lib 0)
+endif ()
 
-file (APPEND ${parts} "cxx: ${cxx-compiler}\n")
-
-string (REPLACE ";" "\n  - " str-lib-names "${all-lib-names}")
-file (APPEND ${parts} "lib-names:\n  - ${str-lib-names}\n")
-
-string (REPLACE ";" "\n  - " str-libs "${all-libs}")
-file (APPEND ${parts} "libs:\n  - ${str-libs}\n")
-
-string (REPLACE ";" "\n  - " str-srcs "${srcs}")
-file (APPEND ${parts} "srcs:\n  - ${str-srcs}\n")
-
+# phony target 'parts-yaml'
+add_custom_target (
+  ${parts-yaml}
+  COMMAND ${root-source-dir}/bin/dakota-parts.sh ${parts}
+    target:    ${target}
+    is-lib:    ${is-lib}
+    build-dir: ${build-dir}
+    cxx:       ${cxx-compiler}
+    lib-names: ${target-lib-names} ${lib-names}
+    libs:      ${target-libs}      ${libs}
+    srcs:      ${srcs}
+  VERBATIM)
 # phony target 'target-ast'
 add_custom_target (
   ${target-ast}
+  DEPENDS ${parts-yaml}
   COMMAND ${dakota} --target-ast --parts ${parts}
   VERBATIM)
 # phony target 'target-hdr'
@@ -82,7 +82,6 @@ if (${is-lib})
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-source-dir}/lib)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-  file (APPEND ${parts} "is-lib: 1\n")
 else ()
   add_executable (${target} ${srcs})
   set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)

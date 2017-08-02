@@ -650,27 +650,37 @@ sub build_dir {
   return $build_dir;
 }
 sub target_build_dir {
-  return &build_dir() . '/x';
+  my ($build_dir) = @_;
+  if ($build_dir) {
+    return $build_dir . '/x';
+  } else {
+    return &build_dir() . '/x';
+  }
 }
 sub target_srcs_ast_path {
   my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_build_dir() . '/target.ast';
+  my $target_srcs_ast_path = &target_build_dir($$cmd_info{'build-dir'}) . '/target.ast';
   return $target_srcs_ast_path;
 }
 sub target_h_path {
   my ($cmd_info) = @_;
-  my $target_h_path = &target_build_dir() . '/target.' . $h_ext;
+  my $target_h_path = &target_build_dir($$cmd_info{'build-dir'}) . '/target.' . $h_ext;
   return $target_h_path;
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
-  my $target_cc_path = &target_build_dir() . '/target.' . $cc_ext;
+  my $target_cc_path = &target_build_dir($$cmd_info{'build-dir'}) . '/target.' . $cc_ext;
   return $target_cc_path;
 }
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    if (0) {
+    my $source_dir = &dir_part(&relpath($$cmd_info{'opts'}{'parts'}));
+    my $project = &dakota::util::project_from_yaml_file($$cmd_info{'opts'}{'parts'});
+    my $force;
+    $$cmd_info{'build-dir'} = &adjust_path($source_dir, $$project{'build-dir'}, $force = 1);
+
+  if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
       print &target_srcs_ast_path($cmd_info) . $nl;
     } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
