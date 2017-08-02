@@ -652,9 +652,9 @@ sub build_dir {
 sub target_build_dir {
   my ($build_dir) = @_;
   if ($build_dir) {
-    return $build_dir . '/x';
+    return $build_dir . '/z';
   } else {
-    return &build_dir() . '/x';
+    return &build_dir() . '/z';
   }
 }
 sub target_srcs_ast_path {
