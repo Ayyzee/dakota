@@ -8,23 +8,15 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif ()
 
-if (NOT root-source-dir)
-  set (root-source-dir ${CMAKE_CURRENT_SOURCE_DIR}/..)
-endif ()
-
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
-
-find_program (cxx-compiler clang++)
-find_program (dakota       dakota PATHS ${bin-dirs})
-set (parts      ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
-set (build-vars ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake)
-
-include (${build-vars})
 
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 #set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
-set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
+find_program (cxx-compiler clang++)
+find_program (dakota       dakota PATHS ${bin-dirs})
+set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
+set (CMAKE_CXX_COMPILER ${dakota})
 #list (APPEND CMAKE_CXX_SOURCE_FILE_EXTENSIONS dk)
 
 file (WRITE  ${parts} "")
