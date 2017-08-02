@@ -14,7 +14,4 @@ rm -fr build-dkt build-cmk
 echo 1 > jobs.txt
 
 bin/cmake-configure.sh
-bin/build.sh clean
-if [[ $# -ge 1 && $1 != clean ]]; then
-    echo bin/build.sh $@
-fi
+bin/build.sh $@
