@@ -31,7 +31,7 @@ use sort 'stable';
 my $gbl_compiler;
 my $gbl_used;
 my $source_dir;
-my $builddir;
+my $build_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
@@ -77,16 +77,16 @@ sub ast_path_from_o_path {
   return $out_path;
 }
 my $patterns = {
-  'cc_path_from_dk_path' => '$(builddir)/%.$(cc_ext) : $(source_dir)/%.dk',
-  'inc_path_from_dk_path' => '$(builddir)/%.inc : $(source_dir)/%.dk',
+  'cc_path_from_dk_path' => '$(build_dir)/%.$(cc_ext) : $(source_dir)/%.dk',
+  'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(source_dir)/%.dk',
 
-  'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(source_dir)/%.dk',
+  'o_path_from_dk_path' =>  '$(build_dir)/%.$(cc_ext).$(o_ext) : $(source_dir)/%.dk',
   'o_path_from_cc_path' =>  '%.$(cc_ext).$(o_ext) : %.$(cc_ext)',
 
-  'ast_path_from_dk_path' =>   '$(builddir)/%.dk.ast      : $(source_dir)/%.dk',
+  'ast_path_from_dk_path' =>   '$(build_dir)/%.dk.ast      : $(source_dir)/%.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
-  'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
+  'ctlg_path_from_so_path' =>   '$(build_dir)/%.$(so_ext).ctlg : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -398,7 +398,7 @@ sub var_perl_from_make { # convert variable syntax to perl from make
 sub expand {
   my ($str) = @_;
   $source_dir if 0;
-  $builddir if 0;
+  $build_dir if 0;
   $cc_ext if 0;
   $o_ext  if 0;
   $so_ext if 0;
@@ -427,7 +427,7 @@ sub out_path_from_in_path {
     $path_in = &prepend_dot_slash($path_in);
   }
   $source_dir = &source_dir();
-  $builddir = &builddir();
+  $build_dir = &build_dir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
@@ -1891,7 +1891,7 @@ my $_target_inputs_ast;
 sub target_inputs_ast {
   my ($asts, $is_precompile) = @_;
   return $_target_inputs_ast if $_target_inputs_ast;
-  my $target_inputs_ast_path = &target_builddir() . '/inputs.ast';
+  my $target_inputs_ast_path = &target_build_dir() . '/inputs.ast';
   if ($is_precompile && -e $target_inputs_ast_path) {
     $_target_inputs_ast = &scalar_from_file($target_inputs_ast_path);
     return $_target_inputs_ast;

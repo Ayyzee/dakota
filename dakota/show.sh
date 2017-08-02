@@ -1,15 +1,15 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-builddir=build-dkt
+build_dir=build-dkt
 
-cat $builddir/dakota.io
+cat $build_dir/dakota.io
 
-if [[ -d $builddir ]]; then
+if [[ -d $build_dir ]]; then
     {
-        find $builddir  -name "*.h"
-        find $builddir  -name "*.cc"
-        find $builddir  -name "*.inc"
+        find $build_dir  -name "*.h"
+        find $build_dir  -name "*.cc"
+        find $build_dir  -name "*.inc"
     } | sort
 fi
 if [[ -d CMakeFiles ]]; then

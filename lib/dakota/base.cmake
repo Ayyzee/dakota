@@ -31,7 +31,7 @@ set (CMAKE_CXX_COMPILER ${dakota}) # must follow: project (<> LANGUAGES CXX)
 
 file (WRITE  ${dakota-project-path} "")
 file (APPEND ${dakota-project-path} "target: ${target}\n") # hackhack
-file (APPEND ${dakota-project-path} "builddir: ${builddir}\n")
+file (APPEND ${dakota-project-path} "build-dir: ${build-dir}\n")
 
 # get target-src path
 execute_process (
@@ -87,7 +87,7 @@ endif ()
 add_dependencies (${target} ${target-hdr})
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
+set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${build-dir})
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)

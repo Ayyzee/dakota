@@ -2,7 +2,7 @@ rootdir := ..
 
 SOURCE_DIR := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
+build-dir := $(shell $(rootdir)/bin/dakota-build build-dir dakota.build)
 
 include $(rootdir)/common.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output dk-vars.mk dakota.build)
@@ -34,7 +34,7 @@ install: all $(install-dirs) $(install.files) $(install-links)
 clean: | dakota.project
 	$(DAKOTA-BASE) --project dakota.project --clean
 	$(RM) $(RMFLAGS) $(target)
-	$(RM) $(RMFLAGS) $(builddir)
+	$(RM) $(RMFLAGS) $(build-dir)
 	$(RM) $(RMFLAGS) dk-compiler.mk dk-vars.mk
 	$(RM) $(RMFLAGS) $(SOURCE_DIR)/strerror-name-tbl.inc
 

@@ -251,13 +251,13 @@ sub detect_cxx_opts {
 sub project_io_path_from_project_path {
   my ($project_path) = @_;
   my $project = &dakota::util::project_from_yaml_file($project_path);
-  if (! $$project{'builddir'}) {
-    $$project{'builddir'} = &builddir();
+  if (! $$project{'build-dir'}) {
+    $$project{'build-dir'} = &build_dir();
   }
   my $source_dir = &dir_part(&relpath($project_path));
   my $force;
-  my $builddir = &adjust_path($source_dir, $$project{'builddir'}, $force = 1);
-  my $project_io_path = $builddir . '/dakota.io';
+  my $build_dir = &adjust_path($source_dir, $$project{'build-dir'}, $force = 1);
+  my $project_io_path = $build_dir . '/dakota.io';
   return $project_io_path;
 }
 sub is_so_path {
@@ -338,7 +338,7 @@ sub project_adjust_paths {
   $$project{'inputs'} =       &adjust_paths($$project{'source-dir'}, $$project{'inputs'});
   $$project{'srcs'} =         &adjust_paths($$project{'source-dir'}, $$project{'srcs'});
   $$project{'include-dirs'} = &adjust_paths($$project{'source-dir'}, $$project{'include-dirs'}, $force = 1);
-  $$project{'builddir'} =     &adjust_path( $$project{'source-dir'}, $$project{'builddir'}, $force = 1);
+  $$project{'build-dir'} =     &adjust_path( $$project{'source-dir'}, $$project{'build-dir'}, $force = 1);
 }
 sub use_project {
   my ($root_cmd) = @_;
@@ -348,8 +348,8 @@ sub use_project {
   $$project{'libs'} = [] if ! $$project{'libs'};
   $$project{'found-libs'} = [] if ! $$project{'found-libs'};
   $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'project'}));
-  if (! $$project{'builddir'}) {
-    $$project{'builddir'} = &builddir();
+  if (! $$project{'build-dir'}) {
+    $$project{'build-dir'} = &build_dir();
   }
   $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'found-libs'}} ];
   if (! $$project{'target'}) {
@@ -359,19 +359,19 @@ sub use_project {
     $$project{'is-lib'} = 1;
   }
   &project_adjust_paths($project);
-  if (! -e $$project{'builddir'}) {
-    &make_dir($$project{'builddir'});
+  if (! -e $$project{'build-dir'}) {
+    &make_dir($$project{'build-dir'});
   }
   $$root_cmd{'source-dir'} = $$project{'source-dir'}; # 'project.source-dir'?
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
-  $$root_cmd{'project.builddir'} = $$project{'builddir'};
+  $$root_cmd{'project.build-dir'} = $$project{'build-dir'};
   $$root_cmd{'project.target'} = $$project{'target'};
-  $$root_cmd{'project.io'} = $$project{'builddir'} . '/dakota.io';
+  $$root_cmd{'project.io'} = $$project{'build-dir'} . '/dakota.io';
   my $project_io_path = $$root_cmd{'project.io'};
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_project_io = { 'compile' => {},
-                               'builddir' => undef };
+                               'build-dir' => undef };
     &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
   my $project_io = &dakota::util::project_io_from_file($project_io_path);
@@ -379,8 +379,8 @@ sub use_project {
     $$project_io{'link'} = $$root_cmd{'link'};
   }
   # my $l4s = $$link{'M2L'}{$$link{'S2M'}};
-  if ($$project{'builddir'}) {
-    $$project_io{'builddir'} = &canon_path($$project{'builddir'});
+  if ($$project{'build-dir'}) {
+    $$project_io{'build-dir'} = &canon_path($$project{'build-dir'});
   }
   &dakota::util::project_io_to_file($project_io_path, $project_io);
   return ($project, $project_io);
@@ -389,9 +389,9 @@ sub project_clean {
   my ($root_cmd, $project, $project_io, $project_io_path) = @_;
   if ($project_io) {
     if (0) {
-      if ($$project_io{'builddir'} && $$project_io{'builddir'} ne '.') {
-        print "rm -r $$project_io{'builddir'}" . $nl;
-        `rm -r $$project_io{'builddir'}`;
+      if ($$project_io{'build-dir'} && $$project_io{'build-dir'} ne '.') {
+        print "rm -r $$project_io{'build-dir'}" . $nl;
+        `rm -r $$project_io{'build-dir'}`;
       }
     }
     if (1) { # cmake writes .o files in its own build dir

@@ -66,7 +66,7 @@ sub start {
   $$result{'lib-dirs'} =     [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'lib-dirs'}}     ] if $$build{'lib-dirs'};
   $$result{'include-dirs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'include-dirs'}} ] if $$build{'include-dirs'};
   $$result{'macros'} =       [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'macros'}}       ] if $$build{'macros'};
-  $$result{'builddir'} = &canon_path(&subst($$build{'builddir'}, $$opts{'var'})) if $$build{'builddir'};
+  $$result{'build-dir'} = &canon_path(&subst($$build{'build-dir'}, $$opts{'var'})) if $$build{'build-dir'};
   $$result{'output'} =   &canon_path(&subst($$build{'output'},   $$opts{'var'})) if $$build{'output'};
   $$result{'target'} =   &canon_path(&subst($$build{'target'},   $$opts{'var'})) if $$build{'target'};
   $$result{'is-lib'} =   &canon_path(&subst($$build{'is-lib'},   $$opts{'var'})) if $$build{'is-lib'};

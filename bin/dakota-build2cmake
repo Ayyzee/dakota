@@ -93,7 +93,7 @@ sub start {
     'srcs' => 1,
   };
   my $scalar_keys = {
-    'builddir' => 1,
+    'build-dir' => 1,
     'is-lib' => 1,
     'output' => 1,
     'target' => 1,

@@ -32,7 +32,7 @@ my $subcmd_tbl = {
   'init' =>         \&subcmd_init,
   'macros' =>       \&subcmd_macros,
   'output' =>       \&subcmd_output,
-  'builddir' =>     \&subcmd_builddir,
+  'build-dir' =>     \&subcmd_build_dir,
   'remove' =>       \&subcmd_remove,
   'set-output' =>   \&subcmd_set_output,
   'set-soname' =>   \&subcmd_set_soname,
@@ -271,10 +271,10 @@ sub var {
   }
   return $result;
 }
-sub subcmd_builddir {
+sub subcmd_build_dir {
   my ($rep, $args) = @_;
   my $result = 'dkt';
-  $result = $$rep{'builddir'} if $$rep{'builddir'};
+  $result = $$rep{'build-dir'} if $$rep{'build-dir'};
   print $result . $nl;
 }
 sub subcmd_soname {

@@ -33,7 +33,7 @@ use sort 'stable';
 my $gbl_prefix;
 my $gbl_compiler;
 my $extra;
-my $builddir;
+my $build_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
@@ -373,17 +373,17 @@ sub sig1 {
 }
 sub target_srcs_ast_path {
   my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_builddir() . '/target.ast';
+  my $target_srcs_ast_path = &target_build_dir() . '/target.ast';
   return $target_srcs_ast_path;
 }
 sub target_h_path {
   my ($cmd_info) = @_;
-  my $target_h_path = &target_builddir() . '/target.' . $h_ext;
+  my $target_h_path = &target_build_dir() . '/target.' . $h_ext;
   return $target_h_path;
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
-  my $target_cc_path = &target_builddir() . '/target.' . $cc_ext;
+  my $target_cc_path = &target_build_dir() . '/target.' . $cc_ext;
   return $target_cc_path;
 }
 sub target_o_path {
@@ -405,25 +405,25 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-klass-func-decls.inc=r;
+  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
+  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
+  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
+  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub dk_parse {
@@ -642,7 +642,7 @@ sub start_cmd {
   } else {
     $dk_exe_type = '#lib';
   }
-  $builddir = &builddir();
+  $build_dir = &build_dir();
   if (0) {
   } elsif ($$cmd_info{'opts'}{'path-only'} && $$cmd_info{'opts'}{'target-hdr'}) {
     my $target_h_path = &target_h_path($cmd_info);
@@ -1031,16 +1031,16 @@ sub cc_from_dk {
   return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
 sub common_opts_path {
-  return $builddir . '/cxx-common.opts';
+  return $build_dir . '/cxx-common.opts';
 }
 sub compile_opts_path {
-  return $builddir . '/cxx-compile.opts';
+  return $build_dir . '/cxx-compile.opts';
 }
 sub link_so_opts_path {
-  return $builddir . '/cxx-link-so.opts';
+  return $build_dir . '/cxx-link-so.opts';
 }
 sub link_exe_opts_path {
-  return $builddir . '/cxx-link-exe.opts';
+  return $build_dir . '/cxx-link-exe.opts';
 }
 sub o_from_cc {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
@@ -1112,7 +1112,7 @@ sub target_from_ast {
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $target_srcs_ast) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
-  $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
+  $file_basename =~ s|^[^/]*/||;       # strip off leading $build_dir/
   # $target_inputs_ast not used, called for side-effect
   my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_o_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
@@ -1247,7 +1247,7 @@ sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
   &make_dir_part($outfile, $should_echo);
-  if ($outfile =~ m|^$builddir/$builddir/|) { die "found double builddir/builddir: $outfile"; } # likely a double $builddir prepend
+  if ($outfile =~ m|^$build_dir/$build_dir/|) { die "found double build-dir/build-dir: $outfile"; } # likely a double $build_dir prepend
   my $file_db = {};
   my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile,
                              $$cmd_info{'link'},

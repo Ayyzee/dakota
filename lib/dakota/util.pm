@@ -72,7 +72,7 @@ our @EXPORT= qw(
                  as_literal_symbol_interior
                  at
                  basename
-                 builddir
+                 build_dir
                  canon_path
                  check_libs_vs_found_libs
                  clean_paths
@@ -181,7 +181,7 @@ our @EXPORT= qw(
                  sqstr_regex
                  str_from_seq
                  suffix
-                 target_builddir
+                 target_build_dir
                  use_abs_path
                  var
                  var_array
@@ -624,29 +624,29 @@ sub make_dir_part {
   }
 }
 my $build_vars = {
-  'builddir' => 'build-dkt',
+  'build-dir' => 'build-dkt',
 };
-sub builddir {
-  my $builddir;
+sub build_dir {
+  my $build_dir;
   my $project = &global_project();
-  if ($project && $$project{'builddir'}) {
-    $builddir = $$project{'builddir'};
+  if ($project && $$project{'build-dir'}) {
+    $build_dir = $$project{'build-dir'};
   } elsif ($ENV{'OBJDIR'}) {
-    $builddir = $ENV{'OBJDIR'};
+    $build_dir = $ENV{'OBJDIR'};
   } else {
-    $builddir = $$build_vars{'builddir'};
+    $build_dir = $$build_vars{'build-dir'};
   }
-  die if ! $builddir;
-  if (-e $builddir && ! -d $builddir) {
+  die if ! $build_dir;
+  if (-e $build_dir && ! -d $build_dir) {
     die;
   }
-  if (! -e $builddir) {
-    &make_dir($builddir, $global_should_echo);
+  if (! -e $build_dir) {
+    &make_dir($build_dir, $global_should_echo);
   }
-  return $builddir;
+  return $build_dir;
 }
-sub target_builddir {
-  return &builddir . '/x';
+sub target_build_dir {
+  return &build_dir() . '/x';
 }
 
 # 1. cmd line
@@ -1488,7 +1488,7 @@ sub project_from_yaml_file {
     my ($lhs, $rhs) = ($1, $2);
     $$result{$lhs} = [split /\s+/, $rhs];
   }
-  foreach my $lhs ('builddir', 'cxx', 'target') {
+  foreach my $lhs ('build-dir', 'cxx', 'target') {
     $$result{$lhs} = $$result{$lhs}[0];
   }
   return $result;
