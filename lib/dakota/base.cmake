@@ -61,7 +61,7 @@ add_custom_target (
 # phony target 'target-ast'
 add_custom_target (
   ${target-ast}
-  DEPENDS ${parts-yaml}
+  DEPENDS ${parts-yaml} ${target-lib-names} dakota-catalog
   COMMAND ${dakota} --target-ast --parts ${parts}
   VERBATIM)
 # phony target 'target-hdr'
