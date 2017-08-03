@@ -531,6 +531,7 @@ sub cc_files {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info, $parts) = @_;
+  #die &Dumper($cmd_info) if ! $$cmd_info{'parts.build-dir'};
   my $cc_files = [];
   $root_cmd = $cmd_info;
   my $is_exe = &is_exe($cmd_info, $parts);

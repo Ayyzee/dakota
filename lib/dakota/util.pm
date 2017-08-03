@@ -634,8 +634,6 @@ sub build_dir {
   my $parts = &global_parts();
   if ($parts && $$parts{'build-dir'}) {
     $build_dir = $$parts{'build-dir'};
-  } elsif ($ENV{'OBJDIR'}) {
-    $build_dir = $ENV{'OBJDIR'};
   } else {
     $build_dir = $$build_vars{'build-dir'};
   }
@@ -651,10 +649,7 @@ sub build_dir {
 sub target_build_dir {
   my ($cmd_info) = @_;
   my $build_dir;
-  if (0) {
-  } elsif (      $$cmd_info{'build-dir'}) {
-    $build_dir = $$cmd_info{'build-dir'};
-  } elsif (      $$cmd_info{'parts.build-dir'}) {
+  if ($$cmd_info{'parts.build-dir'}) {
     $build_dir = $$cmd_info{'parts.build-dir'};
   } else {
     #die &Dumper($cmd_info);
