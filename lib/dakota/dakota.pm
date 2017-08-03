@@ -79,7 +79,6 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 is_o_path
                  target_klass_func_decls_path
                  target_klass_func_defns_path
                  target_generic_func_decls_path
@@ -96,7 +95,6 @@ $Data::Dumper::Indent =    1;   # default = 2
 
 undef $/;
 
-my $should_replace_library_path_with_lib_opts = 1;
 my $should_write_ctlg_files = 1;
 my $want_separate_ast_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
@@ -104,10 +102,6 @@ my $show_outfile_info = 0;
 my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_exe_type = undef;
-
-my $cxx_compile_flags = &var($gbl_compiler, 'CXX_COMPILE_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
-my $cxx_shared_flags =  &var($gbl_compiler, 'CXX_SHARED_FLAGS',  '--shared');
-my $cxx_dynamic_flags = &var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &ident_regex();
@@ -159,14 +153,6 @@ sub is_ast_input_path { # dk, ctlg, or so
 sub is_ast_path { # ast
   my ($arg) = @_;
   if ($arg =~ m/\.ast$/) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_o_path { # $o_ext
-  my ($arg) = @_;
-  if ($arg =~ m/\.$o_ext$/) {
     return 1;
   } else {
     return 0;
@@ -369,18 +355,6 @@ sub sig1 {
   $result .= ')';
   return $result;
 }
-sub target_o_path {
-  my ($cmd_info, $target_cc_path) = @_;
-  my $target_o_path;
-  my $project_io = &project_io_from_file($$cmd_info{'project.io'});
-  if ($$project_io{'target-src'} && $$project_io{'compile'}{$$project_io{'target-src'}}) {
-    $target_o_path = $$project_io{'compile'}{$$project_io{'target-src'}};
-  } else {
-    $target_o_path = &o_path_from_cc_path($target_cc_path);
-    #print STDERR "target_o_path=$target_o_path not in project.io" . $nl;
-  }
-  return $target_o_path;
-}
 sub default_cmd_info {
   my $cmd_info = { 'project.target' => &global_project_target() };
   return $cmd_info;
@@ -494,53 +468,6 @@ sub gcc_library_from_library_name {
     return "-l$library_name";
   }
 }
-sub cmd_opts_from_library_name {
-  my ($lib) = @_;
-  my $path = $lib;
-  if (&is_so_path($lib) && $lib !~ m|/| && -e $lib) {
-    $path = './' . $lib;
-  }
-  return &cmd_opts_from_library_path($path);
-}
-sub cmd_opts_from_library_path {
-  my ($lib) = @_;
-
-  my $result = '';
-  # linux and darwin so-regexs are separate
-  if ($lib =~ m=^(.*/)?(lib([.\w-]+))\.$so_ext((\.\d+)+)?$= ||
-      $lib =~ m=^(.*/)?(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
-    my $library_directory = $1;
-    my $library_name = $2 . ".$so_ext";
-    if ($library_directory && 0 != length($library_directory)) {
-      $library_directory = &canon_path($library_directory);
-      $result .= "--library-directory=$library_directory --for-linker -rpath --for-linker $library_directory ";
-    }
-    $result .= &gcc_library_from_library_name($library_name);
-  } else {
-    $result = $lib;
-  }
-  return $result;
-}
-sub inputs_tbl {
-  my ($inputs) = @_;
-  my $result = {};
-  foreach my $input (@$inputs) {
-    my $cmd_opts = &cmd_opts_from_library_name($input);
-    if ($cmd_opts ne $input) {
-      $$result{$input} = $cmd_opts;
-    }
-  }
-  return $result;
-}
-sub for_linker {
-  my ($tkns) = @_;
-  my $for_linker = &var($gbl_compiler, 'CXX_FOR_LINKER_FLAGS', [ '--for-linker' ]);
-  my $result = '';
-  foreach my $tkn (@$tkns) {
-    $result .= ' ' . $for_linker . ' ' . $tkn;
-  }
-  return $result;
-}
 sub update_kw_arg_generics {
   my ($asts) = @_;
   my $kw_arg_generics = {};
@@ -593,17 +520,6 @@ sub update_target_srcs_ast_from_all_inputs {
   }
   return $cmd_info;
 }
-sub add_target_o_path_to_inputs {
-  my ($cmd_info) = @_;
-  $$cmd_info{'inputs'} = &clean_paths($$cmd_info{'inputs'});
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $target_o_path =  &target_o_path($cmd_info, $target_cc_path);
-  foreach my $input (@{$$cmd_info{'inputs'}}) {
-    return if $input eq $target_o_path;
-  }
-  &add_first($$cmd_info{'inputs'}, $target_o_path);
-  $$cmd_info{'inputs'} = &clean_paths($$cmd_info{'inputs'});
-}
 sub cc_files {
   my ($seq) = @_;
   my $cc_files = [];
@@ -627,40 +543,7 @@ sub start_cmd {
   }
   $build_dir = &build_dir();
   &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};
-  if (!$$cmd_info{'opts'}{'compiler'}) {
-    my $cxx = &var($gbl_compiler, 'CXX', 'g++');
-    $$cmd_info{'opts'}{'compiler'} = $cxx;
-  }
-  if (!$$cmd_info{'opts'}{'compiler-flags'}) {
-    my $cxxflags =       &var($gbl_compiler, 'CXXFLAGS', [ '-std=c++1z', '--visibility=hidden' ]);
-    my $extra_cxxflags = &var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
-    $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
-  }
-  my $ld_soname_flags =    &var_array($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
-  my $no_undefined_flags = &var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
-  &add_last($ld_soname_flags, $$cmd_info{'opts'}{'soname'});
-  if ($$cmd_info{'opts'}{'compile'}) {
-    $dk_exe_type = undef;
-  } elsif ($$cmd_info{'opts'}{'shared'}) {
-    if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= &for_linker($ld_soname_flags);
-    }
-    $cxx_shared_flags .= &for_linker($no_undefined_flags);
-  } elsif ($$cmd_info{'opts'}{'dynamic'}) {
-    if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_dynamic_flags .= &for_linker($ld_soname_flags);
-    }
-    $cxx_dynamic_flags .= &for_linker($no_undefined_flags);
-  } elsif (!$$cmd_info{'opts'}{'compile'}
-	   && !$$cmd_info{'opts'}{'shared'}
-	   && !$$cmd_info{'opts'}{'dynamic'}) {
-  } else {
-    die __FILE__, ":", __LINE__, ": error:\n";
-  }
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'}; ###
-  if ($should_replace_library_path_with_lib_opts) {
-    $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
-  }
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   my $lock_file = $target_srcs_ast_path . '.flock';
   &make_dir_part($target_srcs_ast_path);
@@ -718,32 +601,6 @@ sub start_cmd {
       if (!$$cmd_info{'opts'}{'target-hdr'}) {
           &gen_target_o($cmd_info, $is_exe);
       }
-    }
-  }
-  if (!$$cmd_info{'opts'}{'precompile'} && !$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
-    if ($$cmd_info{'opts'}{'compile'}) {
-      if ($want_separate_precompile_pass) {
-        &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
-      }
-    } elsif ($$cmd_info{'opts'}{'shared'}) {
-      &add_target_o_path_to_inputs($cmd_info);
-      &linked_output_from_o($cmd_info, &link_so_opts_path(), $cxx_shared_flags);
-    } elsif ($$cmd_info{'opts'}{'dynamic'}) {
-      &add_target_o_path_to_inputs($cmd_info);
-      &linked_output_from_o($cmd_info, &link_dso_opts_path(), $cxx_dynamic_flags);
-    } elsif (!$$cmd_info{'opts'}{'compile'} &&
-             !$$cmd_info{'opts'}{'shared'}  &&
-             !$$cmd_info{'opts'}{'dynamic'}) {
-      &add_target_o_path_to_inputs($cmd_info);
-      if ($is_exe) {
-        my $mode_flags;
-        &linked_output_from_o($cmd_info, &link_exe_opts_path(), $mode_flags = undef);
-      } else {
-        # default to shared, not dynamic
-        &linked_output_from_o($cmd_info, &link_so_opts_path(), $cxx_shared_flags);
-      }
-    } else {
-      die __FILE__, ":", __LINE__, ": error:\n";
     }
   }
   return ($exit_status, $cc_files);
@@ -888,18 +745,14 @@ sub gen_target {
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   &check_path($target_srcs_ast_path);
   $$cmd_info{'ast'} = $target_srcs_ast_path;
-  my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
     $$other{'type'} = $dk_exe_type;
   }
   die if ! $$cmd_info{'output'};
-  if ($$cmd_info{'opts'}{'soname'}) {
-    $$other{'name'} = $$cmd_info{'opts'}{'soname'};
-  } elsif ($$cmd_info{'output'}) {
+  if ($$cmd_info{'output'}) {
     $$other{'name'} = $$cmd_info{'output'};
   }
-  $$cmd_info{'opts'}{'compiler-flags'} = $flags;
   if (!$is_defn) {
     &target_h_from_ast($cmd_info, $other, $is_exe);
   } else {
@@ -918,12 +771,6 @@ sub o_from_dk {
     $outfile = $input;
   } else {
     my $inc_path = &inc_path_from_dk_path($input);
-    my $o_path;
-    if ($$cmd_info{'output'} && &is_o_path($$cmd_info{'output'})) {
-      $o_path = $$cmd_info{'output'};
-    } else {
-      $o_path =  &o_path_from_dk_path($input);
-    }
     my $src_path = &cc_path_from_dk_path($input);
     my $h_path = &h_path_from_src_path($src_path);
     if (!$want_separate_ast_pass) {
@@ -948,16 +795,6 @@ sub o_from_dk {
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
       &project_io_add($$cmd_info{'project.io'}, 'precompile', $input, $outfile);
-    } else {
-      my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$o_cmd{'inputs'} = [ $src_path ];
-      $$o_cmd{'output'} = $o_path;
-      $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
-      delete $$o_cmd{'opts'}{'output'};
-      $num_out_of_date_infiles = &o_from_cc($o_cmd, &compile_opts_path(), $cxx_compile_flags);
-
-      &project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path); # should also be in dk
-      $outfile = $$o_cmd{'output'};
     }
   }
   return $outfile;
@@ -977,7 +814,7 @@ sub loop_o_from_dk {
     if (&is_dk_path($input)) {
       &add_last($outfiles, &o_from_dk($cmd_info, $input));
     } elsif (&is_cc_path($input)) {
-      &add_last($outfiles, &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags));
+      ###
     } else {
       &add_last($outfiles, $input);
     }
@@ -1001,57 +838,6 @@ sub cc_from_dk {
   my $should_echo;
   return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
-sub common_opts_path {
-  return $build_dir . '/cxx-common.opts';
-}
-sub compile_opts_path {
-  return $build_dir . '/cxx-compile.opts';
-}
-sub link_so_opts_path {
-  return $build_dir . '/cxx-link-so.opts';
-}
-sub link_exe_opts_path {
-  return $build_dir . '/cxx-link-exe.opts';
-}
-sub o_from_cc {
-  my ($cmd_info, $opts_path, $mode_flags) = @_;
-  my $opts = $$cmd_info{'opts'}{'compiler-flags'};
-  $opts =~ s/^\s+//gs;
-  $opts =~ s/\s+$//gs;
-  $opts =~ s/\s+/\n/g;
-  &filestr_to_file($opts, &common_opts_path());
-  $opts =
-    $mode_flags . $nl .
-      '@' . &common_opts_path() . $nl;
-  $opts =~ s/^\s+//gs;
-  $opts =~ s/\s+$//gs;
-  $opts =~ s/\s+/\n/g;
-  &filestr_to_file($opts, $opts_path);
-  my $o_cmd = { 'opts' => $$cmd_info{'opts'}, 'inputs' => [] };
-  $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$o_cmd{'project.target'} = $$cmd_info{'project.target'};
-  $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$o_cmd{'cmd-flags'} = '@' . $opts_path;
-  $$o_cmd{'output'} = $$cmd_info{'output'};
-
-  foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if (&is_cc_path($input)) {
-      &add_last($$o_cmd{'inputs'}, $input);
-    }
-  }
-  my $should_echo = 0;
-  if ($ENV{'DK_ECHO_COMPILE_CMD'}) {
-    $should_echo = 1;
-  }
-  if (0) {
-    $$o_cmd{'cmd-flags'} .= " -MMD";
-    return &outfile_from_infiles($o_cmd, $should_echo);
-    $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
-  }
-  my $count = &outfile_from_infiles($o_cmd, $should_echo);
-  #&project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
-  return $count;
-}
 sub target_h_from_ast {
   my ($cmd_info, $other, $is_exe) = @_;
   my $is_defn;
@@ -1069,13 +855,10 @@ sub target_from_ast {
   my $target_cc_path = &target_cc_path($cmd_info);
   my $target_h_path =  &target_h_path($cmd_info);
   &check_path($target_srcs_ast_path);
-  my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
 
   if ($is_defn) {
     if ($$cmd_info{'opts'}{'precompile'}) {
       return if !&is_out_of_date($target_srcs_ast_path, $target_cc_path);
-    } else {
-      return if !&is_out_of_date($target_srcs_ast_path, $target_o_path);
     }
   } else {
     return if !&is_out_of_date($target_srcs_ast_path, $target_h_path);
@@ -1107,97 +890,6 @@ sub target_from_ast {
   } else {
     &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
   }
-
-  if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
-  my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
-  $$o_info{'project.io'} =  $$cmd_info{'project.io'};
-  if ($$cmd_info{'opts'}{'silent'}) {
-    $$o_info{'opts'}{'silent'} = $$cmd_info{'opts'}{'silent'};
-  }
-  if ($$cmd_info{'opts'}{'precompile'}) {
-    $$o_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
-  }
-  if ($$cmd_info{'opts'}{'compiler'}) {
-    $$o_info{'opts'}{'compiler'} = $$cmd_info{'opts'}{'compiler'};
-  }
-  if ($$cmd_info{'opts'}{'compiler-flags'}) {
-    $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
-  }
-    &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
-    &add_first($$cmd_info{'inputs'}, $target_o_path);
-    &project_io_add($$cmd_info{'project.io'}, 'compile', $target_cc_path, $target_o_path); # should also be in dk
-  }
-}
-sub gcc_libraries_str {
-  my ($library_names) = @_;
-  my $gcc_libraries = [];
-  foreach my $library_name (@$library_names) {
-    &add_last($gcc_libraries, &gcc_library_from_library_name($library_name));
-  }
-  my $result = join(' ', @$gcc_libraries);
-  return $result;
-}
-# adding first before any arguments (i.e. files (*.dk, *.$cc_ext, *.$so_ext, etc))
-# but after all cmd-flags
-sub library_names_add_first {
-  my ($cmd_info) = @_;
-  if ($$cmd_info{'opts'}{'library'} && 0 != @{$$cmd_info{'opts'}{'library'}}) {
-    my $gcc_libraries_str = &gcc_libraries_str($$cmd_info{'opts'}{'library'});
-    if (!defined $$cmd_info{'cmd-flags'}) {
-      $$cmd_info{'cmd-flags'} = $gcc_libraries_str;
-    } else {
-      $$cmd_info{'cmd-flags'} .= ' ' . $gcc_libraries_str;
-    }
-  }
-}
-sub lib_dirs {
-  my ($dirs, $project) = @_;
-  return '' if ! $dirs;
-  my $str = '';
-  foreach my $dir (@$dirs) {
-    $str .= " --library-directory $dir ";
-  }
-  foreach my $dir (@{$$project{'lib-dirs'}}) {
-    my $install_prefix = $ENV{'INSTALL_PREFIX'};
-    $install_prefix = '/usr/local' if ! $install_prefix;
-    $dir =~ s/\$\{INSTALL_PREFIX\}/$install_prefix/;
-    $dir =~ s/\$\(INSTALL_PREFIX\)/$install_prefix/;
-    $dir =~ s/\$INSTALL_PREFIX/$install_prefix/;
-    $str .= " --library-directory $dir ";
-  }
-  return $str;
-}
-sub linked_output_from_o {
-  my ($cmd_info, $opts_path, $mode_flags) = @_;
-  my $cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$cmd{'project.io'} =  $$cmd_info{'project.io'};
-  my $ldflags =       &var($gbl_compiler, 'LDFLAGS', '');
-  my $extra_ldflags = &var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-  my $opts = '';
-  $opts .= $mode_flags . $nl if $mode_flags;
-  $opts .= &lib_dirs($$cmd_info{'opts'}{'library-directory'}, &global_project()) . $nl;
-  $opts .=
-    $ldflags . $nl .
-    $extra_ldflags . $nl .
-    '@' . &common_opts_path() . $nl;
-  $opts =~ s/^\s+//gs;
-  $opts =~ s/\s+$//gs;
-  $opts =~ s/\s+/\n/g;
-  $opts .= $nl;
-  &filestr_to_file($opts, $opts_path);
-  $$cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$cmd{'cmd-flags'} = '@' . $opts_path;
-  $$cmd{'output'} = $$cmd_info{'output'};
-  $$cmd{'project.target'} = $$cmd_info{'project.target'};
-  $$cmd{'inputs'} =     $$cmd_info{'inputs'};
-  $$cmd{'inputs-tbl'} = $$cmd_info{'inputs-tbl'};
-  &library_names_add_first($cmd);
-  my $should_echo = 0;
-  if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_EXE_CMD'}) {
-    $should_echo = 1;
-  }
-  my $result = &outfile_from_infiles($cmd, $should_echo);
-  return $result;
 }
 sub exec_cmd {
   my ($cmd_info, $should_echo) = @_;
@@ -1253,9 +945,6 @@ sub outfile_from_infiles {
       &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
     } else {
       &exec_cmd($cmd_info, $should_echo);
-      if (!$$cmd_info{'opts'}{'silent'}) {
-        &echo_output_path($output, &digsig(&filestr_from_file($output))) if &is_o_path($output);
-      }
     }
 
     if (1) {
