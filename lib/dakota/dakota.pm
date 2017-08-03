@@ -791,7 +791,7 @@ sub o_from_dk {
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
-      &project_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
+      &dakota_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
     }
   }
   return $outfile;
@@ -883,7 +883,7 @@ sub target_from_ast {
 
   if ($is_defn) {
     &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
-    &project_io_assign($$cmd_info{'io'}, 'target-src', $target_cc_path);
+    &dakota_io_assign($$cmd_info{'io'}, 'target-src', $target_cc_path);
   } else {
     &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
   }

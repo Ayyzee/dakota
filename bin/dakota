@@ -248,7 +248,7 @@ sub detect_cxx_opts {
   }
   return ($num_dk_files, $ordered_input_args);
 }
-sub project_io_path_from_project_path {
+sub dakota_io_path_from_project_path {
   my ($project_path) = @_;
   my $project = &dakota::util::project_from_yaml_file($project_path);
   if (! $$project{'build-dir'}) {
@@ -257,8 +257,8 @@ sub project_io_path_from_project_path {
   my $source_dir = &dir_part(&relpath($project_path));
   my $force;
   my $build_dir = &adjust_path($source_dir, $$project{'build-dir'}, $force = 1);
-  my $project_io_path = $build_dir . '/dakota.io';
-  return $project_io_path;
+  my $dakota_io_path = $build_dir . '/dakota.io';
+  return $dakota_io_path;
 }
 sub is_so_path {
   my ($name) = @_;
@@ -285,7 +285,7 @@ sub cxx_argv_from_argv {
     }
     my $exit_val;
    #if ($$precompile_cmd_info{'opts'}{'parts'}) {
-   #  my ($project, $project_io) = &use_project($precompile_cmd_info);
+   #  my ($project, $dakota_io) = &use_project($precompile_cmd_info);
    #}
    #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info, $project);
     ($exit_val, $cc_paths) = &exec_cmd_info($precompile_cmd_info);
@@ -367,44 +367,44 @@ sub use_project {
   $$root_cmd{'parts.build-dir'} = $$project{'build-dir'};
   $$root_cmd{'parts.target'} = $$project{'target'};
   $$root_cmd{'io'} = $$project{'build-dir'} . '/dakota.io';
-  my $project_io_path = $$root_cmd{'io'};
-  if (! -e $project_io_path) {
+  my $dakota_io_path = $$root_cmd{'io'};
+  if (! -e $dakota_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
-    my $default_project_io = { 'precompile' => {}, 'cwd' => &cwd(),
+    my $default_dakota_io = { 'precompile' => {}, 'cwd' => &cwd(),
                                'build-dir' => $$project{'build-dir'}, 'source-dir' => $$project{'source-dir'} };
-    &dakota::util::project_io_to_file($project_io_path, $default_project_io);
+    &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
   }
-  my $project_io = &dakota::util::project_io_from_file($project_io_path);
+  my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
   if ($$project{'build-dir'}) {
-    $$project_io{'build-dir'} = &canon_path($$project{'build-dir'});
+    $$dakota_io{'build-dir'} = &canon_path($$project{'build-dir'});
   }
-  &dakota::util::project_io_to_file($project_io_path, $project_io);
-  return ($project, $project_io);
+  &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
+  return ($project, $dakota_io);
 } # use_project
 sub project_clean {
-  my ($root_cmd, $project, $project_io, $project_io_path) = @_;
-  if ($project_io) {
+  my ($root_cmd, $project, $dakota_io, $dakota_io_path) = @_;
+  if ($dakota_io) {
     if (0) {
-      if ($$project_io{'build-dir'} && $$project_io{'build-dir'} ne '.') {
-        print "rm -r $$project_io{'build-dir'}" . $nl;
-        `rm -r $$project_io{'build-dir'}`;
+      if ($$dakota_io{'build-dir'} && $$dakota_io{'build-dir'} ne '.') {
+        print "rm -r $$dakota_io{'build-dir'}" . $nl;
+        `rm -r $$dakota_io{'build-dir'}`;
       }
     }
     if (1) { # cmake writes .o files in its own build dir
       if (! $$root_cmd{'opts'}{'precompile'}) {
-        &project_clean_paths($project_io, $project_io_path, 'compile');
+        &project_clean_paths($dakota_io, $dakota_io_path, 'compile');
       }
-      &project_clean_paths($project_io, $project_io_path, 'precompile', 'target-src');
+      &project_clean_paths($dakota_io, $dakota_io_path, 'precompile', 'target-src');
     }
   }
 }
 sub project_clean_paths {
-  my ($project_io, $project_io_path, $key, $extra_key) = @_;
-  my $values = [values %{$$project_io{$key}}];
-  $$project_io{$key} = {};
-  if ($extra_key && $$project_io{$extra_key}) {
-    &add_last($values, $$project_io{$extra_key});
-    delete $$project_io{$extra_key};
+  my ($dakota_io, $dakota_io_path, $key, $extra_key) = @_;
+  my $values = [values %{$$dakota_io{$key}}];
+  $$dakota_io{$key} = {};
+  if ($extra_key && $$dakota_io{$extra_key}) {
+    &add_last($values, $$dakota_io{$extra_key});
+    delete $$dakota_io{$extra_key};
   }
   my $remove = {};
   foreach my $out_path (@$values) {
@@ -412,7 +412,7 @@ sub project_clean_paths {
       $$remove{$out_path} = undef;
     }
   }
-  &dakota::util::project_io_to_file($project_io_path, $project_io);
+  &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
   foreach my $path (sort keys %$remove) {
     print "rm $path" . $nl;
     unlink $path;
@@ -512,14 +512,14 @@ sub exec_cmd_info {
 
   my $rel_argv = [map { &relpath($_) } @{$$root_cmd{'args'}}];
   my $inputs = &clean_paths($rel_argv);
-  my ($project, $project_io);
+  my ($project, $dakota_io);
 
   if ($$root_cmd{'opts'}{'parts'}) {
-    ($project, $project_io) = &use_project($root_cmd);
+    ($project, $dakota_io) = &use_project($root_cmd);
   }
-  my $project_io_path = &project_io_path_from_project_path($$root_cmd{'opts'}{'parts'});
+  my $dakota_io_path = &dakota_io_path_from_project_path($$root_cmd{'opts'}{'parts'});
   if ($$root_cmd{'opts'}{'clean'}) {
-    &project_clean($root_cmd, $project, $project_io, $project_io_path);
+    &project_clean($root_cmd, $project, $dakota_io, $dakota_io_path);
     exit 0;
   }
   if ($project) {
@@ -531,15 +531,15 @@ sub exec_cmd_info {
     }
     if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
       if (1 == scalar @$inputs && &is_dk_path($$inputs[0]) && !$$root_cmd{'opts'}{'precompile'}) {
-        &dakota::util::project_io_add($$root_cmd{'io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
+        &dakota::util::dakota_io_add($$root_cmd{'io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
         my $original_state;
-        &dakota::util::project_io_to_file($project_io_path, $project_io);
+        &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
       }
     }
   }
-  if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
-    &dakota::util::project_io_remove($project_io, 'compile', $inputs);
-    &add_last($inputs, values %{$$project_io{'compile'}});
+  if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$dakota_io{'compile'}}) {
+    &dakota::util::dakota_io_remove($dakota_io, 'compile', $inputs);
+    &add_last($inputs, values %{$$dakota_io{'compile'}});
     foreach my $input (@{$$project{'inputs'}}) {
       if ($input =~ /\.$so_ext$/) { # is_so_path()
         &add_last($inputs, $input);
