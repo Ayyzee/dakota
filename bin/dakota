@@ -366,11 +366,11 @@ sub use_project {
   $$root_cmd{'parts.inputs'} = $$project{'inputs'};
   $$root_cmd{'parts.build-dir'} = $$project{'build-dir'};
   $$root_cmd{'parts.target'} = $$project{'target'};
-  $$root_cmd{'parts.io'} = $$project{'build-dir'} . '/dakota.io';
-  my $project_io_path = $$root_cmd{'parts.io'};
+  $$root_cmd{'io'} = $$project{'build-dir'} . '/dakota.io';
+  my $project_io_path = $$root_cmd{'io'};
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
-    my $default_project_io = { 'compile' => {},
+    my $default_project_io = { 'compile' => {}, 'cwd' => &cwd(),
                                'build-dir' => undef };
     &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
@@ -531,7 +531,7 @@ sub exec_cmd_info {
     }
     if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
       if (1 == scalar @$inputs && &is_dk_path($$inputs[0]) && !$$root_cmd{'opts'}{'precompile'}) {
-        &dakota::util::project_io_add($$root_cmd{'parts.io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
+        &dakota::util::project_io_add($$root_cmd{'io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
         my $original_state;
         &dakota::util::project_io_to_file($project_io_path, $project_io);
       }
