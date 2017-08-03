@@ -760,7 +760,7 @@ sub global_project {
   return $global_project;
 }
 sub global_project_target {
-  my $result = $$global_project{'project.target'};
+  my $result = $$global_project{'parts.target'};
   $result = $$global_project{'target'} if ! $result;
   return $result;
 }

@@ -356,7 +356,7 @@ sub sig1 {
   return $result;
 }
 sub default_cmd_info {
-  my $cmd_info = { 'project.target' => &global_project_target() };
+  my $cmd_info = { 'parts.target' => &global_project_target() };
   return $cmd_info;
 }
 sub target_klass_func_decls_path {
@@ -493,8 +493,8 @@ sub update_target_srcs_ast_from_all_inputs {
                'output' => $$cmd_info{'output'},
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
              };
-  $$cmd_info{'inputs'} = $$cmd_info{'project.inputs'},
-  $$cmd_info{'output'} = $$cmd_info{'project.target'},
+  $$cmd_info{'inputs'} = $$cmd_info{'parts.inputs'},
+  $$cmd_info{'output'} = $$cmd_info{'parts.target'},
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
@@ -612,7 +612,7 @@ sub ast_from_so {
   }
   my $ctlg_path = &ctlg_path_from_so_path($arg);
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$ctlg_cmd{'project.io'} = $$cmd_info{'project.io'};
+  $$ctlg_cmd{'parts.io'} = $$cmd_info{'parts.io'};
   $$ctlg_cmd{'output'} = $ctlg_path;
   if (0) {
     my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
@@ -626,7 +626,7 @@ sub ast_from_so {
   my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ast_cmd{'output'} = $ast_path;
   $$ast_cmd{'inputs'} = [ $ctlg_path ];
-  $$ast_cmd{'project.io'} =  $$cmd_info{'project.io'};
+  $$ast_cmd{'parts.io'} =  $$cmd_info{'parts.io'};
   &ast_from_inputs($ast_cmd);
   if (!$should_write_ctlg_files) {
     #unlink $ctlg_path;
@@ -658,8 +658,8 @@ sub ast_from_inputs {
     'opts' =>        $$cmd_info{'opts'},
     'output' =>      $$cmd_info{'output'},
     'inputs' =>      $$cmd_info{'inputs'},
-    'project.io' =>  $$cmd_info{'project.io'},
-    'project.target' =>  $$cmd_info{'project.target'},
+    'parts.io' =>  $$cmd_info{'parts.io'},
+    'parts.target' =>  $$cmd_info{'parts.target'},
   };
   my $should_echo;
   my $result = &outfile_from_infiles($ast_cmd, $should_echo = 0);
@@ -694,7 +694,7 @@ sub loop_ast_from_inputs {
       &check_path($ast_path);
       my $ast_cmd = {
         'opts' =>        $$cmd_info{'opts'},
-        'project.io' =>  $$cmd_info{'project.io'},
+        'parts.io' =>  $$cmd_info{'parts.io'},
         'output' => $ast_path,
         'inputs' => [ $input ],
       };
@@ -712,7 +712,7 @@ sub loop_ast_from_inputs {
       &ordered_set_add($$cmd_info{'asts'}, $target_srcs_ast_path, __FILE__, __LINE__);
       my $ast_cmd = {
         'opts' =>        $$cmd_info{'opts'},
-        'project.io' =>  $$cmd_info{'project.io'},
+        'parts.io' =>  $$cmd_info{'parts.io'},
         'output' => $target_srcs_ast_path,
         'inputs' => $ast_files,
       };
@@ -778,7 +778,7 @@ sub o_from_dk {
       my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ast_cmd{'inputs'} = [ $input ];
       $$ast_cmd{'output'} = $ast_path;
-      $$ast_cmd{'project.io'} =  $$cmd_info{'project.io'};
+      $$ast_cmd{'parts.io'} =  $$cmd_info{'parts.io'};
       $num_out_of_date_infiles = &ast_from_inputs($ast_cmd);
       &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
     }
@@ -786,15 +786,15 @@ sub o_from_dk {
     $$cc_cmd{'inputs'} = [ $input ];
     $$cc_cmd{'output'} = $src_path;
     $$cc_cmd{'asts'} = $$cmd_info{'asts'};
-    $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
-    $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
+    $$cc_cmd{'parts.io'} =  $$cmd_info{'parts.io'};
+    $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
-      &project_io_add($$cmd_info{'project.io'}, 'precompile', $input, $outfile);
+      &project_io_add($$cmd_info{'parts.io'}, 'precompile', $input, $outfile);
     }
   }
   return $outfile;
@@ -829,8 +829,8 @@ sub loop_o_from_dk {
 sub cc_from_dk {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
+  $$cc_cmd{'parts.io'} =  $$cmd_info{'parts.io'};
+  $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
   $$cc_cmd{'cmd'} = '&loop_cc_from_dk';
   $$cc_cmd{'asts'} = $$cmd_info{'asts'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
@@ -886,7 +886,7 @@ sub target_from_ast {
 
   if ($is_defn) {
     &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
-    &project_io_assign($$cmd_info{'project.io'}, 'target-src', $target_cc_path);
+    &project_io_assign($$cmd_info{'parts.io'}, 'target-src', $target_cc_path);
   } else {
     &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
   }
@@ -962,7 +962,7 @@ sub ctlg_from_so {
     #map { print '// ' . $_ . $nl; } @{$$cmd_info{'inputs'}};
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$ctlg_cmd{'project.io'} =  $$cmd_info{'project.io'};
+  $$ctlg_cmd{'parts.io'} =  $$cmd_info{'parts.io'};
 
   if ($ENV{'DAKOTA_CATALOG'}) {
     $$ctlg_cmd{'cmd'} = $ENV{'DAKOTA_CATALOG'};
@@ -978,7 +978,7 @@ sub ctlg_from_so {
     $$ctlg_cmd{'cmd'} .= ' --silent';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
-  $$ctlg_cmd{'project.target'} = $$cmd_info{'project.target'};
+  $$ctlg_cmd{'parts.target'} = $$cmd_info{'parts.target'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
 
   if ($$cmd_info{'opts'}{'precompile'}) {
