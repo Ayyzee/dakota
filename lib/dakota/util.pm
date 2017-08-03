@@ -683,7 +683,7 @@ sub path_only {
     my $parts = &parts($$cmd_info{'opts'}{'parts'});
     my $current_source_dir = &relpath($$parts{'current-source-dir'});
     my $force;
-    $$cmd_info{'build-dir'} = &adjust_path($current_source_dir, $$parts{'build-dir'}, $force = 1);
+    $$cmd_info{'parts.build-dir'} = &adjust_path($current_source_dir, $$parts{'build-dir'}, $force = 1);
 
   if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {

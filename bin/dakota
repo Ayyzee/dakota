@@ -139,11 +139,11 @@ sub build_precompile_cmd_info {
     'opts'=> {
       'output' => undef,
     },
-    'build-dir' =>          $$parts{'build-dir'},
-    'source-dir' =>         $$parts{'source-dir'},
-    'current-source-dir' => $$parts{'current-source-dir'},
     'inputs' => [],
     'libs' => [],
+    'parts.build-dir' =>          $$parts{'build-dir'},
+    'parts.source-dir' =>         $$parts{'source-dir'},
+    'parts.current-source-dir' => $$parts{'current-source-dir'},
   };
   $$root_cmd{'opts'}{'precompile'} = 1;
   $$root_cmd{'args'} = $ordered_input_args;
