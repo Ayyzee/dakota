@@ -673,10 +673,10 @@ sub target_cc_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    my $source_dir = &dir_part(&relpath($$cmd_info{'opts'}{'parts'}));
+    my $current_source_dir = &dir_part(&relpath($$cmd_info{'opts'}{'parts'}));
     my $project = &dakota::util::project_from_yaml_file($$cmd_info{'opts'}{'parts'});
     my $force;
-    $$cmd_info{'build-dir'} = &adjust_path($source_dir, $$project{'build-dir'}, $force = 1);
+    $$cmd_info{'build-dir'} = &adjust_path($current_source_dir, $$project{'build-dir'}, $force = 1);
 
   if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
@@ -765,9 +765,9 @@ sub global_project_target {
 sub set_global_project {
   my ($project_path) = @_;
   $global_project = &project_from_yaml_file($project_path);
-  my $source_dir = &dir_part(&relpath($project_path));
-  if ($source_dir ne '.') {
-    $$global_project{'source-dir'} = $source_dir;
+  my $current_source_dir = &dir_part(&relpath($project_path));
+  if ($current_source_dir ne '.') {
+    $$global_project{'current-source-dir'} = $current_source_dir;
   }
   return $global_project;
 }
@@ -1201,8 +1201,8 @@ sub is_dk_path {
   }
 }
 sub adjust_path {
-  my ($source_dir, $input, $force) = @_;
-  return $input if $source_dir eq '.';
+  my ($current_source_dir, $input, $force) = @_;
+  return $input if $current_source_dir eq '.';
   $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {
@@ -1210,7 +1210,7 @@ sub adjust_path {
     #die if ! -e $rel_input;
     return $rel_input;
   }
-  my $path = $source_dir . '/' . $input;
+  my $path = $current_source_dir . '/' . $input;
   if ($force || (! -e $input && -e $path)) {
     $rel_input = &relpath($path);
   }
@@ -1218,11 +1218,11 @@ sub adjust_path {
   return $rel_input;
 }
 sub adjust_paths {
-  my ($source_dir, $inputs, $force) = @_;
-  return $inputs if ! $source_dir || ($source_dir eq '.');
+  my ($current_source_dir, $inputs, $force) = @_;
+  return $inputs if ! $current_source_dir || ($current_source_dir eq '.');
   my $rel_inputs = [];
   foreach my $input (@$inputs) {
-    my $rel_input = &adjust_path($source_dir, $input, $force);
+    my $rel_input = &adjust_path($current_source_dir, $input, $force);
     &add_last($rel_inputs, $rel_input);
   }
   return $rel_inputs;
