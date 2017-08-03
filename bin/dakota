@@ -142,7 +142,6 @@ sub build_precompile_cmd_info {
       'output' => undef,
     },
     'inputs' => [],
-    'lib-names' => [],
     'libs' => [],
   };
   $$root_cmd{'opts'}{'precompile'} = 1;
@@ -150,7 +149,6 @@ sub build_precompile_cmd_info {
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
-  $$root_cmd{'lib-names'} =       $$project{'lib-names'};
   $$root_cmd{'libs'} = $$project{'libs'};
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
@@ -342,10 +340,8 @@ sub project_adjust_paths {
 }
 sub use_project {
   my ($root_cmd) = @_;
-  &check_lib_names_vs_libs($root_cmd);
   my $project = &set_global_project($$root_cmd{'opts'}{'parts'});
   $$project{'srcs'} = [] if ! $$project{'srcs'};
-  $$project{'lib-names'} = [] if ! $$project{'lib-names'};
   $$project{'libs'} = [] if ! $$project{'libs'};
   $$project{'source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'parts'}));
   if (! $$project{'build-dir'}) {
@@ -439,7 +435,6 @@ sub cmd_info_from_argv {
   my $root_cmd = {
     'asts' => [],
     'inputs' => [],
-    'lib-names' => [],
     'libs' => [],
     'opts' => {
       'define-macro' => [],

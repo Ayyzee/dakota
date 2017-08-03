@@ -53,7 +53,6 @@ add_custom_target (
     target:    ${target}
     is-lib:    ${is-lib}
     build-dir: ${build-dir}
-    lib-names: ${target-lib-names} ${lib-names}
     libs:      ${target-libs}      ${libs}
     srcs:      ${srcs}
   VERBATIM)
