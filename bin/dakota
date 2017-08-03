@@ -139,6 +139,9 @@ sub build_precompile_cmd_info {
     'opts'=> {
       'output' => undef,
     },
+    'build-dir' =>          $$parts{'build-dir'},
+    'source-dir' =>         $$parts{'source-dir'},
+    'current-source-dir' => $$parts{'current-source-dir'},
     'inputs' => [],
     'libs' => [],
   };
