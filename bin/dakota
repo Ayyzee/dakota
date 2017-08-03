@@ -84,7 +84,7 @@ $Data::Dumper::Indent    = 1; # default = 2
 use Getopt::Long qw(GetOptionsFromArray);
 $Getopt::Long::ignorecase = 0;
 
-my $default_project_path = 'dakota.project';
+my $default_project_path = 'parts.yaml';
 
 sub path_opt {
   my ($cmd, $ir, $short, $long, $info) = @_;
@@ -341,11 +341,10 @@ sub project_adjust_paths {
 sub use_project {
   my ($root_cmd) = @_;
   my $project = &set_global_project($$root_cmd{'opts'}{'parts'});
-  my $xxx_parts = &parts($$root_cmd{'opts'}{'parts'});
   $$project{'srcs'} = [] if ! $$project{'srcs'};
   $$project{'libs'} = [] if ! $$project{'libs'};
-  $$project{'current-source-dir'} = &relpath($$xxx_parts{'current-source-dir'});
-  $$project{'source-dir'} =         &relpath($$xxx_parts{'source-dir'});
+  $$project{'current-source-dir'} = &relpath($$project{'current-source-dir'});
+  $$project{'source-dir'} =         &relpath($$project{'source-dir'});
   if (! $$project{'build-dir'}) {
     $$project{'build-dir'} = &build_dir();
   }
@@ -385,7 +384,7 @@ sub use_project {
   &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
   return ($project, $dakota_io);
 } # use_project
-sub project_clean {
+sub clean {
   my ($root_cmd, $project, $dakota_io, $dakota_io_path) = @_;
   if ($dakota_io) {
     if (0) {
@@ -396,13 +395,13 @@ sub project_clean {
     }
     if (1) { # cmake writes .o files in its own build dir
       if (! $$root_cmd{'opts'}{'precompile'}) {
-        &project_clean_paths($dakota_io, $dakota_io_path, 'compile');
+        &clean_paths($dakota_io, $dakota_io_path, 'compile');
       }
-      &project_clean_paths($dakota_io, $dakota_io_path, 'precompile', 'target-src');
+      &clean_paths($dakota_io, $dakota_io_path, 'precompile', 'target-src');
     }
   }
 }
-sub project_clean_paths {
+sub clean_paths {
   my ($dakota_io, $dakota_io_path, $key, $extra_key) = @_;
   my $values = [values %{$$dakota_io{$key}}];
   $$dakota_io{$key} = {};
@@ -514,7 +513,7 @@ sub exec_cmd_info {
   # m/1: many inputs, one output (directory)
 
   my $rel_argv = [map { &relpath($_) } @{$$root_cmd{'args'}}];
-  my $inputs = &clean_paths($rel_argv);
+  my $inputs = &normalize_paths($rel_argv);
   my ($project, $dakota_io);
 
   if ($$root_cmd{'opts'}{'parts'}) {
@@ -522,7 +521,7 @@ sub exec_cmd_info {
   }
   my $dakota_io_path = &dakota_io_path_from_project_path($$root_cmd{'opts'}{'parts'});
   if ($$root_cmd{'opts'}{'clean'}) {
-    &project_clean($root_cmd, $project, $dakota_io, $dakota_io_path);
+    &clean($root_cmd, $project, $dakota_io, $dakota_io_path);
     exit 0;
   }
   if ($project) {
@@ -549,7 +548,7 @@ sub exec_cmd_info {
       }
     }
   }
-  $inputs = &clean_paths($inputs);
+  $inputs = &normalize_paths($inputs);
 
   if (0) {
     my $stuff = {};
@@ -612,9 +611,9 @@ sub exec_cmd_info {
   }
   $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
 
-  &clean_paths($root_cmd, 'inputs');
-  &clean_paths($$root_cmd{'opts'}, 'include-directory');
-  &clean_paths($$root_cmd{'opts'}, 'library-directory');
+  &normalize_paths($root_cmd, 'inputs');
+  &normalize_paths($$root_cmd{'opts'}, 'include-directory');
+  &normalize_paths($$root_cmd{'opts'}, 'library-directory');
 
   my $gcc_from_dakota = {
     '--include-directory' => '--include-directory', # yep, the same

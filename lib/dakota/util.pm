@@ -74,7 +74,7 @@ our @EXPORT= qw(
                  basename
                  build_dir
                  canon_path
-                 clean_paths
+                 normalize_paths
                  colin
                  colout
                  cpp_directives
@@ -1228,7 +1228,7 @@ sub adjust_paths {
   }
   return $rel_inputs;
 }
-sub clean_paths {
+sub normalize_paths {
   my ($in, $key) = @_;
   die if !defined $in;
   if ($key && !exists $$in{$key}) {
