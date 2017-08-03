@@ -97,9 +97,9 @@ our @EXPORT= qw(
                  filestr_to_file
                  first
                  flatten
-                 global_project
+                 global_parts
                  target_srcs_ast
-                 global_project_target
+                 global_parts_target
                  has_kw_args
                  has_kw_arg_names
                  header_file_regex
@@ -149,7 +149,7 @@ our @EXPORT= qw(
                  parts
                  path_only
                  prepend_dot_slash
-                 project_from_yaml_file
+                 parts_from_yaml_file
                  dakota_io_add
                  dakota_io_append
                  dakota_io_assign
@@ -170,7 +170,7 @@ our @EXPORT= qw(
                  scalar_from_file
                  scalar_to_file
                  set_exe_target
-                 set_global_project
+                 set_global_parts
                  set_target_srcs_ast
                  set_root_cmd
                  set_src_decl
@@ -631,9 +631,9 @@ my $build_vars = {
 };
 sub build_dir {
   my $build_dir;
-  my $project = &global_project();
-  if ($project && $$project{'build-dir'}) {
-    $build_dir = $$project{'build-dir'};
+  my $parts = &global_parts();
+  if ($parts && $$parts{'build-dir'}) {
+    $build_dir = $$parts{'build-dir'};
   } elsif ($ENV{'OBJDIR'}) {
     $build_dir = $ENV{'OBJDIR'};
   } else {
@@ -674,10 +674,10 @@ sub target_cc_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    my $project = &parts($$cmd_info{'opts'}{'parts'});
-    my $current_source_dir = &relpath($$project{'current-source-dir'});
+    my $parts = &parts($$cmd_info{'opts'}{'parts'});
+    my $current_source_dir = &relpath($$parts{'current-source-dir'});
     my $force;
-    $$cmd_info{'build-dir'} = &adjust_path($current_source_dir, $$project{'build-dir'}, $force = 1);
+    $$cmd_info{'build-dir'} = &adjust_path($current_source_dir, $$parts{'build-dir'}, $force = 1);
 
   if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
@@ -754,23 +754,23 @@ sub kw_args_method_sig {
   &add_last($kw_args, ['...']);
   return ($$method{'name'}, $kw_args);
 }
-my $global_project;
-sub global_project {
-  return $global_project;
+my $global_parts;
+sub global_parts {
+  return $global_parts;
 }
-sub global_project_target {
-  my $result = $$global_project{'parts.target'};
-  $result = $$global_project{'target'} if ! $result;
+sub global_parts_target {
+  my $result = $$global_parts{'parts.target'};
+  $result = $$global_parts{'target'} if ! $result;
   return $result;
 }
-sub set_global_project {
-  my ($project_path) = @_;
-  $global_project = &parts($project_path);
-  my $current_source_dir = &relpath($$global_project{'current-source-dir'});
+sub set_global_parts {
+  my ($parts_path) = @_;
+  $global_parts = &parts($parts_path);
+  my $current_source_dir = &relpath($$global_parts{'current-source-dir'});
   if ($current_source_dir ne '.') {
-    $$global_project{'current-source-dir'} = $current_source_dir;
+    $$global_parts{'current-source-dir'} = $current_source_dir;
   }
-  return $global_project;
+  return $global_parts;
 }
 my $target_srcs_ast;
 sub target_srcs_ast {
@@ -1284,19 +1284,19 @@ sub copy_no_dups {
   return $result;
 }
 sub is_exe {
-  my ($cmd_info, $project) = @_;
+  my ($cmd_info, $parts) = @_;
   my $is_exe = 1;
   if ($$cmd_info{'opts'}{'dynamic'} || $$cmd_info{'opts'}{'shared'}) {
     $is_exe = 0;
   }
-  if (!$project && $$cmd_info{'opts'}{'parts'}) {
-    $project = &parts($$cmd_info{'opts'}{'parts'});
+  if (!$parts && $$cmd_info{'opts'}{'parts'}) {
+    $parts = &parts($$cmd_info{'opts'}{'parts'});
   }
-  if (! $is_exe && ! $$project{'is-lib'}) {
+  if (! $is_exe && ! $$parts{'is-lib'}) {
     print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'parts'} . $nl;
   }
   my $is_lib = 0;
-  $is_lib = 1 if $$project{'is-lib'};
+  $is_lib = 1 if $$parts{'is-lib'};
   return !$is_lib;
 }
 sub is_abs {
@@ -1498,7 +1498,7 @@ sub scalar_from_file {
   }
   return $result;
 }
-sub project_from_yaml_file {
+sub parts_from_yaml_file {
   my ($file) = @_;
   die if ! -e $file;
   my $result = {};
@@ -1515,7 +1515,7 @@ sub project_from_yaml_file {
 }
 sub parts {
   my ($path) = @_;
-  my $parts = &project_from_yaml_file($path);
+  my $parts = &parts_from_yaml_file($path);
   return $parts;
 }
 sub filestr_from_file {

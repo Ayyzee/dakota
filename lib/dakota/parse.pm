@@ -417,8 +417,8 @@ sub expand_tbl_values {
   return $tbl_out;
 }
 sub current_source_dir {
-  my $project = &global_project();
-  return $$project{'current-source-dir'};
+  my $parts = &global_parts();
+  return $$parts{'current-source-dir'};
 }
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;

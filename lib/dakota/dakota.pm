@@ -356,7 +356,7 @@ sub sig1 {
   return $result;
 }
 sub default_cmd_info {
-  my $cmd_info = { 'parts.target' => &global_project_target() };
+  my $cmd_info = { 'parts.target' => &global_parts_target() };
   return $cmd_info;
 }
 sub target_klass_func_decls_path {
@@ -482,7 +482,7 @@ sub update_kw_arg_generics {
       }
     }
   }
-  my $path = $$asts[-1]; # only update the project file ast
+  my $path = $$asts[-1]; # only update the parts file ast
   my $ast = &scalar_from_file($path);
   $$ast{'kw-arg-generics'} = $kw_arg_generics;
   &scalar_to_file($path, $ast);
@@ -530,10 +530,10 @@ sub cc_files {
 }
 my $root_cmd;
 sub start_cmd {
-  my ($cmd_info, $project) = @_;
+  my ($cmd_info, $parts) = @_;
   my $cc_files = [];
   $root_cmd = $cmd_info;
-  my $is_exe = &is_exe($cmd_info, $project);
+  my $is_exe = &is_exe($cmd_info, $parts);
   if ($is_exe) {
     $dk_exe_type = '#exe';
   } else {

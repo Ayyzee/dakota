@@ -134,7 +134,7 @@ sub translate_dk_to_cc {
 }
 sub build_precompile_cmd_info {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
-  my $project = &parts($$dakota_opts{'parts'}[0]);
+  my $parts = &parts($$dakota_opts{'parts'}[0]);
   my $root_cmd = {
     'opts'=> {
       'output' => undef,
@@ -147,7 +147,7 @@ sub build_precompile_cmd_info {
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
-  $$root_cmd{'libs'} = $$project{'libs'};
+  $$root_cmd{'libs'} = $$parts{'libs'};
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
   }
@@ -244,15 +244,15 @@ sub detect_cxx_opts {
   }
   return ($num_dk_files, $ordered_input_args);
 }
-sub dakota_io_path_from_project_path {
-  my ($project_path) = @_;
-  my $project = &parts($project_path);
-  if (! $$project{'build-dir'}) {
-    $$project{'build-dir'} = &build_dir();
+sub dakota_io_path_from_parts_path {
+  my ($parts_path) = @_;
+  my $parts = &parts($parts_path);
+  if (! $$parts{'build-dir'}) {
+    $$parts{'build-dir'} = &build_dir();
   }
-  my $current_source_dir = $$project{'current-source-dir'};
+  my $current_source_dir = $$parts{'current-source-dir'};
   my $force;
-  my $build_dir = &adjust_path($current_source_dir, $$project{'build-dir'}, $force = 1);
+  my $build_dir = &adjust_path($current_source_dir, $$parts{'build-dir'}, $force = 1);
   my $dakota_io_path = $build_dir . '/dakota.io';
   return $dakota_io_path;
 }
@@ -281,9 +281,9 @@ sub cxx_argv_from_argv {
     }
     my $exit_val;
    #if ($$precompile_cmd_info{'opts'}{'parts'}) {
-   #  my ($project, $dakota_io) = &use_project($precompile_cmd_info);
+   #  my ($parts, $dakota_io) = &use_parts($precompile_cmd_info);
    #}
-   #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info, $project);
+   #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info, $parts);
     ($exit_val, $cc_paths) = &exec_cmd_info($precompile_cmd_info);
     exit $exit_val if $exit_val;
   }
@@ -312,60 +312,60 @@ sub exe_from_exe_name {
   my ($name) = @_;
   return $name;
 }
-sub project_adjust_paths {
-  my ($project) = @_;
-  return if $$project{'current-source-dir'} eq '.';
+sub parts_adjust_paths {
+  my ($parts) = @_;
+  return if $$parts{'current-source-dir'} eq '.';
   my $force;
-  $$project{'inputs'} =       &adjust_paths($$project{'current-source-dir'}, $$project{'inputs'});
-  $$project{'srcs'} =         &adjust_paths($$project{'current-source-dir'}, $$project{'srcs'});
-  $$project{'include-dirs'} = &adjust_paths($$project{'current-source-dir'}, $$project{'include-dirs'}, $force = 1);
-  $$project{'build-dir'} =     &adjust_path( $$project{'current-source-dir'}, $$project{'build-dir'}, $force = 1);
+  $$parts{'inputs'} =       &adjust_paths($$parts{'current-source-dir'}, $$parts{'inputs'});
+  $$parts{'srcs'} =         &adjust_paths($$parts{'current-source-dir'}, $$parts{'srcs'});
+  $$parts{'include-dirs'} = &adjust_paths($$parts{'current-source-dir'}, $$parts{'include-dirs'}, $force = 1);
+  $$parts{'build-dir'} =     &adjust_path( $$parts{'current-source-dir'}, $$parts{'build-dir'}, $force = 1);
 }
-sub use_project {
+sub use_parts {
   my ($root_cmd) = @_;
-  my $project = &set_global_project($$root_cmd{'opts'}{'parts'});
-  $$project{'srcs'} = [] if ! $$project{'srcs'};
-  $$project{'libs'} = [] if ! $$project{'libs'};
-  $$project{'current-source-dir'} = &relpath($$project{'current-source-dir'});
-  $$project{'source-dir'} =         &relpath($$project{'source-dir'});
-  if (! $$project{'build-dir'}) {
-    $$project{'build-dir'} = &build_dir();
+  my $parts = &set_global_parts($$root_cmd{'opts'}{'parts'});
+  $$parts{'srcs'} = [] if ! $$parts{'srcs'};
+  $$parts{'libs'} = [] if ! $$parts{'libs'};
+  $$parts{'current-source-dir'} = &relpath($$parts{'current-source-dir'});
+  $$parts{'source-dir'} =         &relpath($$parts{'source-dir'});
+  if (! $$parts{'build-dir'}) {
+    $$parts{'build-dir'} = &build_dir();
   }
-  $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'libs'}} ];
+  $$parts{'inputs'} = [ @{$$parts{'srcs'}}, @{$$parts{'libs'}} ];
   if (! &is_exe($root_cmd)) {
-    $$project{'is-lib'} = 1;
+    $$parts{'is-lib'} = 1;
   }
-  &project_adjust_paths($project);
-  if (! -e $$project{'build-dir'}) {
-    &make_dir($$project{'build-dir'});
+  &parts_adjust_paths($parts);
+  if (! -e $$parts{'build-dir'}) {
+    &make_dir($$parts{'build-dir'});
   }
-  $$root_cmd{'parts.current-source-dir'} = $$project{'current-source-dir'};
-  $$root_cmd{'parts.source-dir'} =         $$project{'source-dir'};
-  $$root_cmd{'parts.inputs'} = $$project{'inputs'};
-  $$root_cmd{'parts.build-dir'} = $$project{'build-dir'};
-  $$root_cmd{'parts.target'} = $$project{'target'};
-  $$root_cmd{'io'} = $$project{'build-dir'} . '/dakota.io';
+  $$root_cmd{'parts.current-source-dir'} = $$parts{'current-source-dir'};
+  $$root_cmd{'parts.source-dir'} =         $$parts{'source-dir'};
+  $$root_cmd{'parts.inputs'} = $$parts{'inputs'};
+  $$root_cmd{'parts.build-dir'} = $$parts{'build-dir'};
+  $$root_cmd{'parts.target'} = $$parts{'target'};
+  $$root_cmd{'io'} = $$parts{'build-dir'} . '/dakota.io';
   my $dakota_io_path = $$root_cmd{'io'};
   if (! -e $dakota_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_dakota_io = {
       'precompile' =>         {},
       'cwd' =>                &cwd(),
-      'build-dir' =>          $$project{'build-dir'},
-      'current-source-dir' => $$project{'current-source-dir'},
-      'source-dir' =>         $$project{'source-dir'},
+      'build-dir' =>          $$parts{'build-dir'},
+      'current-source-dir' => $$parts{'current-source-dir'},
+      'source-dir' =>         $$parts{'source-dir'},
     };
     &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
   }
   my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
-  if ($$project{'build-dir'}) {
-    $$dakota_io{'build-dir'} = &canon_path($$project{'build-dir'});
+  if ($$parts{'build-dir'}) {
+    $$dakota_io{'build-dir'} = &canon_path($$parts{'build-dir'});
   }
   &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
-  return ($project, $dakota_io);
-} # use_project
+  return ($parts, $dakota_io);
+} # use_parts
 sub clean {
-  my ($root_cmd, $project, $dakota_io, $dakota_io_path) = @_;
+  my ($root_cmd, $parts, $dakota_io, $dakota_io_path) = @_;
   if ($dakota_io) {
     if (0) {
       if ($$dakota_io{'build-dir'} && $$dakota_io{'build-dir'} ne '.') {
@@ -476,17 +476,17 @@ sub exec_cmd_info {
 
   my $rel_argv = [map { &relpath($_) } @{$$root_cmd{'args'}}];
   my $inputs = &normalize_paths($rel_argv);
-  my ($project, $dakota_io);
+  my ($parts, $dakota_io);
 
   if ($$root_cmd{'opts'}{'parts'}) {
-    ($project, $dakota_io) = &use_project($root_cmd);
+    ($parts, $dakota_io) = &use_parts($root_cmd);
   }
-  my $dakota_io_path = &dakota_io_path_from_project_path($$root_cmd{'opts'}{'parts'});
+  my $dakota_io_path = &dakota_io_path_from_parts_path($$root_cmd{'opts'}{'parts'});
   if ($$root_cmd{'opts'}{'clean'}) {
-    &clean($root_cmd, $project, $dakota_io, $dakota_io_path);
+    &clean($root_cmd, $parts, $dakota_io, $dakota_io_path);
     exit 0;
   }
-  if ($project) {
+  if ($parts) {
     if (!$$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
       if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
         my $o_path = &o_path_from_dk_path($$inputs[0]);
@@ -504,7 +504,7 @@ sub exec_cmd_info {
   if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$dakota_io{'compile'}}) {
     &dakota::util::dakota_io_remove($dakota_io, 'compile', $inputs);
     &add_last($inputs, values %{$$dakota_io{'compile'}});
-    foreach my $input (@{$$project{'inputs'}}) {
+    foreach my $input (@{$$parts{'inputs'}}) {
       if ($input =~ /\.$so_ext$/) { # is_so_path()
         &add_last($inputs, $input);
       }
@@ -515,8 +515,8 @@ sub exec_cmd_info {
   if (0) {
     my $stuff = {};
     $$stuff{'cwd'} = &getcwd();
-    $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'parts'});
-    $$stuff{'rel-dir'} = &relpath($$stuff{'project-dir'}, $$stuff{'cwd'});
+    $$stuff{'parts-dir'} = &dir_part($$root_cmd{'opts'}{'parts'});
+    $$stuff{'rel-dir'} = &relpath($$stuff{'parts-dir'}, $$stuff{'cwd'});
     #&dmp($stuff);
     my $dir = $$stuff{'rel-dir'};
     if (! $dir) {
@@ -525,9 +525,9 @@ sub exec_cmd_info {
       $dir = &getcwd() . '/' . $dir;
     }
     for (my $i = 0; $i < @{$$root_cmd{'parts.inputs'}}; $i++) {
-      my $project_input = $$root_cmd{'parts.inputs'}[$i];
-      if (! &is_abs($project_input)) {
-        my $input = $dir . '/' . $project_input;
+      my $parts_input = $$root_cmd{'parts.inputs'}[$i];
+      if (! &is_abs($parts_input)) {
+        my $input = $dir . '/' . $parts_input;
         if (! -e $input) {
           print STDERR $0 . ": error: no-such-file: $input" . $nl;
         }
@@ -537,7 +537,7 @@ sub exec_cmd_info {
   }
   if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
     if (1 >= scalar $$root_cmd{'parts.inputs'}) {
-      die "$0: error: inputs are requried either in the project file or the command line." . $nl;
+      die "$0: error: inputs are requried either in the parts file or the command line." . $nl;
     } else {
       $inputs = $$root_cmd{'parts.inputs'};
       $$root_cmd{'inputs'} = [];
@@ -557,12 +557,12 @@ sub exec_cmd_info {
   # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
 
   if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-    if ($$project{'target'} =~ /\.$so_ext$/) { # is_so_path()
-      $$root_cmd{'opts'}{'output'} = $$project{'target'};
-    } elsif ($$project{'is-lib'}) {
-      $$root_cmd{'opts'}{'output'} = &lib_from_lib_name($$project{'target'});
+    if ($$parts{'target'} =~ /\.$so_ext$/) { # is_so_path()
+      $$root_cmd{'opts'}{'output'} = $$parts{'target'};
+    } elsif ($$parts{'is-lib'}) {
+      $$root_cmd{'opts'}{'output'} = &lib_from_lib_name($$parts{'target'});
     } else {
-      $$root_cmd{'opts'}{'output'} = &exe_from_exe_name($$project{'target'});
+      $$root_cmd{'opts'}{'output'} = &exe_from_exe_name($$parts{'target'});
     }
   }
   if ($$root_cmd{'opts'}{'output'}) {
@@ -617,14 +617,14 @@ sub exec_cmd_info {
     }
   }
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
-  #print STDERR 'project: ' .  &Dumper($project);
+  #print STDERR 'parts: ' .  &Dumper($parts);
   die if ! $$root_cmd{'parts.build-dir'};
   die if ! $$root_cmd{'parts.current-source-dir'};
   die if ! $$root_cmd{'parts.source-dir'};
-  die if ! $$project{'build-dir'};
-  die if ! $$project{'current-source-dir'};
-  die if ! $$project{'source-dir'};
-  my ($exit_val, $cc_files) = &dakota::dakota::start_cmd($root_cmd, $project);
+  die if ! $$parts{'build-dir'};
+  die if ! $$parts{'current-source-dir'};
+  die if ! $$parts{'source-dir'};
+  my ($exit_val, $cc_files) = &dakota::dakota::start_cmd($root_cmd, $parts);
   return ($exit_val, $cc_files);
 }
 sub verbose_exec {
