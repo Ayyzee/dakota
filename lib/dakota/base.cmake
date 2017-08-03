@@ -17,7 +17,8 @@ find_program (cxx-compiler clang++)
 find_program (dakota       dakota PATHS ${bin-dirs})
 set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
 set (CMAKE_CXX_COMPILER ${dakota})
-file (WRITE ${parts} "build-dir: ${build-dir}") # dummy ${parts} created here
+file (WRITE ${parts} # dummy ${parts} created here
+  "build-dir: ${build-dir}\nsource-dir: ${CMAKE_SOURCE_DIR}\ncurrent-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # get target-src path
 execute_process (
@@ -53,6 +54,8 @@ add_custom_target (
     target:    ${target}
     is-lib:    ${is-lib}
     build-dir: ${build-dir}
+    source-dir:         ${CMAKE_SOURCE_DIR}
+    current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     libs:      ${target-libs}      ${libs}
     srcs:      ${srcs}
   VERBATIM)

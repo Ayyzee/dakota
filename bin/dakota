@@ -136,7 +136,7 @@ sub translate_dk_to_cc {
 }
 sub build_precompile_cmd_info {
   my ($dakota_opts, $info, $ordered_input_args) = @_;
-  my $project = &dakota::util::project_from_yaml_file($$dakota_opts{'parts'}[0]);
+  my $project = &parts($$dakota_opts{'parts'}[0]);
   my $root_cmd = {
     'opts'=> {
       'output' => undef,
@@ -248,11 +248,11 @@ sub detect_cxx_opts {
 }
 sub dakota_io_path_from_project_path {
   my ($project_path) = @_;
-  my $project = &dakota::util::project_from_yaml_file($project_path);
+  my $project = &parts($project_path);
   if (! $$project{'build-dir'}) {
     $$project{'build-dir'} = &build_dir();
   }
-  my $current_source_dir = &dir_part(&relpath($project_path));
+  my $current_source_dir = $$project{'current-source-dir'};
   my $force;
   my $build_dir = &adjust_path($current_source_dir, $$project{'build-dir'}, $force = 1);
   my $dakota_io_path = $build_dir . '/dakota.io';
@@ -341,9 +341,11 @@ sub project_adjust_paths {
 sub use_project {
   my ($root_cmd) = @_;
   my $project = &set_global_project($$root_cmd{'opts'}{'parts'});
+  my $xxx_parts = &parts($$root_cmd{'opts'}{'parts'});
   $$project{'srcs'} = [] if ! $$project{'srcs'};
   $$project{'libs'} = [] if ! $$project{'libs'};
-  $$project{'current-source-dir'} = &dir_part(&relpath($$root_cmd{'opts'}{'parts'}));
+  $$project{'current-source-dir'} = &relpath($$xxx_parts{'current-source-dir'});
+  $$project{'source-dir'} =         &relpath($$xxx_parts{'source-dir'});
   if (! $$project{'build-dir'}) {
     $$project{'build-dir'} = &build_dir();
   }
@@ -358,7 +360,8 @@ sub use_project {
   if (! -e $$project{'build-dir'}) {
     &make_dir($$project{'build-dir'});
   }
-  $$root_cmd{'current-source-dir'} = $$project{'current-source-dir'}; # 'parts.source-dir'?
+  $$root_cmd{'parts.current-source-dir'} = $$project{'current-source-dir'};
+  $$root_cmd{'parts.source-dir'} =         $$project{'source-dir'};
   $$root_cmd{'parts.inputs'} = $$project{'inputs'};
   $$root_cmd{'parts.build-dir'} = $$project{'build-dir'};
   $$root_cmd{'parts.target'} = $$project{'target'};
@@ -366,8 +369,13 @@ sub use_project {
   my $dakota_io_path = $$root_cmd{'io'};
   if (! -e $dakota_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
-    my $default_dakota_io = { 'precompile' => {}, 'cwd' => &cwd(),
-                               'build-dir' => $$project{'build-dir'}, 'current-source-dir' => $$project{'current-source-dir'} };
+    my $default_dakota_io = {
+      'precompile' =>         {},
+      'cwd' =>                &cwd(),
+      'build-dir' =>          $$project{'build-dir'},
+      'current-source-dir' => $$project{'current-source-dir'},
+      'source-dir' =>         $$project{'source-dir'},
+    };
     &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
   }
   my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
@@ -649,8 +657,12 @@ sub exec_cmd_info {
   }
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
   #print STDERR 'project: ' .  &Dumper($project);
-  die if ! $$root_cmd{'current-source-dir'};
+  die if ! $$root_cmd{'parts.build-dir'};
+  die if ! $$root_cmd{'parts.current-source-dir'};
+  die if ! $$root_cmd{'parts.source-dir'};
+  die if ! $$project{'build-dir'};
   die if ! $$project{'current-source-dir'};
+  die if ! $$project{'source-dir'};
   my ($exit_val, $cc_files) = &dakota::dakota::start_cmd($root_cmd, $project);
   return ($exit_val, $cc_files);
 }

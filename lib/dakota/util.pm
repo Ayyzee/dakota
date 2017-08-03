@@ -146,6 +146,7 @@ our @EXPORT= qw(
                  num_kw_arg_names
                  pann
                  param_types_str
+                 parts
                  path_only
                  prepend_dot_slash
                  project_from_yaml_file
@@ -673,8 +674,8 @@ sub target_cc_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    my $current_source_dir = &dir_part(&relpath($$cmd_info{'opts'}{'parts'}));
-    my $project = &dakota::util::project_from_yaml_file($$cmd_info{'opts'}{'parts'});
+    my $project = &parts($$cmd_info{'opts'}{'parts'});
+    my $current_source_dir = &relpath($$project{'current-source-dir'});
     my $force;
     $$cmd_info{'build-dir'} = &adjust_path($current_source_dir, $$project{'build-dir'}, $force = 1);
 
@@ -764,8 +765,8 @@ sub global_project_target {
 }
 sub set_global_project {
   my ($project_path) = @_;
-  $global_project = &project_from_yaml_file($project_path);
-  my $current_source_dir = &dir_part(&relpath($project_path));
+  $global_project = &parts($project_path);
+  my $current_source_dir = &relpath($$global_project{'current-source-dir'});
   if ($current_source_dir ne '.') {
     $$global_project{'current-source-dir'} = $current_source_dir;
   }
@@ -1289,7 +1290,7 @@ sub is_exe {
     $is_exe = 0;
   }
   if (!$project && $$cmd_info{'opts'}{'parts'}) {
-    $project = &project_from_yaml_file($$cmd_info{'opts'}{'parts'});
+    $project = &parts($$cmd_info{'opts'}{'parts'});
   }
   if (! $is_exe && ! $$project{'is-lib'}) {
     print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'parts'} . $nl;
@@ -1507,10 +1508,15 @@ sub project_from_yaml_file {
     my ($lhs, $rhs) = ($1, $2);
     $$result{$lhs} = [split /\s+/, $rhs];
   }
-  foreach my $lhs ('build-dir', 'cxx', 'target') {
+  foreach my $lhs ('target', 'is-lib', 'build-dir', 'source-dir', 'current-source-dir') {
     $$result{$lhs} = $$result{$lhs}[0];
   }
   return $result;
+}
+sub parts {
+  my ($path) = @_;
+  my $parts = &project_from_yaml_file($path);
+  return $parts;
 }
 sub filestr_from_file {
   my ($file) = @_;
