@@ -474,7 +474,6 @@ sub cmd_info_from_argv {
               'target-src',
 
               'clean',          # make target like
-              'create-project=s',
               'directory=s',    # make-like
               'echo-inputs',    #
               'silent',         #
