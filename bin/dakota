@@ -150,9 +150,11 @@ sub build_precompile_cmd_info {
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
+  if (1) {
   $$root_cmd{'libs'} = $$parts{'libs'};
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
+  }
   }
   if ($$info{'output'} && $$info{'output'}[1]) {
     $$root_cmd{'opts'}{'output'} = $$info{'output'}[1];
