@@ -499,9 +499,7 @@ sub update_target_srcs_ast_from_all_inputs {
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
   &check_path($target_srcs_ast_path);
-  $cmd_info = &loop_ast_from_so($cmd_info,
-                                $$cmd_info{'link'},
-                                $$cmd_info{'opts'}{'library-directory'});
+  $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);
   if ($$cmd_info{'asts'}) {
     die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
@@ -606,7 +604,7 @@ sub start_cmd {
   return ($exit_status, $cc_files);
 }
 sub ast_from_so {
-  my ($cmd_info, $arg, $qual_arg) = @_;
+  my ($cmd_info, $arg) = @_;
   if (!$arg) {
     $arg = $$cmd_info{'input'};
   }
@@ -618,7 +616,7 @@ sub ast_from_so {
     my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
     $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
   }
-  $$ctlg_cmd{'inputs'} = [ $qual_arg ];
+  $$ctlg_cmd{'inputs'} = [ $arg ];
   &ctlg_from_so($ctlg_cmd);
   my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
   &check_path($ast_path);
@@ -633,12 +631,11 @@ sub ast_from_so {
   }
 }
 sub loop_ast_from_so {
-  my ($cmd_info, $link, $library_directory) = @_;
+  my ($cmd_info) = @_;
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
-      my $qual_input = &find_library($input, $link, $library_directory);
-      &ast_from_so($cmd_info, $input, $qual_input);
+      &ast_from_so($cmd_info, $input);
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
       $input = &canon_path($input);
@@ -912,9 +909,7 @@ sub outfile_from_infiles {
   &make_dir_part($outfile, $should_echo);
   if ($outfile =~ m|^$build_dir/$build_dir/|) { die "found double build-dir/build-dir: $outfile"; } # likely a double $build_dir prepend
   my $file_db = {};
-  my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile,
-                             $$cmd_info{'link'},
-                             $$cmd_info{'library-directory'}, $file_db);
+  my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile, $file_db);
   my $num_out_of_date_infiles = scalar @$infiles;
   if (0 != $num_out_of_date_infiles) {
     #print STDERR "outfile=$outfile, infiles=[ " . join(' ', @$infiles) . ' ]' . $nl;

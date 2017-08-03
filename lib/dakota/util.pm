@@ -96,7 +96,6 @@ our @EXPORT= qw(
                  encode_strings
                  filestr_from_file
                  filestr_to_file
-                 find_library
                  first
                  flatten
                  global_project
@@ -1088,23 +1087,6 @@ sub path_stat {
   }
   return $stat;
 }
-sub find_library {
-  my ($name, $link, $library_directory) = @_;
-  my $result = $name;
-  if ($$link{'M2L'}{$name}) {
-    $result = $$link{'M2L'}{$name};
-    die "error: perl: find_library($name, ...): $!\n" if ! -e $result;
-  } else {
-    foreach my $dir (@$library_directory) {
-      my $qual_lib = "$dir/$name";
-      if (-e $qual_lib) {
-        $result = $qual_lib;
-        last;
-      }
-    }
-  }
-  return $result;
-}
 sub digsig {
   my ($filestr) = @_;
   my $sig;
@@ -1114,13 +1096,13 @@ sub digsig {
   return $sig;
 }
 sub is_out_of_date {
-  my ($infiles, $outfile, $link, $library_directory, $file_db) = @_;
-  my $files = &out_of_date($infiles, $outfile, $link, $library_directory, $file_db);
+  my ($infiles, $outfile, $file_db) = @_;
+  my $files = &out_of_date($infiles, $outfile, $file_db);
   my $result = scalar @$files;
   return $result;
 }
 sub out_of_date {
-  my ($infiles, $outfile, $link, $library_directory, $file_db) = @_;
+  my ($infiles, $outfile, $file_db) = @_;
   my $result = [];
   $file_db = {} if ! defined $file_db;
   if (!&is_array($infiles)) {
@@ -1132,10 +1114,7 @@ sub out_of_date {
   }
   foreach my $infile (@$infiles) {
     if (! -e $infile) {
-      my $tmp_infile = &find_library($infile, $link, $library_directory);
-      if ($tmp_infile) {
-        $infile = $tmp_infile;
-      }
+      die "error: missing $infile" . $nl;
     }
     my $infile_stat =  &path_stat($file_db, $infile,  '--inputs');
 

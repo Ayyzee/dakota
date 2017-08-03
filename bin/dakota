@@ -375,10 +375,6 @@ sub use_project {
     &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
   my $project_io = &dakota::util::project_io_from_file($project_io_path);
-  if (1) {
-    $$project_io{'link'} = $$root_cmd{'link'};
-  }
-  # my $l4s = $$link{'M2L'}{$$link{'S2M'}};
   if ($$project{'build-dir'}) {
     $$project_io{'build-dir'} = &canon_path($$project{'build-dir'});
   }
@@ -504,30 +500,6 @@ sub exec_cmd_info {
     $$root_cmd{'opts'}{'parts'} = $default_project_path;
   }
   &set_root_cmd($root_cmd);
-
-  my $link = { 'order' => [] };
-  &check_lib_names_vs_libs($root_cmd);
-  for (my $i = 0; $i < scalar @{$$root_cmd{'lib-names'}}; $i++) {
-    my $s = $$root_cmd{'lib-names'}[$i];
-    my $l = $$root_cmd{'libs'}[$i];
-    &add_last($$link{'order'}, $s);
-    my $m = &lib_from_lib_name($s);
-    # $m could also be created by basename
-    # but the soname aspect comes into play
-    $$link{'S2M'}{$s} = $m;
-    $$link{'M2L'}{$m} = $l;
-  }
-  $$root_cmd{'link'} = $link;
-  if (0) {
-  foreach my $name (@{$$root_cmd{'opts'}{'library'}}) {
-    foreach my $lib_dir (@{$$root_cmd{'opts'}{'library-directory'}}) {
-      # use &find_library() to resolve --library=<> that are not resolved in
-      # 'lib-names'/'libs' above. Always use the above info over anything we do
-      # here since that comes from cmake and cmake will be building the link
-      # cmd so its best if we use what it gives us.
-    }
-  }
-  }
 
   # --quiet
   # --help
