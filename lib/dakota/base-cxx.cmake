@@ -10,12 +10,6 @@ endif ()
 
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
-set (cxx-standard 17)
-set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
-find_program (cxx-compiler clang++)
-set (CMAKE_CXX_COMPILER ${cxx-compiler})
-
 set (libs)
 foreach (lib-name ${lib-names})
   set (lib NOTFOUND) # lib-NOTFOUND
@@ -26,6 +20,11 @@ foreach (lib-name ${lib-names})
   #message ( "info: target: ${target}: find_library(): ${lib} => ${lib-name}")
   list (APPEND libs ${lib})
 endforeach ()
+set (cxx-standard 17)
+set (CMAKE_COMPILER_IS_GNUCXX TRUE)
+#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
+find_program (cxx-compiler clang++)
+set (CMAKE_CXX_COMPILER ${cxx-compiler})
 
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
@@ -38,14 +37,16 @@ else ()
 endif ()
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${build-dir})
+set (additional-make-clean-files
+  ${build-dir}
+)
+set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${additional-make-clean-files}")
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   ${compiler-opts}
 )
@@ -53,3 +54,4 @@ string (CONCAT link-flags
   " ${linker-opts}"
 )
 set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-flags})
+target_link_libraries (${target} ${libs})

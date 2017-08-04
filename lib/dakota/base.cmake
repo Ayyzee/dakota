@@ -10,24 +10,6 @@ endif ()
 
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
-set (cxx-standard 17)
-set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
-find_program (cxx-compiler clang++)
-find_program (dakota       dakota PATHS ${bin-dirs})
-set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
-set (CMAKE_CXX_COMPILER ${dakota})
-
-file (WRITE ${parts} # dummy ${parts}
-  "build-dir: ${build-dir}\n"
-  "source-dir: ${CMAKE_SOURCE_DIR}\n"
-  "current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}\n")
-execute_process (
-  COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
-  OUTPUT_VARIABLE target-src
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
-file (REMOVE ${parts})
-
 set (libs)
 foreach (lib-name ${lib-names})
   set (lib NOTFOUND) # lib-NOTFOUND
@@ -38,6 +20,22 @@ foreach (lib-name ${lib-names})
   #message ( "info: target: ${target}: find_library(): ${lib} => ${lib-name}")
   list (APPEND libs ${lib})
 endforeach ()
+set (cxx-standard 17)
+set (CMAKE_COMPILER_IS_GNUCXX TRUE)
+#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
+find_program (cxx-compiler clang++)
+find_program (dakota       dakota PATHS ${bin-dirs})
+set (CMAKE_CXX_COMPILER ${dakota})
+set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
+file (WRITE ${parts} # dummy ${parts}
+  "build-dir: ${build-dir}\n"
+  "source-dir: ${CMAKE_SOURCE_DIR}\n"
+  "current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}\n")
+execute_process (
+  COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
+  OUTPUT_VARIABLE target-src
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+file (REMOVE ${parts})
 
 set (target-libs)
 foreach (lib-name ${target-lib-names})
@@ -49,6 +47,7 @@ if (NOT is-lib)
   set (is-lib 0)
 endif ()
 
+set (target-hdr ${target}-target-hdr)
 add_custom_command (
   OUTPUT ${parts}
   DEPENDS ${current-source-build-vars}
@@ -84,7 +83,6 @@ else ()
   set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
-add_dependencies (${target} ${target-hdr})
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set (additional-make-clean-files
@@ -98,7 +96,6 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_link_libraries (${target} ${libs})
 target_compile_options (${target} PRIVATE
   --parts ${parts} --cxx ${cxx-compiler}
   ${compiler-opts}
@@ -108,3 +105,7 @@ string (CONCAT link-flags
   " ${linker-opts}"
 )
 set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-flags})
+target_link_libraries (${target} ${libs})
+target_link_libraries (${target} ${target-lib-names})
+add_dependencies (     ${target} ${target-lib-names})
+add_dependencies (     ${target} ${target-hdr})
