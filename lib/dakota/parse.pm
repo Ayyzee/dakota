@@ -71,11 +71,6 @@ sub h_path_from_src_path {
   my $h_path = $src_path =~ s/\.(dk|$cc_ext)$/.$h_ext/r;
   return $h_path;
 }
-sub ast_path_from_o_path {
-  my ($in_path) = @_;
-  my $out_path = $in_path =~ s/(\.($cc_ext|dk))?\.$o_ext$/.dk.ast/r; # hackhack
-  return $out_path;
-}
 my $patterns = {
   'cc_path_from_dk_path' => '$(build_dir)/%.$(cc_ext) : $(current_source_dir)/%.dk',
   'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(current_source_dir)/%.dk',
@@ -144,7 +139,6 @@ our @EXPORT= qw(
                  o_path_from_cc_path
                  ast_path_from_dk_path
                  ast_path_from_ctlg_path
-                 ast_path_from_o_path
                  ast_merge
                  str_from_cmd_info
               );
