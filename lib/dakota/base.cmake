@@ -68,7 +68,7 @@ add_custom_target (
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts}
+  DEPENDS ${parts} ${target-lib-names} dakota-catalog
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
 list (APPEND srcs ${target-src})
