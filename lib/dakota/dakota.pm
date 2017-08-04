@@ -534,7 +534,8 @@ sub start_cmd {
   #die &Dumper($cmd_info) if ! $$cmd_info{'parts.build-dir'};
   my $cc_files = [];
   $root_cmd = $cmd_info;
-  my $is_exe = &is_exe($cmd_info, $parts);
+  my $is_exe = 1;
+  $is_exe = 0 if $$parts{'is-lib'};
   if ($is_exe) {
     $dk_exe_type = '#exe';
   } else {

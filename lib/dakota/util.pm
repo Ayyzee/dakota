@@ -111,7 +111,6 @@ our @EXPORT= qw(
                  is_box_type
                  is_debug
                  is_decl
-                 is_exe
                  is_exe_target
                  is_exported
                  is_kw_args_method
@@ -1283,22 +1282,6 @@ sub copy_no_dups {
     }
   }
   return $result;
-}
-sub is_exe {
-  my ($cmd_info, $parts) = @_;
-  my $is_exe = 1;
-  if ($$cmd_info{'opts'}{'dynamic'} || $$cmd_info{'opts'}{'shared'}) {
-    $is_exe = 0;
-  }
-  if (!$parts && $$cmd_info{'opts'}{'parts'}) {
-    $parts = &parts($$cmd_info{'opts'}{'parts'});
-  }
-  if (! $is_exe && ! $$parts{'is-lib'}) {
-    print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'parts'} . $nl;
-  }
-  my $is_lib = 0;
-  $is_lib = 1 if $$parts{'is-lib'};
-  return !$is_lib;
 }
 sub is_abs {
   my ($path) = @_;

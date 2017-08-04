@@ -213,10 +213,6 @@ sub extract_dakota_opts {
 my $major_mode_tbl = {
   '-c'        => 'compile',
   '--compile' => 'compile',
-  '-shared'   => 'shared',
-  '--shared'  => 'shared',
-  '-dynamic'  => 'dynamic',
-  '--dynamic' => 'dynamic',
 };
 sub detect_cxx_opts {
   my ($cmd, $info) = @_;
@@ -337,9 +333,6 @@ sub use_parts {
     $$parts{'build-dir'} = &build_dir();
   }
   $$parts{'inputs'} = [ @{$$parts{'srcs'}}, @{$$parts{'libs'}} ];
-  if (! &is_exe($root_cmd)) {
-    $$parts{'is-lib'} = 1;
-  }
   &parts_adjust_paths($parts);
   if (! -e $$parts{'build-dir'}) {
     &make_dir($$parts{'build-dir'});
@@ -430,8 +423,6 @@ sub cmd_info_from_argv {
               'output=s',  # gcc-like
 
               'compile',        # gcc-like
-              'dynamic',        # gcc-like
-              'shared',         # gcc-like
 
               'path-only',
               'precompile',     # gcc-ish (--compile)
@@ -557,10 +548,6 @@ sub exec_cmd_info {
     }
   }
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-  # dakota --compile --output <> {dk}+
-  # dakota --shared  --output <> {o}+ [build/+rt/<>.o] {so}*
-  # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
-
   if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
     if ($$parts{'target'} =~ /\.$so_ext$/) { # is_so_path()
       $$root_cmd{'opts'}{'output'} = $$parts{'target'};
