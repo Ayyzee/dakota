@@ -584,7 +584,7 @@ sub start_cmd {
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'target-hdr'}) {
-          &gen_target_o($cmd_info, $is_exe);
+          &gen_target_cc($cmd_info, $is_exe);
       }
     }
     if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
@@ -599,7 +599,7 @@ sub start_cmd {
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'target-hdr'}) {
-          &gen_target_o($cmd_info, $is_exe);
+          &gen_target_cc($cmd_info, $is_exe);
       }
     }
   }
@@ -725,7 +725,7 @@ sub gen_target_h {
   my $is_defn;
   return &gen_target($cmd_info, $is_exe, $is_defn = 0);
 }
-sub gen_target_o {
+sub gen_target_cc {
   my ($cmd_info, $is_exe) = @_;
   my $is_defn;
   return &gen_target($cmd_info, $is_exe, $is_defn = 1);
@@ -755,9 +755,9 @@ sub gen_target {
   if (!$is_defn) {
     &target_h_from_ast($cmd_info, $other, $is_exe);
   } else {
-    &target_o_from_ast($cmd_info, $other, $is_exe);
+    &target_cc_from_ast($cmd_info, $other, $is_exe);
   }
-} # gen_target_o
+} # gen_target_cc
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
   my $ast_path = &ast_path_from_dk_path($input);
@@ -842,7 +842,7 @@ sub target_h_from_ast {
   my $is_defn;
   return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 0);
 }
-sub target_o_from_ast {
+sub target_cc_from_ast {
   my ($cmd_info, $other, $is_exe) = @_;
   my $is_defn;
   return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 1);
@@ -867,7 +867,7 @@ sub target_from_ast {
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $build_dir/
   # $target_inputs_ast not used, called for side-effect
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_o_from_ast
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_cc_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
   die if $$target_srcs_ast{'other'};
   $$target_srcs_ast{'other'} = $other;

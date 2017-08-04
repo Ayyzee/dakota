@@ -75,9 +75,6 @@ my $patterns = {
   'cc_path_from_dk_path' => '$(build_dir)/%.$(cc_ext) : $(current_source_dir)/%.dk',
   'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(current_source_dir)/%.dk',
 
-  'o_path_from_dk_path' =>  '$(build_dir)/%.$(cc_ext).$(o_ext) : $(current_source_dir)/%.dk',
-  'o_path_from_cc_path' =>  '%.$(cc_ext).$(o_ext) : %.$(cc_ext)',
-
   'ast_path_from_dk_path' =>   '$(build_dir)/%.dk.ast      : $(current_source_dir)/%.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
@@ -135,8 +132,6 @@ our @EXPORT= qw(
                  h_path_from_src_path
                  target_inputs_ast
                  kw_args_translate
-                 o_path_from_dk_path
-                 o_path_from_cc_path
                  ast_path_from_dk_path
                  ast_path_from_ctlg_path
                  ast_merge
@@ -349,14 +344,6 @@ sub str_from_cmd_info {
 sub inc_path_from_dk_path {
   my ($path) = @_;
   return &out_path_from_in_path('inc_path_from_dk_path', $path);
-}
-sub o_path_from_dk_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('o_path_from_dk_path', $path);
-}
-sub o_path_from_cc_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('o_path_from_cc_path', $path);
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
