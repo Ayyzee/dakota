@@ -47,9 +47,9 @@ if (NOT is-lib)
   set (is-lib 0)
 endif ()
 
-# phony target 'parts-yaml'
-add_custom_target (
-  ${parts-yaml}
+add_custom_command (
+  OUTPUT ${parts}
+  DEPENDS ${current-source-build-vars}
   COMMAND ${root-source-dir}/bin/dakota-parts.sh ${parts}
     target:    ${target}
     is-lib:    ${is-lib}
@@ -62,7 +62,7 @@ add_custom_target (
 # phony target 'target-ast'
 add_custom_target (
   ${target-ast}
-  DEPENDS ${parts-yaml} ${target-lib-names} dakota-catalog
+  DEPENDS ${parts} ${target-lib-names} dakota-catalog
   COMMAND ${dakota} --target-ast --parts ${parts}
   VERBATIM)
 # phony target 'target-hdr'
