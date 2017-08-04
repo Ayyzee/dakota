@@ -59,22 +59,16 @@ add_custom_command (
     libs:      ${target-libs}      ${libs}
     srcs:      ${srcs}
   VERBATIM)
-# phony target 'target-ast'
-add_custom_target (
-  ${target-ast}
-  DEPENDS ${parts} ${target-lib-names} dakota-catalog
-  COMMAND ${dakota} --target-ast --parts ${parts}
-  VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
-  DEPENDS ${target-ast}
+  DEPENDS ${parts} ${target-lib-names} dakota-catalog
   COMMAND ${dakota} --target-hdr --parts ${parts}
   VERBATIM)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${target-ast}
+  DEPENDS ${parts}
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
 list (APPEND srcs ${target-src})
