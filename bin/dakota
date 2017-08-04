@@ -139,8 +139,6 @@ sub build_precompile_cmd_info {
     'opts'=> {
       'output' => undef,
     },
-    'inputs' => [],
-    'libs' => [],
     'parts.build-dir' =>          $$parts{'build-dir'},
     'parts.source-dir' =>         $$parts{'source-dir'},
     'parts.current-source-dir' => $$parts{'current-source-dir'},
@@ -151,7 +149,6 @@ sub build_precompile_cmd_info {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
   if (1) {
-  $$root_cmd{'libs'} = $$parts{'libs'};
   if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
     $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
   }
@@ -455,6 +452,7 @@ sub cmd_info_from_argv {
 sub exec_cmd_info {
   my ($root_cmd) = @_;
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
+  $$root_cmd{'inputs'} = [] if ! $$root_cmd{'inputs'};
   $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target-src'};
   if ($$root_cmd{'opts'}{'parts'}) {
     $$root_cmd{'opts'}{'parts'} = &relpath($$root_cmd{'opts'}{'parts'});
