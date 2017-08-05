@@ -78,6 +78,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  cpp_directives
+                 current_source_dir
                  ct
                  decode_comments
                  decode_strings
@@ -176,6 +177,7 @@ our @EXPORT= qw(
                  set_src_defn
                  set_target_decl
                  set_target_defn
+                 source_dir
                  split_path
                  sqstr_regex
                  str_from_seq
@@ -625,31 +627,47 @@ sub make_dir_part {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
 }
-my $build_vars = {
-  'build-dir' => 'build-dkt',
-};
-sub build_dir {
-  my $build_dir;
+sub xxx_dir {
+  my ($dir_key, $default_dir) = @_;
+  my $dir;
   my $parts = &global_parts();
-  if ($parts && $$parts{'build-dir'}) {
-    $build_dir = $$parts{'build-dir'};
+  if ($parts && $$parts{$dir_key}) {
+    $dir = $$parts{$dir_key};
   } else {
-    $build_dir = $$build_vars{'build-dir'};
+    die if ! $default_dir;
+    $dir = $default_dir;
   }
-  die if ! $build_dir;
-  if (-e $build_dir && ! -d $build_dir) {
+  die if ! $dir;
+  if (-e $dir && ! -d $dir) {
     die;
   }
-  if (! -e $build_dir) {
-    &make_dir($build_dir, $global_should_echo);
+  if (! -e $dir) {
+    &make_dir($dir, $global_should_echo);
   }
-  return $build_dir;
+  return $dir;
+}
+sub build_dir {
+  my $default_dir;
+  my $dir = &xxx_dir('build-dir', $default_dir = 'build-dkt-default');
+  return $dir;
+}
+sub source_dir {
+  my $default_dir;
+  my $dir = &xxx_dir('source-dir', $default_dir = undef);
+  return $dir;
+}
+sub current_source_dir {
+  my $default_dir;
+  my $dir = &xxx_dir('current-source-dir', $default_dir = undef);
+  return $dir;
 }
 sub target_build_dir {
   my ($cmd_info) = @_;
   my $build_dir;
   if ($$cmd_info{'parts.build-dir'}) {
     $build_dir = $$cmd_info{'parts.build-dir'};
+    #print STDERR "1/2: build-dir():     " . &build_dir() . $nl;
+    #print STDERR "2/2: parts.build-dir: " . $build_dir . $nl;
   } else {
     #die &Dumper($cmd_info);
     $build_dir = &build_dir();
