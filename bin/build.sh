@@ -6,8 +6,10 @@ else
   binary_dir=build-cmk
 fi
 jobs=$(getconf _NPROCESSORS_ONLN)
+jobs=$(( jobs + 2 ))
 
 if [[ -e jobs.txt ]]; then
   jobs=$(cat jobs.txt)
 fi
-make --directory $binary_dir --jobs $jobs $@
+generator="${generator:-ninja}"
+$generator -C $binary_dir -j $jobs $@

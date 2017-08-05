@@ -7,7 +7,8 @@ else
   echo $binary_dir > ../cmake-binary-dir.txt
 fi
 rel_source_dir=..
-extra_opts="-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=Debug -Wdev -Wdeprecated"
+generator_id="${generator_id:-Ninja}"
+extra_opts="-DCMAKE_BUILD_TYPE=Debug -Wdev -Wdeprecated"
 mkdir -p $binary_dir
 cd $binary_dir
-cmake $extra_opts $rel_source_dir
+cmake -G "$generator_id" $extra_opts $rel_source_dir
