@@ -648,7 +648,7 @@ sub xxx_dir {
 }
 sub build_dir {
   my $default_dir;
-  my $dir = &xxx_dir('build-dir', $default_dir = 'build-dkt-default');
+  my $dir = &xxx_dir('build-dir', $default_dir = undef);
   return $dir;
 }
 sub source_dir {

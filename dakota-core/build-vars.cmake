@@ -1,5 +1,6 @@
 # -*- mode: cmake -*-
-set (build-dir ${CMAKE_CURRENT_SOURCE_DIR}/build-dkt)
+set (target dakota-core)
+set (build-dir ${CMAKE_SOURCE_DIR}/build-dkt/${target})
 set (compiler-opts @${root-source-dir}/lib/dakota/compiler.opts)
 set (linker-opts   @${root-source-dir}/lib/dakota/linker.opts)
 set (macros
@@ -20,7 +21,6 @@ set (target-lib-names
   dakota-dso
 )
 set (is-lib 1)
-set (target dakota-core)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/bit-vector.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/boole.dk
