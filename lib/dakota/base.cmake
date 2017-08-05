@@ -28,9 +28,9 @@ find_program (dakota       dakota PATHS ${bin-dirs})
 set (CMAKE_CXX_COMPILER ${dakota})
 set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
 file (WRITE ${parts} # dummy ${parts}
-  "build-dir: ${build-dir}\n"
-  "source-dir: ${CMAKE_SOURCE_DIR}\n"
-  "current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}\n")
+  "source-dir:         ${CMAKE_SOURCE_DIR}\n"
+  "current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}\n"
+  "build-dir:          ${build-dir}\n")
 execute_process (
   COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
   OUTPUT_VARIABLE target-src
@@ -52,13 +52,13 @@ add_custom_command (
   OUTPUT ${parts}
   DEPENDS ${current-source-build-vars}
   COMMAND ${root-source-dir}/bin/dakota-parts.sh ${parts}
-    target:    ${target}
-    is-lib:    ${is-lib}
-    build-dir: ${build-dir}
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
-    libs:      ${target-libs}      ${libs}
-    srcs:      ${srcs}
+    build-dir:          ${build-dir}
+    target:             ${target}
+    is-lib:             ${is-lib}
+    libs:               ${target-libs} ${libs}
+    srcs:               ${srcs}
   VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
