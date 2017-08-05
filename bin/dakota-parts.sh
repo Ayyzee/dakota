@@ -4,6 +4,7 @@ set -o errexit -o nounset -o pipefail
 parts=$1
 shift
 
+mkdir -p $(dirname $parts)
 cat /dev/null > $parts
 
 for arg in $@; do

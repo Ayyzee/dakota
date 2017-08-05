@@ -26,16 +26,16 @@ set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 find_program (cxx-compiler clang++)
 find_program (dakota       dakota PATHS ${bin-dirs})
 set (CMAKE_CXX_COMPILER ${dakota})
-set (parts ${CMAKE_CURRENT_SOURCE_DIR}/parts.yaml)
-file (WRITE ${parts} # dummy ${parts}
-  "source-dir:         ${CMAKE_SOURCE_DIR}\n"
-  "current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}\n"
-  "build-dir:          ${build-dir}\n")
+set (parts ${build-dir}/parts.yaml)
+execute_process (
+  COMMAND ${root-source-dir}/bin/dakota-parts.sh ${parts} # dummy ${parts}
+    source-dir:         ${CMAKE_SOURCE_DIR}
+    current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
+    build-dir:          ${build-dir})
 execute_process (
   COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
-file (REMOVE ${parts})
 
 set (target-libs)
 foreach (lib-name ${target-lib-names})
