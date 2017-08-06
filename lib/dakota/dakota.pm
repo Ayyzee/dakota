@@ -384,10 +384,10 @@ sub dk_parse {
   $ast = &kw_args_translate($ast);
   return $ast;
 }
-sub loop_cc_from_dk {
+sub loop_cc_from_dk_core {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
-    print STDERR '  &loop_cc_from_dk --output ' .
+    print STDERR '  &loop_cc_from_dk_core --output ' .
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   my $inputs = [];
@@ -407,7 +407,7 @@ sub loop_cc_from_dk {
   $$cmd_info{'asts'} = $asts;
   $$cmd_info{'inputs'} = $inputs;
 
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within loop_cc_from_dk_core
   my $num_inputs = @{$$cmd_info{'inputs'}};
   if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
@@ -449,7 +449,7 @@ sub loop_cc_from_dk {
     &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path); # rel_target_h_path not used
   }
   return $num_inputs;
-} # loop_cc_from_dk
+} # loop_cc_from_dk_core
 
 sub gcc_library_from_library_name {
   my ($library_name) = @_;
@@ -582,13 +582,13 @@ sub start_cmd {
       }
     }
     if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
-      $cmd_info = &loop_o_from_dk($cmd_info);
+      $cmd_info = &loop_cc_from_dk($cmd_info);
       $cc_files = &cc_files($$cmd_info{'inputs'});
     }
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
     if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
-      $cmd_info = &loop_o_from_dk($cmd_info);
+      $cmd_info = &loop_cc_from_dk($cmd_info);
       $cc_files = &cc_files($$cmd_info{'inputs'});
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
@@ -752,7 +752,7 @@ sub gen_target {
     &target_cc_from_ast($cmd_info, $other, $is_exe);
   }
 } # gen_target_cc
-sub o_from_dk {
+sub cc_from_dk {
   my ($cmd_info, $input) = @_;
   my $ast_path = &ast_path_from_dk_path($input);
   my $num_out_of_date_infiles = 0;
@@ -781,7 +781,7 @@ sub o_from_dk {
     $$cc_cmd{'asts'} = $$cmd_info{'asts'};
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
     $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
-    $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
+    $num_out_of_date_infiles = &cc_from_dk_core($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     }
@@ -791,8 +791,8 @@ sub o_from_dk {
     }
   }
   return $outfile;
-} # o_from_dk
-sub loop_o_from_dk {
+} # cc_from_dk
+sub loop_cc_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
   my $output;
@@ -805,7 +805,7 @@ sub loop_o_from_dk {
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_path($input)) {
-      &add_last($outfiles, &o_from_dk($cmd_info, $input));
+      &add_last($outfiles, &cc_from_dk($cmd_info, $input));
     } elsif (&is_cc_path($input)) {
       ###
     } else {
@@ -818,13 +818,13 @@ sub loop_o_from_dk {
   $$cmd_info{'inputs'} = $outfiles;
   delete $$cmd_info{'opts'}{'output'}; # hackhack
   return $cmd_info;
-} # loop_o_from_dk
-sub cc_from_dk {
+} # loop_cc_from_dk
+sub cc_from_dk_core {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cc_cmd{'io'} =  $$cmd_info{'io'};
   $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
-  $$cc_cmd{'cmd'} = '&loop_cc_from_dk';
+  $$cc_cmd{'cmd'} = '&loop_cc_from_dk_core';
   $$cc_cmd{'asts'} = $$cmd_info{'asts'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
   $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
@@ -928,12 +928,12 @@ sub outfile_from_infiles {
       delete $$cmd_info{'cmd'};
       delete $$cmd_info{'cmd-flags'};
       &loop_merged_ast_from_inputs($cmd_info, $global_should_echo || $should_echo);
-    } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
+    } elsif ('&loop_cc_from_dk_core' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
       delete $$cmd_info{'output'};
       delete $$cmd_info{'cmd'};
       delete $$cmd_info{'cmd-flags'};
-      &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
+      &loop_cc_from_dk_core($cmd_info, $global_should_echo || $should_echo);
     } else {
       &exec_cmd($cmd_info, $should_echo);
     }
