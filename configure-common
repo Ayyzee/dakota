@@ -30,5 +30,8 @@ canon_compiler=$(compiler $compiler)
 pushd lib/dakota > /dev/null 2>&1
 $LN $LNFLAGS linker-$canon_compiler.opts   linker.opts
 $LN $LNFLAGS compiler-$canon_compiler.opts compiler.opts
-$LN $LNFLAGS platform-$sysname.json        platform.json
+popd > /dev/null 2>&1
+
+pushd lib/dakota/platform > /dev/null 2>&1
+./configure
 popd > /dev/null 2>&1

@@ -61,8 +61,8 @@ BEGIN {
   use dakota::parse;
   use dakota::rewrite;
   use dakota::util;
-  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/platform.json")
-    or die "&do_json(\"$gbl_prefix/lib/dakota/platform.json\") failed: $!\n";
+  $gbl_compiler = &platform("$gbl_prefix/lib/dakota/platform.yaml")
+    or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
 };

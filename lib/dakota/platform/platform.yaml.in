@@ -1,0 +1,10 @@
+h_ext:
+  - h
+cc_ext:
+  - cc
+o_ext:
+  - ${CMAKE_CXX_OUTPUT_EXTENSION}
+so_ext:
+  - ${CMAKE_SHARED_LIBRARY_SUFFIX}
+so_prefix:
+  - ${CMAKE_SHARED_LIBRARY_PREFIX}

@@ -59,10 +59,10 @@ BEGIN {
   use dakota::util;
   use dakota::parse;
   use dakota::generate;
-  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/platform.json")
-    or die "&do_json(\"$gbl_prefix/lib/dakota/platform.json\") failed: $!\n";
+  $gbl_compiler = &platform("$gbl_prefix/lib/dakota/platform.yaml")
+    or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
   $extra = &do_json("$gbl_prefix/lib/dakota/extra.json")
-    or die "&do_json(\"$gbl_prefix/lib/dakota/extra.json\") failed: $!\n";
+    or die "&do_json(\"$gbl_prefix/lib/dakota/extra.json\") failed: $!" . $nl;
   $h_ext = &var($gbl_compiler, 'h_ext', 'h');
   $cc_ext = &var($gbl_compiler, 'cc_ext', 'cc');
   $o_ext =  &var($gbl_compiler, 'o_ext',  'o');

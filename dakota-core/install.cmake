@@ -4,8 +4,7 @@ set (install-lib-dakota-files
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-gcc.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/extra.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/lang-user-data.json
-  ${CMAKE_SOURCE_DIR}/lib/dakota/platform-darwin.json
-  ${CMAKE_SOURCE_DIR}/lib/dakota/platform-linux.json
+  ${CMAKE_SOURCE_DIR}/lib/dakota/platform.yaml
   ${CMAKE_SOURCE_DIR}/lib/dakota/used.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/dakota.pm
   ${CMAKE_SOURCE_DIR}/lib/dakota/generate.pm
@@ -42,10 +41,6 @@ install (
 install (
   PROGRAMS ${install-bin-files}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-)
-install_symlink (
-  ${CMAKE_INSTALL_PREFIX}/lib/dakota/platform-darwin.json
-  ${CMAKE_INSTALL_PREFIX}/lib/dakota/platform.json
 )
 install_symlink (
   ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler-clang.opts

@@ -149,7 +149,8 @@ our @EXPORT= qw(
                  parts
                  path_only
                  prepend_dot_slash
-                 parts_from_yaml_file
+                 parts
+                 platform
                  dakota_io_add
                  dakota_io_append
                  dakota_io_assign
@@ -1500,8 +1501,8 @@ sub scalar_from_file {
   }
   return $result;
 }
-sub parts_from_yaml_file {
-  my ($file) = @_;
+sub xxx_from_yaml_file {
+  my ($file, $scalar_keys) = @_;
   die if ! -e $file;
   my $result = {};
   my $filestr = &filestr_from_file($file);
@@ -1510,15 +1511,37 @@ sub parts_from_yaml_file {
     my ($lhs, $rhs) = ($1, $2);
     $$result{$lhs} = [split /\s+/, $rhs];
   }
-  foreach my $lhs ('target', 'is-lib', 'build-dir', 'source-dir', 'current-source-dir') {
-    $$result{$lhs} = $$result{$lhs}[0];
+  if ($scalar_keys) {
+    foreach my $lhs (@$scalar_keys) {
+      $$result{$lhs} = $$result{$lhs}[0];
+    }
+  } else { # assume that every var is scalar
+    while (my ($key, $array) = each (%$result)) {
+      die if scalar @$array > 1;
+      $$result{$key} = $$array[0];
+    }
   }
   return $result;
 }
 sub parts {
-  my ($path) = @_;
-  my $parts = &parts_from_yaml_file($path);
-  return $parts;
+  my ($file) = @_;
+  my $result =  &xxx_from_yaml_file($file,
+                                    [
+                                      'target',
+                                      'is-lib',
+                                      'build-dir',
+                                      'source-dir',
+                                      'current-source-dir',
+                                    ]);
+  return $result;
+}
+sub platform {
+  my ($file) = @_;
+  my $result = &xxx_from_yaml_file($file, undef);
+  while (my ($key, $array) = each (%$result)) {
+    $$result{$key} =~ s/^\.//g; # hackhack
+  }
+  return $result;
 }
 sub filestr_from_file {
   my ($file) = @_;
@@ -1539,8 +1562,8 @@ sub start {
 }
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
-  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/platform.json")
-    or die "&do_json(\"$gbl_prefix/lib/dakota/platform.json\") failed: $!\n";
+  $gbl_compiler = &platform("$gbl_prefix/lib/dakota/platform.yaml")
+    or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
 };
