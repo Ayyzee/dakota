@@ -38,7 +38,7 @@ find_program (dakota       dakota PATHS ${bin-dirs})
 set (CMAKE_CXX_COMPILER ${dakota})
 set (parts ${build-dir}/parts.yaml)
 execute_process (
-  COMMAND ${root-source-dir}/bin/dakota-parts.sh ${parts} # dummy ${parts}
+  COMMAND ${root-source-dir}/bin/dakota-parts ${parts} # dummy ${parts}
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir})
@@ -51,7 +51,7 @@ set (target-hdr ${target}-target-hdr)
 add_custom_command (
   OUTPUT ${parts}
   DEPENDS ${current-source-build-vars}
-  COMMAND ${root-source-dir}/bin/dakota-parts.sh ${parts}
+  COMMAND ${root-source-dir}/bin/dakota-parts ${parts}
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir}

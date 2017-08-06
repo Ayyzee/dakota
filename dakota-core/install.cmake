@@ -30,7 +30,7 @@ set (install-include-files
 )
 set (install-bin-files
   ${CMAKE_SOURCE_DIR}/bin/dakota
-  ${CMAKE_SOURCE_DIR}/bin/dakota-parts.sh
+  ${CMAKE_SOURCE_DIR}/bin/dakota-parts
   ${CMAKE_SOURCE_DIR}/bin/dakota-fixup-stderr
 )
 install (
