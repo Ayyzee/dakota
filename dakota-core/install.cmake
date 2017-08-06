@@ -1,10 +1,8 @@
 set (install-lib-dakota-files
   ${CMAKE_SOURCE_DIR}/lib/dakota/base.cmake
-  ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-clang.cmake
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-clang.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-command-line-clang.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-command-line-gcc.json
-  ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-gcc.cmake
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-gcc.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/extra.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/lang-user-data.json
@@ -32,10 +30,7 @@ set (install-include-files
 )
 set (install-bin-files
   ${CMAKE_SOURCE_DIR}/bin/dakota
-  ${CMAKE_SOURCE_DIR}/bin/dakota-build
-  ${CMAKE_SOURCE_DIR}/bin/dakota-build2cmake
-  ${CMAKE_SOURCE_DIR}/bin/dakota-build2mk
-  ${CMAKE_SOURCE_DIR}/bin/dakota-build2project
+  ${CMAKE_SOURCE_DIR}/bin/dakota-parts.sh
   ${CMAKE_SOURCE_DIR}/bin/dakota-fixup-stderr
 )
 install (
