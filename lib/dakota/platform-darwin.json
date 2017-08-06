@@ -5,10 +5,5 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  "LD_SONAME_FLAGS"=> [ "-install_name" ], # unique to darwin
-  "LD_NO_UNDEFINED_FLAGS"=> [ "-undefined", "error" ], # unique to darwin
   "so_ext"=> "dylib", # unique to darwin
-  "CXX_LIBRARY_DIRECTORY_FLAGS"=> [ "-L" ],
-  "CXX_LIBRARY_FLAGS"=> [ "-l" ],
-  "cxx_debug_symbols_ext"=> "dSYM", # unique to darwin
 }
