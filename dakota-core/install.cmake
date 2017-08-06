@@ -1,9 +1,11 @@
 set (install-lib-dakota-files
   ${CMAKE_SOURCE_DIR}/lib/dakota/base.cmake
-  ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-clang.opts
+  ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-apple-clang.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-gcc.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/extra.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/lang-user-data.json
+  ${CMAKE_SOURCE_DIR}/lib/dakota/linker-apple-clang.opts
+  ${CMAKE_SOURCE_DIR}/lib/dakota/linker-gcc.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/platform.yaml
   ${CMAKE_SOURCE_DIR}/lib/dakota/used.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/dakota.pm
@@ -43,6 +45,10 @@ install (
   DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 install_symlink (
-  ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler-clang.opts
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler-${cxx-compiler-id}.opts
   ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler.opts
+)
+install_symlink (
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/linker-${cxx-compiler-id}.opts
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/linker.opts
 )

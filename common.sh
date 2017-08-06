@@ -38,7 +38,7 @@ platform() {
     echo "$0: error: could not determine platform" 1>&2
     return 1
 }
-compiler_names[0]="clang";              compiler_names[1]="gcc"
+compiler_names[0]="apple-clang";        compiler_names[1]="gcc"
 compiler_regexs[0]=".*clang\+\+.*";     compiler_regexs[1]=".*g\+\+.*"
 compiler_globs[0]="/usr/bin/*clang++*"; compiler_globs[1]="/usr/bin/*g++*"
 

@@ -3,6 +3,6 @@
 set -o nounset -o errexit -o pipefail -o verbose
 
 sysname=darwin
-compiler=clang
+compiler=apple-clang
 
 ./configure-common $sysname $compiler

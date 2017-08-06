@@ -3,8 +3,6 @@
 .DS_Store
 config.mk
 config.sh
-dakota-core/config.h
-lib/dakota/compiler-command-line.json
 lib/dakota/compiler.opts
 lib/dakota/linker.opts
-lib/dakota/platform.json 
+lib/dakota/platform.yaml
