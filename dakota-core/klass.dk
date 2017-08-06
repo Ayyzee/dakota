@@ -19,7 +19,6 @@
 # include <cstdio>
 # include <cstring>
 
-# include "config.h"
 # include "dakota-rt-private.h"
 # include "dakota-dso.h" // dso-symbol-for-address()
 # include "private.h"

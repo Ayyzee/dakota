@@ -19,7 +19,6 @@
 # include <cstdio>
 # include <cstring>
 
-# include "config.h"
 # include "private.h"
 # include "safe-str.h"
 

@@ -22,10 +22,6 @@ source $DIR/config-$sysname.sh
 
 $LN $LNFLAGS config-$sysname.sh config.sh
 
-pushd dakota-core > /dev/null 2>&1
-$LN $LNFLAGS config-$sysname.h config.h
-popd > /dev/null 2>&1
-
 canon_compiler=$(compiler $compiler)
 pushd lib/dakota > /dev/null 2>&1
 $LN $LNFLAGS linker-$canon_compiler.opts   linker.opts

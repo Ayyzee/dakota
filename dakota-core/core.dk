@@ -34,8 +34,6 @@ include-for <sys/stat.h> struct stat;
 
 # include "dakota-os.h"
 
-# include "config.h"
-
 # include "private.h"
 # include "dakota-rt-private.h"
 # include "dakota-dso.h" // dso-*()
@@ -1689,7 +1687,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
     } else {
       //fprintf(stdout, "KLASSPATH=%s\n", klasspath);
       str-t file-name = file-name-from-klass-name(kls-name);
-      str-t file = find-file(klasspath, file-name, so-ext);
+      str-t file = find-file(klasspath, file-name, "so"); // hackhack: the extension should be handeled in a platform neutral way
 
       if (file != nullptr) {
         dso-open(file, 0);
