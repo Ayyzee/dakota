@@ -13,9 +13,10 @@ set (include-dirs
   ${root-source-dir}/include
 )
 set (lib-dirs
-  ${root-source-dir}/lib
 )
 set (lib-names
+)
+set (target-lib-dirs
 )
 set (target-lib-names
   dakota-dso
