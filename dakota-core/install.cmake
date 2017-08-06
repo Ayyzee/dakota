@@ -43,3 +43,11 @@ install (
   PROGRAMS ${install-bin-files}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
+install_symlink (
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/platform-darwin.json
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/platform.json
+)
+install_symlink (
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler-clang.opts
+  ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler.opts
+)

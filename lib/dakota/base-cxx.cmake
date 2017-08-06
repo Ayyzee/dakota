@@ -25,6 +25,11 @@ foreach (lib ${target-libs})
   list (APPEND target-lib-files ${target-lib-file})
 endforeach ()
 
+macro (install_symlink file symlink)
+  install (CODE "execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${file} ${symlink})")
+  install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
+endmacro ()
+
 if (NOT is-lib)
   set (is-lib 0)
 endif ()
