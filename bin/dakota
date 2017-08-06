@@ -61,15 +61,9 @@ use dakota::util;
 my ( $id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
-$gbl_compiler = do "$gbl_prefix/lib/dakota/compiler-command-line.json"
-  or die "do $gbl_prefix/lib/dakota/compiler-command-line.json failed: $!" . $nl;
+$gbl_compiler = do "$gbl_prefix/lib/dakota/platform.json"
+  or die "do $gbl_prefix/lib/dakota/platform.json failed: $!" . $nl;
 {
-  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
-    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!" . $nl;
-  my ($key, $values);
-  while (($key, $values) = each (%$platform)) {
-    $$gbl_compiler{$key} = $values;
-  }
   $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
   $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', 'o'); # could be .bc or .lto
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', 'cc');

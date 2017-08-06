@@ -87,14 +87,8 @@ BEGIN {
   unshift @INC, "$prefix/lib";
   use dakota::sst;
   use dakota::util;
-  $gbl_compiler = &do_json("$prefix/lib/dakota/compiler-command-line.json")
-    or die "&do_json(\"$prefix/lib/dakota/compiler-command-line.json\") failed: $!\n";
-  my $platform = &do_json("$prefix/lib/dakota/platform.json")
+  $gbl_compiler = &do_json("$prefix/lib/dakota/platform.json")
     or die "&do_json(\"$prefix/lib/dakota/platform.json\") failed: $!\n";
-  my ($key, $values);
-  while (($key, $values) = each (%$platform)) {
-    $$gbl_compiler{$key} = $values;
-  }
   $gbl_used = &do_json("$prefix/lib/dakota/used.json")
     or die "&do_json(\"$prefix/lib/dakota/used.json\") failed: $!\n";
   $h_ext = &var($gbl_compiler, 'h_ext', undef);

@@ -59,14 +59,8 @@ BEGIN {
   use dakota::util;
   use dakota::parse;
   use dakota::generate;
-  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/compiler-command-line.json")
-    or die "&do_json(\"$gbl_prefix/lib/dakota/compiler-command-line.json\") failed: $!\n";
-  my $platform = &do_json("$gbl_prefix/lib/dakota/platform.json")
-    or die "&do_json($gbl_prefix/lib/dakota/platform.json) failed: $!\n";
-  my ($key, $values);
-  while (($key, $values) = each (%$platform)) {
-    $$gbl_compiler{$key} = $values;
-  }
+  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/platform.json")
+    or die "&do_json(\"$gbl_prefix/lib/dakota/platform.json\") failed: $!\n";
   $extra = &do_json("$gbl_prefix/lib/dakota/extra.json")
     or die "&do_json(\"$gbl_prefix/lib/dakota/extra.json\") failed: $!\n";
   $h_ext = &var($gbl_compiler, 'h_ext', 'h');

@@ -1,8 +1,6 @@
 set (install-lib-dakota-files
   ${CMAKE_SOURCE_DIR}/lib/dakota/base.cmake
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-clang.opts
-  ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-command-line-clang.json
-  ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-command-line-gcc.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/compiler-gcc.opts
   ${CMAKE_SOURCE_DIR}/lib/dakota/extra.json
   ${CMAKE_SOURCE_DIR}/lib/dakota/lang-user-data.json
