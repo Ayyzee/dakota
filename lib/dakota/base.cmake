@@ -20,6 +20,13 @@ foreach (lib-name ${lib-names})
   #message ( "info: target: ${target}: find_library(): ${lib} => ${lib-name}")
   list (APPEND libs ${lib})
 endforeach ()
+
+set (target-libs)
+foreach (lib-name ${target-lib-names})
+  set (target-lib ${root-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib-name}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  list (APPEND target-libs ${target-lib})
+endforeach ()
+
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 #set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
@@ -36,12 +43,6 @@ execute_process (
   COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-set (target-libs)
-foreach (lib-name ${target-lib-names})
-  set (target-lib ${root-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib-name}${CMAKE_SHARED_LIBRARY_SUFFIX})
-  list (APPEND target-libs ${target-lib})
-endforeach ()
 
 if (NOT is-lib)
   set (is-lib 0)
