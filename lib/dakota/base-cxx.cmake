@@ -12,13 +12,13 @@ set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
 set (libs)
 foreach (lib-name ${lib-names})
-  set (lib NOTFOUND) # lib-NOTFOUND
-  find_library (lib ${lib-name} PATHS ${lib-dirs})
-  if (NOT lib)
+  set (found-lib NOTFOUND) # lib-NOTFOUND
+  find_library (found-lib ${lib-name} PATHS ${lib-dirs})
+  if (NOT found-lib)
     message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib-name}")
   endif ()
-  #message ( "info: target: ${target}: find_library(): ${lib} => ${lib-name}")
-  list (APPEND libs ${lib})
+  #message ( "info: target: ${target}: find_library(): ${lib-name} => ${found-lib}")
+  list (APPEND libs ${found-lib})
 endforeach ()
 
 set (target-libs)
