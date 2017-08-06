@@ -8,8 +8,6 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif ()
 
-set (CMAKE_PREFIX_PATH  ${root-source-dir})
-
 set (lib-files)
 foreach (lib ${libs})
   set (found-lib-file NOTFOUND) # lib-NOTFOUND
@@ -27,9 +25,14 @@ foreach (lib ${target-libs})
   list (APPEND target-lib-files ${target-lib-file})
 endforeach ()
 
+if (NOT is-lib)
+  set (is-lib 0)
+endif ()
+
+set (CMAKE_PREFIX_PATH  ${root-source-dir})
+#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 find_program (cxx-compiler clang++)
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
 

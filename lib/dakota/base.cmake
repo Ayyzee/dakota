@@ -8,8 +8,6 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif ()
 
-set (CMAKE_PREFIX_PATH  ${root-source-dir})
-
 set (lib-files)
 foreach (lib ${libs})
   set (found-lib-file NOTFOUND) # lib-NOTFOUND
@@ -27,9 +25,14 @@ foreach (lib ${target-libs})
   list (APPEND target-lib-files ${target-lib-file})
 endforeach ()
 
+if (NOT is-lib)
+  set (is-lib 0)
+endif ()
+
+set (CMAKE_PREFIX_PATH  ${root-source-dir})
+#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 find_program (cxx-compiler clang++)
 find_program (dakota       dakota PATHS ${bin-dirs})
 set (CMAKE_CXX_COMPILER ${dakota})
@@ -43,10 +46,6 @@ execute_process (
   COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-if (NOT is-lib)
-  set (is-lib 0)
-endif ()
 
 set (target-hdr ${target}-target-hdr)
 add_custom_command (
@@ -88,7 +87,6 @@ endif ()
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set (additional-make-clean-files
   ${build-dir}
-  ${parts}
 )
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${additional-make-clean-files}")
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
