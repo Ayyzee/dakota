@@ -10,21 +10,21 @@ endif ()
 
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
 
-set (libs)
-foreach (lib-name ${lib-names})
-  set (found-lib NOTFOUND) # lib-NOTFOUND
-  find_library (found-lib ${lib-name} PATHS ${lib-dirs})
-  if (NOT found-lib)
-    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib-name}")
+set (lib-files)
+foreach (lib ${libs})
+  set (found-lib-file NOTFOUND) # lib-NOTFOUND
+  find_library (found-lib-file ${lib} PATHS ${lib-dirs})
+  if (NOT found-lib-file)
+    message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
   endif ()
-  #message ( "info: target: ${target}: find_library(): ${lib-name} => ${found-lib}")
-  list (APPEND libs ${found-lib})
+  #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib-file}")
+  list (APPEND lib-files ${found-lib-file})
 endforeach ()
 
-set (target-libs)
-foreach (lib-name ${target-lib-names})
-  set (target-lib ${root-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib-name}${CMAKE_SHARED_LIBRARY_SUFFIX})
-  list (APPEND target-libs ${target-lib})
+set (target-lib-files)
+foreach (lib ${target-libs})
+  set (target-lib-file ${root-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  list (APPEND target-lib-files ${target-lib-file})
 endforeach ()
 
 set (cxx-standard 17)
@@ -58,19 +58,19 @@ add_custom_command (
     build-dir:          ${build-dir}
     target:             ${target}
     is-lib:             ${is-lib}
-    libs:               ${target-libs} ${libs}
+    lib-files:               ${target-lib-files} ${lib-files}
     srcs:               ${srcs}
   VERBATIM)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
-  DEPENDS ${parts} ${target-lib-names} dakota-catalog
+  DEPENDS ${parts} ${target-libs} dakota-catalog
   COMMAND ${dakota} --target-hdr --parts ${parts}
   VERBATIM)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts} ${target-lib-names} dakota-catalog
+  DEPENDS ${parts} ${target-libs} dakota-catalog
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
 list (APPEND srcs ${target-src})
@@ -106,13 +106,13 @@ string (CONCAT link-flags
   " ${linker-opts}"
 )
 set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-flags})
-list (LENGTH libs len)
+list (LENGTH lib-files len)
 if (${len})
-  target_link_libraries (${target} ${libs})
+  target_link_libraries (${target} ${lib-files})
 endif ()
-list (LENGTH target-libs len)
+list (LENGTH target-lib-files len)
 if (${len})
-  target_link_libraries (${target} ${target-libs})
-  add_dependencies (     ${target} ${target-lib-names})
+  target_link_libraries (${target} ${target-lib-files})
+  add_dependencies (     ${target} ${target-libs})
 endif ()
 add_dependencies (     ${target} ${target-hdr})

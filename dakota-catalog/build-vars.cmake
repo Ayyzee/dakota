@@ -10,11 +10,11 @@ set (include-dirs
 )
 set (lib-dirs
 )
-set (lib-names
+set (libs
 )
 set (target-lib-dirs
 )
-set (target-lib-names
+set (target-libs
   dakota-dso
 )
 set (srcs

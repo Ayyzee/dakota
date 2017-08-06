@@ -323,13 +323,13 @@ sub use_parts {
   my ($root_cmd) = @_;
   my $parts = &set_global_parts($$root_cmd{'opts'}{'parts'});
   $$parts{'srcs'} = [] if ! $$parts{'srcs'};
-  $$parts{'libs'} = [] if ! $$parts{'libs'};
+  $$parts{'lib-files'} = [] if ! $$parts{'lib-files'};
   $$parts{'current-source-dir'} = &relpath($$parts{'current-source-dir'});
   $$parts{'source-dir'} =         &relpath($$parts{'source-dir'});
   if (! $$parts{'build-dir'}) {
     $$parts{'build-dir'} = &build_dir();
   }
-  $$parts{'inputs'} = [ @{$$parts{'srcs'}}, @{$$parts{'libs'}} ];
+  $$parts{'inputs'} = [ @{$$parts{'srcs'}}, @{$$parts{'lib-files'}} ];
   &parts_adjust_paths($parts);
   if (! -e $$parts{'build-dir'}) {
     &make_dir($$parts{'build-dir'});
@@ -401,7 +401,7 @@ sub cmd_info_from_argv {
   my $root_cmd = {
     'asts' => [],
     'inputs' => [],
-    'libs' => [],
+    'lib-files' => [],
     'opts' => {
       'define-macro' => [],
       'include-directory' => [ "$gbl_prefix/include" ],

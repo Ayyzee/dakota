@@ -13,12 +13,12 @@ set (install-include-files
 )
 set (lib-dirs
 )
-set (lib-names
+set (libs
   dl
 )
 set (target-lib-dirs
 )
-set (target-lib-names
+set (target-libs
 )
 set (is-lib 1)
 set (srcs

@@ -8,9 +8,9 @@ set (include-dirs
 set (lib-dirs
   ${root-source-dir}/lib
 )
-set (lib-names
+set (libs
 )
-set (target-lib-names
+set (target-libs
   dakota-dso
 )
 set (srcs
