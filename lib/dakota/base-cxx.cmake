@@ -66,13 +66,14 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-target_compile_options (${target} PRIVATE
+set (compile-options
   ${compiler-opts}
 )
-string (CONCAT link-flags
+target_compile_options (${target} PRIVATE ${compile-options})
+string (CONCAT link-options
   " ${linker-opts}"
 )
-set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-flags})
+set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-options})
 list (LENGTH lib-files len)
 if (${len})
   target_link_libraries (${target} ${lib-files})
