@@ -15,7 +15,7 @@ endfunction()
 
 set (lib-files)
 foreach (lib ${libs})
-  set (found-lib-file NOTFOUND) # lib-NOTFOUND
+  set (found-lib-file NOTFOUND) # found-lib-file-NOTFOUND
   find_library (found-lib-file ${lib} PATHS ${lib-dirs})
   if (NOT found-lib-file)
     message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
