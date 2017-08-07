@@ -79,6 +79,7 @@ add_custom_command (
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
 list (APPEND srcs ${target-src})
+set (target-dependencies ${target-hdr})
 
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
@@ -88,6 +89,9 @@ else ()
   add_executable (${target} ${srcs})
   set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif ()
+if (target-dependencies)
+  add_dependencies (${target} ${target-dependencies})
 endif ()
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
@@ -119,4 +123,3 @@ if (${len})
   target_link_libraries (${target} ${target-lib-files})
   add_dependencies (     ${target} ${target-libs})
 endif ()
-add_dependencies (     ${target} ${target-hdr})

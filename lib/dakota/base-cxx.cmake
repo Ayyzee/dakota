@@ -51,6 +51,9 @@ else ()
   set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
+if (target-dependencies)
+  add_dependencies (${target} ${target-dependencies})
+endif ()
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set (additional-make-clean-files
