@@ -384,10 +384,10 @@ sub dk_parse {
   $ast = &kw_args_translate($ast);
   return $ast;
 }
-sub loop_cc_from_dk_core {
+sub cc_from_dk_core2 {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
-    print STDERR '  &loop_cc_from_dk_core --output ' .
+    print STDERR '  &cc_from_dk_core2 --output ' .
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   my $inputs = [];
@@ -407,7 +407,7 @@ sub loop_cc_from_dk_core {
   $$cmd_info{'asts'} = $asts;
   $$cmd_info{'inputs'} = $inputs;
 
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within loop_cc_from_dk_core
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within cc_from_dk_core2
   my $num_inputs = @{$$cmd_info{'inputs'}};
   if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
@@ -449,7 +449,7 @@ sub loop_cc_from_dk_core {
     &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path); # rel_target_h_path not used
   }
   return $num_inputs;
-} # loop_cc_from_dk_core
+} # cc_from_dk_core2
 
 sub gcc_library_from_library_name {
   my ($library_name) = @_;
@@ -781,7 +781,7 @@ sub cc_from_dk {
     $$cc_cmd{'asts'} = $$cmd_info{'asts'};
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
     $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
-    $num_out_of_date_infiles = &cc_from_dk_core($cc_cmd);
+    $num_out_of_date_infiles = &cc_from_dk_core1($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     }
@@ -819,12 +819,12 @@ sub loop_cc_from_dk {
   delete $$cmd_info{'opts'}{'output'}; # hackhack
   return $cmd_info;
 } # loop_cc_from_dk
-sub cc_from_dk_core {
+sub cc_from_dk_core1 {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cc_cmd{'io'} =  $$cmd_info{'io'};
   $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
-  $$cc_cmd{'cmd'} = '&loop_cc_from_dk_core';
+  $$cc_cmd{'cmd'} = '&cc_from_dk_core2';
   $$cc_cmd{'asts'} = $$cmd_info{'asts'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
   $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
@@ -928,12 +928,12 @@ sub outfile_from_infiles {
       delete $$cmd_info{'cmd'};
       delete $$cmd_info{'cmd-flags'};
       &loop_merged_ast_from_inputs($cmd_info, $global_should_echo || $should_echo);
-    } elsif ('&loop_cc_from_dk_core' eq $$cmd_info{'cmd'}) {
+    } elsif ('&cc_from_dk_core2' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
       delete $$cmd_info{'output'};
       delete $$cmd_info{'cmd'};
       delete $$cmd_info{'cmd-flags'};
-      &loop_cc_from_dk_core($cmd_info, $global_should_echo || $should_echo);
+      &cc_from_dk_core2($cmd_info, $global_should_echo || $should_echo);
     } else {
       &exec_cmd($cmd_info, $should_echo);
     }
