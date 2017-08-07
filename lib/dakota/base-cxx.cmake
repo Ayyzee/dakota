@@ -8,6 +8,11 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   endif ()
 endif ()
 
+function (opts_str values output-var)
+  string (REPLACE ";" " " tmp-opts-str "${values}")
+  set (${output-var} "${tmp-opts-str}" PARENT_SCOPE)
+endfunction()
+
 set (lib-files)
 foreach (lib ${libs})
   set (found-lib-file NOTFOUND) # lib-NOTFOUND
@@ -35,6 +40,7 @@ if (NOT is-lib)
 endif ()
 
 set (compile-options ${compiler-opts})
+set (link-options ${linker-opts})
 set (CMAKE_PREFIX_PATH  ${root-source-dir})
 #set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
 set (cxx-standard 17)
@@ -67,11 +73,9 @@ set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions (${target} PRIVATE ${macros})
 target_include_directories (${target} PRIVATE ${include-dirs})
-string (CONCAT link-options
-  " ${linker-opts}"
-)
+opts_str ("${link-options}" link-options-str)
 target_compile_options (${target} PRIVATE ${compile-options})
-set_target_properties (${target} PROPERTIES LINK_FLAGS ${link-options})
+set_target_properties (${target} PROPERTIES LINK_FLAGS "${link-options-str}")
 list (LENGTH lib-files len)
 if (${len})
   target_link_libraries (${target} ${lib-files})
