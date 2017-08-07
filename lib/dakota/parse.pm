@@ -116,7 +116,7 @@ our @EXPORT= qw(
                  add_str
                  add_symbol
                  add_trait_decl
-                 ast_from_dk_path
+                 ast_from_dk
                  cc_path_from_dk_path
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
@@ -2254,7 +2254,7 @@ sub add_object_methods_decls {
     }
   }
 }
-sub ast_from_dk_path {
+sub ast_from_dk {
   my ($arg) = @_;
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);

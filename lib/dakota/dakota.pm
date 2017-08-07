@@ -175,7 +175,7 @@ sub loop_merged_ast_from_inputs {
   my $root_ast_path;
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
-      $ast = &ast_from_dk_path($input);
+      $ast = &ast_from_dk($input);
       my $ast_path;
       if (&is_dk_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
