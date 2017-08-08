@@ -21,3 +21,5 @@ if [[ $# -ge 1 && $1 == config ]]; then
 else
   build $@
 fi
+
+# generator=make generator_id="Unix Makefiles" ./root-build.sh ...
