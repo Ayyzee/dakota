@@ -20,7 +20,7 @@ set (target-lib-dirs
 )
 set (target-libs
 )
-set (is-lib 1)
+set (target-type shared-library)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/dakota-dso.cc
 )

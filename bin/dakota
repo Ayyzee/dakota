@@ -527,7 +527,7 @@ sub exec_cmd_info {
   }
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
   if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-    if ($$parts{'is-lib'}) {
+    if ($$parts{'target-type'} eq "shared-library") {
       $$root_cmd{'opts'}{'output'} = &lib_file_from_lib($$parts{'target'});
     } else {
       $$root_cmd{'opts'}{'output'} = &exe_file_from_exe($$parts{'target'});

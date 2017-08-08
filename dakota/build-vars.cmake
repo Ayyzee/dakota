@@ -22,7 +22,7 @@ set (target-libs
   dakota-dso
   dakota-core
 )
-set (is-lib 1)
+set (target-type shared-library)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/ascii-number-klass.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/ascii-number.dk

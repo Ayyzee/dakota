@@ -1528,7 +1528,7 @@ sub parts {
   my $result =  &xxx_from_yaml_file($file,
                                     [
                                       'target',
-                                      'is-lib',
+                                      'target-type',
                                       'build-dir',
                                       'source-dir',
                                       'current-source-dir',

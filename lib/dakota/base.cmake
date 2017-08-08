@@ -35,8 +35,8 @@ macro (install_symlink file symlink)
   install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
 endmacro ()
 
-if (NOT is-lib)
-  set (is-lib 0)
+if (NOT target-type)
+  set (target-type executable)
 endif ()
 
 set (compile-options ${compiler-opts})
@@ -68,7 +68,7 @@ add_custom_command (
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir}
     target:             ${target}
-    is-lib:             ${is-lib}
+    target-type:        ${target-type}
     lib-files:               ${target-lib-files} ${lib-files}
     srcs:               ${srcs}
   VERBATIM)
@@ -91,7 +91,7 @@ list (APPEND compile-options
 list (APPEND link-options
   --parts ${parts} --cxx ${cxx-compiler})
 
-if (${is-lib})
+if ("${target-type}" STREQUAL "shared-library")
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-source-dir}/lib)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

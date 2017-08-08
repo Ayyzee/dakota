@@ -1524,7 +1524,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
   sort-reg-info(registration-info); // REQUIRED since symbols address are not known at compile time
-  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#exe);
+  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#executable);
   bool-t ctlg-exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
   bool-t ctlg-recursive =     getenv-int("DAKOTA_CATALOG_RECURSIVE");
   bool-t ctlg-json =          getenv-int("DAKOTA_CATALOG_JSON");
@@ -1559,10 +1559,10 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     }
   }
   switch (type) {
-    case #lib:
+    case #shared-library:
       add-registration-info(registration-info);
       break;
-    case #exe:
+    case #executable:
     default:
       openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
       sigaction-setup(SIGBUS,  bus-segv-handler);

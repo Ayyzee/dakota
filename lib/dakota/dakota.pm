@@ -529,11 +529,11 @@ sub start_cmd {
   my $cc_files = [];
   $root_cmd = $cmd_info;
   my $is_exe = 1;
-  $is_exe = 0 if $$parts{'is-lib'};
+  $is_exe = 0 if $$parts{'target-type'} && $$parts{'target-type'} eq "shared-library";
   if ($is_exe) {
-    $dk_exe_type = '#exe';
+    $dk_exe_type = '#executable';
   } else {
-    $dk_exe_type = '#lib';
+    $dk_exe_type = '#shared-library';
   }
   $build_dir = &build_dir();
   &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};

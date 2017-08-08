@@ -21,7 +21,7 @@ set (target-lib-dirs
 set (target-libs
   dakota-dso
 )
-set (is-lib 1)
+set (target-type shared-library)
 set (srcs
   ${CMAKE_CURRENT_SOURCE_DIR}/bit-vector.dk
   ${CMAKE_CURRENT_SOURCE_DIR}/boole.dk

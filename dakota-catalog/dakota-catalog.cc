@@ -216,7 +216,7 @@ FUNC main(int argc, char** argv) -> int {
       setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
       setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
       setenv("DAKOTA_CATALOG_ARG", arg, overwrite = 1);
-      setenv("DAKOTA_CATALOG_ARG_TYPE", "exe", overwrite = 1); // not currently used
+      setenv("DAKOTA_CATALOG_ARG_TYPE", "executable", overwrite = 1); // not currently used
     }
     int status = -1;
     if (!opts.path_only)
@@ -226,7 +226,7 @@ FUNC main(int argc, char** argv) -> int {
       if (!opts.path_only) {
         unsetenv("DKT_NO_INIT_RUNTIME");
         unsetenv("DKT_EXIT_BEFORE_MAIN");
-        setenv("DAKOTA_CATALOG_ARG_TYPE", "lib", overwrite = 1); // not currently used
+        setenv("DAKOTA_CATALOG_ARG_TYPE", "shared-library", overwrite = 1); // not currently used
       }
       ptr_t handle = dso_open(arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
 
