@@ -8,7 +8,11 @@ build() {
   SECONDS=0; bin/build.sh $@; duration=$SECONDS; echo "duration: $(($duration / 60))m$(($duration % 60))s"
 }
 if [[ $# -ge 1 && $1 == config ]]; then
-  rm -fr $(cat cmake-binary-dir.txt)
+  binary_dir=$(cat cmake-binary-dir.txt)
+  build_dir=$binary_dir/../build-dkt
+  # must delete build_dir before binary_dir
+  rm -fr $build_dir # ninja ignore ADDITIONAL_MAKE_CLEAN_FILES
+  rm -fr $binary_dir
   bin/cmake-configure.sh
   shift
   if [[ $# -ge 1 ]]; then
