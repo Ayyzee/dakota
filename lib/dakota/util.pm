@@ -985,13 +985,13 @@ sub dakota_io_remove {
   if (&is_array($input)) {
     foreach my $in (@$input) {
       $in = &canon_path($in);
-      if ($$dakota_io{'compile'}{$in}) {
-        delete $$dakota_io{'compile'}{$in};
+      if ($$dakota_io{$key}{$in}) {
+        delete $$dakota_io{$key}{$in};
       }
     }
   } else {
-    if ($$dakota_io{'compile'}{$input}) {
-      delete $$dakota_io{'compile'}{$input};
+    if ($$dakota_io{$key}{$input}) {
+      delete $$dakota_io{$key}{$input};
     }
   }
 }
