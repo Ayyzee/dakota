@@ -67,7 +67,7 @@ add_custom_command (
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir}
-    lib-files:               ${target-lib-files} ${lib-files}
+    lib-files:          ${target-lib-files} ${lib-files}
     srcs:               ${srcs}
   VERBATIM)
 # phony target 'target-hdr'
