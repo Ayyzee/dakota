@@ -349,9 +349,6 @@ sub clean {
       }
     }
     if (1) { # cmake writes .o files in its own build dir
-      if (! $$root_cmd{'opts'}{'precompile'}) {
-        &clean_paths($dakota_io, $dakota_io_path, 'compile');
-      }
       &clean_paths($dakota_io, $dakota_io_path, 'precompile', 'target-src');
     }
   }
@@ -387,8 +384,6 @@ sub cmd_info_from_argv {
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
               'output=s',  # gcc-like
-
-              'compile',        # gcc-like
 
               'path-only',
               'precompile',     # gcc-ish (--compile)
@@ -446,30 +441,6 @@ sub exec_cmd_info {
     &clean($root_cmd, $parts, $dakota_io, $dakota_io_path);
     exit 0;
   }
-  if ($parts) {
-    if (!$$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
-      if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
-        my $o_path = &o_path_from_dk_path($$inputs[0]);
-        $$root_cmd{'opts'}{'output'} = $o_path; # setting default output (compile) path for single .dk input path
-      }
-    }
-    if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
-      if (1 == scalar @$inputs && &is_dk_path($$inputs[0]) && !$$root_cmd{'opts'}{'precompile'}) {
-        &dakota::util::dakota_io_add($$root_cmd{'io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
-        my $original_state;
-        &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
-      }
-    }
-  }
-  if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$dakota_io{'compile'}}) {
-    &dakota::util::dakota_io_remove($dakota_io, 'compile', $inputs);
-    &add_last($inputs, values %{$$dakota_io{'compile'}});
-    foreach my $input (@{$$parts{'inputs'}}) {
-      if ($input =~ /\.$so_ext$/) { # is_so_path()
-        &add_last($inputs, $input);
-      }
-    }
-  }
   $inputs = &normalize_paths($inputs);
 
   if (0) {
@@ -495,14 +466,6 @@ sub exec_cmd_info {
       }
     }
   }
-  if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
-    if (1 >= scalar $$root_cmd{'parts.inputs'}) {
-      die "$0: error: inputs are requried either in the parts file or the command line." . $nl;
-    } else {
-      $inputs = $$root_cmd{'parts.inputs'};
-      $$root_cmd{'inputs'} = [];
-    }
-  }
   # should only reorder the .o files (between .so files) leaving the .so files in their
   # original position so the inputs should be split into separate sublist (and then sorted).
   # its OK to sort the .dk files, but we must link using the original positions.
@@ -512,9 +475,6 @@ sub exec_cmd_info {
     }
   }
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-  if ($$root_cmd{'opts'}{'output'}) {
-    $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
-  }
 
   &normalize_paths($root_cmd, 'inputs');
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
