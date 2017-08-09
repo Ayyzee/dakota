@@ -73,7 +73,7 @@ set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
-target_compile_definitions (${target} PRIVATE ${macros} DKT_TARGET_NAME="${target-file}" DKT_TARGET_TYPE="${target-type}")
+target_compile_definitions (${target} PRIVATE ${macros} DKT_TARGET_FILE="${target-file}" DKT_TARGET_TYPE="${target-type}")
 target_include_directories (${target} PRIVATE ${include-dirs})
 opts_str ("${link-options}" link-options-str)
 target_compile_options (${target} PRIVATE ${compile-options})

@@ -649,7 +649,7 @@ sub generate_target_runtime {
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char-t   dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-NAME);" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-FILE);" . $nl;
   $target_cc_str .= "[[read-only]] static symbol-t type = dk-intern(DKT-TARGET-TYPE);" . $nl;
   $target_cc_str .= $nl;
   #my $col;
