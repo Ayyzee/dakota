@@ -182,8 +182,8 @@ our @EXPORT= qw(
                  suffix
                  target_build_dir
                  target_srcs_ast_path
-                 target_h_path
-                 target_cc_path
+                 target_hdr_path
+                 target_src_path
                  use_abs_path
                  var
                  var_array
@@ -677,15 +677,15 @@ sub target_srcs_ast_path {
   my $target_srcs_ast_path = &target_build_dir($cmd_info) . '/srcs.ast';
   return $target_srcs_ast_path;
 }
-sub target_h_path {
+sub target_hdr_path {
   my ($cmd_info) = @_;
-  my $target_h_path = &target_build_dir($cmd_info) . '/target.' . $h_ext;
-  return $target_h_path;
+  my $target_hdr_path = &target_build_dir($cmd_info) . '/target.' . $h_ext;
+  return $target_hdr_path;
 }
-sub target_cc_path {
+sub target_src_path {
   my ($cmd_info) = @_;
-  my $target_cc_path = &target_build_dir($cmd_info) . '/target.' . $cc_ext;
-  return $target_cc_path;
+  my $target_src_path = &target_build_dir($cmd_info) . '/target.' . $cc_ext;
+  return $target_src_path;
 }
 sub path_only {
   my ($cmd_info) = @_;
@@ -699,9 +699,9 @@ sub path_only {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
       print &target_srcs_ast_path($cmd_info) . $nl;
     } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
-      print &cwd . '/' . &target_h_path($cmd_info) . $nl;
+      print &cwd . '/' . &target_hdr_path($cmd_info) . $nl;
     } elsif ($$cmd_info{'opts'}{'target-src'}) {
-      print &cwd . '/' . &target_cc_path($cmd_info) . $nl;
+      print &cwd . '/' . &target_src_path($cmd_info) . $nl;
     } else {
       die;
     }

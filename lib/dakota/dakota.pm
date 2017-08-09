@@ -355,25 +355,25 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-decls.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub dk_parse {
@@ -442,10 +442,10 @@ sub cc_from_dk_core2 {
     &src::add_extra_klass_decls($file_ast);
     &src::add_extra_keywords($file_ast);
     &src::add_extra_generics($file_ast);
-    my $rel_target_h_path = &relpath(&target_h_path($cmd_info));
+    my $rel_target_hdr_path = &relpath(&target_hdr_path($cmd_info));
 
-    &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path);
-    &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path); # rel_target_h_path not used
+    &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_hdr_path);
+    &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_hdr_path); # rel_target_hdr_path not used
   }
   return $num_inputs;
 } # cc_from_dk_core2
@@ -671,10 +671,10 @@ sub gen_target {
   my ($cmd_info, $is_defn) = @_;
   #die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
-    my $target_cc_path = &target_cc_path($cmd_info);
-    my $target_h_path =  &target_h_path($cmd_info);
+    my $target_src_path = &target_src_path($cmd_info);
+    my $target_hdr_path =  &target_hdr_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
-      my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
+      my $target_dk_path = &dk_path_from_cc_path($target_src_path);
       print $target_dk_path . $nl;
     }
   }
@@ -682,9 +682,9 @@ sub gen_target {
   &check_path($target_srcs_ast_path);
   $$cmd_info{'ast'} = $target_srcs_ast_path;
   if (!$is_defn) {
-    &target_h_from_ast($cmd_info);
+    &target_hdr_from_ast($cmd_info);
   } else {
-    &target_cc_from_ast($cmd_info);
+    &target_src_from_ast($cmd_info);
   }
 } # gen_target_src
 sub cc_from_dk {
@@ -764,12 +764,12 @@ sub cc_from_dk_core1 {
   my $should_echo;
   return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
-sub target_h_from_ast {
+sub target_hdr_from_ast {
   my ($cmd_info) = @_;
   my $is_defn;
   return &target_from_ast($cmd_info, $is_defn = 0);
 }
-sub target_cc_from_ast {
+sub target_src_from_ast {
   my ($cmd_info) = @_;
   my $is_defn;
   return &target_from_ast($cmd_info, $is_defn = 1);
@@ -778,23 +778,23 @@ sub target_from_ast {
   my ($cmd_info, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $target_h_path =  &target_h_path($cmd_info);
+  my $target_src_path = &target_src_path($cmd_info);
+  my $target_hdr_path =  &target_hdr_path($cmd_info);
   &check_path($target_srcs_ast_path);
 
   if ($is_defn) {
     if ($$cmd_info{'opts'}{'precompile'}) {
-      return if !&is_out_of_date($target_srcs_ast_path, $target_cc_path);
+      return if !&is_out_of_date($target_srcs_ast_path, $target_src_path);
     }
   } else {
-    return if !&is_out_of_date($target_srcs_ast_path, $target_h_path);
+    return if !&is_out_of_date($target_srcs_ast_path, $target_hdr_path);
   }
-  &make_dir_part($target_cc_path, $global_should_echo);
-  my ($path, $file_basename, $target_srcs_ast) = ($target_cc_path, $target_cc_path, undef);
+  &make_dir_part($target_src_path, $global_should_echo);
+  my ($path, $file_basename, $target_srcs_ast) = ($target_src_path, $target_src_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $build_dir/
   # $target_inputs_ast not used, called for side-effect
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_cc_from_ast
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_src_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
   $target_srcs_ast = &kw_args_translate($target_srcs_ast);
   $$target_srcs_ast{'should-generate-make'} = 1;
@@ -809,10 +809,10 @@ sub target_from_ast {
   &src::add_extra_generics($target_srcs_ast);
 
   if ($is_defn) {
-    &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast);
-    &dakota_io_assign($$cmd_info{'io'}, 'target-src', $target_cc_path);
+    &generate_target_defn($target_src_path, $target_srcs_ast, $target_inputs_ast);
+    &dakota_io_assign($$cmd_info{'io'}, 'target-src', $target_src_path);
   } else {
-    &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast);
+    &generate_target_decl($target_hdr_path, $target_srcs_ast, $target_inputs_ast);
   }
 }
 sub exec_cmd {

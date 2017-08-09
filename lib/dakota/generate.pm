@@ -207,16 +207,16 @@ sub is_silent {
   return $$root_cmd{'opts'}{'silent'};
 }
 sub generate_src_decl {
-  my ($path, $file_ast, $target_inputs_ast, $target_h_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_hdr_path) = @_;
   #print "generate_src_decl($path, ...)" . $nl;
   &set_src_decl($path);
-  return &generate_src($path, $file_ast, $target_inputs_ast, $target_h_path);
+  return &generate_src($path, $file_ast, $target_inputs_ast, $target_hdr_path);
 }
 sub generate_src_defn {
-  my ($path, $file_ast, $target_inputs_ast, $target_h_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_hdr_path) = @_;
   #print "generate_src_defn($path, ...)" . $nl;
   &set_src_defn($path);
-  return &generate_src($path, $file_ast, $target_inputs_ast, $target_h_path);
+  return &generate_src($path, $file_ast, $target_inputs_ast, $target_hdr_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => "$cc_ext.dkt",
@@ -244,10 +244,10 @@ sub add_include_fors {
   }
 }
 sub generate_src {
-  my ($path, $file_ast, $target_inputs_ast, $target_h_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_hdr_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
-  my $src_h_path = "$name.$h_ext";
+  my $src_hdr_path = "$name.$h_ext";
   my $inc_path = $name . '.inc';
   my ($generics, $symbols) = &generics::parse($file_ast);
   my $suffix = &suffix();
@@ -270,9 +270,9 @@ sub generate_src {
   } else {
     $str =
       "# if !defined DK_SRC_UNIQUE_HEADER || 0 == DK_SRC_UNIQUE_HEADER" . $nl .
-      "  # include \"$target_h_path\"" . &ann(__FILE__, __LINE__) . $nl .
+      "  # include \"$target_hdr_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# else" . $nl .
-      "  # include \"$src_h_path\"" . &ann(__FILE__, __LINE__) . $nl .
+      "  # include \"$src_hdr_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# endif" . $nl .
       $nl .
       "# include \"$inc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to inc)
@@ -566,55 +566,55 @@ sub generate_target_runtime {
       }
     }
   }
-  my $target_cc_str = '';
+  my $target_src_str = '';
   my $col = '';
-  $target_cc_str .= $col . "static const str-t[] include-fors = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+  $target_src_str .= $col . "static const str-t[] include-fors = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   foreach my $header (sort keys %$symbols_from_header) {
-    $target_cc_str .= $col . "\"$header\",";
+    $target_src_str .= $col . "\"$header\",";
     foreach my $type (sort keys %{$$symbols_from_header{$header}}) {
-      $target_cc_str .= $col . "\"$type\",";
+      $target_src_str .= $col . "\"$type\",";
     }
-    $target_cc_str .= $col . "nullptr," . $nl;
+    $target_src_str .= $col . "nullptr," . $nl;
   }
-  $target_cc_str .= $col . "nullptr" . $nl;
+  $target_src_str .= $col . "nullptr" . $nl;
   $col = &colout($col);
-  $target_cc_str .= $col . "};" . $nl;
+  $target_src_str .= $col . "};" . $nl;
 
   my $keys_count = keys %{$$target_srcs_ast{'klasses'}};
   if (0 == $keys_count) {
-    $target_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
-    $target_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
+    $target_src_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
+    $target_src_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
   } else {
-    $target_cc_str .= $col . "static symbol-t[] imported-klass-names = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $target_src_str .= $col . "static symbol-t[] imported-klass-names = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     my $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
-      $target_cc_str .= $col . "$klass_name\::__name__," . $nl;
+      $target_src_str .= $col . "$klass_name\::__name__," . $nl;
     }
-    $target_cc_str .= $col . "nullptr" . $nl;
+    $target_src_str .= $col . "nullptr" . $nl;
     $col = &colout($col);
-    $target_cc_str .= $col . "};" . $nl;
+    $target_src_str .= $col . "};" . $nl;
     ###
-    $target_cc_str .= $col . "static assoc-node-t[] imported-klass-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $target_src_str .= $col . "static assoc-node-t[] imported-klass-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
-      $target_cc_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)&$klass_name\::_klass_ }, /// &object-t" . $nl;
+      $target_src_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)&$klass_name\::_klass_ }, /// &object-t" . $nl;
     }
-    $target_cc_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
+    $target_src_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
-    $target_cc_str .= $col . "};" . $nl;
-    $target_cc_str .= &linkage_unit::generate_target_runtime_selectors_seq( $generics);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_signatures_seq($generics);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_generic_func_ptrs_seq($generics);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_strs_seq($target_srcs_ast);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_ints_seq($target_srcs_ast);
+    $target_src_str .= $col . "};" . $nl;
+    $target_src_str .= &linkage_unit::generate_target_runtime_selectors_seq( $generics);
+    $target_src_str .= &linkage_unit::generate_target_runtime_signatures_seq($generics);
+    $target_src_str .= &linkage_unit::generate_target_runtime_generic_func_ptrs_seq($generics);
+    $target_src_str .= &linkage_unit::generate_target_runtime_strs_seq($target_srcs_ast);
+    $target_src_str .= &linkage_unit::generate_target_runtime_ints_seq($target_srcs_ast);
 
-    $target_cc_str .= &dk_generate_cc_footer($target_srcs_ast);
+    $target_src_str .= &dk_generate_cc_footer($target_srcs_ast);
   }
-  #$target_cc_str .= $col . "extern \"C\$nl;
-  #$target_cc_str .= $col . "{" . $nl;
+  #$target_src_str .= $col . "extern \"C\$nl;
+  #$target_src_str .= $col . "{" . $nl;
   #$col = &colin($col);
 
   my $info_tbl = {
@@ -646,40 +646,40 @@ sub generate_target_runtime {
     $$info_tbl{"\#int-names"} =    '__int-names';
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
-  $target_cc_str .= $nl;
-  $target_cc_str .= "[[read-only]] static char-t   dir-buffer[4096] = \"\";" . $nl;
-  $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-FILE);" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t type = dk-intern(DKT-TARGET-TYPE);" . $nl;
-  $target_cc_str .= $nl;
+  $target_src_str .= $nl;
+  $target_src_str .= "[[read-only]] static char-t   dir-buffer[4096] = \"\";" . $nl;
+  $target_src_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
+  $target_src_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-FILE);" . $nl;
+  $target_src_str .= "[[read-only]] static symbol-t type = dk-intern(DKT-TARGET-TYPE);" . $nl;
+  $target_src_str .= $nl;
   #my $col;
-  $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
+  $target_src_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
 
-  $target_cc_str .= $nl;
-  $target_cc_str .= $col . "static func __initial-epilog() -> void {" . $nl;
+  $target_src_str .= $nl;
+  $target_src_str .= $col . "static func __initial-epilog() -> void {" . $nl;
   $col = &colin($col);
-  $target_cc_str .=
+  $target_src_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
     $col . "dkt-register-info(&reg-info);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
-  $target_cc_str .= $col . "}" . $nl;
-  $target_cc_str .= $col . "static func __final-epilog() -> void {" . $nl;
+  $target_src_str .= $col . "}" . $nl;
+  $target_src_str .= $col . "static func __final-epilog() -> void {" . $nl;
   $col = &colin($col);
-  $target_cc_str .=
+  $target_src_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
     $col . "dkt-deregister-info(&reg-info);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
-  $target_cc_str .= $col . "}" . $nl;
+  $target_src_str .= $col . "}" . $nl;
   #$col = &colout($col);
-  #$target_cc_str .= $col . "};" . $nl;
+  #$target_src_str .= $col . "};" . $nl;
 
-  $target_cc_str .=
+  $target_src_str .=
     $col . "static __ddl-t __ddl-epilog = __ddl-t{__initial-epilog, __final-epilog};" . &ann(__FILE__, __LINE__) . $nl;
-  return $target_cc_str;
+  return $target_src_str;
 }
 sub path::add_last {
   my ($stack, $part) = @_;
