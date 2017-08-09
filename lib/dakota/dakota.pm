@@ -523,7 +523,6 @@ sub start_cmd {
   my $cc_files = [];
   $root_cmd = $cmd_info;
   $build_dir = &build_dir();
-  &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'}; ###
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   my $lock_file = $target_srcs_ast_path . '.flock';
@@ -534,7 +533,6 @@ sub start_cmd {
     open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     flock LOCK_FILE, LOCK_EX or die;
   }
-  &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};
   $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
   if ($$cmd_info{'opts'}{'target-ast'}) {
     if ($should_lock) {
@@ -546,39 +544,20 @@ sub start_cmd {
   }
   &set_target_srcs_ast($target_srcs_ast_path);
 
-  if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
-    if ($$cmd_info{'opts'}{'target-hdr'}) {
-        &gen_target_hdr($cmd_info);
-    }
+  if ($$cmd_info{'opts'}{'target-hdr'}) {
+    &gen_target_hdr($cmd_info);
   }
   if ($should_lock) {
     flock LOCK_FILE, LOCK_UN or die;
     close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     unlink $lock_file;
   }
-
-  if ($ENV{'DK_GENERATE_TARGET_FIRST'}) {
-    # generate the single (but slow) runtime .o, then the user .o files
-    # this might be useful for distributed building (initiating the building of the slowest first
-    # or for testing runtime code generation
-    # also, this might be useful if the runtime .h file is being used rather than generating a
-    # translation unit specific .h file (like in the case of inline funcs)
-      if ($$cmd_info{'opts'}{'target-src'}) {
-          &gen_target_src($cmd_info);
-      }
-    if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
-      $cmd_info = &loop_cc_from_dk($cmd_info);
-      $cc_files = &cc_files($$cmd_info{'inputs'});
-    }
-  } else {
-     # generate user .o files first, then the single (but slow) runtime .o
-    if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
-      $cmd_info = &loop_cc_from_dk($cmd_info);
-      $cc_files = &cc_files($$cmd_info{'inputs'});
-    }
-      if ($$cmd_info{'opts'}{'target-src'}) {
-          &gen_target_src($cmd_info);
-      }
+  if ($$cmd_info{'opts'}{'target-src'}) {
+    &gen_target_src($cmd_info);
+  }
+  if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
+    $cmd_info = &loop_cc_from_dk($cmd_info);
+    $cc_files = &cc_files($$cmd_info{'inputs'});
   }
   return ($exit_status, $cc_files);
 }

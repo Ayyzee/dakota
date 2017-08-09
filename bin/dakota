@@ -205,15 +205,7 @@ sub detect_cxx_opts {
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
     my $pair;
-    if (0) {
-    #} elsif ($$major_mode_tbl{$arg}) {
-    #  $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
-    #} elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
-    #  &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
-    #} elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
-    #  &add_last($ordered_input_args, ('--library', $$pair[1]));
-    #} elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
-    } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
+    if (&path_opt($cmd, \$i, 'o', 'output', $info)) {
     } elsif ($arg !~ /^-/) {
       if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
         $pair = [$i, $arg];
@@ -288,7 +280,6 @@ sub parts_adjust_paths {
   my $force;
   $$parts{'inputs'} =       &adjust_paths($$parts{'current-source-dir'}, $$parts{'inputs'});
   $$parts{'srcs'} =         &adjust_paths($$parts{'current-source-dir'}, $$parts{'srcs'});
-  $$parts{'include-dirs'} = &adjust_paths($$parts{'current-source-dir'}, $$parts{'include-dirs'}, $force = 1);
   $$parts{'build-dir'} =    &adjust_path( $$parts{'current-source-dir'}, $$parts{'build-dir'}, $force = 1);
 }
 sub use_parts {
