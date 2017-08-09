@@ -82,7 +82,8 @@ add_custom_command (
   DEPENDS ${parts} ${target-libs} dakota-catalog
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
-list (APPEND srcs ${target-src})
+list (INSERT srcs 0 ${target-src}) # add-first
+#list (APPEND srcs ${target-src}) # add-last
 set (target-dependencies ${target-hdr})
 list (APPEND compile-options
   --parts ${parts} --cxx ${cxx-compiler})
