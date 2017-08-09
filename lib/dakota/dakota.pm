@@ -548,7 +548,7 @@ sub start_cmd {
 
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if ($$cmd_info{'opts'}{'target-hdr'}) {
-        &gen_target_h($cmd_info);
+        &gen_target_hdr($cmd_info);
     }
   }
   if ($should_lock) {
@@ -564,7 +564,7 @@ sub start_cmd {
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
       if ($$cmd_info{'opts'}{'target-src'}) {
-          &gen_target_cc($cmd_info);
+          &gen_target_src($cmd_info);
       }
     if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
       $cmd_info = &loop_cc_from_dk($cmd_info);
@@ -577,7 +577,7 @@ sub start_cmd {
       $cc_files = &cc_files($$cmd_info{'inputs'});
     }
       if ($$cmd_info{'opts'}{'target-src'}) {
-          &gen_target_cc($cmd_info);
+          &gen_target_src($cmd_info);
       }
   }
   return ($exit_status, $cc_files);
@@ -695,12 +695,12 @@ sub loop_ast_from_inputs {
   #}
   return $cmd_info;
 } # loop_ast_from_inputs
-sub gen_target_h {
+sub gen_target_hdr {
   my ($cmd_info) = @_;
   my $is_defn;
   return &gen_target($cmd_info, $is_defn = 0);
 }
-sub gen_target_cc {
+sub gen_target_src {
   my ($cmd_info) = @_;
   my $is_defn;
   return &gen_target($cmd_info, $is_defn = 1);
@@ -724,7 +724,7 @@ sub gen_target {
   } else {
     &target_cc_from_ast($cmd_info);
   }
-} # gen_target_cc
+} # gen_target_src
 sub cc_from_dk {
   my ($cmd_info, $input) = @_;
   my $ast_path = &ast_path_from_dk_path($input);
