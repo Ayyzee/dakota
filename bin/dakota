@@ -291,19 +291,6 @@ sub has_cxx_opt {
   }
   return 0;
 }
-sub lib_file_from_lib {
-  my ($name) = @_;
-  # linux and darwin so-regexs are separate
-  if ($name =~ m=^(.*/)?(lib([.\w-]+))\.$so_ext((\.\d+)+)?$= ||
-      $name =~ m=^(.*/)?(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
-    return $name;
-  }
-  return 'lib' . $name . ".$so_ext";
-}
-sub exe_file_from_exe {
-  my ($name) = @_;
-  return $name;
-}
 sub parts_adjust_paths {
   my ($parts) = @_;
   return if $$parts{'current-source-dir'} eq '.';
@@ -332,7 +319,6 @@ sub use_parts {
   $$root_cmd{'parts.source-dir'} =         $$parts{'source-dir'};
   $$root_cmd{'parts.inputs'} =             $$parts{'inputs'};
   $$root_cmd{'parts.build-dir'} =          $$parts{'build-dir'};
-  $$root_cmd{'parts.target'} =             $$parts{'target'};
   $$root_cmd{'io'} =                       $$parts{'build-dir'} . '/dakota.io';
   my $dakota_io_path = $$root_cmd{'io'};
   if (! -e $dakota_io_path) {
@@ -526,13 +512,6 @@ sub exec_cmd_info {
     }
   }
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-  if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-    if ($$parts{'target-type'} eq "shared-library") {
-      $$root_cmd{'opts'}{'output'} = &lib_file_from_lib($$parts{'target'});
-    } else {
-      $$root_cmd{'opts'}{'output'} = &exe_file_from_exe($$parts{'target'});
-    }
-  }
   if ($$root_cmd{'opts'}{'output'}) {
     $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
   }

@@ -100,7 +100,6 @@ our @EXPORT= qw(
                  flatten
                  global_parts
                  target_srcs_ast
-                 global_parts_target
                  has_kw_args
                  has_kw_arg_names
                  header_file_regex
@@ -112,7 +111,6 @@ our @EXPORT= qw(
                  is_box_type
                  is_debug
                  is_decl
-                 is_exe_target
                  is_exported
                  is_kw_args_method
                  is_out_of_date
@@ -170,7 +168,6 @@ our @EXPORT= qw(
                  root_cmd
                  scalar_from_file
                  scalar_to_file
-                 set_exe_target
                  set_global_parts
                  set_target_srcs_ast
                  set_root_cmd
@@ -777,11 +774,6 @@ my $global_parts;
 sub global_parts {
   return $global_parts;
 }
-sub global_parts_target {
-  my $result = $$global_parts{'parts.target'};
-  $result = $$global_parts{'target'} if ! $result;
-  return $result;
-}
 sub set_global_parts {
   my ($parts_path) = @_;
   $global_parts = &parts($parts_path);
@@ -804,7 +796,6 @@ my $gbl_src_file = undef;
 my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
 my $global_is_defn = undef; # klass decl vs defn
 my $global_suffix = undef;
-my $global_is_exe_target = undef;
 
 sub set_src_decl {
   my ($path) = @_;
@@ -835,10 +826,6 @@ sub set_target_defn {
   $global_is_target =   1;
   $global_is_defn = 1;
   $global_suffix = $cc_ext;
-}
-sub set_exe_target {
-  my ($path) = @_;
-  $global_is_exe_target = $path;
 }
 sub suffix {
   return $global_suffix
@@ -891,9 +878,6 @@ sub is_decl {
   } else {
     return 0;
   }
-}
-sub is_exe_target {
-  return $global_is_exe_target;
 }
 sub is_exported {
   my ($method) = @_;
@@ -1527,8 +1511,6 @@ sub parts {
   my ($file) = @_;
   my $result =  &xxx_from_yaml_file($file,
                                     [
-                                      'target',
-                                      'target-type',
                                       'build-dir',
                                       'source-dir',
                                       'current-source-dir',

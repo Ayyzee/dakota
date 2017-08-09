@@ -1539,8 +1539,6 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       ostrm = ostream::fopen(ctlg-output-path, "a"); // ctlg-output-path is initially truncated by dakota-catalog
     symbol-t name = name-from-info(registration-info);
     assert-valid-str(name);
-    //fprintf(stderr, "arg = %s\n",  ctlg-arg);
-    //fprintf(stderr, "name = %s\n", name);
     str-t ctlg-arg-base = bname(ctlg-arg);
     str-t name-base =     bname(name);
     static symbol-t[] keys = {

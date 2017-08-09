@@ -95,7 +95,6 @@ my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
 my $global_should_echo = 0;
 my $exit_status = 0;
-my $dk_exe_type = undef;
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &ident_regex();
@@ -350,7 +349,7 @@ sub sig1 {
   return $result;
 }
 sub default_cmd_info {
-  my $cmd_info = { 'parts.target' => &global_parts_target() };
+  my $cmd_info = {};
   return $cmd_info;
 }
 sub target_klass_func_decls_path {
@@ -488,16 +487,12 @@ sub update_target_srcs_ast_from_all_inputs {
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
              };
   $$cmd_info{'inputs'} = $$cmd_info{'parts.inputs'},
-  $$cmd_info{'output'} = $$cmd_info{'parts.target'},
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
   &check_path($target_srcs_ast_path);
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);
-  if ($$cmd_info{'asts'}) {
-    die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
-  }
   &add_visibility_file($target_srcs_ast_path);
 
   if ($$cmd_info{'asts'}) {
@@ -528,13 +523,6 @@ sub start_cmd {
   #die &Dumper($cmd_info) if ! $$cmd_info{'parts.build-dir'};
   my $cc_files = [];
   $root_cmd = $cmd_info;
-  my $is_exe = 1;
-  $is_exe = 0 if $$parts{'target-type'} && $$parts{'target-type'} eq "shared-library";
-  if ($is_exe) {
-    $dk_exe_type = '#executable';
-  } else {
-    $dk_exe_type = '#shared-library';
-  }
   $build_dir = &build_dir();
   &path_only($cmd_info) if $$cmd_info{'opts'}{'path-only'};
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'}; ###
@@ -561,7 +549,7 @@ sub start_cmd {
 
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
-        &gen_target_h($cmd_info, $is_exe);
+        &gen_target_h($cmd_info);
     }
   }
   if ($should_lock) {
@@ -578,7 +566,7 @@ sub start_cmd {
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'target-hdr'}) {
-          &gen_target_cc($cmd_info, $is_exe);
+          &gen_target_cc($cmd_info);
       }
     }
     if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
@@ -593,7 +581,7 @@ sub start_cmd {
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'target-hdr'}) {
-          &gen_target_cc($cmd_info, $is_exe);
+          &gen_target_cc($cmd_info);
       }
     }
   }
@@ -652,7 +640,6 @@ sub ast_from_inputs {
     'output' =>      $$cmd_info{'output'},
     'inputs' =>      $$cmd_info{'inputs'},
     'io' =>  $$cmd_info{'io'},
-    'parts.target' =>  $$cmd_info{'parts.target'},
   };
   my $should_echo;
   my $result = &outfile_from_infiles($ast_cmd, $should_echo = 0);
@@ -697,8 +684,7 @@ sub loop_ast_from_inputs {
       &ordered_set_add($ast_files, $input, __FILE__, __LINE__);
     }
   }
-  die if ! $$cmd_info{'output'};
-  if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
+  if (! $$cmd_info{'opts'}{'compile'}) {
     if (0 != @$ast_files) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
       &check_path($target_srcs_ast_path);
@@ -715,18 +701,18 @@ sub loop_ast_from_inputs {
   return $cmd_info;
 } # loop_ast_from_inputs
 sub gen_target_h {
-  my ($cmd_info, $is_exe) = @_;
+  my ($cmd_info) = @_;
   my $is_defn;
-  return &gen_target($cmd_info, $is_exe, $is_defn = 0);
+  return &gen_target($cmd_info, $is_defn = 0);
 }
 sub gen_target_cc {
-  my ($cmd_info, $is_exe) = @_;
+  my ($cmd_info) = @_;
   my $is_defn;
-  return &gen_target($cmd_info, $is_exe, $is_defn = 1);
+  return &gen_target($cmd_info, $is_defn = 1);
 }
 sub gen_target {
-  my ($cmd_info, $is_exe, $is_defn) = @_;
-  die if ! $$cmd_info{'output'};
+  my ($cmd_info, $is_defn) = @_;
+  #die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
     my $target_h_path =  &target_h_path($cmd_info);
@@ -738,18 +724,10 @@ sub gen_target {
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   &check_path($target_srcs_ast_path);
   $$cmd_info{'ast'} = $target_srcs_ast_path;
-  my $other = {};
-  if ($dk_exe_type) {
-    $$other{'type'} = $dk_exe_type;
-  }
-  die if ! $$cmd_info{'output'};
-  if ($$cmd_info{'output'}) {
-    $$other{'name'} = $$cmd_info{'output'};
-  }
   if (!$is_defn) {
-    &target_h_from_ast($cmd_info, $other, $is_exe);
+    &target_h_from_ast($cmd_info);
   } else {
-    &target_cc_from_ast($cmd_info, $other, $is_exe);
+    &target_cc_from_ast($cmd_info);
   }
 } # gen_target_cc
 sub cc_from_dk {
@@ -780,7 +758,6 @@ sub cc_from_dk {
     $$cc_cmd{'output'} = $src_path;
     $$cc_cmd{'asts'} = $$cmd_info{'asts'};
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
-    $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
     $num_out_of_date_infiles = &cc_from_dk_core1($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
@@ -823,7 +800,6 @@ sub cc_from_dk_core1 {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cc_cmd{'io'} =  $$cmd_info{'io'};
-  $$cc_cmd{'parts.target'} = $$cmd_info{'parts.target'};
   $$cc_cmd{'cmd'} = '&cc_from_dk_core2';
   $$cc_cmd{'asts'} = $$cmd_info{'asts'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
@@ -832,17 +808,17 @@ sub cc_from_dk_core1 {
   return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
 sub target_h_from_ast {
-  my ($cmd_info, $other, $is_exe) = @_;
+  my ($cmd_info) = @_;
   my $is_defn;
-  return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 0);
+  return &target_from_ast($cmd_info, $is_defn = 0);
 }
 sub target_cc_from_ast {
-  my ($cmd_info, $other, $is_exe) = @_;
+  my ($cmd_info) = @_;
   my $is_defn;
-  return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 1);
+  return &target_from_ast($cmd_info, $is_defn = 1);
 }
 sub target_from_ast {
-  my ($cmd_info, $other, $is_exe, $is_defn) = @_;
+  my ($cmd_info, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   my $target_cc_path = &target_cc_path($cmd_info);
@@ -863,8 +839,6 @@ sub target_from_ast {
   # $target_inputs_ast not used, called for side-effect
   my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_cc_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
-  die if $$target_srcs_ast{'other'};
-  $$target_srcs_ast{'other'} = $other;
   $target_srcs_ast = &kw_args_translate($target_srcs_ast);
   $$target_srcs_ast{'should-generate-make'} = 1;
 
@@ -878,10 +852,10 @@ sub target_from_ast {
   &src::add_extra_generics($target_srcs_ast);
 
   if ($is_defn) {
-    &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
+    &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast);
     &dakota_io_assign($$cmd_info{'io'}, 'target-src', $target_cc_path);
   } else {
-    &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
+    &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast);
   }
 }
 sub exec_cmd {
@@ -969,7 +943,6 @@ sub ctlg_from_so {
     $$ctlg_cmd{'cmd'} .= ' --silent';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
-  $$ctlg_cmd{'parts.target'} = $$cmd_info{'parts.target'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
 
   if ($$cmd_info{'opts'}{'precompile'}) {

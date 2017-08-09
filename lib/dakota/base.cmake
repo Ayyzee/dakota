@@ -67,8 +67,6 @@ add_custom_command (
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir}
-    target:             ${target}
-    target-type:        ${target-type}
     lib-files:               ${target-lib-files} ${lib-files}
     srcs:               ${srcs}
   VERBATIM)
@@ -92,10 +90,12 @@ list (APPEND link-options
   --parts ${parts} --cxx ${cxx-compiler})
 
 if ("${target-type}" STREQUAL "shared-library")
+  set (target-file ${CMAKE_SHARED_LIBRARY_PREFIX}${target}${CMAKE_SHARED_LIBRARY_SUFFIX})
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-source-dir}/lib)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 else ()
+  set (target-file ${target}${CMAKE_EXECUTABLE_SUFFIX})
   add_executable (${target} ${srcs})
   set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
@@ -113,7 +113,7 @@ set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 #set (CMAKE_CXX_VISIBILITY_PRESET hidden)
-target_compile_definitions (${target} PRIVATE ${macros})
+target_compile_definitions (${target} PRIVATE ${macros} DKT_TARGET_NAME="${target-file}" DKT_TARGET_TYPE="${target-type}")
 target_include_directories (${target} PRIVATE ${include-dirs})
 opts_str ("${link-options}" link-options-str)
 target_compile_options (${target} PRIVATE ${compile-options})

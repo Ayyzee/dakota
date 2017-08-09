@@ -294,21 +294,15 @@ sub generate_src {
   return $output;
 } # sub generate_src
 sub generate_target_decl {
-  my ($path, $target_srcs_ast, $target_inputs_ast, $is_exe) = @_;
+  my ($path, $target_srcs_ast, $target_inputs_ast) = @_;
   #print "generate_target_decl($path, ...)" . $nl;
   &set_target_decl($path);
-  if ($is_exe) {
-    &set_exe_target($path);
-  }
   return &generate_target($path, $target_srcs_ast, $target_inputs_ast);
 }
 sub generate_target_defn {
-  my ($path, $target_srcs_ast, $target_inputs_ast, $is_exe) = @_;
+  my ($path, $target_srcs_ast, $target_inputs_ast) = @_;
   #print "generate_target_defn($path, ...)" . $nl;
   &set_target_defn($path);
-  if ($is_exe) {
-    &set_exe_target($path);
-  }
   return &generate_target($path, $target_srcs_ast, $target_inputs_ast);
 }
 sub generate_target {
@@ -634,7 +628,7 @@ sub generate_target_runtime {
                   "\#name" => 'name',
                   "\#selectors" =>  'selectors',
                   "\#signatures" => 'signatures',
-                  "\#type" => $$target_srcs_ast{'other'}{'type'},
+                  "\#type" => 'type',
                   "\#va-generic-func-ptrs" => 'va-generic-func-ptrs',
                   "\#va-selectors" =>  'va-selectors',
                   "\#va-signatures" => 'va-signatures',
@@ -655,7 +649,8 @@ sub generate_target_runtime {
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char-t   dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$target_srcs_ast{'other'}{'name'}\");" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-NAME);" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t type = dk-intern(DKT-TARGET-TYPE);" . $nl;
   $target_cc_str .= $nl;
   #my $col;
   $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
