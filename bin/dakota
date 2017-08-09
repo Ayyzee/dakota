@@ -142,11 +142,6 @@ sub build_precompile_cmd_info {
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
-  if (1) {
-  if ($$info{'major-mode'} && $$info{'major-mode'}[1]) {
-    $$root_cmd{'opts'}{$$info{'major-mode'}[1]} = 1;
-  }
-  }
   if ($$info{'output'} && $$info{'output'}[1]) {
     $$root_cmd{'opts'}{'output'} = $$info{'output'}[1];
   }
@@ -201,10 +196,6 @@ sub extract_dakota_opts {
   }
   return $info;
 }
-my $major_mode_tbl = {
-  '-c'        => 'compile',
-  '--compile' => 'compile',
-};
 sub detect_cxx_opts {
   my ($cmd, $info) = @_;
   my $num_dk_files = 0;
@@ -215,8 +206,8 @@ sub detect_cxx_opts {
     my $arg = $$cmd[$i];
     my $pair;
     if (0) {
-    } elsif ($$major_mode_tbl{$arg}) {
-      $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
+    #} elsif ($$major_mode_tbl{$arg}) {
+    #  $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
     #} elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
     #  &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
     #} elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {

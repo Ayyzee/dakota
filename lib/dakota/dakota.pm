@@ -489,7 +489,6 @@ sub update_target_srcs_ast_from_all_inputs {
   $$cmd_info{'inputs'} = $$cmd_info{'parts.inputs'},
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
-  delete $$cmd_info{'opts'}{'compile'};
   &check_path($target_srcs_ast_path);
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);
@@ -548,7 +547,7 @@ sub start_cmd {
   &set_target_srcs_ast($target_srcs_ast_path);
 
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
-    if (!$$cmd_info{'opts'}{'compile'}) {
+    if ($$cmd_info{'opts'}{'target-hdr'}) {
         &gen_target_h($cmd_info);
     }
   }
@@ -564,11 +563,9 @@ sub start_cmd {
     # or for testing runtime code generation
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
-    if (!$$cmd_info{'opts'}{'compile'}) {
-      if (!$$cmd_info{'opts'}{'target-hdr'}) {
+      if ($$cmd_info{'opts'}{'target-src'}) {
           &gen_target_cc($cmd_info);
       }
-    }
     if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
       $cmd_info = &loop_cc_from_dk($cmd_info);
       $cc_files = &cc_files($$cmd_info{'inputs'});
@@ -579,11 +576,9 @@ sub start_cmd {
       $cmd_info = &loop_cc_from_dk($cmd_info);
       $cc_files = &cc_files($$cmd_info{'inputs'});
     }
-    if (!$$cmd_info{'opts'}{'compile'}) {
-      if (!$$cmd_info{'opts'}{'target-hdr'}) {
+      if ($$cmd_info{'opts'}{'target-src'}) {
           &gen_target_cc($cmd_info);
       }
-    }
   }
   return ($exit_status, $cc_files);
 }
@@ -684,7 +679,7 @@ sub loop_ast_from_inputs {
       &ordered_set_add($ast_files, $input, __FILE__, __LINE__);
     }
   }
-  if (! $$cmd_info{'opts'}{'compile'}) {
+  #if ($$cmd_info{'opts'}{'target-hdr'}) {
     if (0 != @$ast_files) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
       &check_path($target_srcs_ast_path);
@@ -697,7 +692,7 @@ sub loop_ast_from_inputs {
       };
       &ast_from_inputs($ast_cmd); # multiple inputs
     }
-  }
+  #}
   return $cmd_info;
 } # loop_ast_from_inputs
 sub gen_target_h {
