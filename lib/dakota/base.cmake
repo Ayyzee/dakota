@@ -51,25 +51,17 @@ find_program (dakota       dakota PATHS ${bin-dirs})
 set (CMAKE_CXX_COMPILER ${dakota})
 set (parts ${build-dir}/parts.yaml)
 execute_process (
-  COMMAND ${root-source-dir}/bin/dakota-parts ${parts} # dummy ${parts}
-    source-dir:         ${CMAKE_SOURCE_DIR}
-    current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
-    build-dir:          ${build-dir})
-execute_process (
-  COMMAND ${dakota} --target-src --parts ${parts} --path-only # dummy ${parts}
-  OUTPUT_VARIABLE target-src
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
-set (target-hdr ${target}-target-hdr)
-add_custom_command (
-  OUTPUT ${parts}
-  DEPENDS ${current-source-build-vars}
   COMMAND ${root-source-dir}/bin/dakota-parts ${parts}
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir}
     lib-files:          ${target-lib-files} ${lib-files}
-    srcs:               ${srcs}
-  VERBATIM)
+    srcs:               ${srcs})
+execute_process (
+  COMMAND ${dakota} --target-src --parts ${parts} --path-only
+  OUTPUT_VARIABLE target-src
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+set (target-hdr ${target}-target-hdr)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
