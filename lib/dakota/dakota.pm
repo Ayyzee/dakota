@@ -528,7 +528,7 @@ sub start_cmd {
   my $lock_file = $target_srcs_ast_path . '.flock';
   &make_dir_part($target_srcs_ast_path);
 
-  my $should_lock = 0;
+  my $should_lock = 1;
   if ($should_lock) {
     open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     flock LOCK_FILE, LOCK_EX or die;
