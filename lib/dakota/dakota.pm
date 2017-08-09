@@ -523,15 +523,11 @@ sub start_cmd {
   $build_dir = &build_dir();
   $exit_status = 0;
   my $cc_files = [];
-  $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'}; ###
+  $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if (1) {
     my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     &make_dir_part($target_srcs_ast_path);
-
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
-    if ($$cmd_info{'opts'}{'target-ast'}) {
-      return ($exit_status, $cc_files);
-    }
     &set_target_srcs_ast($target_srcs_ast_path);
   }
   if ($$cmd_info{'opts'}{'target-hdr'}) {
@@ -540,7 +536,9 @@ sub start_cmd {
   if ($$cmd_info{'opts'}{'target-src'}) {
     &gen_target_src($cmd_info);
   }
-  if (!$$cmd_info{'opts'}{'target-hdr'} && !$$cmd_info{'opts'}{'target-src'}) {
+  if (!$$cmd_info{'opts'}{'target-ast'} &&
+      !$$cmd_info{'opts'}{'target-hdr'} &&
+      !$$cmd_info{'opts'}{'target-src'}) {
     $cmd_info = &loop_cc_from_dk($cmd_info);
     $cc_files = &cc_files($$cmd_info{'inputs'});
   }
