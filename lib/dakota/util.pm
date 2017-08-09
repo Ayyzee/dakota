@@ -674,7 +674,7 @@ sub target_build_dir {
 }
 sub target_srcs_ast_path {
   my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_build_dir($cmd_info) . '/target.ast';
+  my $target_srcs_ast_path = &target_build_dir($cmd_info) . '/srcs.ast';
   return $target_srcs_ast_path;
 }
 sub target_h_path {
