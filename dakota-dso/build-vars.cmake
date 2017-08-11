@@ -1,15 +1,12 @@
 # -*- mode: cmake -*-
-set (target dakota-dso)
 set (build-dir ${CMAKE_SOURCE_DIR}/build-dkt/${target})
-set (compiler-opts @${root-source-dir}/lib/dakota/compiler.opts)
-set (linker-opts   @${root-source-dir}/lib/dakota/linker.opts)
 set (macros
 )
 set (include-dirs
-  ${root-source-dir}/include
+  ${CMAKE_SOURCE_DIR}/include
 )
 set (install-include-files
-  ${root-source-dir}/include/dakota-dso.h
+  ${CMAKE_SOURCE_DIR}/include/dakota-dso.h
 )
 set (lib-dirs
 )

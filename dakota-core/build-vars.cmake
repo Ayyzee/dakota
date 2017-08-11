@@ -1,16 +1,13 @@
 # -*- mode: cmake -*-
-set (target dakota-core)
 set (build-dir ${CMAKE_SOURCE_DIR}/build-dkt/${target})
-set (compiler-opts @${root-source-dir}/lib/dakota/compiler.opts)
-set (linker-opts   @${root-source-dir}/lib/dakota/linker.opts)
 set (macros
 )
 set (bin-dirs
-  ${root-source-dir}/bin
+  ${CMAKE_SOURCE_DIR}/bin
 )
 set (include-dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${root-source-dir}/include
+  ${CMAKE_SOURCE_DIR}/include
 )
 set (lib-dirs
 )

@@ -26,7 +26,7 @@ endforeach ()
 
 set (target-lib-files)
 foreach (lib ${target-libs})
-  set (target-lib-file ${root-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set (target-lib-file ${CMAKE_SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
   list (APPEND target-lib-files ${target-lib-file})
 endforeach ()
 
@@ -39,10 +39,12 @@ if (NOT target-type)
   set (target-type executable)
 endif ()
 
+set (compiler-opts @${CMAKE_SOURCE_DIR}/lib/dakota/compiler.opts)
+set (linker-opts   @${CMAKE_SOURCE_DIR}/lib/dakota/linker.opts)
 set (compile-options ${compiler-opts})
 set (link-options ${linker-opts})
-set (CMAKE_PREFIX_PATH  ${root-source-dir})
-#set (CMAKE_LIBRARY_PATH ${root-source-dir}/lib)
+set (CMAKE_PREFIX_PATH  ${CMAKE_SOURCE_DIR})
+#set (CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler-id       apple-clang)
@@ -51,7 +53,7 @@ find_program (dakota       dakota PATHS ${bin-dirs})
 set (CMAKE_CXX_COMPILER ${dakota})
 set (parts ${build-dir}/parts.yaml)
 execute_process (
-  COMMAND ${root-source-dir}/bin/dakota-parts ${parts}
+  COMMAND ${CMAKE_SOURCE_DIR}/bin/dakota-parts ${parts}
     source-dir:         ${CMAKE_SOURCE_DIR}
     current-source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
     build-dir:          ${build-dir}
@@ -85,12 +87,12 @@ list (APPEND link-options
 if ("${target-type}" STREQUAL "shared-library")
   set (target-output-file ${CMAKE_SHARED_LIBRARY_PREFIX}${target}${CMAKE_SHARED_LIBRARY_SUFFIX})
   add_library (${target} SHARED ${srcs})
-  set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${root-source-dir}/lib)
+  set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 else ()
   set (target-output-file ${target}${CMAKE_EXECUTABLE_SUFFIX})
   add_executable (${target} ${srcs})
-  set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${root-source-dir}/bin)
+  set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
