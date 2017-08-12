@@ -76,8 +76,6 @@ add_custom_command (
   DEPENDS ${parts} ${target-libs} dakota-catalog
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
-list (INSERT srcs 0 ${target-src}) # add-first
-#list (APPEND srcs ${target-src}) # add-last
 set (target-dependencies ${target-hdr})
 list (APPEND compile-options
   --parts ${parts} --cxx ${cxx-compiler})
@@ -97,6 +95,8 @@ elseif ("${target-type}" STREQUAL "executable")
 else ()
   message (FATAL_ERROR "error: target-type must be shared-library or executable.")
 endif ()
+target_sources (${target} PRIVATE ${target-src})
+
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
 if (target-dependencies)
