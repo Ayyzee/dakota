@@ -866,14 +866,7 @@ sub outfile_from_infiles {
       delete $$cmd_info{'cmd-flags'};
       &cc_from_dk_core2($cmd_info, $global_should_echo || $should_echo);
     } else {
-      &exec_cmd($cmd_info, $should_echo);
-    }
-
-    if (1) {
-      foreach my $input (@$infiles) {
-        $input =~ s=^--library-directory\s+(.+)\s+-l(.+)$=$1/lib$2.$so_ext=;
-        $input = &canon_path($input);
-      }
+      &exec_cmd($cmd_info, $should_echo); # dakota-catalog
     }
   }
   return $num_out_of_date_infiles;
@@ -897,7 +890,7 @@ sub ctlg_from_so {
     }
   }
   if ($$cmd_info{'opts'}{'silent'} && !$$cmd_info{'opts'}{'echo-inputs'}) {
-    $$ctlg_cmd{'cmd'} .= ' --silent';
+    $$ctlg_cmd{'cmd-flags'} = '--silent';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
