@@ -6,7 +6,6 @@ set (bin-dirs
   ${CMAKE_SOURCE_DIR}/bin
 )
 set (include-dirs
-  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/include
 )
 set (lib-dirs
