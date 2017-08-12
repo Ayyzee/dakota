@@ -91,7 +91,6 @@ undef $/;
 
 my $should_write_ctlg_files = 1;
 my $want_separate_ast_pass = 1; # currently required to bootstrap dakota
-my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
 my $global_should_echo = 0;
 my $exit_status = 0;
@@ -719,10 +718,8 @@ sub cc_from_dk {
     if ($num_out_of_date_infiles) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     }
-    if ($$cmd_info{'opts'}{'precompile'}) {
-      $outfile = $$cc_cmd{'output'};
-      &dakota_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
-    }
+    $outfile = $$cc_cmd{'output'};
+    &dakota_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
   }
   return $outfile;
 } # cc_from_dk
@@ -783,10 +780,10 @@ sub target_from_ast {
   &check_path($target_srcs_ast_path);
 
   if ($is_defn) {
-    if ($$cmd_info{'opts'}{'precompile'}) {
+    if ($$cmd_info{'opts'}{'target-src'}) {
       return if !&is_out_of_date($target_srcs_ast_path, $target_src_path);
     }
-  } else {
+  } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
     return if !&is_out_of_date($target_srcs_ast_path, $target_hdr_path);
   }
   &make_dir_part($target_src_path, $global_should_echo);
@@ -794,7 +791,7 @@ sub target_from_ast {
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $build_dir/
   # $target_inputs_ast not used, called for side-effect
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_src_from_ast
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within target_src_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
   $target_srcs_ast = &kw_args_translate($target_srcs_ast);
   $$target_srcs_ast{'should-generate-make'} = 1;
@@ -895,11 +892,7 @@ sub ctlg_from_so {
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
 
-  if ($$cmd_info{'opts'}{'precompile'}) {
-    $$ctlg_cmd{'inputs'} = &precompiled_inputs($cmd_info);
-  } else {
-    $$ctlg_cmd{'inputs'} = $$cmd_info{'inputs'};
-  }
+  $$ctlg_cmd{'inputs'} = &precompiled_inputs($cmd_info);
   #print &Dumper($ctlg_cmd);
   my $should_echo;
   return &outfile_from_infiles($ctlg_cmd, $should_echo = 0);

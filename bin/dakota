@@ -137,7 +137,6 @@ sub build_precompile_cmd_info {
     'parts.source-dir' =>         $$parts{'source-dir'},
     'parts.current-source-dir' => $$parts{'current-source-dir'},
   };
-  $$root_cmd{'opts'}{'precompile'} = 1;
   $$root_cmd{'args'} = $ordered_input_args;
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
@@ -360,7 +359,6 @@ sub cmd_info_from_argv {
               'output=s',  # gcc-like
 
               'path-only',
-              'precompile',     # gcc-ish (--compile)
               'parts=s',
               'target-ast',
               'target-hdr',
@@ -388,7 +386,6 @@ sub exec_cmd_info {
   my ($root_cmd) = @_;
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   $$root_cmd{'inputs'} = [] if ! $$root_cmd{'inputs'};
-  $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target-src'};
   if ($$root_cmd{'opts'}{'parts'}) {
     $$root_cmd{'opts'}{'parts'} = &relpath($$root_cmd{'opts'}{'parts'});
   }
@@ -438,14 +435,6 @@ sub exec_cmd_info {
         }
         $$root_cmd{'parts.inputs'}[$i] = $input;
       }
-    }
-  }
-  # should only reorder the .o files (between .so files) leaving the .so files in their
-  # original position so the inputs should be split into separate sublist (and then sorted).
-  # its OK to sort the .dk files, but we must link using the original positions.
-  if (1) {
-    if (!$$root_cmd{'opts'}{'precompile'}) {
-      $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
     }
   }
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];

@@ -1860,10 +1860,10 @@ sub method {
 }
 my $_target_inputs_ast;
 sub target_inputs_ast {
-  my ($asts, $is_precompile) = @_;
+  my ($asts) = @_;
   return $_target_inputs_ast if $_target_inputs_ast;
   my $target_inputs_ast_path = &target_build_dir() . '/inputs.ast';
-  if ($is_precompile && -e $target_inputs_ast_path) {
+  if (-e $target_inputs_ast_path) {
     $_target_inputs_ast = &scalar_from_file($target_inputs_ast_path);
     return $_target_inputs_ast;
   }
@@ -1888,8 +1888,6 @@ sub generics::klass_type_from_klass_name { ###
     $klass_type = 'klass';
   } elsif ($$target_inputs_ast{'traits'}{$klass_name}) {
     $klass_type = 'trait';
-  } elsif ($$cmd_info{'opts'}{'precompile'}) {
-    $klass_type = 'klass||trait';
   } else {
     my $root_cmd = &root_cmd();
     my $ast_path_var = [join '::', @{$$root_cmd{'asts'}}];
@@ -1910,8 +1908,6 @@ sub generics::klass_ast_from_klass_name {
     $klass_ast = $$target_inputs_ast{'klasses'}{$klass_name};
   } elsif ($$target_inputs_ast{'traits'}{$klass_name}) {
     $klass_ast = $$target_inputs_ast{'traits'}{$klass_name};
-  } elsif ($$cmd_info{'opts'}{'precompile'}) {
-    $klass_ast = {};
   } else {
     my $root_cmd = &root_cmd();
     my $ast_path_var = [join '::', @{$$root_cmd{'asts'} || []}];
