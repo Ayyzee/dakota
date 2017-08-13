@@ -187,6 +187,7 @@ our @EXPORT= qw(
                  use_abs_path
                  var
                  var_array
+                 verbose_exec
  );
 use Cwd;
 use File::Spec;
@@ -605,6 +606,17 @@ sub dir_part {
   $dir = '.' if $dir eq "";
   return $dir;
 }
+sub verbose_exec {
+  my ($argv) = @_;
+  if ($ENV{'DAKOTA_VERBOSE'}) {
+    print join(' ', @$argv) . $nl;
+  }
+  my $exit_val = system(@$argv);
+  if ($exit_val) {
+    print STDERR 'error: ' . join(' ', @$argv) . $nl;
+  }
+  return $exit_val;
+}
 sub make_dir {
   my ($path, $should_echo) = @_;
   $path = join('/', @$path) if &is_array($path);
@@ -613,7 +625,8 @@ sub make_dir {
       print STDERR $0 . ': info: make_dir(' . $path . ')' . $nl;
     }
     my $cmd = ['mkdir', '-p', $path];
-    system(@$cmd) == 0 or die $0 . ': error: ' . @$cmd . $nl;
+    my $exit_val = &verbose_exec($cmd);
+    exit $exit_val >> 8 if $exit_val;
   }
 }
 sub make_dir_part {
@@ -705,8 +718,7 @@ sub path_only {
     } else {
       die;
     }
-    my $exit_status = 0;
-    exit $exit_status;
+    exit 0;
   }
 }
 

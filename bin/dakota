@@ -257,8 +257,7 @@ sub cxx_argv_from_argv {
    #  my ($parts, $dakota_io) = &use_parts($precompile_cmd_info);
    #}
    #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info, $parts);
-    ($exit_val, $cc_paths) = &exec_cmd_info($precompile_cmd_info);
-    exit $exit_val if $exit_val;
+    $cc_paths = &exec_cmd_info($precompile_cmd_info);
   }
   if (0 != @$cc_paths) {
     &translate_dk_to_cc($cxx_argv, $cc_paths);
@@ -360,24 +359,13 @@ sub cmd_info_from_argv {
 
               'path-only',
               'parts=s',
-              'target-ast',
+              'target-ast', # mainly for debugging
               'target-hdr',
               'target-src',
 
               'clean',          # make target like
               'echo-inputs',    #
               'silent',         #
-              #'compiler-flags=s',     # similiar to env vars CXXFLAGS & EXTRA_CXXFLAGS
-              #'compiler=s',           # similiar to env var CXX
-              #'environment-overrides' # make-like
-              #'for-compiler=s',       # gcc-like (--for-linker <>)
-              #'for-linker=s',         # gcc-like
-              #'jobs'                  # make-like
-              #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
-              #'linker=s',             # similiar to env var LD
-              #'pie'                   # ld-like
-              #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
-              #'touch'                 # make-like
             );
   $$root_cmd{'args'} = $argv;
   return $root_cmd;
@@ -390,15 +378,6 @@ sub exec_cmd_info {
     $$root_cmd{'opts'}{'parts'} = &relpath($$root_cmd{'opts'}{'parts'});
   }
   &set_root_cmd($root_cmd);
-
-  # --quiet
-  # --help
-  # --verbose
-
-  # 1/1: one  input,  one output
-  # 1/0: one  input,  no  output
-  # m/0: many inputs, no  output
-  # m/1: many inputs, one output (directory)
 
   my $rel_argv = [map { &relpath($_) } @{$$root_cmd{'args'}}];
   my $inputs = &normalize_paths($rel_argv);
@@ -413,32 +392,7 @@ sub exec_cmd_info {
     exit 0;
   }
   $inputs = &normalize_paths($inputs);
-
-  if (0) {
-    my $stuff = {};
-    $$stuff{'cwd'} = &getcwd();
-    $$stuff{'parts-dir'} = &dir_part($$root_cmd{'opts'}{'parts'});
-    $$stuff{'rel-dir'} = &relpath($$stuff{'parts-dir'}, $$stuff{'cwd'});
-    #&dmp($stuff);
-    my $dir = $$stuff{'rel-dir'};
-    if (! $dir) {
-      $dir = &getcwd();
-    } elsif (! &is_abs($dir)) {
-      $dir = &getcwd() . '/' . $dir;
-    }
-    for (my $i = 0; $i < @{$$root_cmd{'parts.inputs'}}; $i++) {
-      my $parts_input = $$root_cmd{'parts.inputs'}[$i];
-      if (! &is_abs($parts_input)) {
-        my $input = $dir . '/' . $parts_input;
-        if (! -e $input) {
-          print STDERR $0 . ": error: no-such-file: $input" . $nl;
-        }
-        $$root_cmd{'parts.inputs'}[$i] = $input;
-      }
-    }
-  }
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-
   &normalize_paths($root_cmd, 'inputs');
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
   #print STDERR 'parts: ' .  &Dumper($parts);
@@ -448,27 +402,19 @@ sub exec_cmd_info {
   die if ! $$parts{'build-dir'};
   die if ! $$parts{'project-source-dir'};
   die if ! $$parts{'source-dir'};
-  my ($exit_val, $cc_files) = &dakota::dakota::start_cmd($root_cmd, $parts);
-  return ($exit_val, $cc_files);
-}
-sub verbose_exec {
-  my ($argv, $should_echo) = @_;
-  if ($should_echo) {
-    print '# ' . join(' ', @$argv) . $nl;
-  }
-  my $exit_val = system(@$argv);
-  return $exit_val;
+  my $cc_files = &dakota::dakota::start_cmd($root_cmd, $parts);
+  return (0, $cc_files);
 }
 sub start {
   my ($argv) = @_;
   if (&has_cxx_opt($argv)) {
     my $cxx_argv = &cxx_argv_from_argv($argv); # calls exec_cmd_info() => start_cmd()
-    my $exit_val = &verbose_exec($cxx_argv, $ENV{'DAKOTA_VERBOSE'});
+    my $exit_val = &verbose_exec($cxx_argv); # g++/clang++
     exit $exit_val >> 8;
   } else {
-    my $cmd_info =              &cmd_info_from_argv($argv);
-    my ($exit_val, $cc_files) = &exec_cmd_info($cmd_info); # calls start_cmd()
-    exit $exit_val;
+    my $cmd_info = &cmd_info_from_argv($argv);
+    my $cc_files = &exec_cmd_info($cmd_info); # calls start_cmd()
+    exit 0;
   }
 }
 &start(\@ARGV);

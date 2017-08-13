@@ -93,7 +93,6 @@ my $should_write_ctlg_files = 1;
 my $want_separate_ast_pass = 1; # currently required to bootstrap dakota
 my $show_outfile_info = 0;
 my $global_should_echo = 0;
-my $exit_status = 0;
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &ident_regex();
@@ -520,7 +519,6 @@ sub start_cmd {
   my ($cmd_info, $parts) = @_;
   $root_cmd = $cmd_info;
   $build_dir = &build_dir();
-  $exit_status = 0;
   my $cc_files = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if (1) {
@@ -541,7 +539,7 @@ sub start_cmd {
     $cmd_info = &loop_cc_from_dk($cmd_info);
     $cc_files = &cc_files($$cmd_info{'inputs'});
   }
-  return ($exit_status, $cc_files);
+  return $cc_files;
 }
 sub ast_from_so {
   my ($cmd_info, $arg) = @_;
@@ -812,20 +810,11 @@ sub target_from_ast {
     &generate_target_decl($target_hdr_path, $target_srcs_ast, $target_inputs_ast);
   }
 }
-sub exec_cmd {
-  my ($cmd_info, $should_echo) = @_;
-  my $cmd_str;
-  $cmd_str = &str_from_cmd_info($cmd_info);
-  if (&is_debug() || $global_should_echo || $should_echo) {
-    print STDERR $cmd_str . $nl;
-  }
-  if ($ENV{'DKT_INITIAL_WORKDIR'}) {
-    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die "$!";
-  }
-  else {
-    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die "$!";
-  }
-  system($cmd_str) == 0 or die $0 . ': error: ' . $cmd_str . $nl;
+sub verbose_exec_cmd_info {
+  my ($cmd_info) = @_;
+  my $argv = &argv_from_cmd_info($cmd_info);
+  my $exit_val = &verbose_exec($argv);
+  return $exit_val;
 }
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
@@ -863,7 +852,8 @@ sub outfile_from_infiles {
       delete $$cmd_info{'cmd-flags'};
       &cc_from_dk_core2($cmd_info, $global_should_echo || $should_echo);
     } else {
-      &exec_cmd($cmd_info, $should_echo); # dakota-catalog
+      my $exit_val = &verbose_exec_cmd_info($cmd_info); # dakota-catalog
+      exit $exit_val >> 8 if $exit_val;
     }
   }
   return $num_out_of_date_infiles;

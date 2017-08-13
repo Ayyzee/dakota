@@ -129,7 +129,7 @@ our @EXPORT= qw(
                  ast_path_from_dk_path
                  ast_path_from_ctlg_path
                  ast_merge
-                 str_from_cmd_info
+                 argv_from_cmd_info
               );
 my $colon = ':'; # key/item delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
@@ -304,36 +304,34 @@ sub init_ast_from_inputs_vars {
   $gbl_current_ast_scope = $gbl_root_ast;
   $gbl_filename = undef;
 }
-sub str_from_cmd_info {
+sub argv_from_cmd_info {
   my ($cmd_info) = @_;
-
-  my $str = '';
+  my $argv = [];
   if (defined $$cmd_info{'cmd'}) {
-    $str .= $$cmd_info{'cmd'};
+    &add_last($argv, $$cmd_info{'cmd'});
   } else {
-    $str .= 'xxx';
+    &add_last($argv, 'xxx');
   }
   if ($$cmd_info{'cmd-flags'}) {
-    $str .= " $$cmd_info{'cmd-flags'}";
+    &add_last($argv, $$cmd_info{'cmd-flags'});
   }
   if ($$cmd_info{'output'}) {
-    $str .= " --output " . $$cmd_info{'output'};
+    &add_last($argv, ('--output', $$cmd_info{'output'}));
   }
   if ($$cmd_info{'output-directory'}) {
-    $str .= " --output-directory " . $$cmd_info{'output-directory'};
+    &add_last($argv, ('--output-directory', $$cmd_info{'output-directory'}));
   }
   foreach my $infile (@{$$cmd_info{'asts'}}) {
-    $str .= " $infile";
+    &add_last($argv, $infile);
   }
   foreach my $infile (@{$$cmd_info{'inputs'}}) {
     if ($$cmd_info{'inputs-tbl'}{$infile}) {
-      $str .= " $$cmd_info{'inputs-tbl'}{$infile}";
+      &add_last($argv, $$cmd_info{'inputs-tbl'}{$infile});
     } else {
-      $str .= " $infile";
+      &add_last($argv, $infile);
     }
   }
-  $str =~ s|(\s)\s+|$1|g;
-  return $str;
+  return $argv;
 }
 sub inc_path_from_dk_path {
   my ($path) = @_;

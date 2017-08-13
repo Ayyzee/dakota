@@ -12,4 +12,4 @@ if [[ -e jobs.txt ]]; then
   jobs=$(cat jobs.txt)
 fi
 generator="${generator:-ninja}"
-$generator -C $binary_dir -j $jobs $@
+DAKOTA_VERBOSE=1 $generator -C $binary_dir -j $jobs $@
