@@ -78,7 +78,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  cpp_directives
-                 current_source_dir
+                 project_source_dir
                  ct
                  decode_comments
                  decode_strings
@@ -654,9 +654,9 @@ sub source_dir {
   my $dir = &xxx_dir('source-dir', $default_dir = undef);
   return $dir;
 }
-sub current_source_dir {
+sub project_source_dir {
   my $default_dir;
-  my $dir = &xxx_dir('current-source-dir', $default_dir = undef);
+  my $dir = &xxx_dir('project-source-dir', $default_dir = undef);
   return $dir;
 }
 sub target_build_dir {
@@ -691,9 +691,9 @@ sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
     my $parts = &parts($$cmd_info{'opts'}{'parts'});
-    my $current_source_dir = &relpath($$parts{'current-source-dir'});
+    my $project_source_dir = &relpath($$parts{'project-source-dir'});
     my $force;
-    $$cmd_info{'parts.build-dir'} = &adjust_path($current_source_dir, $$parts{'build-dir'}, $force = 1);
+    $$cmd_info{'parts.build-dir'} = &adjust_path($project_source_dir, $$parts{'build-dir'}, $force = 1);
 
   if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
@@ -777,9 +777,9 @@ sub global_parts {
 sub set_global_parts {
   my ($parts_path) = @_;
   $global_parts = &parts($parts_path);
-  my $current_source_dir = &relpath($$global_parts{'current-source-dir'});
-  if ($current_source_dir ne '.') {
-    $$global_parts{'current-source-dir'} = $current_source_dir;
+  my $project_source_dir = &relpath($$global_parts{'project-source-dir'});
+  if ($project_source_dir ne '.') {
+    $$global_parts{'project-source-dir'} = $project_source_dir;
   }
   return $global_parts;
 }
@@ -1205,8 +1205,8 @@ sub is_dk_path {
   }
 }
 sub adjust_path {
-  my ($current_source_dir, $input, $force) = @_;
-  return $input if $current_source_dir eq '.';
+  my ($project_source_dir, $input, $force) = @_;
+  return $input if $project_source_dir eq '.';
   $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {
@@ -1214,7 +1214,7 @@ sub adjust_path {
     #die if ! -e $rel_input;
     return $rel_input;
   }
-  my $path = $current_source_dir . '/' . $input;
+  my $path = $project_source_dir . '/' . $input;
   if ($force || (! -e $input && -e $path)) {
     $rel_input = &relpath($path);
   }
@@ -1222,11 +1222,11 @@ sub adjust_path {
   return $rel_input;
 }
 sub adjust_paths {
-  my ($current_source_dir, $inputs, $force) = @_;
-  return $inputs if ! $current_source_dir || ($current_source_dir eq '.');
+  my ($project_source_dir, $inputs, $force) = @_;
+  return $inputs if ! $project_source_dir || ($project_source_dir eq '.');
   my $rel_inputs = [];
   foreach my $input (@$inputs) {
-    my $rel_input = &adjust_path($current_source_dir, $input, $force);
+    my $rel_input = &adjust_path($project_source_dir, $input, $force);
     &add_last($rel_inputs, $rel_input);
   }
   return $rel_inputs;
@@ -1513,7 +1513,7 @@ sub parts {
                                     [
                                       'build-dir',
                                       'source-dir',
-                                      'current-source-dir',
+                                      'project-source-dir',
                                     ]);
   return $result;
 }

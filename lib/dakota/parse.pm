@@ -30,7 +30,7 @@ use sort 'stable';
 
 my $gbl_compiler;
 my $gbl_used;
-my $current_source_dir;
+my $project_source_dir;
 my $build_dir;
 my $h_ext;
 my $cc_ext;
@@ -72,10 +72,10 @@ sub h_path_from_src_path {
   return $h_path;
 }
 my $patterns = {
-  'cc_path_from_dk_path' => '$(build_dir)/%.$(cc_ext) : $(current_source_dir)/%.dk',
-  'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(current_source_dir)/%.dk',
+  'cc_path_from_dk_path' => '$(build_dir)/%.$(cc_ext) : $(project_source_dir)/%.dk',
+  'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(project_source_dir)/%.dk',
 
-  'ast_path_from_dk_path' =>   '$(build_dir)/%.dk.ast      : $(current_source_dir)/%.dk',
+  'ast_path_from_dk_path' =>   '$(build_dir)/%.dk.ast      : $(project_source_dir)/%.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
   'ctlg_path_from_so_path' =>   '$(build_dir)/%.$(so_ext).ctlg : %.$(so_ext)',
@@ -372,7 +372,7 @@ sub var_perl_from_make { # convert variable syntax to perl from make
 }
 sub expand {
   my ($str) = @_;
-  $current_source_dir if 0;
+  $project_source_dir if 0;
   $build_dir if 0;
   $cc_ext if 0;
   $o_ext  if 0;
@@ -397,7 +397,7 @@ sub out_path_from_in_path {
   if (&is_dk_path($path_in)) {
     $path_in = &prepend_dot_slash($path_in);
   }
-  $current_source_dir = &current_source_dir();
+  $project_source_dir = &project_source_dir();
   $build_dir = &build_dir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
