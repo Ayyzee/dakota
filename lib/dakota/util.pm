@@ -662,17 +662,17 @@ sub build_dir {
   my $dir = &xxx_dir('build-dir', $default_dir = undef);
   return $dir;
 }
-sub source_dir {
+sub source_dir { # root source dir (CMAKE_SOURCE_DIR)
   my $default_dir;
   my $dir = &xxx_dir('source-dir', $default_dir = undef);
   return $dir;
 }
-sub project_source_dir {
+sub project_source_dir { # sub project source dir (PROJECT_SOURCE_DIR)
   my $default_dir;
   my $dir = &xxx_dir('project-source-dir', $default_dir = undef);
   return $dir;
 }
-sub target_build_dir {
+sub target_build_dir { # dakota build dir (cmake has own build dir; it uses phrase "binary dir")
   my ($cmd_info) = @_;
   my $build_dir;
   if ($$cmd_info{'parts.build-dir'}) {
