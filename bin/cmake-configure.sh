@@ -8,7 +8,7 @@ else
 fi
 rel_source_dir=..
 generator_id="${generator_id:-Ninja}"
-if [[ $generator == make ]]; then
+if [[ ${generator:-ninja} == make ]]; then
   generator_id="Unix Makefiles"
 fi
 extra_opts="-DCMAKE_BUILD_TYPE=Debug -Wdev -Wdeprecated"

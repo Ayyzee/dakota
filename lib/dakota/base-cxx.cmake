@@ -61,7 +61,6 @@ set (CMAKE_PREFIX_PATH  ${CMAKE_SOURCE_DIR})
 #set (CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-set (cxx-compiler-id       apple-clang)
 find_program (cxx-compiler clang++)
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
 
