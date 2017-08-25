@@ -1,0 +1,11 @@
+// -*- mode: c++; mode: dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass hashed-set;
+klass ssize;
+
+func main() -> int-t {
+  object-t s = $make(hashed-set::klass());
+  $add(s, ssize::box(42));
+  $dump(s);
+  return 0;
+}
