@@ -485,8 +485,6 @@ sub update_target_srcs_ast_from_all_inputs {
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
              };
   $$cmd_info{'inputs'} = $$cmd_info{'parts.inputs'},
-  $$cmd_info{'opts'}{'echo-inputs'} = 0;
-  $$cmd_info{'opts'}{'silent'} = 1;
   &check_path($target_srcs_ast_path);
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);
@@ -670,10 +668,6 @@ sub gen_target {
   if ($$cmd_info{'output'}) {
     my $target_src_path = &target_src_path($cmd_info);
     my $target_hdr_path =  &target_hdr_path($cmd_info);
-    if ($$cmd_info{'opts'}{'echo-inputs'}) {
-      my $target_dk_path = &dk_path_from_cc_path($target_src_path);
-      print $target_dk_path . $nl;
-    }
   }
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   &check_path($target_srcs_ast_path);
@@ -690,9 +684,6 @@ sub cc_from_dk {
   my $num_out_of_date_infiles = 0;
   my $outfile;
   if (!&is_dk_src_path($input)) {
-    if ($$cmd_info{'opts'}{'echo-inputs'}) {
-      #print $input . $nl; # dk_path
-    }
     $outfile = $input;
   } else {
     my $inc_path = &inc_path_from_dk_path($input);
@@ -860,9 +851,6 @@ sub outfile_from_infiles {
 } # outfile_from_infiles
 sub ctlg_from_so {
   my ($cmd_info) = @_;
-  if ($$cmd_info{'opts'}{'echo-inputs'}) {
-    #map { print '// ' . $_ . $nl; } @{$$cmd_info{'inputs'}};
-  }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'io'} =  $$cmd_info{'io'};
 
@@ -875,9 +863,6 @@ sub ctlg_from_so {
     } else {
       $$ctlg_cmd{'cmd'} = 'dakota-catalog';
     }
-  }
-  if ($$cmd_info{'opts'}{'silent'} && !$$cmd_info{'opts'}{'echo-inputs'}) {
-    $$ctlg_cmd{'cmd-flags'} = '--silent';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};

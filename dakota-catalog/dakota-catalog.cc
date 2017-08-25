@@ -40,7 +40,6 @@ enum {
   DAKOTA_CATALOG_PATH_ONLY,
   DAKOTA_CATALOG_RECURSIVE,
   DAKOTA_CATALOG_JSON,
-  DAKOTA_CATALOG_SILENT,
 };
 struct opts_t {
   bool  exported_only;
@@ -50,7 +49,6 @@ struct opts_t {
   bool  path_only;
   bool  recursive;
   bool  json;
-  bool  silent;
 };
 static opts_t opts = {};
 
@@ -95,7 +93,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
     { "path-only",        no_argument,       nullptr, DAKOTA_CATALOG_PATH_ONLY },
     { "recursive",        no_argument,       nullptr, DAKOTA_CATALOG_RECURSIVE },
     { "json",             no_argument,       nullptr, DAKOTA_CATALOG_JSON },
-    { "silent",           no_argument,       nullptr, DAKOTA_CATALOG_SILENT },
     { nullptr, 0, nullptr, 0 }
   };
   int opt;
@@ -126,9 +123,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         break;
       case DAKOTA_CATALOG_JSON:
         opts.json = true;
-        break;
-      case DAKOTA_CATALOG_SILENT:
-        opts.silent = true;
         break;
       default:
         unrecognized_opt_cnt++;
@@ -230,14 +224,6 @@ FUNC main(int argc, char** argv) -> int {
           handle = dso_open(rel_arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
       }
       if (handle != nullptr) {
-        if (! opts.silent) {
-          // str_t l_name = getenv("DKT_SHARED_LIBRARY_PATH");
-          str_t l_name = dso_abs_path_for_handle(handle);
-          if (l_name != nullptr)
-            printf("%s\n", l_name);
-          else
-            exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_abs_path_for_handle()", arg, dso_error()); // dso_close() failure
-        }
         if (dso_close(handle) != 0)
           exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_close()", arg, dso_error()); // dso_close() failure
       } else

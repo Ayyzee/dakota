@@ -364,8 +364,6 @@ sub cmd_info_from_argv {
               'target-src',
 
               'clean',          # make target like
-              'echo-inputs',    #
-              'silent',         #
             );
   $$root_cmd{'args'} = $argv;
   return $root_cmd;

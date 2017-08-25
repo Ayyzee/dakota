@@ -195,16 +195,10 @@ sub write_to_file_converted_strings {
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
   &convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
   my $should_echo;
-  if (!&is_silent()) {
-    $should_echo = 1 if $path =~ /target\.($h_ext|$cc_ext)$/;
-  }
+  $should_echo = 1 if $path =~ /target\.($h_ext|$cc_ext)$/;
   # swap "# line 1" followed by "// -*- mode:" so the emacs mode line is first
   $converted_string =~ s=^(\s*#\s+line)\s+1(\s+.*?\n)(\s*//\s+-\*-\s+mode:.*?\n)=$3$1 2$2=s;
   &filestr_to_file($converted_string, $path, $should_echo);
-}
-sub is_silent {
-  my $root_cmd = &root_cmd();
-  return $$root_cmd{'opts'}{'silent'};
 }
 sub generate_src_decl {
   my ($path, $file_ast, $target_inputs_ast, $target_hdr_path) = @_;
