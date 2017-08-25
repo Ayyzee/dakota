@@ -61,9 +61,14 @@ set (CMAKE_PREFIX_PATH  ${CMAKE_SOURCE_DIR})
 #set (CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
-find_program (cxx-compiler clang++)
-set (CMAKE_CXX_COMPILER ${cxx-compiler})
 
+set (cxx-compiler NOTFOUND) # cxx-compiler-NOTFOUND
+find_program (cxx-compiler clang++)
+if (NOT cxx-compiler)
+  message (FATAL_ERROR "error: program: clang++: find_library(): ${cxx-compiler}")
+endif ()
+
+set (CMAKE_CXX_COMPILER ${cxx-compiler})
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
 if (target-dependencies)

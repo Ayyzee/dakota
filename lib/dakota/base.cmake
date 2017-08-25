@@ -61,9 +61,20 @@ set (CMAKE_PREFIX_PATH  ${CMAKE_SOURCE_DIR})
 #set (CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
+
+set (cxx-compiler NOTFOUND) # cxx-compiler-NOTFOUND
 find_program (cxx-compiler clang++)
+if (NOT cxx-compiler)
+  message (FATAL_ERROR "error: program: clang++: find_library(): ${cxx-compiler}")
+endif ()
+
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
+set (dakota NOTFOUND) # dakota-NOTFOUND
 find_program (dakota dakota PATHS ${bin-dirs})
+if (NOT dakota)
+  message (FATAL_ERROR "error: program: dakota: find_library(): ${dakota}")
+endif ()
+
 set (CMAKE_CXX_COMPILER ${dakota})
 set (parts ${build-dir}/parts.yaml)
 execute_process (
