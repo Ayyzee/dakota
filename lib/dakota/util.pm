@@ -692,12 +692,12 @@ sub target_srcs_ast_path {
 }
 sub target_hdr_path {
   my ($cmd_info) = @_;
-  my $target_hdr_path = &target_build_dir($cmd_info) . '/target.' . $h_ext;
+  my $target_hdr_path = &target_build_dir($cmd_info) . '/target' . $h_ext;
   return $target_hdr_path;
 }
 sub target_src_path {
   my ($cmd_info) = @_;
-  my $target_src_path = &target_build_dir($cmd_info) . '/target.' . $cc_ext;
+  my $target_src_path = &target_build_dir($cmd_info) . '/target' . $cc_ext;
   return $target_src_path;
 }
 sub path_only {
@@ -823,7 +823,7 @@ sub set_src_defn {
   $gbl_src_file = &canon_path("$name.dk");
   $global_is_target =   0;
   $global_is_defn = 1;
-  $global_suffix = $ext;
+  $global_suffix = ".$ext";
 }
 sub set_target_decl {
   my ($path) = @_;
@@ -1532,9 +1532,6 @@ sub parts {
 sub platform {
   my ($file) = @_;
   my $result = &xxx_from_yaml_file($file, undef);
-  while (my ($key, $array) = each (%$result)) {
-    $$result{$key} =~ s/^\.//g; # hackhack
-  }
   return $result;
 }
 sub filestr_from_file {

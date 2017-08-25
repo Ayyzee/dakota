@@ -63,10 +63,10 @@ BEGIN {
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
   $extra = &do_json("$gbl_prefix/lib/dakota/extra.json")
     or die "&do_json(\"$gbl_prefix/lib/dakota/extra.json\") failed: $!" . $nl;
-  $h_ext = &var($gbl_compiler, 'h_ext', 'h');
-  $cc_ext = &var($gbl_compiler, 'cc_ext', 'cc');
-  $o_ext =  &var($gbl_compiler, 'o_ext',  'o');
-  $so_ext = &var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  $h_ext = &var($gbl_compiler, 'h_ext', undef);
+  $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
+  $o_ext =  &var($gbl_compiler, 'o_ext',  undef);
+  $so_ext = &var($gbl_compiler, 'so_ext', undef); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -112,13 +112,13 @@ my $msig = &method_sig_regex();
 sub is_so_path {
   my ($name) = @_;
   # linux and darwin so-regexs are combined
-  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
-  #my $libname = $2 . ".$so_ext";
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))($so_ext((\.\d+)+)?|((\.\d+)+)?$so_ext)$=; # so-regex
+  #my $libname = $2 . $so_ext;
   return $result;
 }
 sub is_cc_path {
   my ($arg) = @_;
-  if ($arg =~ m/\.$cc_ext$/) {
+  if ($arg =~ m/$cc_ext$/) {
     return 1;
   } else {
     return 0;
@@ -353,25 +353,25 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-decls.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub dk_parse {
@@ -428,11 +428,11 @@ sub cc_from_dk_core2 {
     if ($$cmd_info{'opts'}{'output'}) {
       $cc_path = $$cmd_info{'opts'}{'output'};
     } else {
-      $cc_path = "$input_dir/$input_name.$cc_ext";
+      $cc_path = "$input_dir/$input_name$cc_ext";
     }
     my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     my $inc_path = &inc_path_from_dk_path($input);
-    my $h_path = $cc_path =~ s/\.$cc_ext$/\.$h_ext/r;
+    my $h_path = $cc_path =~ s/$cc_ext$/$h_ext/r;
     $input = &canon_path($input);
     &empty_klass_defns();
     &dk_generate_cc($input, $inc_path, $target_inputs_ast);
@@ -451,8 +451,8 @@ sub cc_from_dk_core2 {
 sub gcc_library_from_library_name {
   my ($library_name) = @_;
   # linux and darwin so-regexs are separate
-  if ($library_name =~ m=^lib([.\w-]+)\.$so_ext((\.\d+)+)?$= ||
-      $library_name =~ m=^lib([.\w-]+)((\.\d+)+)?\.$so_ext$=) { # so-regex
+  if ($library_name =~ m=^lib([.\w-]+)$so_ext((\.\d+)+)?$= ||
+      $library_name =~ m=^lib([.\w-]+)((\.\d+)+)?$so_ext$=) { # so-regex
     my $library_name_base = $1;
     return "-l$library_name_base"; # hardhard: hardcoded use of -l (both gcc/clang use it)
   } else {
@@ -506,7 +506,7 @@ sub cc_files {
   my ($seq) = @_;
   my $cc_files = [];
   foreach my $cc_file (@$seq) {
-    if ($cc_file =~ /\.$cc_ext$/) {
+    if ($cc_file =~ /$cc_ext$/) {
       &add_last($cc_files, $cc_file);
     }
   }

@@ -53,13 +53,13 @@ sub dk_prefix {
 }
 sub h_path_from_cc_path {
   my ($cc_path) = @_;
-  my $h_path = $cc_path =~ s/\.$cc_ext/\.$h_ext/r;
+  my $h_path = $cc_path =~ s/$cc_ext/$h_ext/r;
   return $h_path;
 }
 # related to generate.pm:pre_output_path_from_any_path()
 sub dk_path_from_cc_path { # reverse dependency
   my ($cc_path) = @_;
-  my $dk_path = $cc_path =~ s/\.$cc_ext$/.dk/r;
+  my $dk_path = $cc_path =~ s/$cc_ext$/.dk/r;
   return $dk_path;
 }
 sub cc_path_from_dk_path {
@@ -68,17 +68,17 @@ sub cc_path_from_dk_path {
 }
 sub h_path_from_src_path {
   my ($src_path) = @_;
-  my $h_path = $src_path =~ s/\.(dk|$cc_ext)$/.$h_ext/r;
+  my $h_path = $src_path =~ s/(\.dk|$cc_ext)$/$h_ext/r;
   return $h_path;
 }
 my $patterns = {
-  'cc_path_from_dk_path' => '$(build_dir)/%.$(cc_ext) : $(project_source_dir)/%.dk',
+  'cc_path_from_dk_path' => '$(build_dir)/%$(cc_ext) : $(project_source_dir)/%.dk',
   'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(project_source_dir)/%.dk',
 
   'ast_path_from_dk_path' =>   '$(build_dir)/%.dk.ast      : $(project_source_dir)/%.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
-  'ctlg_path_from_so_path' =>   '$(build_dir)/%.$(so_ext).ctlg : %.$(so_ext)',
+  'ctlg_path_from_so_path' =>   '$(build_dir)/%$(so_ext).ctlg : %$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -94,7 +94,7 @@ BEGIN {
   $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
   $o_ext =  &var($gbl_compiler, 'o_ext', undef);
-  $so_ext = &var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  $so_ext = &var($gbl_compiler, 'so_ext', undef); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -340,7 +340,7 @@ sub inc_path_from_dk_path {
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
   $in_path = &basename($in_path);
-  $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
+  $in_path =~ s/$so_ext((\.\d+)+)$/$so_ext/;
   my $vers = $1;
   my $out_path = &out_path_from_in_path('ctlg_path_from_so_path', $in_path);
   if (defined $vers) {

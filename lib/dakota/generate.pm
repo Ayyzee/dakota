@@ -145,15 +145,15 @@ sub extra_dakota_headers {
     }
     $result .=
       $nl .
-      "# include <dakota.$h_ext>" . $nl .
-      "# include <dakota-log.$h_ext> // optional" . $nl;
+      "# include <dakota$h_ext>" . $nl .
+      "# include <dakota-log$h_ext> // optional" . $nl;
     if (&is_target()) {
       $result .=
-        "# include <dakota-os.$h_ext>" . $nl;
+        "# include <dakota-os$h_ext>" . $nl;
     }
   } elsif (&is_target_defn()) { # generated target h file
     $result .=
-      "# include \"$name.$h_ext\"" . $nl;
+      "# include \"$name$h_ext\"" . $nl;
   } else {
     $result .=
       "bug-in-code-gen" . $nl;
@@ -195,7 +195,7 @@ sub write_to_file_converted_strings {
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
   &convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
   my $should_echo;
-  $should_echo = 1 if $path =~ /target\.($h_ext|$cc_ext)$/;
+  $should_echo = 1 if $path =~ /target($h_ext|$cc_ext)$/;
   # swap "# line 1" followed by "// -*- mode:" so the emacs mode line is first
   $converted_string =~ s=^(\s*#\s+line)\s+1(\s+.*?\n)(\s*//\s+-\*-\s+mode:.*?\n)=$3$1 2$2=s;
   &filestr_to_file($converted_string, $path, $should_echo);
@@ -212,18 +212,18 @@ sub generate_src_defn {
   &set_src_defn($path);
   return &generate_src($path, $file_ast, $target_inputs_ast, $target_hdr_path);
 }
-my $im_suffix_for_suffix = {
+my $im_ext_for_ext = {
   $cc_ext => "$cc_ext.dkt",
   $h_ext => "$h_ext.dkt",
-  'inc'   => 'inc.dkt',
+  '.inc'   => '.inc.dkt',
 };
 sub pre_output_path_from_any_path {
   my ($path) = @_;
-  $path =~ m/\.([\w-]+)$/;
+  $path =~ m/(\.[\w-]+)$/;
   my $ext = $1;
-  my $pre_output_ext = $$im_suffix_for_suffix{$ext};
+  my $pre_output_ext = $$im_ext_for_ext{$ext};
   die $path if !defined $pre_output_ext;
-  my $pre_output = $path =~ s/\.$ext$/.$pre_output_ext/r;
+  my $pre_output = $path =~ s/$ext$/$pre_output_ext/r;
   return $pre_output;
 }
 sub add_include_fors {
@@ -241,11 +241,11 @@ sub generate_src {
   my ($path, $file_ast, $target_inputs_ast, $target_hdr_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
-  my $src_hdr_path = "$name.$h_ext";
+  my $src_hdr_path = "$name$h_ext";
   my $inc_path = $name . '.inc';
   my ($generics, $symbols) = &generics::parse($file_ast);
   my $suffix = &suffix();
-  my $output = &canon_path("$dir/$name.$suffix");
+  my $output = &canon_path("$dir/$name$suffix");
   my $pre_output = &pre_output_path_from_any_path($output);
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
@@ -305,7 +305,7 @@ sub generate_target {
   $dir = '.' if !$dir;
   my ($generics, $symbols) = &generics::parse($target_srcs_ast);
   my $suffix = &suffix();
-  my $output = &canon_path("$dir/$name.$suffix");
+  my $output = &canon_path("$dir/$name$suffix");
   my $start_time;
   my $end_time;
   if (&is_debug()) {
@@ -4373,7 +4373,7 @@ sub dk_generate_cc {
   my ($file, $path_name, $target_inputs_ast) = @_;
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &filestr_from_file($file);
-  my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
+  my $output = $path_name =~ s/\.dk$/$cc_ext/r;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output

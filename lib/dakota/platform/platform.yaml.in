@@ -1,7 +1,7 @@
 h_ext:
-  - h
+  - .h
 cc_ext:
-  - cc
+  - .cc
 o_ext:
   - ${CMAKE_CXX_OUTPUT_EXTENSION}
 so_ext:

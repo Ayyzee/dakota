@@ -64,9 +64,9 @@ my ( $id,  $mid,  $bid,  $tid,
 $gbl_compiler = &platform("$gbl_prefix/lib/dakota/platform.yaml")
   or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
 {
-  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
-  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', 'o'); # could be .bc or .lto
-  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', 'cc');
+  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', undef); # default dynamic shared object/library extension
+  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext',  undef); # could also be .bc or .lto
+  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
 }
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -206,7 +206,7 @@ sub detect_cxx_opts {
     my $pair;
     if (&path_opt($cmd, \$i, 'o', 'output', $info)) {
     } elsif ($arg !~ /^-/) {
-      if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
+      if ($arg =~ /^([^\s]+?(\.dk|$cc_ext|$o_ext|$so_ext))$/) {
         $pair = [$i, $arg];
         &add_last($$info{'input-pairs'}, $pair);
         &add_last($ordered_input_args, $$pair[1]);
