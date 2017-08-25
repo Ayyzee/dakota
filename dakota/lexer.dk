@@ -494,7 +494,7 @@ klass lexer {
           } while ($tokenid(open-token) == '<');
 
           if ($tokenid(open-token) != '(')
-            throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balenced");
+            throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balanced");
           $set-close-token(open-token, token);
           return token;
         }
@@ -784,7 +784,7 @@ klass lexer {
           } while ($tokenid(open-token) == '<');
 
           if ($tokenid(open-token) != '[')
-            throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balenced");
+            throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balanced");
           $set-close-token(open-token, token);
           return token;
         }
@@ -854,7 +854,7 @@ klass lexer {
           } while ($tokenid(open-token) == '<');
 
           if ($tokenid(open-token) != '{')
-            throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balenced");
+            throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balanced");
           $set-close-token(open-token, token);
           return token;
         }
