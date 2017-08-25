@@ -425,8 +425,11 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
   return;
 }
 # endif
-static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table, str-t only, bool-t exported-only) -> void {
-  ostream-t ostrm = { .output = stdout, .col = 0 };
+static func json-dump-klass-defns(ostream-t ostrm, sorted-set-core-t* klass-defns-table, str-t only, bool-t exported-only) -> void {
+  assert(ostrm.output != nullptr);
+  assert(8 > ostrm.col);
+  assert(klass-defns-table != nullptr);
+
   ostream::print-format(ostrm, "{\n");
   ostream::col-incr(ostrm);
 
@@ -1569,7 +1572,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (!getenv-int("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
       if (ctlg-json)
-        json-dump-klass-defns(gbl-klass-defns-table, ctlg-only, ctlg-exported-only);
+        json-dump-klass-defns(ostrm, gbl-klass-defns-table, ctlg-only, ctlg-exported-only);
       if (getenv-int("DKT_JSON_DUMP_RESOURCE_INFO"))
         json-dump-resource-info(gbl-klass-defns-table);
       last-user-code-before-main();
