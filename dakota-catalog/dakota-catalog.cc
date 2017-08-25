@@ -33,7 +33,6 @@
 const str_t dev_null = "/dev/null";
 enum {
   DAKOTA_CATALOG_HELP = 256,
-  DAKOTA_CATALOG_DIRECTORY,
   DAKOTA_CATALOG_EXPORTED_ONLY,
   DAKOTA_CATALOG_ONLY,
   DAKOTA_CATALOG_OUTPUT,
@@ -44,7 +43,6 @@ enum {
   DAKOTA_CATALOG_SILENT,
 };
 struct opts_t {
-  char* directory;
   bool  exported_only;
   char* only; // full or partial (prefix) klass name
   char* output; // path or "" for stdout
@@ -90,7 +88,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
   // options descriptor
   static struct option longopts[] = {
     { "help",             no_argument,       nullptr, DAKOTA_CATALOG_HELP },
-    { "directory",        required_argument, nullptr, DAKOTA_CATALOG_DIRECTORY },
     { "exported-only",    no_argument,       nullptr, DAKOTA_CATALOG_EXPORTED_ONLY },
     { "only",             required_argument, nullptr, DAKOTA_CATALOG_ONLY },
     { "output",           required_argument, nullptr, DAKOTA_CATALOG_OUTPUT },
@@ -108,9 +105,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
       case DAKOTA_CATALOG_HELP:
         usage(progname, longopts);
         exit(EXIT_SUCCESS);
-      case DAKOTA_CATALOG_DIRECTORY:
-        opts.directory = optarg;
-        break;
       case DAKOTA_CATALOG_EXPORTED_ONLY:
         opts.exported_only = true;
         break;
@@ -183,10 +177,6 @@ FUNC main(int argc, char** argv) -> int {
   int overwrite;
 
   if (!opts.path_only) {
-    if (opts.directory != nullptr) {
-      int n = chdir(opts.directory);
-      if (n == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", opts.directory, strerror(errno));
-    }
     if (opts.output != nullptr) {
       if (strcmp(opts.output, dev_null) == 0) {
         tmp_output = opts.output;
