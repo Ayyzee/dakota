@@ -37,7 +37,6 @@ enum {
   DAKOTA_CATALOG_ONLY,
   DAKOTA_CATALOG_OUTPUT,
   DAKOTA_CATALOG_OUTPUT_DIRECTORY,
-  DAKOTA_CATALOG_PATH_ONLY,
   DAKOTA_CATALOG_RECURSIVE,
   DAKOTA_CATALOG_JSON,
 };
@@ -46,7 +45,6 @@ struct opts_t {
   char* only; // full or partial (prefix) klass name
   char* output; // path or "" for stdout
   char* output_directory; // path or "" for .
-  bool  path_only;
   bool  recursive;
   bool  json;
 };
@@ -90,7 +88,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
     { "only",             required_argument, nullptr, DAKOTA_CATALOG_ONLY },
     { "output",           required_argument, nullptr, DAKOTA_CATALOG_OUTPUT },
     { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
-    { "path-only",        no_argument,       nullptr, DAKOTA_CATALOG_PATH_ONLY },
     { "recursive",        no_argument,       nullptr, DAKOTA_CATALOG_RECURSIVE },
     { "json",             no_argument,       nullptr, DAKOTA_CATALOG_JSON },
     { nullptr, 0, nullptr, 0 }
@@ -114,9 +111,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         break;
       case DAKOTA_CATALOG_OUTPUT_DIRECTORY:
         opts.output_directory = optarg;
-        break;
-      case DAKOTA_CATALOG_PATH_ONLY:
-        opts.path_only = true;
         break;
       case DAKOTA_CATALOG_RECURSIVE:
         opts.recursive = true;
@@ -170,7 +164,6 @@ FUNC main(int argc, char** argv) -> int {
   char* tmp_output = tmp_output_buffer;
   int overwrite;
 
-  if (!opts.path_only) {
     if (opts.output != nullptr) {
       if (strcmp(opts.output, dev_null) == 0) {
         tmp_output = opts.output;
@@ -192,24 +185,17 @@ FUNC main(int argc, char** argv) -> int {
       setenv_int("DAKOTA_CATALOG_RECURSIVE", opts.recursive);
     if (opts.json)
       setenv_int("DAKOTA_CATALOG_JSON", opts.json);
-  }
   int i = 0;
   str_t arg = nullptr;
   while ((arg = argv[i++]) != nullptr) {
-    if (!opts.path_only) {
       if (!opts.json)
         setenv("DKT_NO_INIT_RUNTIME",  "1", overwrite = 1);
       setenv("DKT_EXIT_BEFORE_MAIN", "1", overwrite = 1);
-    }
-    int status = -1;
-    if (!opts.path_only)
-      status = spawn(arg);
+    int status = spawn(arg);
     if (status == -1) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
-      if (!opts.path_only) {
         unsetenv("DKT_NO_INIT_RUNTIME");
         unsetenv("DKT_EXIT_BEFORE_MAIN");
-      }
       ptr_t handle = dso_open(arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
 
       // if the shared library is not found in the search path
