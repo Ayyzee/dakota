@@ -63,7 +63,7 @@ set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 
 set (cxx-compiler NOTFOUND) # cxx-compiler-NOTFOUND
-find_program (cxx-compiler clang++)
+find_program (cxx-compiler clang++${CMAKE_EXECUTABLE_SUFFIX})
 if (NOT cxx-compiler)
   message (FATAL_ERROR "error: program: clang++: find_library(): ${cxx-compiler}")
 endif ()

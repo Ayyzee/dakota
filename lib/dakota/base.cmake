@@ -63,14 +63,14 @@ set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 
 set (cxx-compiler NOTFOUND) # cxx-compiler-NOTFOUND
-find_program (cxx-compiler clang++)
+find_program (cxx-compiler clang++${CMAKE_EXECUTABLE_SUFFIX})
 if (NOT cxx-compiler)
   message (FATAL_ERROR "error: program: clang++: find_library(): ${cxx-compiler}")
 endif ()
 
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
 set (dakota NOTFOUND) # dakota-NOTFOUND
-find_program (dakota dakota PATHS ${bin-dirs})
+find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX} PATHS ${bin-dirs})
 if (NOT dakota)
   message (FATAL_ERROR "error: program: dakota: find_library(): ${dakota}")
 endif ()
@@ -93,13 +93,13 @@ set (target-hdr ${target}-target-hdr)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
-  DEPENDS ${parts} ${target-libs} dakota-catalog
+  DEPENDS ${parts} ${target-libs} dakota-catalog${CMAKE_EXECUTABLE_SUFFIX}
   COMMAND ${dakota} --target-hdr --parts ${parts}
   VERBATIM)
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts} ${target-libs} dakota-catalog
+  DEPENDS ${parts} ${target-libs} dakota-catalog${CMAKE_EXECUTABLE_SUFFIX}
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
 set (target-dependencies ${target-hdr})
