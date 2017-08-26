@@ -164,38 +164,38 @@ FUNC main(int argc, char** argv) -> int {
   char* tmp_output = tmp_output_buffer;
   int overwrite;
 
-    if (opts.output != nullptr) {
-      if (strcmp(opts.output, dev_null) == 0) {
-        tmp_output = opts.output;
-      } else {
-        snprintf(tmp_output_buffer, sizeof(tmp_output_buffer), "%s-%i", opts.output, getpid());
-        create_empty_file(tmp_output);
-      }
+  if (opts.output != nullptr) {
+    if (strcmp(opts.output, dev_null) == 0) {
+      tmp_output = opts.output;
+    } else {
+      snprintf(tmp_output_buffer, sizeof(tmp_output_buffer), "%s-%i", opts.output, getpid());
+      create_empty_file(tmp_output);
     }
-    if (opts.exported_only)
-      setenv_int("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only);
+  }
+  if (opts.exported_only)
+    setenv_int("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only);
 
-    setenv("DAKOTA_CATALOG_OUTPUT", tmp_output, overwrite = 1); // may be empty-string ("")
+  setenv("DAKOTA_CATALOG_OUTPUT", tmp_output, overwrite = 1); // may be empty-string ("")
 
-    if (opts.output_directory != nullptr)
-      setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
-    if (opts.only != nullptr)
-      setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1); // should be space delimitted list
-    if (opts.recursive)
-      setenv_int("DAKOTA_CATALOG_RECURSIVE", opts.recursive);
-    if (opts.json)
-      setenv_int("DAKOTA_CATALOG_JSON", opts.json);
+  if (opts.output_directory != nullptr)
+    setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
+  if (opts.only != nullptr)
+    setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1); // should be space delimitted list
+  if (opts.recursive)
+    setenv_int("DAKOTA_CATALOG_RECURSIVE", opts.recursive);
+  if (opts.json)
+    setenv_int("DAKOTA_CATALOG_JSON", opts.json);
   int i = 0;
   str_t arg = nullptr;
   while ((arg = argv[i++]) != nullptr) {
-      if (!opts.json)
-        setenv("DKT_NO_INIT_RUNTIME",  "1", overwrite = 1);
-      setenv("DKT_EXIT_BEFORE_MAIN", "1", overwrite = 1);
+    if (!opts.json)
+      setenv("DKT_NO_INIT_RUNTIME",  "1", overwrite = 1);
+    setenv("DKT_EXIT_BEFORE_MAIN", "1", overwrite = 1);
     int status = spawn(arg);
     if (status == -1) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
-        unsetenv("DKT_NO_INIT_RUNTIME");
-        unsetenv("DKT_EXIT_BEFORE_MAIN");
+      unsetenv("DKT_NO_INIT_RUNTIME");
+      unsetenv("DKT_EXIT_BEFORE_MAIN");
       ptr_t handle = dso_open(arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
 
       // if the shared library is not found in the search path
