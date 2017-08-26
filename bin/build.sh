@@ -11,5 +11,11 @@ jobs=$(( jobs + 2 ))
 if [[ -e jobs.txt ]]; then
   jobs=$(cat jobs.txt)
 fi
+export PATH=$HOME/dakota/bin:$PATH
+export DAKOTA_VERBOSE=1
+export CMAKE_VERBOSE_MAKEFILE=ON
 generator="${generator:-ninja}"
-DAKOTA_VERBOSE=1 CMAKE_VERBOSE_MAKEFILE=1 $generator -C $binary_dir -j $jobs $@
+SECONDS=0
+$generator -C $binary_dir -j $jobs $@
+duration=$SECONDS
+echo "duration: $(($duration / 60))m$(($duration % 60))s"
