@@ -176,15 +176,17 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
 // iterate over list of named-info-t
 static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
   named-info-t* current-info = info;
-  const void* previous-item = nullptr;
+  // const void* previous-item = nullptr;
   const void* item = nullptr;
   do {
     item = cast(const void*)named-info::at(current-info, key);
-    assert((previous-item == nullptr && item != nullptr) ||
-           (previous-item != nullptr && item == nullptr) ||
-           (previous-item == item));
-    if (item == nullptr && previous-item != nullptr)
-      item = previous-item;
+    if (item)
+      break;
+    // assert((previous-item == nullptr && item != nullptr) ||
+    //        (previous-item != nullptr && item == nullptr) ||
+    //        (previous-item == item));
+    // if (item == nullptr && previous-item != nullptr)
+    //   item = previous-item;
   } while ((current-info = current-info->next) != nullptr);
 
   return item;
@@ -247,7 +249,8 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
   return superkls-name;
 }
 /*LOCAL*/ func name-from-info(named-info-t* info) -> symbol-t {
-  symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
+  symbol-t name = cast(symbol-t)named-info::at(info, #name);
+  assert(name);
   return name;
 }
 /*LOCAL*/ func klass-name-from-info(named-info-t* info) -> symbol-t {
