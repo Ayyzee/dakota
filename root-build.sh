@@ -3,9 +3,11 @@ set -o errexit -o nounset -o pipefail
 
 if [[ $# -ge 1 && $1 == config ]]; then
   binary_dir=$(cat cmake-binary-dir.txt)
-  build_dir=$binary_dir/../build-dkt
   # must delete build_dir before binary_dir
-  rm -fr $build_dir # ninja ignore ADDITIONAL_MAKE_CLEAN_FILES
+  if [[ ${force:-0} -ne 0 ]]; then
+    build_dir=$binary_dir/../build-dkt
+    rm -fr $build_dir # ninja ignore ADDITIONAL_MAKE_CLEAN_FILES
+  fi
   rm -fr $binary_dir
   bin/cmake-configure.sh
   shift
