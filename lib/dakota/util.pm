@@ -662,7 +662,7 @@ sub build_dir {
   my $dir = &xxx_dir('build-dir', $default_dir = undef);
   return $dir;
 }
-sub source_dir { # root source dir (CMAKE_SOURCE_DIR)
+sub source_dir { # root source dir (dakota-lang-source-dir)
   my $default_dir;
   my $dir = &xxx_dir('source-dir', $default_dir = undef);
   return $dir;

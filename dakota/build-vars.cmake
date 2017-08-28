@@ -1,12 +1,12 @@
 # -*- mode: cmake -*-
-set (build-dir ${CMAKE_SOURCE_DIR}/build-dkt/${target})
+set (build-dir ${dakota-lang-source-dir}/build-dkt/${target})
 set (macros
 )
 set (bin-dirs
-  ${CMAKE_SOURCE_DIR}/bin
+  ${dakota-lang-source-dir}/bin
 )
 set (include-dirs
-  ${CMAKE_SOURCE_DIR}/include
+  ${dakota-lang-source-dir}/include
 )
 set (lib-dirs
 )

@@ -19,12 +19,12 @@ endif ()
 
 if ("${target-type}" STREQUAL "shared-library")
   add_library (${target} SHARED ${srcs})
-  set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+  set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${dakota-lang-source-dir}/lib)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
   set (target-output-file ${CMAKE_SHARED_LIBRARY_PREFIX}${target}${CMAKE_SHARED_LIBRARY_SUFFIX})
 elseif ("${target-type}" STREQUAL "executable")
   add_executable (${target} ${srcs})
-  set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+  set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${dakota-lang-source-dir}/bin)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
   set (target-output-file ${target}${CMAKE_EXECUTABLE_SUFFIX})
 else ()
@@ -44,7 +44,7 @@ endforeach ()
 
 set (target-lib-files)
 foreach (lib ${target-libs})
-  set (target-lib-file ${CMAKE_SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set (target-lib-file ${dakota-lang-source-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
   list (APPEND target-lib-files ${target-lib-file})
 endforeach ()
 
@@ -53,12 +53,12 @@ macro (install_symlink file symlink)
   install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
 endmacro ()
 
-set (compiler-opts @${CMAKE_SOURCE_DIR}/lib/dakota/compiler.opts)
-set (linker-opts   @${CMAKE_SOURCE_DIR}/lib/dakota/linker.opts)
+set (compiler-opts @${dakota-lang-source-dir}/lib/dakota/compiler.opts)
+set (linker-opts   @${dakota-lang-source-dir}/lib/dakota/linker.opts)
 set (compile-options ${compiler-opts})
 set (link-options ${linker-opts})
-set (CMAKE_PREFIX_PATH  ${CMAKE_SOURCE_DIR})
-#set (CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib)
+set (CMAKE_PREFIX_PATH  ${dakota-lang-source-dir})
+#set (CMAKE_LIBRARY_PATH ${dakota-lang-source-dir}/lib)
 set (cxx-standard 17)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 
@@ -78,8 +78,8 @@ endif ()
 set (CMAKE_CXX_COMPILER ${dakota})
 set (parts ${build-dir}/parts.yaml)
 execute_process (
-  COMMAND ${CMAKE_SOURCE_DIR}/bin/dakota-parts ${parts}
-    source-dir:         ${CMAKE_SOURCE_DIR}
+  COMMAND ${dakota-lang-source-dir}/bin/dakota-parts ${parts}
+    source-dir:         ${dakota-lang-source-dir}
     project-source-dir: ${PROJECT_SOURCE_DIR}
     build-dir:          ${build-dir}
     lib-files:          ${target-lib-files} ${lib-files}
