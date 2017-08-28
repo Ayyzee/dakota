@@ -970,11 +970,13 @@ sub is_array {
 }
 sub dakota_io_from_file {
   my ($dakota_io_path) = @_;
+  return {}; ### disable
   my $dakota_io = &scalar_from_file($dakota_io_path);
   return $dakota_io;
 }
 sub dakota_io_to_file {
   my ($dakota_io_path, $dakota_io) = @_;
+  return; ### disable
   &scalar_to_file($dakota_io_path, $dakota_io);
 }
 sub dakota_io_append {
