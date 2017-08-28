@@ -89,7 +89,7 @@ execute_process (
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
-set (target-hdr ${target}-target-hdr)
+set (target-hdr ${target}.target-hdr)
 # phony target 'target-hdr'
 add_custom_target (
   ${target-hdr}
