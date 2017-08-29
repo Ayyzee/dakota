@@ -10,10 +10,11 @@ find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX} PATHS ${bin-dirs})
 if (NOT dakota)
   message (FATAL_ERROR "error: program: dakota: find_library(): ${dakota}")
 endif ()
+get_filename_component (dakota-dir ${dakota} DIRECTORY)
 
 set (CMAKE_CXX_COMPILER ${dakota})
 execute_process (
-  COMMAND ${dakota-lang-source-dir}/bin/dakota-parts ${parts}
+  COMMAND ${dakota-dir}/dakota-parts ${parts}
     source-dir:         ${dakota-lang-source-dir}
     project-source-dir: ${PROJECT_SOURCE_DIR}
     build-dir:          ${build-dir}
