@@ -102,7 +102,7 @@ add_custom_command (
   DEPENDS ${parts} ${target-libs} dakota-catalog${CMAKE_EXECUTABLE_SUFFIX}
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
-set (target-dependencies ${target-hdr})
+add_dependencies (${target} ${target-hdr})
 target_compile_options (${target} PRIVATE
   --parts ${parts} --cxx ${cxx-compiler})
 list (APPEND link-options
@@ -110,9 +110,6 @@ list (APPEND link-options
 
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
-if (target-dependencies)
-  add_dependencies (${target} ${target-dependencies})
-endif ()
 
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set (additional-make-clean-files

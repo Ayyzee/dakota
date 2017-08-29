@@ -69,12 +69,6 @@ if (NOT cxx-compiler)
 endif ()
 
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
-set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
-set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
-if (target-dependencies)
-  add_dependencies (${target} ${target-dependencies})
-endif ()
-
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set (additional-make-clean-files
   ${build-dir}
