@@ -69,6 +69,34 @@ if (NOT cxx-compiler)
 endif ()
 
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
+install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+set (additional-make-clean-files
+  ${build-dir}
+)
+set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${additional-make-clean-files}")
+set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
+set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
+set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
+#set (CMAKE_CXX_VISIBILITY_PRESET hidden)
+target_compile_definitions (${target} PRIVATE ${macros})
+target_include_directories (${target} PRIVATE ${include-dirs})
+opts_str ("${link-options}" link-options-str)
+set_target_properties (${target} PROPERTIES LINK_FLAGS "${link-options-str}")
+list (LENGTH lib-files len)
+if (${len})
+  target_link_libraries (${target} ${lib-files})
+endif ()
+list (LENGTH target-lib-files len)
+if (${len})
+  target_link_libraries (${target} ${target-lib-files})
+  add_dependencies (     ${target} ${target-libs})
+endif ()
+get_target_property(link-flags ${target} LINK_FLAGS)
+set (parts ${build-dir}/parts.yaml)
+list (APPEND link-flags
+  --parts ${parts} --cxx ${cxx-compiler})
+opts_str ("${link-flags}" link-flags-str)
+set_target_properties (${target} PROPERTIES LINK_FLAGS "${link-flags-str}")
 set (dakota NOTFOUND) # dakota-NOTFOUND
 find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX} PATHS ${bin-dirs})
 if (NOT dakota)
@@ -76,7 +104,6 @@ if (NOT dakota)
 endif ()
 
 set (CMAKE_CXX_COMPILER ${dakota})
-set (parts ${build-dir}/parts.yaml)
 execute_process (
   COMMAND ${dakota-lang-source-dir}/bin/dakota-parts ${parts}
     source-dir:         ${dakota-lang-source-dir}
@@ -105,31 +132,6 @@ add_custom_command (
 add_dependencies (${target} ${target-hdr})
 target_compile_options (${target} PRIVATE
   --parts ${parts} --cxx ${cxx-compiler})
-list (APPEND link-options
-  --parts ${parts} --cxx ${cxx-compiler})
 
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
-
-install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-set (additional-make-clean-files
-  ${build-dir}
-)
-set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${additional-make-clean-files}")
-set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
-set_target_properties (${target} PROPERTIES CXX_VISIBILITY_PRESET hidden)
-#set (CMAKE_CXX_VISIBILITY_PRESET hidden)
-target_compile_definitions (${target} PRIVATE ${macros})
-target_include_directories (${target} PRIVATE ${include-dirs})
-opts_str ("${link-options}" link-options-str)
-set_target_properties (${target} PROPERTIES LINK_FLAGS "${link-options-str}")
-list (LENGTH lib-files len)
-if (${len})
-  target_link_libraries (${target} ${lib-files})
-endif ()
-list (LENGTH target-lib-files len)
-if (${len})
-  target_link_libraries (${target} ${target-lib-files})
-  add_dependencies (     ${target} ${target-libs})
-endif ()
