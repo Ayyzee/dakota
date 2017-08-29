@@ -363,7 +363,7 @@ sub cmd_info_from_argv {
               'target-hdr',
               'target-src',
 
-              'clean',          # make target like
+              #'clean',          # make target like
             );
   $$root_cmd{'args'} = $argv;
   return $root_cmd;
