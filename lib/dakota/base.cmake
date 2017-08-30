@@ -5,7 +5,7 @@ dk_find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX})
 get_filename_component (dakota-dir ${dakota} DIRECTORY)
 set (CMAKE_CXX_COMPILER ${dakota})
 execute_process (
-  COMMAND ${dakota} --target-src --parts ${parts} --path-only
+  COMMAND ${dakota} --target-src --path-only ${build-dir}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})

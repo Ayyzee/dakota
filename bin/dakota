@@ -357,7 +357,7 @@ sub cmd_info_from_argv {
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
               'output=s',  # gcc-like
 
-              'path-only',
+              'path-only=s',
               'parts=s',
               'target-ast', # mainly for debugging
               'target-hdr',

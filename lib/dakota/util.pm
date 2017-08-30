@@ -703,21 +703,20 @@ sub target_src_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    my $parts = &parts($$cmd_info{'opts'}{'parts'});
-    my $project_source_dir = &relpath($$parts{'project-source-dir'});
-    my $force;
-    $$cmd_info{'parts.build-dir'} = &adjust_path($project_source_dir, $$parts{'build-dir'}, $force = 1);
+    $$cmd_info{'parts.build-dir'} = $$cmd_info{'opts'}{'path-only'};
 
-  if (0) {
+    my $path;
+    if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
-      print &target_srcs_ast_path($cmd_info) . $nl;
+      $path = &target_srcs_ast_path($cmd_info);
     } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
-      print &cwd . '/' . &target_hdr_path($cmd_info) . $nl;
+      $path = &target_hdr_path($cmd_info);
     } elsif ($$cmd_info{'opts'}{'target-src'}) {
-      print &cwd . '/' . &target_src_path($cmd_info) . $nl;
+      $path = &target_src_path($cmd_info);
     } else {
       die;
     }
+    print $path . $nl;
     exit 0;
   }
 }
