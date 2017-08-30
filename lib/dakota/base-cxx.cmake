@@ -1,6 +1,5 @@
 # -*- mode: cmake -*-
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
-set (prefix ${dakota-lang-source-dir})
 set (CMAKE_PREFIX_PATH ${prefix})
 
 function (opts_str values output-var)
