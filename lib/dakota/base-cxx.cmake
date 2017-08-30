@@ -7,6 +7,12 @@ function (opts_str values output-var)
   set (${output-var} "${str}" PARENT_SCOPE)
 endfunction()
 
+function (append_target_property target property str)
+  get_target_property(current ${target} ${property})
+  opts_str ("${current}" current-str)
+  set_target_properties (${target} PROPERTIES ${property} "${current-str} ${str}")
+endfunction ()
+
 function (install_symlink file symlink)
   install (CODE "execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${file} ${symlink})")
   install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
