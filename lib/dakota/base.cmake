@@ -2,14 +2,8 @@
 
 set (parts ${build-dir}/parts.yaml)
 append_target_property (${target} LINK_FLAGS "--parts ${parts} --cxx ${cxx-compiler}")
-
-set (dakota NOTFOUND) # dakota-NOTFOUND
-find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX} PATHS ${bin-dirs})
-if (NOT dakota)
-  message (FATAL_ERROR "error: program: dakota: find_library(): ${dakota}")
-endif ()
+dk_find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX})
 get_filename_component (dakota-dir ${dakota} DIRECTORY)
-
 set (CMAKE_CXX_COMPILER ${dakota})
 execute_process (
   COMMAND ${dakota} --target-src --parts ${parts} --path-only
