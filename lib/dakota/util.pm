@@ -1465,8 +1465,11 @@ sub filestr_to_file {
 }
 sub scalar_to_file {
   my ($file, $ref) = @_;
+  if (!defined $file) {
+    die __FILE__ . ':' . __LINE__ . ": ERROR: scalar_to_file(\$file, \$ref): \$file undefined" . $nl;
+  }
   if (!defined $ref) {
-    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file(\"$file\", $ref)\n";
+    die __FILE__ . ':' . __LINE__ . ": ERROR: scalar_to_file(\"$file\", \$ref): \$ref undefined" . $nl;
   }
   my $refstr = '# -*- mode: perl -*-' . $nl . &Dumper($ref);
   &filestr_to_file($refstr, $file);
