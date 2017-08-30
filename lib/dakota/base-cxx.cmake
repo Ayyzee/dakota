@@ -48,6 +48,10 @@ function (dk_find_program var name)
   set (${var} ${found-name} PARENT_SCOPE)
 endfunction ()
 
+if (NOT build-dir)
+  set (build-dir ${source-dir}/build-dkt/${target})
+endif ()
+
 if (NOT target-type)
   set (target-type executable)
 endif ()

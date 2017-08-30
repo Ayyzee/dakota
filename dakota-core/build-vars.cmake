@@ -1,5 +1,4 @@
 # -*- mode: cmake -*-
-set (build-dir ${source-dir}/build-dkt/${target})
 set (macros
 )
 set (bin-dirs
