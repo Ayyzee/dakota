@@ -147,11 +147,10 @@ static FUNC file_exists(str_t path, int flags = O_RDONLY) -> bool {
 static FUNC create_empty_file(str_t path) -> int_t {
   assert(path != nullptr);
   assert(path[0] != NUL);
-  int exit_value = 0;
   int fd = open(path, O_CREAT | O_TRUNC, 0644);
   if (fd == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
   int n = close(fd);
-  if (n == -1) exit_value = non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
+  if (n == -1) non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
   return 0;
 }
 // 1: try to spawn() path
@@ -211,7 +210,7 @@ FUNC main(int argc, char** argv) -> int {
         if (dso_close(handle) != 0)
           exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_close()", arg, dso_error()); // dso_close() failure
       } else
-        exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_open", arg, dso_error());   // dso_open() failure
+        exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_open()", arg, dso_error());   // dso_open() failure
     }
   }
   if (opts.output != nullptr) {

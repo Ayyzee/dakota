@@ -844,7 +844,7 @@ sub outfile_from_infiles {
       &cc_from_dk_core2($cmd_info, $global_should_echo || $should_echo);
     } else {
       my $exit_val = &verbose_exec_cmd_info($cmd_info); # dakota-catalog
-      exit $exit_val >> 8 if $exit_val;
+      exit 1 if $exit_val;
     }
   }
   return $num_out_of_date_infiles;

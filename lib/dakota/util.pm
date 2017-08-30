@@ -613,7 +613,8 @@ sub verbose_exec {
   }
   my $exit_val = system(@$argv);
   if ($exit_val) {
-    print STDERR 'error: ' . join(' ', @$argv) . $nl;
+    my $cwd = &cwd();
+    print STDERR "error: cd $cwd && " . join(' ', @$argv) . $nl;
   }
   return $exit_val;
 }
@@ -626,7 +627,7 @@ sub make_dir {
     }
     my $cmd = ['mkdir', '-p', $path];
     my $exit_val = &verbose_exec($cmd);
-    exit $exit_val >> 8 if $exit_val;
+    exit 1 if $exit_val;
   }
 }
 sub make_dir_part {
