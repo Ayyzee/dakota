@@ -13,14 +13,6 @@ endif ()
 get_filename_component (dakota-dir ${dakota} DIRECTORY)
 
 set (CMAKE_CXX_COMPILER ${dakota})
-# only needed because of force=1 root-build.sh config clean all
-execute_process (
-  COMMAND ${dakota-dir}/dakota-parts ${parts}
-    source-dir:         ${dakota-lang-source-dir}
-    project-source-dir: ${PROJECT_SOURCE_DIR}
-    build-dir:          ${build-dir}
-    lib-files:          ${target-lib-files} ${lib-files}
-    srcs:               ${srcs})
 add_custom_command (
   OUTPUT ${parts}
   COMMAND ${dakota-dir}/dakota-parts ${parts}
