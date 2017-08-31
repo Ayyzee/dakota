@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use sort 'stable';
 
-my $gbl_compiler;
+my $gbl_platform;
 my $gbl_used;
 my $source_dir;
 my $build_dir;
@@ -72,13 +72,12 @@ sub h_path_from_src_path {
   return $h_path;
 }
 my $patterns = {
-  'cc_path_from_dk_path' => '$(build_dir)/%$(cc_ext) : $(source_dir)/%.dk',
-  'inc_path_from_dk_path' => '$(build_dir)/%.inc : $(source_dir)/%.dk',
+  'cc_path_from_dk_path'    => '$(build_dir)/%$(cc_ext) : $(source_dir)/%.dk',
+  'inc_path_from_dk_path'   => '$(build_dir)/%.inc      : $(source_dir)/%.dk',
+  'ast_path_from_dk_path'   => '$(build_dir)/%.dk.ast   : $(source_dir)/%.dk',
 
-  'ast_path_from_dk_path' =>   '$(build_dir)/%.dk.ast      : $(source_dir)/%.dk',
+  'ctlg_path_from_so_path'  => '$(build_dir)/%$(so_ext).ctlg : %$(so_ext)',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
-
-  'ctlg_path_from_so_path' =>   '$(build_dir)/%$(so_ext).ctlg : %$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -87,14 +86,14 @@ BEGIN {
   unshift @INC, "$prefix/lib";
   use dakota::sst;
   use dakota::util;
-  $gbl_compiler = &platform("$prefix/lib/dakota/platform.yaml")
+  $gbl_platform = &platform("$prefix/lib/dakota/platform.yaml")
     or die "&platform(\"$prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $gbl_used = &do_json("$prefix/lib/dakota/used.json")
     or die "&do_json(\"$prefix/lib/dakota/used.json\") failed: $!\n";
-  $h_ext = &var($gbl_compiler, 'h_ext', undef);
-  $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
-  $o_ext =  &var($gbl_compiler, 'o_ext', undef);
-  $so_ext = &var($gbl_compiler, 'so_ext', undef); # default dynamic shared object/library extension
+  $h_ext = &var($gbl_platform, 'h_ext', undef);
+  $cc_ext = &var($gbl_platform, 'cc_ext', undef);
+  $o_ext =  &var($gbl_platform, 'o_ext', undef);
+  $so_ext = &var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 

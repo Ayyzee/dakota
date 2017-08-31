@@ -32,7 +32,7 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 
 my $nl = "\n";
 my $gbl_prefix;
-my $gbl_compiler;
+my $gbl_platform;
 my $h_ext;
 my $cc_ext;
 
@@ -1547,10 +1547,10 @@ sub start {
 }
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
-  $gbl_compiler = &platform("$gbl_prefix/lib/dakota/platform.yaml")
+  $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
-  $h_ext = &var($gbl_compiler, 'h_ext', undef);
-  $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
+  $h_ext = &var($gbl_platform, 'h_ext', undef);
+  $cc_ext = &var($gbl_platform, 'cc_ext', undef);
 };
 unless (caller) {
   &start(\@ARGV);

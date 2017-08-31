@@ -28,7 +28,7 @@ use sort 'stable';
 use Cwd;
 
 my $gbl_prefix;
-my $gbl_compiler;
+my $gbl_platform;
 my $so_ext;
 my $o_ext;
 my $cc_ext;
@@ -61,12 +61,12 @@ use dakota::util;
 my ( $id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
-$gbl_compiler = &platform("$gbl_prefix/lib/dakota/platform.yaml")
+$gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
   or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
 {
-  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', undef); # default dynamic shared object/library extension
-  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext',  undef); # could also be .bc or .lto
-  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
+  $so_ext = &dakota::util::var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
+  $o_ext =  &dakota::util::var($gbl_platform, 'o_ext',  undef); # could also be .bc or .lto
+  $cc_ext = &dakota::util::var($gbl_platform, 'cc_ext', undef);
 }
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
