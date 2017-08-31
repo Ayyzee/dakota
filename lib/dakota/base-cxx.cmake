@@ -13,7 +13,7 @@ function (join output-var glue) # ...
 endfunction ()
 
 function (append_target_property target property) # ...
-  get_target_property(current ${target} ${property})
+  get_target_property (current ${target} ${property})
   foreach (arg ${ARGN})
     list (APPEND current ${arg})
   endforeach ()
