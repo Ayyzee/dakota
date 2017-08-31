@@ -223,7 +223,6 @@ sub dakota_io_path_from_parts_path {
   if (! $$parts{'build-dir'}) {
     $$parts{'build-dir'} = &build_dir();
   }
-  my $project_source_dir = $$parts{'project-source-dir'};
   my $force;
   my $dakota_io_path = $$parts{'build-dir'} . '/dakota.io';
   return $dakota_io_path;
