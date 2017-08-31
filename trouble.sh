@@ -11,3 +11,5 @@ else
  #generator=ninja ./root-build.sh clean
   generator=ninja ./root-build.sh all
 fi
+
+# grep -l build-cmk bin/exe* lib/lib*.*
