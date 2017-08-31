@@ -1,8 +1,6 @@
 *~
 *.dSYM
 .DS_Store
-config.mk
-config.sh
 lib/dakota/compiler.opts
 lib/dakota/linker.opts
 lib/dakota/platform.yaml
