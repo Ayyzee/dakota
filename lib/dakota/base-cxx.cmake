@@ -2,14 +2,14 @@
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 set (CMAKE_PREFIX_PATH ${prefix-dir})
 
-function (join string-var glue) # ...
-  set (tmp-string "")
+function (join output-var glue) # ...
+  set (string "")
   set (_glue "")
   foreach (arg ${ARGN})
-    set (tmp-string "${tmp-string}${_glue}${arg}")
+    set (string "${string}${_glue}${arg}")
     set (_glue "${glue}")
   endforeach ()
-  set (${string-var} "${tmp-string}" PARENT_SCOPE)
+  set (${output-var} "${string}" PARENT_SCOPE)
 endfunction ()
 
 function (append_target_property target property) # ...
@@ -26,7 +26,7 @@ function (install_symlink file symlink)
   install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
 endfunction ()
 
-function (find_lib_files lib-files-var lib-dirs) # ...
+function (find_lib_files output-var lib-dirs) # ...
   foreach (lib ${ARGN})
     set (found-lib-file NOTFOUND) # found-lib-file-NOTFOUND
     find_library (found-lib-file ${lib} PATHS ${lib-dirs})
@@ -34,26 +34,26 @@ function (find_lib_files lib-files-var lib-dirs) # ...
       message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
     endif ()
     #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib-file}")
-    list (APPEND files ${found-lib-file})
+    list (APPEND lib-files ${found-lib-file})
   endforeach ()
-  set (${lib-files-var} "${files}" PARENT_SCOPE)
+  set (${output-var} "${lib-files}" PARENT_SCOPE)
 endfunction ()
 
-function (find_target_lib_files target-lib-files-var) # ...
+function (find_target_lib_files output-var) # ...
   foreach (lib ${ARGN})
     set (target-lib-file ${prefix-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
-    list (APPEND files ${target-lib-file})
+    list (APPEND target-lib-files ${target-lib-file})
   endforeach ()
-  set (${target-lib-files-var} "${files}" PARENT_SCOPE)
+  set (${output-var} "${target-lib-files}" PARENT_SCOPE)
 endfunction ()
 
-function (dk_find_program program-var name)
+function (dk_find_program output-var name)
   set (found-name NOTFOUND)
   find_program (found-name ${name})
   if (NOT found-name)
     message (FATAL_ERROR "error: program: ${name}: find_library(): NOTFOUND")
   endif ()
-  set (${program-var} ${found-name} PARENT_SCOPE)
+  set (${output-var} "${found-name}" PARENT_SCOPE)
 endfunction ()
 
 if (build-dir)
