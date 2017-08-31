@@ -21,7 +21,6 @@ add_custom_target (
 add_custom_command (
   OUTPUT ${parts}
   COMMAND ${dakota-dir}/dakota-parts ${parts}
-    source-dir:         ${source-dir}
     project-source-dir: ${PROJECT_SOURCE_DIR}
     build-dir:          ${build-dir}
     lib-files:          ${target-lib-files} ${lib-files}

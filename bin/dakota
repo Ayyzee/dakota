@@ -134,7 +134,6 @@ sub build_precompile_cmd_info {
       'output' => undef,
     },
     'parts.build-dir' =>          $$parts{'build-dir'},
-    'parts.source-dir' =>         $$parts{'source-dir'},
     'parts.project-source-dir' => $$parts{'project-source-dir'},
   };
   $$root_cmd{'args'} = $ordered_input_args;
@@ -277,7 +276,6 @@ sub use_parts {
   $$parts{'srcs'} = [] if ! $$parts{'srcs'};
   $$parts{'lib-files'} = [] if ! $$parts{'lib-files'};
   $$parts{'project-source-dir'} = &relpath($$parts{'project-source-dir'});
-  $$parts{'source-dir'} =         &relpath($$parts{'source-dir'});
   if (! $$parts{'build-dir'}) {
     $$parts{'build-dir'} = &build_dir();
   }
@@ -288,7 +286,6 @@ sub use_parts {
     &make_dir($$parts{'build-dir'});
   }
   $$root_cmd{'parts.project-source-dir'} = $$parts{'project-source-dir'};
-  $$root_cmd{'parts.source-dir'} =         $$parts{'source-dir'};
   $$root_cmd{'parts.inputs'} =             $$parts{'inputs'};
   $$root_cmd{'parts.build-dir'} =          $$parts{'build-dir'};
   $$root_cmd{'io'} =                       $$parts{'build-dir'} . '/dakota.io';
@@ -300,7 +297,6 @@ sub use_parts {
       'cwd' =>                &cwd(),
       'build-dir' =>          $$parts{'build-dir'},
       'project-source-dir' => $$parts{'project-source-dir'},
-      'source-dir' =>         $$parts{'source-dir'},
     };
     &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
   }
@@ -396,10 +392,8 @@ sub exec_cmd_info {
   #print STDERR 'parts: ' .  &Dumper($parts);
   die if ! $$root_cmd{'parts.build-dir'};
   die if ! $$root_cmd{'parts.project-source-dir'};
-  die if ! $$root_cmd{'parts.source-dir'};
   die if ! $$parts{'build-dir'};
   die if ! $$parts{'project-source-dir'};
-  die if ! $$parts{'source-dir'};
   my $cc_files = &dakota::dakota::start_cmd($root_cmd, $parts);
   return (0, $cc_files);
 }

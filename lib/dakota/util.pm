@@ -175,7 +175,6 @@ our @EXPORT= qw(
                  set_src_defn
                  set_target_decl
                  set_target_defn
-                 source_dir
                  split_path
                  sqstr_regex
                  str_from_seq
@@ -661,11 +660,6 @@ sub xxx_dir {
 sub build_dir {
   my $default_dir;
   my $dir = &xxx_dir('build-dir', $default_dir = undef);
-  return $dir;
-}
-sub source_dir { # root source dir (dakota-lang-source-dir)
-  my $default_dir;
-  my $dir = &xxx_dir('source-dir', $default_dir = undef);
   return $dir;
 }
 sub project_source_dir { # sub project source dir (PROJECT_SOURCE_DIR)
@@ -1529,7 +1523,6 @@ sub parts {
   my $result =  &xxx_from_yaml_file($file,
                                     [
                                       'build-dir',
-                                      'source-dir',
                                       'project-source-dir',
                                     ]);
   return $result;
