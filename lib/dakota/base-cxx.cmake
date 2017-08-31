@@ -2,14 +2,14 @@
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 set (CMAKE_PREFIX_PATH ${prefix-dir})
 
-function (join result glue) # ...
-  set (tmp-result "")
+function (join string-var glue) # ...
+  set (tmp-string "")
   set (_glue "")
   foreach (arg ${ARGN})
-    set (tmp-result "${tmp-result}${_glue}${arg}")
+    set (tmp-string "${tmp-string}${_glue}${arg}")
     set (_glue "${glue}")
   endforeach ()
-  set (${result} "${tmp-result}" PARENT_SCOPE)
+  set (${string-var} "${tmp-string}" PARENT_SCOPE)
 endfunction ()
 
 function (append_target_property target property) # ...
@@ -26,7 +26,7 @@ function (install_symlink file symlink)
   install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
 endfunction ()
 
-function (find_lib_files lib-dirs libs lib-files-var)
+function (find_lib_files lib-files-var libs lib-dirs)
   foreach (lib ${libs})
     set (found-lib-file NOTFOUND) # found-lib-file-NOTFOUND
     find_library (found-lib-file ${lib} PATHS ${lib-dirs})
@@ -39,7 +39,7 @@ function (find_lib_files lib-dirs libs lib-files-var)
   set (${lib-files-var} "${files}" PARENT_SCOPE)
 endfunction ()
 
-function (find_target_lib_files target-libs target-lib-files-var)
+function (find_target_lib_files target-lib-files-var target-libs)
   foreach (lib ${target-libs})
     set (target-lib-file ${prefix-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
     list (APPEND files ${target-lib-file})
@@ -47,13 +47,13 @@ function (find_target_lib_files target-libs target-lib-files-var)
   set (${target-lib-files-var} "${files}" PARENT_SCOPE)
 endfunction ()
 
-function (dk_find_program var name)
+function (dk_find_program program-var name)
   set (found-name NOTFOUND)
   find_program (found-name ${name})
   if (NOT found-name)
     message (FATAL_ERROR "error: program: ${name}: find_library(): NOTFOUND")
   endif ()
-  set (${var} ${found-name} PARENT_SCOPE)
+  set (${program-var} ${found-name} PARENT_SCOPE)
 endfunction ()
 
 if (build-dir)
@@ -80,8 +80,8 @@ else ()
   message (FATAL_ERROR "error: target-type must be shared-library or executable.")
 endif ()
 
-find_lib_files ("${lib-dirs}" "${libs}" lib-files)
-find_target_lib_files ("${target-libs}" target-lib-files)
+find_lib_files (lib-files "${libs}" "${lib-dirs}")
+find_target_lib_files (target-lib-files "${target-libs}")
 
 set (compiler-opts @${prefix-dir}/lib/dakota/compiler.opts)
 set (linker-opts   @${prefix-dir}/lib/dakota/linker.opts)
