@@ -21,10 +21,10 @@ add_custom_target (
 add_custom_command (
   OUTPUT ${parts}
   COMMAND ${dakota-dir}/dakota-parts ${parts}
-    source-dir:         ${CMAKE_CURRENT_SOURCE_DIR}
-    build-dir:          ${current-build-dir}
-    lib-files:          ${target-lib-files} ${lib-files}
-    srcs:               ${srcs}
+    source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
+    build-dir:  ${current-build-dir}
+    lib-files:  ${target-lib-files} ${lib-files}
+    srcs:       ${srcs}
   VERBATIM)
 # generate target-src
 add_custom_command (
