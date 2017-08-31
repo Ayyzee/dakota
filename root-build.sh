@@ -2,7 +2,8 @@
 set -o errexit -o nounset -o pipefail
 
 if [[ $# -ge 1 && $1 == config ]]; then
-  binary_dir=$(cat cmake-binary-dir.txt)
+    if [[ ! -e .binary-dir.txt ]]; then echo build-cmk > .binary-dir.txt; fi
+    binary_dir=$(cat .binary-dir.txt)
   if false; then
     build_dir=$binary_dir/../build-dkt
     rm -fr $build_dir

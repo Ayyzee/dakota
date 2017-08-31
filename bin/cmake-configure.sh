@@ -1,10 +1,10 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-if [[ -e ../cmake-binary-dir.txt ]]; then
-  binary_dir=$(cat ../cmake-binary-dir.txt)
+if [[ -e ../.binary-dir.txt ]]; then
+  binary_dir=$(cat ../.binary-dir.txt)
 else
   binary_dir=build-cmk
-  echo $binary_dir > ../cmake-binary-dir.txt
+  echo $binary_dir > ../.binary-dir.txt
 fi
 rel_source_dir=..
 generator_id="${generator_id:-Ninja}"

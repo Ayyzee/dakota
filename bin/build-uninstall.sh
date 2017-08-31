@@ -4,8 +4,8 @@ ee() {
   echo $1
   eval $1
 }
-if [[ -e ../cmake-binary-dir.txt ]]; then
-  binary_dir=$(cat ../cmake-binary-dir.txt)
+if [[ -e ../.binary-dir.txt ]]; then
+  binary_dir=$(cat ../.binary-dir.txt)
 else
   binary_dir=build-cmk
 fi
