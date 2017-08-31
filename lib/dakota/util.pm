@@ -1477,10 +1477,6 @@ sub scalar_from_file {
   my $result;
   while ($count--) {
     my $filestr = &filestr_from_file($file);
-    my $SOURCE_DIR = '.';
-    my $BINARY_DIR = '.';
-    my $INSTALL_PREFIX = '/usr/local';
-    $INSTALL_PREFIX = $ENV{'INSTALL_PREFIX'} if  $ENV{'INSTALL_PREFIX'};
     $result = eval $filestr;
 
     if (!defined $result) {
