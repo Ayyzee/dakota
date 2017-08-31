@@ -2,11 +2,11 @@
 set (macros
 )
 set (bin-dirs
-  ${source-dir}/bin
+  ${root-dir}/bin
 )
 set (include-dirs
   ${PROJECT_SOURCE_DIR}
-  ${source-dir}/include
+  ${root-dir}/include
 )
 set (lib-dirs
 )

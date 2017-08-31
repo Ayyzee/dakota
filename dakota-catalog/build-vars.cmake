@@ -2,7 +2,7 @@
 set (macros
 )
 set (include-dirs
-  ${source-dir}/include
+  ${root-dir}/include
 )
 set (lib-dirs
 )
