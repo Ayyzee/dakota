@@ -18,5 +18,5 @@ set (target-libs
 )
 set (target-type executable)
 set (srcs
-  ${PROJECT_SOURCE_DIR}/exe.dk
+  ${CMAKE_CURRENT_SOURCE_DIR}/exe.dk
 )

@@ -48,8 +48,10 @@ function (dk_find_program var name)
   set (${var} ${found-name} PARENT_SCOPE)
 endfunction ()
 
-if (NOT build-dir)
-  set (build-dir ${root-dir}/build-dkt/${target})
+if (build-dir)
+  set (current-build-dir ${build-dir})
+else ()
+  set (current-build-dir ${root-dir}/build-dkt/${target})
 endif ()
 
 if (NOT target-type)
@@ -86,7 +88,7 @@ dk_find_program (cxx-compiler clang++${CMAKE_EXECUTABLE_SUFFIX})
 set (CMAKE_CXX_COMPILER ${cxx-compiler})
 install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 set (additional-make-clean-files
-  ${build-dir}
+  ${current-build-dir}
 )
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${additional-make-clean-files}")
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})

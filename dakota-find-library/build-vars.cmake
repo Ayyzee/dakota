@@ -14,5 +14,5 @@ set (target-libs
   dakota-dso
 )
 set (srcs
-  ${PROJECT_SOURCE_DIR}/dakota-find-library.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/dakota-find-library.cc
 )

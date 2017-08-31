@@ -18,5 +18,5 @@ set (target-libs
 )
 set (target-type shared-library)
 set (srcs
-  ${PROJECT_SOURCE_DIR}/dakota-dso.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/dakota-dso.cc
 )

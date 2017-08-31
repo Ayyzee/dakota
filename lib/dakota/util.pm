@@ -78,7 +78,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  cpp_directives
-                 project_source_dir
+                 source_dir
                  ct
                  decode_comments
                  decode_strings
@@ -657,14 +657,14 @@ sub xxx_dir {
   }
   return $dir;
 }
-sub build_dir {
+sub build_dir { # sub project build dir (current-build-dir)
   my $default_dir;
   my $dir = &xxx_dir('build-dir', $default_dir = undef);
   return $dir;
 }
-sub project_source_dir { # sub project source dir (PROJECT_SOURCE_DIR)
+sub source_dir { # sub project source dir (CMAKE_CURRENT_SOURCE_DIR)
   my $default_dir;
-  my $dir = &xxx_dir('project-source-dir', $default_dir = undef);
+  my $dir = &xxx_dir('source-dir', $default_dir = undef);
   return $dir;
 }
 sub target_build_dir { # dakota build dir (cmake has own build dir; it uses phrase "binary dir")
@@ -783,9 +783,9 @@ sub global_parts {
 sub set_global_parts {
   my ($parts_path) = @_;
   $global_parts = &parts($parts_path);
-  my $project_source_dir = &relpath($$global_parts{'project-source-dir'});
-  if ($project_source_dir ne '.') {
-    $$global_parts{'project-source-dir'} = $project_source_dir;
+  my $source_dir = &relpath($$global_parts{'source-dir'});
+  if ($source_dir ne '.') {
+    $$global_parts{'source-dir'} = $source_dir;
   }
   return $global_parts;
 }
@@ -1213,8 +1213,8 @@ sub is_dk_path {
   }
 }
 sub adjust_path {
-  my ($project_source_dir, $input, $force) = @_;
-  return $input if $project_source_dir eq '.';
+  my ($source_dir, $input, $force) = @_;
+  return $input if $source_dir eq '.';
   $force = 0 if ! $force;
   my $rel_input = $input;
   if (&is_abs($input)) {
@@ -1222,7 +1222,7 @@ sub adjust_path {
     #die if ! -e $rel_input;
     return $rel_input;
   }
-  my $path = $project_source_dir . '/' . $input;
+  my $path = $source_dir . '/' . $input;
   if ($force || (! -e $input && -e $path)) {
     $rel_input = &relpath($path);
   }
@@ -1230,11 +1230,11 @@ sub adjust_path {
   return $rel_input;
 }
 sub adjust_paths {
-  my ($project_source_dir, $inputs, $force) = @_;
-  return $inputs if ! $project_source_dir || ($project_source_dir eq '.');
+  my ($source_dir, $inputs, $force) = @_;
+  return $inputs if ! $source_dir || ($source_dir eq '.');
   my $rel_inputs = [];
   foreach my $input (@$inputs) {
-    my $rel_input = &adjust_path($project_source_dir, $input, $force);
+    my $rel_input = &adjust_path($source_dir, $input, $force);
     &add_last($rel_inputs, $rel_input);
   }
   return $rel_inputs;
@@ -1523,7 +1523,7 @@ sub parts {
   my $result =  &xxx_from_yaml_file($file,
                                     [
                                       'build-dir',
-                                      'project-source-dir',
+                                      'source-dir',
                                     ]);
   return $result;
 }

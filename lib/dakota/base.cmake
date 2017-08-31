@@ -1,12 +1,12 @@
 # -*- mode: cmake -*-
-set (parts ${build-dir}/parts.yaml)
+set (parts ${current-build-dir}/parts.yaml)
 append_target_property (${target} LINK_FLAGS "--parts ${parts} --cxx ${cxx-compiler}")
 target_compile_options (${target} PRIVATE --parts ${parts} --cxx ${cxx-compiler})
 dk_find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX})
 get_filename_component (dakota-dir ${dakota} DIRECTORY)
 set (CMAKE_CXX_COMPILER ${dakota})
 execute_process (
-  COMMAND ${dakota} --target-src --path-only ${build-dir}
+  COMMAND ${dakota} --target-src --path-only ${current-build-dir}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
@@ -21,8 +21,8 @@ add_custom_target (
 add_custom_command (
   OUTPUT ${parts}
   COMMAND ${dakota-dir}/dakota-parts ${parts}
-    project-source-dir: ${PROJECT_SOURCE_DIR}
-    build-dir:          ${build-dir}
+    source-dir:         ${CMAKE_CURRENT_SOURCE_DIR}
+    build-dir:          ${current-build-dir}
     lib-files:          ${target-lib-files} ${lib-files}
     srcs:               ${srcs}
   VERBATIM)
