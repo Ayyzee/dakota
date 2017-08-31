@@ -26,8 +26,8 @@ function (install_symlink file symlink)
   install (CODE "message (\"-- Installing symlink: ${symlink} -> ${file}\")")
 endfunction ()
 
-function (find_lib_files lib-files-var libs lib-dirs)
-  foreach (lib ${libs})
+function (find_lib_files lib-files-var lib-dirs) # ...
+  foreach (lib ${ARGN})
     set (found-lib-file NOTFOUND) # found-lib-file-NOTFOUND
     find_library (found-lib-file ${lib} PATHS ${lib-dirs})
     if (NOT found-lib-file)
@@ -39,8 +39,8 @@ function (find_lib_files lib-files-var libs lib-dirs)
   set (${lib-files-var} "${files}" PARENT_SCOPE)
 endfunction ()
 
-function (find_target_lib_files target-lib-files-var target-libs)
-  foreach (lib ${target-libs})
+function (find_target_lib_files target-lib-files-var) # ...
+  foreach (lib ${ARGN})
     set (target-lib-file ${prefix-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
     list (APPEND files ${target-lib-file})
   endforeach ()
@@ -80,8 +80,8 @@ else ()
   message (FATAL_ERROR "error: target-type must be shared-library or executable.")
 endif ()
 
-find_lib_files (lib-files "${libs}" "${lib-dirs}")
-find_target_lib_files (target-lib-files "${target-libs}")
+find_lib_files (lib-files "${lib-dirs}" ${libs})
+find_target_lib_files (target-lib-files ${target-libs})
 
 set (compiler-opts @${prefix-dir}/lib/dakota/compiler.opts)
 set (linker-opts   @${prefix-dir}/lib/dakota/linker.opts)
