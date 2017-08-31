@@ -1,6 +1,7 @@
 # -*- mode: cmake -*-
 set (parts ${build-dir}/parts.yaml)
 append_target_property (${target} LINK_FLAGS "--parts ${parts} --cxx ${cxx-compiler}")
+target_compile_options (${target} PRIVATE --parts ${parts} --cxx ${cxx-compiler})
 dk_find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX})
 get_filename_component (dakota-dir ${dakota} DIRECTORY)
 set (CMAKE_CXX_COMPILER ${dakota})
@@ -33,7 +34,5 @@ add_custom_command (
   COMMAND ${dakota} --target-src --parts ${parts}
   VERBATIM)
 add_dependencies (${target} ${target-hdr})
-target_compile_options (${target} PRIVATE
-  --parts ${parts} --cxx ${cxx-compiler})
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
