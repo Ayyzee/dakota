@@ -1,7 +1,7 @@
 # -*- mode: cmake -*-
 set (parts ${current-build-dir}/parts.yaml)
-append_target_property (${target} LINK_FLAGS "--parts ${parts} --cxx ${cxx-compiler}")
-target_compile_options (${target} PRIVATE --parts ${parts} --cxx ${cxx-compiler})
+append_target_property (${target} LINK_FLAGS --parts ${parts} --cxx ${cxx-compiler})
+target_compile_options (${target} PRIVATE    --parts ${parts} --cxx ${cxx-compiler})
 dk_find_program (dakota dakota${CMAKE_EXECUTABLE_SUFFIX})
 get_filename_component (dakota-dir ${dakota} DIRECTORY)
 set (CMAKE_CXX_COMPILER ${dakota})

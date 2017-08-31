@@ -2,7 +2,7 @@
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 set (CMAKE_PREFIX_PATH ${prefix-dir})
 
-function (join result glue)
+function (join result glue) # ...
   set (tmp-result "")
   set (_glue "")
   foreach (arg ${ARGN})
@@ -12,10 +12,13 @@ function (join result glue)
   set (${result} "${tmp-result}" PARENT_SCOPE)
 endfunction ()
 
-function (append_target_property target property str) # todo: use cmake_parse_arguments ()
+function (append_target_property target property) # ...
   get_target_property(current ${target} ${property})
+  foreach (arg ${ARGN})
+    list (APPEND current ${arg})
+  endforeach ()
   join (current-str " " ${current})
-  set_target_properties (${target} PROPERTIES ${property} "${current-str} ${str}")
+  set_target_properties (${target} PROPERTIES ${property} "${current-str}")
 endfunction ()
 
 function (install_symlink file symlink)
