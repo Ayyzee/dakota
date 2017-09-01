@@ -440,7 +440,7 @@ sub cc_from_dk_core2 {
     &src::add_extra_klass_decls($file_ast);
     &src::add_extra_keywords($file_ast);
     &src::add_extra_generics($file_ast);
-    my $rel_target_hdr_path = &relpath(&target_hdr_path($cmd_info));
+    my $rel_target_hdr_path = &rel_target_hdr_path($cmd_info);
 
     &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_hdr_path);
     &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_hdr_path); # rel_target_hdr_path not used

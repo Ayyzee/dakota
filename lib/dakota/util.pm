@@ -179,6 +179,7 @@ our @EXPORT= qw(
                  suffix
                  target_build_dir
                  target_srcs_ast_path
+                 rel_target_hdr_path
                  target_hdr_path
                  target_src_path
                  use_abs_path
@@ -682,6 +683,11 @@ sub target_srcs_ast_path {
   my ($cmd_info) = @_;
   my $target_srcs_ast_path = &target_build_dir($cmd_info) . '/srcs.ast';
   return $target_srcs_ast_path;
+}
+sub rel_target_hdr_path {
+  my ($cmd_info) = @_;
+  my $rel_target_hdr_path = 'z/target' . $h_ext;
+  return $rel_target_hdr_path;
 }
 sub target_hdr_path {
   my ($cmd_info) = @_;

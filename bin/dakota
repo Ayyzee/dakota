@@ -82,25 +82,16 @@ sub path_opt {
   my ($cmd, $ir, $short, $long, $info) = @_;
   $short = 'no-such-short-opt' if !$short;
   my $arg = $$cmd[$$ir];
-  my $pair;
+  my $rhs;
   if (0) {
   } elsif ($arg =~ /^(-$short|--$long)=([^\s]+)$/) {
-    $pair = [$$ir, $2];
+    $rhs = $2;
   } elsif ($arg =~ /^-$short|--$long$/) {
-    $pair = [$$ir + 1, $$cmd[$$ir + 1]];
+    $rhs = $$cmd[$$ir + 1];
     $$ir++;
   }
-  if ($pair) {
-    if (exists $$info{$long} && 'ARRAY' ne ref($$info{$long})) {
-      $$info{$long} = $pair;
-    } else {
-      if (!defined $$info{$long}) {
-        $$info{$long} = [];
-      }
-      &add_last($$info{$long}, $pair);
-    }
-  }
-  return $pair;
+  $$info{$long} = $rhs if $rhs;
+  return $rhs;
 }
 sub bname {
   my ($path) = @_;
@@ -133,16 +124,14 @@ sub build_precompile_cmd_info {
     'opts'=> {
       'output' => undef,
     },
-    'parts.build-dir' =>          $$parts{'build-dir'},
+    'parts.build-dir' =>  $$parts{'build-dir'},
     'parts.source-dir' => $$parts{'source-dir'},
   };
   $$root_cmd{'args'} = $ordered_input_args;
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
-  if ($$info{'output'} && $$info{'output'}[1]) {
-    $$root_cmd{'opts'}{'output'} = $$info{'output'}[1];
-  }
+  $$root_cmd{'opts'}{'output'} = $$info{'output'} if $$info{'output'};
   return $root_cmd;
 }
 sub extract_dakota_opts {
@@ -196,27 +185,17 @@ sub extract_dakota_opts {
 }
 sub detect_cxx_opts {
   my ($cmd, $info) = @_;
-  my $num_dk_files = 0;
   $$info{'output'} = undef;
-  $$info{'input-pairs'} = [];
   my $ordered_input_args = [];
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
-    my $pair;
     if (&path_opt($cmd, \$i, 'o', 'output', $info)) {
-    } elsif ($arg !~ /^-/) {
-      # removed $o_ext (but should support in the future)
-      if ($arg =~ /^([^\s]+?(\.dk|$cc_ext|$so_ext))$/) {
-        $pair = [$i, $arg];
-        &add_last($$info{'input-pairs'}, $pair);
-        &add_last($ordered_input_args, $$pair[1]);
-        if ($arg =~ /\.dk$/) {
-          $num_dk_files++;
-        }
-      }
+    } elsif ($arg =~ /^([^\s]+?(\.dk))$/) {
+      $arg = Cwd::abs_path($arg) if ! &is_abs($arg); # added for ninja build system
+      &add_last($ordered_input_args, $arg);
     }
   }
-  return ($num_dk_files, $ordered_input_args);
+  return $ordered_input_args;
 }
 sub dakota_io_path_from_parts_path {
   my ($parts_path) = @_;
@@ -242,9 +221,9 @@ sub cxx_argv_from_argv {
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'}[0];
   my $info = {};
-  my ($num_dk_files, $ordered_input_args) = &detect_cxx_opts($cxx_argv, $info);
+  my $ordered_input_args = &detect_cxx_opts($cxx_argv, $info);
   my $cc_paths = [];
-  if ($num_dk_files) {
+  if (scalar @$ordered_input_args) {
     my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $info, $ordered_input_args);
     if (0) {
       $Data::Dumper::Indent = 0;
