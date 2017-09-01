@@ -13,8 +13,8 @@ if [[ $# -ge 1 && $1 == config ]]; then
   #  bin/build.sh clean
   #fi
   #rm -f bin/exe* bin/dakota-catalog lib/libdakota*
+  rm -fr $build_dir # must delete before $binary_dir
   rm -fr $binary_dir
-  rm -fr $build_dir
   bin/cmake-configure.sh
   if [[ $# -ge 1 ]]; then
     bin/build.sh $@
