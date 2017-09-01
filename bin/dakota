@@ -84,7 +84,7 @@ sub path_opt {
   my $arg = $$cmd[$$ir];
   my $pair;
   if (0) {
-  } elsif ($arg =~ /^(-$short|--$long=)([^\s]+)$/) {
+  } elsif ($arg =~ /^(-$short|--$long)=([^\s]+)$/) {
     $pair = [$$ir, $2];
   } elsif ($arg =~ /^-$short|--$long$/) {
     $pair = [$$ir + 1, $$cmd[$$ir + 1]];
@@ -205,7 +205,8 @@ sub detect_cxx_opts {
     my $pair;
     if (&path_opt($cmd, \$i, 'o', 'output', $info)) {
     } elsif ($arg !~ /^-/) {
-      if ($arg =~ /^([^\s]+?(\.dk|$cc_ext|$o_ext|$so_ext))$/) {
+      # removed $o_ext (but should support in the future)
+      if ($arg =~ /^([^\s]+?(\.dk|$cc_ext|$so_ext))$/) {
         $pair = [$i, $arg];
         &add_last($$info{'input-pairs'}, $pair);
         &add_last($ordered_input_args, $$pair[1]);
