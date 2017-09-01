@@ -1,11 +1,11 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 if [[ ! -e .binary-dir.txt ]]; then
-  binary_dir=build-cmk
+  binary_dir=build/cmk
   echo $binary_dir > .binary-dir.txt
 fi
 binary_dir=$(cat .binary-dir.txt)
-rel_source_dir=..
+rel_source_dir=../..
 generator_id="${generator_id:-Ninja}"
 if [[ ${generator:-ninja} == make ]]; then
   generator_id="Unix Makefiles"

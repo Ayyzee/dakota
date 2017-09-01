@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-build_dir=build-dkt
+build_dir=build/dkt
 
 cat $build_dir/dakota.io
 

@@ -4,11 +4,11 @@ set -o errexit -o nounset -o pipefail
 if [[ $# -ge 1 && $1 == config ]]; then
   shift
   if [[ ! -e .binary-dir.txt ]]; then
-    binary_dir=build-cmk
+    binary_dir=build/cmk
     echo $binary_dir > .binary-dir.txt
   fi
   binary_dir=$(cat .binary-dir.txt)
-  build_dir=$binary_dir/../build-dkt
+  build_dir=$binary_dir/../dkt
   #if [[ -e $binary_dir/Makefile || -e $binary_dir/build.ninja ]]; then
   #  bin/build.sh clean
   #fi

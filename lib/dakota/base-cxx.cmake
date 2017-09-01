@@ -59,9 +59,9 @@ endfunction ()
 if (build-dir)
   set (current-build-dir ${build-dir})
 else ()
- #set (current-build-dir ${root-dir}/build-dkt/${target})
+ #set (current-build-dir ${root-dir}/build/dkt/${target})
  #set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
-  set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}/../../build-dkt/${target})
+  set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}/../../../build/dkt/${target}) # could remove ../build/
 endif ()
 get_filename_component (current-build-dir ${current-build-dir} REALPATH)
 

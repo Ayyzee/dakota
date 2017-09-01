@@ -12,4 +12,4 @@ else
   generator=ninja ./root-build.sh all
 fi
 
-# grep -l build-cmk bin/exe* lib/lib*.*
+# grep -l build-cmk bin/exe* lib/lib*.* (old build-dir name)
