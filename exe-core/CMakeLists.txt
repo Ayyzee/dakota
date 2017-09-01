@@ -1,6 +1,6 @@
 # -*- mode: cmake -*-
 cmake_minimum_required (VERSION 3.9)
-set (project exe_core_project)
+set (project exe-core-project)
 set (target  exe-core)
 project (${project} LANGUAGES CXX)
 include (${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake)
