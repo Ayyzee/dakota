@@ -64,8 +64,6 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  add_first
                  add_last
-                 adjust_path
-                 adjust_paths
                  all_files
                  ann
                  as_literal_symbol
@@ -783,7 +781,7 @@ sub global_parts {
 sub set_global_parts {
   my ($parts_path) = @_;
   $global_parts = &parts($parts_path);
-  my $source_dir = &relpath($$global_parts{'source-dir'});
+  my $source_dir = $$global_parts{'source-dir'};
   if ($source_dir ne '.') {
     $$global_parts{'source-dir'} = $source_dir;
   }
@@ -1212,33 +1210,6 @@ sub is_dk_path {
     return 0;
   }
 }
-sub adjust_path {
-  my ($source_dir, $input, $force) = @_;
-  return $input if $source_dir eq '.';
-  $force = 0 if ! $force;
-  my $rel_input = $input;
-  if (&is_abs($input)) {
-    $rel_input = &relpath($input);
-    #die if ! -e $rel_input;
-    return $rel_input;
-  }
-  my $path = $source_dir . '/' . $input;
-  if ($force || (! -e $input && -e $path)) {
-    $rel_input = &relpath($path);
-  }
-  #die if ! -e $rel_input;
-  return $rel_input;
-}
-sub adjust_paths {
-  my ($source_dir, $inputs, $force) = @_;
-  return $inputs if ! $source_dir || ($source_dir eq '.');
-  my $rel_inputs = [];
-  foreach my $input (@$inputs) {
-    my $rel_input = &adjust_path($source_dir, $input, $force);
-    &add_last($rel_inputs, $rel_input);
-  }
-  return $rel_inputs;
-}
 sub normalize_paths {
   my ($in, $key) = @_;
   die if !defined $in;
@@ -1280,11 +1251,7 @@ sub copy_no_dups {
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
-    if (&is_abs($str)) {
-      $str = &canon_path($str);
-    } else {
-      $str = &relpath($str);
-    }
+    $str = &canon_path($str);
     if (!$$str_set{$str}) {
       &add_last($result, $str);
       $$str_set{$str} = 1;

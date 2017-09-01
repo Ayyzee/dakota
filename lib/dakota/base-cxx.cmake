@@ -63,6 +63,7 @@ else ()
  #set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
   set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}/../../build-dkt/${target})
 endif ()
+get_filename_component (current-build-dir ${current-build-dir} REALPATH)
 
 if (NOT target-type)
   set (target-type executable)

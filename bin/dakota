@@ -274,13 +274,10 @@ sub use_parts {
   my $parts = &set_global_parts($$root_cmd{'opts'}{'parts'});
   $$parts{'srcs'} = [] if ! $$parts{'srcs'};
   $$parts{'lib-files'} = [] if ! $$parts{'lib-files'};
-  $$parts{'source-dir'} = &relpath($$parts{'source-dir'});
   if (! $$parts{'build-dir'}) {
     $$parts{'build-dir'} = &build_dir();
   }
   $$parts{'inputs'} = [ @{$$parts{'srcs'}}, @{$$parts{'lib-files'}} ];
-  $$parts{'inputs'} = &adjust_paths($$parts{'source-dir'}, $$parts{'inputs'});
-  $$parts{'srcs'} =   &adjust_paths($$parts{'source-dir'}, $$parts{'srcs'});
   if (! -e $$parts{'build-dir'}) {
     &make_dir($$parts{'build-dir'});
   }
@@ -367,13 +364,9 @@ sub exec_cmd_info {
   my ($root_cmd) = @_;
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   $$root_cmd{'inputs'} = [] if ! $$root_cmd{'inputs'};
-  if ($$root_cmd{'opts'}{'parts'}) {
-    $$root_cmd{'opts'}{'parts'} = &relpath($$root_cmd{'opts'}{'parts'});
-  }
   &set_root_cmd($root_cmd);
 
-  my $rel_argv = [map { &relpath($_) } @{$$root_cmd{'args'}}];
-  my $inputs = &normalize_paths($rel_argv);
+  my $inputs = &normalize_paths($$root_cmd{'args'});
   my ($parts, $dakota_io);
 
   if ($$root_cmd{'opts'}{'parts'}) {
