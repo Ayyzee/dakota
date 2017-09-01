@@ -12,3 +12,7 @@ add_subdirectory (dakota-core)
 add_subdirectory (dakota)
 add_subdirectory (exe-core)
 add_subdirectory (exe)
+
+enable_testing ()
+add_test (NAME exe-core COMMAND exe-core)
+add_test (NAME exe      COMMAND exe)
