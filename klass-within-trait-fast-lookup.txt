@@ -1,0 +1,24 @@
+each klass is given a klass descriptor (uint8-t)
+each trait is given a trait descriptor (uint8-t)
+[klass and traits both start at 1 leaving 0 for NA]
+
+max of 255 klasses
+max of 255 traits (likely more klasses than traits)
+
+uint8-t  kls-desc = klass-desc-with-trait-desc[klass-desc][trait-desc];
+object-t kls =      klass-for-klass-desc[kls-desc];
+
+klass-with-trait size = num-klasses * num-traits * sizeof(uint8-t)
+klass-for-klass-desc =  num-klasses * sizeof(object-t)
+
+1. (k * t * 1) + (k * 8)
+2. (k) * ((t * 1) + 8)
+3. k * (t + 8)
+
+so 128 klasses and 56 traits:
+klass-desc-with-trait-desc size: (128 * 56 * 1) = 7168
+klass-for-klass-desc size: (128 * 8) =            1024
+(128 * (56 + 8)) = 2 pages
+
+so 256 klasses and 120 traits:
+(256 * (120 + 8))/4096 = 8 pages
