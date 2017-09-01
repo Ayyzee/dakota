@@ -23,4 +23,4 @@ else
   bin/build.sh $@
 fi
 
-# generator=make ./root-build.sh config clean all
+# generator=make ./root-build.sh config all test
