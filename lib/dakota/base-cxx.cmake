@@ -56,14 +56,20 @@ function (dk_find_program output-var name)
   set (${output-var} "${found-name}" PARENT_SCOPE)
 endfunction ()
 
+function (current_build_dir output-var current-binary-dir)
+  get_filename_component (current-binary-dir-dir  ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
+  get_filename_component (current-binary-dir-name ${CMAKE_CURRENT_BINARY_DIR} NAME)
+  set (current-build-dir ${current-binary-dir-dir}/../dkt/${current-binary-dir-name})
+  get_filename_component (current-build-dir ${current-build-dir} REALPATH)
+  set (${output-var} "${current-build-dir}" PARENT_SCOPE)
+endfunction ()
+
 if (build-dir)
   set (current-build-dir ${build-dir})
 else ()
- #set (current-build-dir ${root-dir}/build/dkt/${target})
- #set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
-  set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}/../../../build/dkt/${target}) # could remove ../build/
+  current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
+  #set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
 endif ()
-get_filename_component (current-build-dir ${current-build-dir} REALPATH)
 
 if (NOT target-type)
   set (target-type executable)
