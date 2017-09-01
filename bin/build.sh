@@ -1,10 +1,10 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-if [[ -e ../.binary-dir.txt ]]; then
-  binary_dir=$(cat ../.binary-dir.txt)
-else
+if [[ ! -e .binary-dir.txt ]]; then
   binary_dir=build-cmk
+  echo $binary_dir > .binary-dir.txt
 fi
+binary_dir=$(cat .binary-dir.txt)
 jobs=$(getconf _NPROCESSORS_ONLN)
 jobs=$(( jobs + 2 ))
 

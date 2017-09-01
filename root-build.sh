@@ -7,12 +7,12 @@ if [[ $# -ge 1 && $1 == config ]]; then
     binary_dir=build-cmk
     echo $binary_dir > .binary-dir.txt
   fi
+  binary_dir=$(cat .binary-dir.txt)
+  build_dir=$binary_dir/../build-dkt
   #if [[ -e $binary_dir/Makefile || -e $binary_dir/build.ninja ]]; then
   #  bin/build.sh clean
   #fi
   #rm -f bin/exe* bin/dakota-catalog lib/libdakota*
-  binary_dir=$(cat .binary-dir.txt)
-  build_dir=$binary_dir/../build-dkt
   rm -fr $binary_dir
   rm -fr $build_dir
   bin/cmake-configure.sh
