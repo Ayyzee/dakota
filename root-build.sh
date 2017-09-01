@@ -2,19 +2,20 @@
 set -o errexit -o nounset -o pipefail
 
 if [[ $# -ge 1 && $1 == config ]]; then
+  shift
   if [[ ! -e .binary-dir.txt ]]; then
     binary_dir=build-cmk
     echo $binary_dir > .binary-dir.txt
   fi
+  #if [[ -e $binary_dir/Makefile || -e $binary_dir/build.ninja ]]; then
+  #  bin/build.sh clean
+  #fi
+  #rm -f bin/exe* bin/dakota-catalog lib/libdakota*
   binary_dir=$(cat .binary-dir.txt)
-  if false; then
-    build_dir=$binary_dir/../build-dkt
-    rm -fr $build_dir
-  fi
+  build_dir=$binary_dir/../build-dkt
   rm -fr $binary_dir
- #rm -fr $binary_dir/{CMakeCache.txt,CMakeFiles,Makefile,build.ninja,rules.ninja}
+  rm -fr $build_dir
   bin/cmake-configure.sh
-  shift
   if [[ $# -ge 1 ]]; then
     bin/build.sh $@
   fi
