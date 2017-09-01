@@ -9,10 +9,12 @@ if [[ $# -ge 1 && $1 == config ]]; then
   fi
   binary_dir=$(cat .binary-dir.txt)
   build_dir=$binary_dir/../dkt
-  #if [[ -e $binary_dir/Makefile || -e $binary_dir/build.ninja ]]; then
-  #  bin/build.sh clean
-  #fi
-  #rm -f bin/exe* bin/dakota-catalog lib/libdakota*
+  if [[ ${clean:-0} -ne 0 ]]; then
+    #rm -f bin/dakota-catalog bin/exe* lib/libdakota*
+    if [[ -e $binary_dir/CMakeFiles/Makefile2 || -e $binary_dir/build.ninja ]]; then
+      verbose=1 bin/build.sh clean
+    fi
+  fi
   rm -fr $build_dir # must delete before $binary_dir
   rm -fr $binary_dir
   bin/cmake-configure.sh
