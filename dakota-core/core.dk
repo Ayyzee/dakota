@@ -564,7 +564,6 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
 
 static func named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) -> void {
   *ri = {
-    .dir =                    cast(decltype(ri->dir))                    named-info::at(ni, #dir),
     .generic-func-ptrs =      cast(decltype(ri->generic-func-ptrs))      named-info::at(ni, #generic-func-ptrs),
     .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
     .imported-klass-names =   cast(decltype(ri->imported-klass-names))   named-info::at(ni, #imported-klass-names),
@@ -1299,7 +1298,6 @@ klass get-segment-data-func {
 }
 klass registration-info {
   slots {
-    str-t              dir;
     generic-func-t*    generic-func-ptrs;
     get-segment-data-func-t get-segment-data;
     symbol-t*          imported-klass-names;
@@ -1361,7 +1359,6 @@ static addr2name-pair-t[] named-instances = {
 };
 klass so-symbol-info {
   slots {
-    str-t fdir;
     str-t fname;
     str-t sname;
   }
@@ -1371,7 +1368,6 @@ static func symbol-name-for-addr(ptr-t addr, so-symbol-info::slots-t* info) -> s
   for (ssize-t i = 0; i < scountof(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
     if (named-instance.addr == addr) {
-        info->fdir =  nullptr; // fixfix
         info->fname = nullptr; // fixfix
         info->sname = named-instance.name;
         return info;
@@ -1386,7 +1382,6 @@ static func symbol-name-for-addr(ptr-t addr, so-symbol-info::slots-t* info) -> s
     // imported-klasses
     for (int-t i = 0; cast(object-t*)ri.imported-klass-ptrs[i].item != nullptr; i++) {
       if (cast(object-t*)ri.imported-klass-ptrs[i].item == cast(object-t*)addr) {
-        info->fdir =  ri.dir;
         info->fname = ri.name;
         info->sname = ri.imported-klass-names[i];
         return info;
@@ -1415,8 +1410,8 @@ static func symbol-name-for-addr(ptr-t addr, so-symbol-info::slots-t* info) -> s
       syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
              strsignal-name(sig), info.sname, si->si-addr);
     } else {
-      syslog(LOG-ERR, "caught sig%s in \"%s/%s\" at \"%s::_klass_\" %p\n",
-             strsignal-name(sig), info.fdir, info.fname, info.sname, si->si-addr);
+      syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s::_klass_\" %p\n",
+             strsignal-name(sig), info.fname, info.sname, si->si-addr);
     }
   }
   x::sigaction-handler-t prev-sa-handler =

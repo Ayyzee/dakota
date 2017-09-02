@@ -86,7 +86,6 @@
     "#bool-t"=> undef, # hardcode typealias
     "#cat"=> undef,
     "#char-t"=> undef, # hardcode typealias
-    "#dir"=> undef,
     "#item"=> undef,
     "#enum"=> undef,
     "#enum-base"=> undef,

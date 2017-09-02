@@ -612,7 +612,6 @@ sub generate_target_runtime {
   #$col = &colin($col);
 
   my $info_tbl = {
-                  "\#dir" => 'dir',
                   "\#generic-func-ptrs" => 'generic-func-ptrs',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                   "\#imported-klass-names" => 'imported-klass-names',
@@ -641,8 +640,6 @@ sub generate_target_runtime {
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
   $target_src_str .= $nl;
-  $target_src_str .= "[[read-only]] static char-t   dir-buffer[4096] = \"\";" . $nl;
-  $target_src_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
   $target_src_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-FILE);" . $nl;
   $target_src_str .= "[[read-only]] static symbol-t type = dk-intern(DKT-TARGET-TYPE);" . $nl;
   $target_src_str .= $nl;
@@ -653,18 +650,18 @@ sub generate_target_runtime {
   $target_src_str .= $col . "static func __initial-epilog() -> void {" . $nl;
   $col = &colin($col);
   $target_src_str .=
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','name':'%s'\", __func__, \"before\", name);" . $nl .
     $col . "dkt-register-info(&reg-info);" . $nl .
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','name':'%s'\", __func__, \"after\", name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
   $target_src_str .= $col . "}" . $nl;
   $target_src_str .= $col . "static func __final-epilog() -> void {" . $nl;
   $col = &colin($col);
   $target_src_str .=
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','name':'%s'\", __func__, \"before\", name);" . $nl .
     $col . "dkt-deregister-info(&reg-info);" . $nl .
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','name':'%s'\", __func__, \"after\", name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
   $target_src_str .= $col . "}" . $nl;
