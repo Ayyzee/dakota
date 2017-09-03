@@ -1,9 +1,8 @@
 # -*- mode: cmake -*-
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
-set (CMAKE_PREFIX_PATH ${prefix-dir})
 include (${prefix-dir}/lib/dakota/functions.cmake)
 
-current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
+dk_current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
 if (DEFINED use-binary-dir-as-build-dir OR DEFINED ENV{DKT_USE_BINARY_DIR_AS_BUILD_DIR})
   set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
 endif ()
@@ -28,8 +27,8 @@ else ()
   message (FATAL_ERROR "error: target-type must be shared-library or executable.")
 endif ()
 
-find_lib_files (lib-files "${lib-dirs}" ${libs})
-target_lib_files (target-lib-files ${target-libs})
+dk_find_lib_files (lib-files "${lib-dirs}" ${libs})
+dk_target_lib_files (target-lib-files ${target-libs})
 
 if (DEFINED lib-files)
   target_link_libraries (${target} ${lib-files})

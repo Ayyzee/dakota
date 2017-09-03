@@ -44,11 +44,11 @@ install (
   PROGRAMS ${install-bin-files}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
-install_symlink (
+dk_install_symlink (
   ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler-${cxx-compiler-id}.opts
   ${CMAKE_INSTALL_PREFIX}/lib/dakota/compiler.opts
 )
-install_symlink (
+dk_install_symlink (
   ${CMAKE_INSTALL_PREFIX}/lib/dakota/linker-${cxx-compiler-id}.opts
   ${CMAKE_INSTALL_PREFIX}/lib/dakota/linker.opts
 )
