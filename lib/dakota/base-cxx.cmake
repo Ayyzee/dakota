@@ -66,7 +66,9 @@ function (current_build_dir output-var current-binary-dir)
 endfunction ()
 
 current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
-#set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
+if (DEFINED use-binary-dir-as-build-dir OR DEFINED ENV{DKT_USE_BINARY_DIR_AS_BUILD_DIR})
+  set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
+endif ()
 
 if (NOT target-type)
   set (target-type executable)
