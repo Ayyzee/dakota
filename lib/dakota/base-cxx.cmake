@@ -56,6 +56,8 @@ function (dk_find_program output-var name)
   set (${output-var} "${found-name}" PARENT_SCOPE)
 endfunction ()
 
+# current-build-dir is set to be a filesystem peer of current-binary-dir
+# (this implies build-dir and binary-dir have the same relationship)
 function (current_build_dir output-var current-binary-dir)
   get_filename_component (current-binary-dir-dir  ${current-binary-dir} DIRECTORY)
   get_filename_component (current-binary-dir-name ${current-binary-dir} NAME)
