@@ -59,17 +59,14 @@ endfunction ()
 function (current_build_dir output-var current-binary-dir)
   get_filename_component (current-binary-dir-dir  ${current-binary-dir} DIRECTORY)
   get_filename_component (current-binary-dir-name ${current-binary-dir} NAME)
-  set (current-build-dir ${current-binary-dir-dir}/../dkt/${current-binary-dir-name})
-  get_filename_component (current-build-dir ${current-build-dir} REALPATH)
+  set (build-dir ${current-binary-dir-dir}/../dkt)
+  get_filename_component (build-dir ${build-dir} REALPATH)
+  set (current-build-dir ${build-dir}/${current-binary-dir-name})
   set (${output-var} "${current-build-dir}" PARENT_SCOPE)
 endfunction ()
 
-if (build-dir)
-  set (current-build-dir ${build-dir})
-else ()
-  current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
-  #set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
-endif ()
+current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
+#set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR}) # write into cmake binary dir
 
 if (NOT target-type)
   set (target-type executable)
