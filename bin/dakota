@@ -200,9 +200,6 @@ sub detect_cxx_opts {
 sub dakota_io_path_from_parts_path {
   my ($parts_path) = @_;
   my $parts = &parts($parts_path);
-  if (! $$parts{'build-dir'}) {
-    $$parts{'build-dir'} = &build_dir();
-  }
   my $force;
   my $dakota_io_path = $$parts{'build-dir'} . '/dakota.io';
   return $dakota_io_path;
@@ -254,10 +251,6 @@ sub use_parts {
   my $parts = &set_global_parts($$root_cmd{'opts'}{'parts'});
   $$parts{'srcs'} = [] if ! $$parts{'srcs'};
   $$parts{'lib-files'} = [] if ! $$parts{'lib-files'};
-  if (! $$parts{'build-dir'}) {
-    $$parts{'build-dir'} = &build_dir();
-  }
-  $$parts{'inputs'} = [ @{$$parts{'srcs'}}, @{$$parts{'lib-files'}} ];
   if (! -e $$parts{'build-dir'}) {
     &make_dir($$parts{'build-dir'});
   }

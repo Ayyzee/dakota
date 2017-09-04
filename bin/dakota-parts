@@ -8,9 +8,5 @@ mkdir -p $(dirname $parts)
 cat /dev/null > $parts
 
 for arg in $@; do
-  if [[ $arg =~ :$ ]]; then
-    echo $arg >> $parts
-  else
-    echo "  -" $arg >> $parts
-  fi
+  echo $arg >> $parts
 done

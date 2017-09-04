@@ -811,7 +811,6 @@ sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
   &make_dir_part($outfile, $should_echo);
-  if ($outfile =~ m|^$build_dir/$build_dir/|) { die "found double build-dir/build-dir: $outfile"; } # likely a double $build_dir prepend
   my $file_db = {};
   my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile, $file_db);
   my $num_out_of_date_infiles = scalar @$infiles;

@@ -1431,17 +1431,46 @@ sub xxx_from_yaml_file {
   }
   return $result;
 }
+sub current_source_dir_from_inputs {
+  my ($inputs) = @_;
+  my $tbl = {};
+  foreach my $input (@$inputs) {
+    if ($input =~ /\.dk$/) {
+      my $dir = $input;
+      while ($dir = &dir_part($dir)) {
+        if (-e "$dir/CMakeLists.txt") {
+          $$tbl{$dir} = 1;
+          last;
+        }
+      }
+    }
+  }
+  my $dirs = [keys %$tbl];
+  if (scalar @$dirs == 1) {
+    return $$dirs[0];
+  } else {
+    my $p1 = pop @$dirs;
+    my $p1_len = length $p1;
+    while (scalar @$dirs) {
+      my $p2 = pop @$dirs;
+      my $p2_len = length $p2;
+      if ($p2_len < $p1_len) {
+        $p1 = $p2;
+        $p1_len = $p2_len
+      } else { die if $p1_len == $p2_len; }
+    }
+    return $p1;
+  }
+}
 sub parts {
   my ($file) = @_;
   my $result = {};
   if (-e $file) {
-    $result = &xxx_from_yaml_file($file,
-                                  [
-                                    'source-dir',
-                                  ]);
-    die if $$result{'build-dir'};
+    my $filestr = &filestr_from_file($file);
+    $$result{'inputs'} = [split /\s+/, $filestr];
   }
   $$result{'build-dir'} = &dir_part($file);
+  $$result{'source-dir'} = &current_source_dir_from_inputs($$result{'inputs'});
   return $result;
 }
 sub platform {

@@ -1,6 +1,6 @@
 # -*- mode: cmake -*-
 include (${prefix-dir}/lib/dakota/base-cxx.cmake)
-set (parts ${current-build-dir}/parts.yaml) # invariant
+set (parts ${current-build-dir}/parts.txt) # invariant
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
 dk_append_target_property (${target} LINK_FLAGS --parts ${parts} --cxx ${cxx-compiler})
@@ -32,11 +32,11 @@ add_custom_target (
   VERBATIM)
 add_dependencies (${target} ${target-hdr})
 
-# generate parts.yaml
+# generate parts.txt
 add_custom_command (
   OUTPUT ${parts}
   COMMAND ${dakota-parts} ${parts}
-    source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
-    lib-files:  ${target-lib-files} ${lib-files}
-    srcs:       ${srcs}
+    ${srcs}
+    ${target-lib-files}
+    ${lib-files}
   VERBATIM)
