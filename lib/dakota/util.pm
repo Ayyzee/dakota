@@ -1464,13 +1464,11 @@ sub current_source_dir_from_inputs {
 }
 sub parts {
   my ($file) = @_;
-  my $result = {};
+  my $result = { 'build-dir' => &dir_part($file) };
   if (-e $file) {
-    my $filestr = &filestr_from_file($file);
-    $$result{'inputs'} = [split /\s+/, $filestr];
+    $$result{'inputs'} = [split /\s+/, &filestr_from_file($file)];
+    $$result{'source-dir'} = &current_source_dir_from_inputs($$result{'inputs'});
   }
-  $$result{'build-dir'} = &dir_part($file);
-  $$result{'source-dir'} = &current_source_dir_from_inputs($$result{'inputs'});
   return $result;
 }
 sub platform {
