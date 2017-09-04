@@ -702,7 +702,7 @@ sub target_src_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    $$cmd_info{'parts.build-dir'} = $$cmd_info{'opts'}{'path-only'};
+    $$cmd_info{'parts.build-dir'} = &dir_part($$cmd_info{'opts'}{'parts'});
 
     my $path;
     if (0) {
@@ -1489,11 +1489,15 @@ sub xxx_from_yaml_file {
 }
 sub parts {
   my ($file) = @_;
-  my $result =  &xxx_from_yaml_file($file,
-                                    [
-                                      'build-dir',
-                                      'source-dir',
-                                    ]);
+  my $result = {};
+  if (-e $file) {
+    $result = &xxx_from_yaml_file($file,
+                                  [
+                                    'source-dir',
+                                  ]);
+    die if $$result{'build-dir'};
+  }
+  $$result{'build-dir'} = &dir_part($file);
   return $result;
 }
 sub platform {

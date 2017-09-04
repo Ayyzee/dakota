@@ -5,7 +5,7 @@ include (${prefix-dir}/lib/dakota/compiler.cmake)
 dk_find_program (dakota-parts dakota-parts) # ${CMAKE_EXECUTABLE_SUFFIX}
 
 execute_process (
-  COMMAND ${CMAKE_CXX_COMPILER} --target-src --path-only ${current-build-dir}
+  COMMAND ${CMAKE_CXX_COMPILER} --target-src --parts ${parts} --path-only
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
@@ -24,7 +24,6 @@ add_custom_command (
   OUTPUT ${parts}
   COMMAND ${dakota-parts} ${parts}
     source-dir: ${CMAKE_CURRENT_SOURCE_DIR}
-    build-dir:  ${current-build-dir}
     lib-files:  ${target-lib-files} ${lib-files}
     srcs:       ${srcs}
   VERBATIM)
