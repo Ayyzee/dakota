@@ -64,7 +64,6 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  add_first
                  add_last
-                 all_files
                  ann
                  as_literal_symbol
                  as_literal_symbol_interior
@@ -153,7 +152,6 @@ our @EXPORT= qw(
                  dakota_io_from_file
                  dakota_io_remove
                  dakota_io_to_file
-                 relpath
                  remove_extra_whitespace
                  remove_first
                  remove_last
@@ -1162,48 +1160,6 @@ sub longest_common_prefix {
   }
   return $path_prefix;
 }
-sub all_files {
-  my ($dirs, $include_regex, $exclude_regex) = @_;
-  if (!is_array($dirs)) {
-    $dirs = [$dirs];
-  }
-  my $files = {};
-  foreach my $dir (@$dirs) {
-    if (-d $dir) {
-      &all_files_recursive([$dir], $include_regex, $exclude_regex, $files);
-    } else {
-      print STDERR $0 . ':warning: skipping non-existent directory ' . $dir . $nl;
-    }
-  }
-  return $files
-}
-sub all_files_recursive {
-  my ($dirs, $include_regex, $exclude_regex, $files) = @_;
-  my $raw_dir = join('/', @$dirs);
-  my $dir = &Cwd::realpath($raw_dir);
-  opendir(my $dh, $dir) || die "can't opendir $dir: $!";
-  foreach my $leaf (readdir($dh)) {
-    if ('.' ne $leaf && '..' ne $leaf) {
-      my $path = $dir . '/' . $leaf;
-      if (-d $path) {
-        &add_last($dirs, $leaf);
-        &all_files_recursive($dirs, $include_regex, $exclude_regex, $files);
-        &remove_last($dirs); # remove $leaf
-      } elsif (-e $path) {
-        if (!defined $include_regex || $path =~ m{$include_regex}) {
-          if (!defined $exclude_regex || $path !~ m{$exclude_regex}) {
-            my $rel_path_dir = &relpath($dir);
-            my $rel_path = $path =~ s=$rel_path_dir=$raw_dir=r;
-            $rel_path = &canon_path($rel_path);
-            $$files{$path} = $rel_path;
-          }
-        }
-      }
-    }
-  }
-  closedir $dh;
-  return $files;
-}
 sub dmp {
   my ($ref) = @_;
   print STDERR &Dumper($ref);
@@ -1285,18 +1241,6 @@ sub prepend_dot_slash {
   return $path if $path =~ /^\.\.\//;
   $path = './' . $path;
   return $path;
-}
-sub relpath {
-  my ($path, $base) = @_; # base is optional
-  die if !$path;
-  return $path if ! &is_abs($path);
-  $path = &realpath($path);
-  if ($base) {
-    $base = &realpath($base);
-  }
-  die if !$path;
-  my $result = File::Spec->abs2rel($path, $base); # base is optional
-  return $result;
 }
 sub canonpath {
   my ($path) = @_;
