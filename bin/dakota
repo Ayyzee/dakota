@@ -120,10 +120,11 @@ sub extract_dakota_opts {
   #  $var4opt_pat: rhs/value == 0 means do not extract
   my $var4opt_pat = { 'parts=s' => 1,
                       'cxx=s' => 1,
+                      'var=s' => 1,
                     };
   my $var4opt = {};
   foreach my $opt_pat (keys %$var4opt_pat) {
-    if ($opt_pat =~ /^(.+?)=s$/) {
+    if ($opt_pat =~ /^([\w-]+)=s$/) {
       $$var4opt{$1} = 1;
     } else {
       $$var4opt{$opt_pat} = 0;
@@ -133,7 +134,7 @@ sub extract_dakota_opts {
   my $to_remove = [];
   my $cmd_len = scalar @$cmd;
   for (my $i = 0; $i < @$cmd; ) {
-    my $opt = $$cmd[$i] =~ s/^--(.+?)(=.*)?$/$1/r;
+    my $opt = $$cmd[$i] =~ s/^--([\w-]+)(=.*)?$/$1/r;
     if (exists $$var4opt{$opt}) {
       my $opt_has_rhs = $$var4opt{$opt};
       if (0) {
@@ -147,9 +148,10 @@ sub extract_dakota_opts {
       } elsif ($$cmd[$i] =~ /^--$opt$/) {
         $$info{$opt} = [] if !exists $$info{$opt};
         if ($opt_has_rhs) { # --opt rhs
+          my $rhs = $$cmd[$i + 1];
           die if ! ($i + 1 < $cmd_len);
-          die if $$cmd[$i +1] =~ /^-/;
-          &add_last($$info{$opt}, $$cmd[$i + 1]);
+          die if $rhs =~ /^-/;
+          &add_last($$info{$opt}, $rhs);
           &add_first($to_remove, $i);
           &add_first($to_remove, $i + 1);
         } else { # --opt
@@ -196,6 +198,7 @@ sub cxx_argv_from_argv {
   my $dakota_opts = &extract_dakota_opts($cmd);
   $$dakota_opts{'parts'} = $$dakota_opts{'parts'}[0];
   $$dakota_opts{'cxx'} =   $$dakota_opts{'cxx'}[0];
+  #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
   my $ordered_dk_src_files = &dk_src_files($cxx_argv);
@@ -295,6 +298,7 @@ sub cmd_info_from_argv {
     'inputs' => [],
     'lib-files' => [],
     'opts' => {
+    'var' => [],
     }
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
@@ -305,6 +309,7 @@ sub cmd_info_from_argv {
               'target-ast', # mainly for debugging
               'target-hdr',
               'target-src',
+              'var=s',
 
               #'clean',          # make target like
             );
@@ -337,6 +342,7 @@ sub exec_cmd_info {
   die if ! $$root_cmd{'source-dir'};
   die if ! $$parts{'build-dir'};
   die if ! $$parts{'source-dir'};
+  #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
   my $cc_files = &dakota::dakota::start_cmd($root_cmd, $parts);
   return (0, $cc_files);
 }
