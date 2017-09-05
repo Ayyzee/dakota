@@ -90,12 +90,12 @@ sub check_paths {
   }
 }
 sub translate_dk_to_cc {
-  my ($cmd, $cc_paths) = @_;
+  my ($cmd, $ordered_cc_paths) = @_;
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
     die if ! $arg || '' eq $arg;
-    if ($arg =~ /\.dk$/) {
-      my $cc_path = &remove_first($cc_paths);
+    if (&is_dk_path($arg)) {
+      my $cc_path = &remove_first($ordered_cc_paths);
       die if ! $cc_path || '' eq $cc_path;
       &check_paths($arg, $cc_path);
       $$cmd[$i] = $cc_path;
@@ -103,9 +103,9 @@ sub translate_dk_to_cc {
   }
 }
 sub build_precompile_cmd_info {
-  my ($dakota_opts, $ordered_input_args) = @_;
+  my ($dakota_opts, $ordered_dk_paths) = @_;
   my $root_cmd = {};
-  $$root_cmd{'args'} = $ordered_input_args;
+  $$root_cmd{'args'} = $ordered_dk_paths;
   if ($$dakota_opts{'parts'}) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'};
   }
@@ -168,17 +168,16 @@ sub extract_dakota_opts {
   }
   return $opts;
 }
-sub dk_src_files {
+sub dk_paths {
   my ($cmd) = @_;
-  my $ordered_input_args = [];
-  for (my $i = 1; $i < @$cmd; $i++) {
-    my $arg = $$cmd[$i];
-    if ($arg =~ /^([^\s]+?(\.dk))$/) {
+  my $ordered_dk_paths = [];
+  foreach my $arg (@$cmd) {
+    if (&is_dk_path($arg)) {
       $arg = Cwd::abs_path($arg) if ! &is_abs($arg); # added for ninja build system
-      &add_last($ordered_input_args, $arg);
+      &add_last($ordered_dk_paths, $arg);
     }
   }
-  return $ordered_input_args;
+  return $ordered_dk_paths;
 }
 sub dakota_io_path {
   my $dakota_io_path = &build_dir() . '/dakota.io';
@@ -208,10 +207,10 @@ sub cxx_argv_from_argv {
   #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
-  my $ordered_dk_src_files = &dk_src_files($cxx_argv);
-  my $cc_paths = [];
-  if (scalar @$ordered_dk_src_files) {
-    my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $ordered_dk_src_files);
+  my $ordered_dk_paths = &dk_paths($cxx_argv);
+  my $ordered_cc_paths = [];
+  if (scalar @$ordered_dk_paths) {
+    my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $ordered_dk_paths);
     if (0) {
       $Data::Dumper::Indent = 0;
       print '# ' . &Dumper($precompile_cmd_info) . $nl;
@@ -221,11 +220,11 @@ sub cxx_argv_from_argv {
    #if ($$precompile_cmd_info{'opts'}{'parts'}) {
    #  my $dakota_io = &dakota_io($precompile_cmd_info);
    #}
-   #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info);
-    $cc_paths = &exec_cmd_info($precompile_cmd_info);
+   #($exit_val, $ordered_cc_paths) = &start_cmd($precompile_cmd_info);
+    $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info);
   }
-  if (0 != @$cc_paths) {
-    &translate_dk_to_cc($cxx_argv, $cc_paths);
+  if (0 != @$ordered_cc_paths) {
+    &translate_dk_to_cc($cxx_argv, $ordered_cc_paths);
   }
   return $cxx_argv;
 }
@@ -340,8 +339,8 @@ sub exec_cmd_info {
   &normalize_paths($root_cmd, 'inputs');
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
   #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
-  my $cc_files = &dakota::dakota::start_cmd($root_cmd);
-  return (0, $cc_files);
+  my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
+  return (0, $ordered_cc_paths);
 }
 sub start {
   my ($argv) = @_;
@@ -351,7 +350,7 @@ sub start {
     exit 1 if $exit_val;
   } else {
     my $cmd_info = &cmd_info_from_argv($argv);
-    my $cc_files = &exec_cmd_info($cmd_info); # calls start_cmd()
+    my $ordered_cc_paths = &exec_cmd_info($cmd_info); # calls start_cmd()
   }
   exit 0;
 }
