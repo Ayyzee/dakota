@@ -484,7 +484,7 @@ sub update_target_srcs_ast_from_all_inputs {
                'output' => $$cmd_info{'output'},
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
              };
-  $$cmd_info{'inputs'} = $$cmd_info{'parts.inputs'},
+  $$cmd_info{'inputs'} = $$cmd_info{'parts'},
   &check_path($target_srcs_ast_path);
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);

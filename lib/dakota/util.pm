@@ -95,7 +95,7 @@ our @EXPORT= qw(
                  filestr_to_file
                  first
                  flatten
-                 global_parts
+                 global_vars
                  target_srcs_ast
                  has_kw_args
                  has_kw_arg_names
@@ -141,10 +141,9 @@ our @EXPORT= qw(
                  num_kw_arg_names
                  pann
                  param_types_str
-                 parts
+                 vars
                  path_only
                  prepend_dot_slash
-                 parts
                  platform
                  dakota_io_add
                  dakota_io_append
@@ -164,7 +163,7 @@ our @EXPORT= qw(
                  root_cmd
                  scalar_from_file
                  scalar_to_file
-                 set_global_parts
+                 set_global_vars
                  set_target_srcs_ast
                  set_root_cmd
                  set_src_decl
@@ -638,9 +637,9 @@ sub make_dir_part {
 sub xxx_dir {
   my ($dir_key, $default_dir) = @_;
   my $dir;
-  my $parts = &global_parts();
-  if ($parts && $$parts{$dir_key}) {
-    $dir = $$parts{$dir_key};
+  my $vars = &global_vars();
+  if ($vars && $$vars{$dir_key}) {
+    $dir = $$vars{$dir_key};
   } else {
     die if ! $default_dir;
     $dir = $default_dir;
@@ -667,10 +666,9 @@ sub source_dir { # sub project source dir (CMAKE_CURRENT_SOURCE_DIR)
 sub target_build_dir { # dakota build dir (cmake has own build dir; it uses phrase "binary dir")
   my ($cmd_info) = @_;
   my $build_dir;
-  if ($$cmd_info{'parts.build-dir'}) {
-    $build_dir = $$cmd_info{'parts.build-dir'};
-    #print STDERR "1/2: build-dir():     " . &build_dir() . $nl;
-    #print STDERR "2/2: parts.build-dir: " . $build_dir . $nl;
+  if ($$cmd_info{'build-dir'}) {
+    $build_dir = $$cmd_info{'build-dir'};
+    #print STDERR "build-dir():     " . &build_dir() . $nl;
   } else {
     #die &Dumper($cmd_info);
     $build_dir = &build_dir();
@@ -700,7 +698,7 @@ sub target_src_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    $$cmd_info{'parts.build-dir'} = &dir_part($$cmd_info{'opts'}{'parts'});
+    $$cmd_info{'build-dir'} = &dir_part($$cmd_info{'opts'}{'parts'});
 
     my $path;
     if (0) {
@@ -778,18 +776,18 @@ sub kw_args_method_sig {
   &add_last($kw_args, ['...']);
   return ($$method{'name'}, $kw_args);
 }
-my $global_parts;
-sub global_parts {
-  return $global_parts;
+my $global_vars;
+sub global_vars {
+  return $global_vars;
 }
-sub set_global_parts {
+sub set_global_vars {
   my ($parts_path) = @_;
-  $global_parts = &parts($parts_path);
-  my $source_dir = $$global_parts{'source-dir'};
+  $global_vars = &vars($parts_path);
+  my $source_dir = $$global_vars{'source-dir'};
   if ($source_dir ne '.') {
-    $$global_parts{'source-dir'} = $source_dir;
+    $$global_vars{'source-dir'} = $source_dir;
   }
-  return $global_parts;
+  return $global_vars;
 }
 my $target_srcs_ast;
 sub target_srcs_ast {
@@ -1462,12 +1460,12 @@ sub current_source_dir_from_inputs {
     return $p1;
   }
 }
-sub parts {
+sub vars {
   my ($file) = @_;
   my $result = { 'build-dir' => &dir_part($file) };
   if (-e $file) {
-    $$result{'inputs'} = [split /\s+/, &filestr_from_file($file)];
-    $$result{'source-dir'} = &current_source_dir_from_inputs($$result{'inputs'});
+    $$result{'parts'} = [split /\s+/, &filestr_from_file($file)];
+    $$result{'source-dir'} = &current_source_dir_from_inputs($$result{'parts'});
   }
   return $result;
 }
