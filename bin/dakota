@@ -78,21 +78,6 @@ $Data::Dumper::Indent    = 1; # default = 2
 use Getopt::Long qw(GetOptionsFromArray);
 $Getopt::Long::ignorecase = 0;
 
-sub path_opt {
-  my ($cmd, $ir, $short, $long, $info) = @_;
-  $short = 'no-such-short-opt' if !$short;
-  my $arg = $$cmd[$$ir];
-  my $rhs;
-  if (0) {
-  } elsif ($arg =~ /^(-$short|--$long)=([^\s]+)$/) {
-    $rhs = $2;
-  } elsif ($arg =~ /^-$short|--$long$/) {
-    $rhs = $$cmd[$$ir + 1];
-    $$ir++;
-  }
-  $$info{$long} = $rhs if $rhs;
-  return $rhs;
-}
 sub bname {
   my ($path) = @_;
   my $bname = $path =~ s=^(.*/)?([^\s]+?)\.[^\s]+$=$2=r;
@@ -118,12 +103,9 @@ sub translate_dk_to_cc {
   }
 }
 sub build_precompile_cmd_info {
-  my ($dakota_opts, $info, $ordered_input_args) = @_;
+  my ($dakota_opts, $ordered_input_args) = @_;
   my $parts = &parts($$dakota_opts{'parts'}[0]);
   my $root_cmd = {
-    'opts'=> {
-      'output' => undef,
-    },
     'parts.build-dir' =>  $$parts{'build-dir'},
     'parts.source-dir' => $$parts{'source-dir'},
   };
@@ -131,7 +113,6 @@ sub build_precompile_cmd_info {
   if ($$dakota_opts{'parts'}[0]) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'}[0];
   }
-  $$root_cmd{'opts'}{'output'} = $$info{'output'} if $$info{'output'};
   return $root_cmd;
 }
 sub extract_dakota_opts {
@@ -183,14 +164,12 @@ sub extract_dakota_opts {
   }
   return $info;
 }
-sub detect_cxx_opts {
-  my ($cmd, $info) = @_;
-  $$info{'output'} = undef;
+sub dk_src_files {
+  my ($cmd) = @_;
   my $ordered_input_args = [];
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
-    if (&path_opt($cmd, \$i, 'o', 'output', $info)) {
-    } elsif ($arg =~ /^([^\s]+?(\.dk))$/) {
+    if ($arg =~ /^([^\s]+?(\.dk))$/) {
       $arg = Cwd::abs_path($arg) if ! &is_abs($arg); # added for ninja build system
       &add_last($ordered_input_args, $arg);
     }
@@ -217,11 +196,10 @@ sub cxx_argv_from_argv {
   my $dakota_opts = &extract_dakota_opts($cmd);
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'}[0];
-  my $info = {};
-  my $ordered_input_args = &detect_cxx_opts($cxx_argv, $info);
+  my $ordered_dk_src_files = &dk_src_files($cxx_argv);
   my $cc_paths = [];
-  if (scalar @$ordered_input_args) {
-    my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $info, $ordered_input_args);
+  if (scalar @$ordered_dk_src_files) {
+    my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $ordered_dk_src_files);
     if (0) {
       $Data::Dumper::Indent = 0;
       print '# ' . &Dumper($precompile_cmd_info) . $nl;
