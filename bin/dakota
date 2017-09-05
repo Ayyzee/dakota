@@ -113,15 +113,18 @@ sub build_precompile_cmd_info {
 }
 sub extract_dakota_opts {
   my ($cmd) = @_;
-  #  $var4opt_pat: rhs/value == 0 means do not extract
+  #  $var4opt_pat: rhs/value == 1 means opt is scalar
   my $var4opt_pat = { 'parts=s' => 1,
-                      'cxx=s' => 1,
-                      'var=s' => 1,
+                      'cxx=s' =>   1,
+                      'var=s' =>   0,
                     };
   my $var4opt = {};
-  foreach my $opt_pat (keys %$var4opt_pat) {
+  my $scalar_opts = [];
+  while (my ($opt_pat, $is_scalar) = each %$var4opt_pat) {
     if ($opt_pat =~ /^([\w-]+)=s$/) {
-      $$var4opt{$1} = 1;
+      my $key = $1;
+      $$var4opt{$key} = 1;
+      &add_last($scalar_opts, $key) if $is_scalar;
     } else {
       $$var4opt{$opt_pat} = 0;
     }
@@ -160,6 +163,9 @@ sub extract_dakota_opts {
   foreach my $i (@$to_remove) {
     splice @$cmd, $i, 1;
   }
+  foreach my $key (@$scalar_opts) {
+    $$info{$key} = $$info{$key}[0];
+  }
   return $info;
 }
 sub dk_src_files {
@@ -197,8 +203,6 @@ sub cxx_argv_from_argv {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
   my $dakota_opts = &extract_dakota_opts($cmd);
-  $$dakota_opts{'parts'} = $$dakota_opts{'parts'}[0];
-  $$dakota_opts{'cxx'} =   $$dakota_opts{'cxx'}[0];
   &set_env_vars($$dakota_opts{'var'}); # sets source_dir, ...
   &set_build_dir_from_parts($$dakota_opts{'parts'});
   #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
