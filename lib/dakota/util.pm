@@ -69,12 +69,14 @@ our @EXPORT= qw(
                  as_literal_symbol_interior
                  at
                  basename
+                 set_build_dir
                  build_dir
                  canon_path
                  normalize_paths
                  colin
                  colout
                  cpp_directives
+                 set_source_dir
                  source_dir
                  ct
                  decode_comments
@@ -162,7 +164,6 @@ our @EXPORT= qw(
                  root_cmd
                  scalar_from_file
                  scalar_to_file
-                 set_build_dir_from_parts
                  set_target_srcs_ast
                  set_root_cmd
                  set_src_decl
@@ -633,8 +634,17 @@ sub make_dir_part {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
 }
+sub set_build_dir {
+  my ($build_dir) = @_;
+  die if ! $build_dir;
+  $ENV{'build_dir'} = $build_dir;
+}
 sub build_dir {
   return $ENV{'build_dir'};
+}
+sub set_source_dir {
+  my ($source_dir) = @_;
+  $ENV{'source_dir'} = $source_dir;
 }
 sub source_dir {
   return $ENV{'source_dir'};
@@ -1377,14 +1387,6 @@ sub xxx_from_yaml_file {
     }
   }
   return $result;
-}
-sub set_build_dir_from_parts {
-  my ($parts) = @_;
-  my $build_dir = &dir_part($parts);
-  $ENV{'build_dir'} = $build_dir;
-  if (! -e $build_dir) {
-    &make_dir($build_dir);
-  }
 }
 sub parts {
   my ($file) = @_;

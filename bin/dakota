@@ -102,19 +102,21 @@ sub translate_dk_to_cc {
     }
   }
 }
+sub parts_path {
+  my $parts_path = &build_dir() . '/parts.txt';
+  return $parts_path;
+}
 sub build_precompile_cmd_info {
   my ($dakota_opts, $ordered_dk_paths) = @_;
   my $root_cmd = { 'inputs' => $ordered_dk_paths };
-  if ($$dakota_opts{'parts'}) {
-    $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'};
-  }
+  $$root_cmd{'opts'}{'build-dir'} = $$dakota_opts{'build-dir'};
   return $root_cmd;
 }
 sub extract_dakota_opts {
   my ($cmd) = @_;
   my $opts = {};
   #  $var4opt_pat: rhs/value == 1 means opt is scalar
-  my $var4opt_pat = { 'parts=s' => 1,
+  my $var4opt_pat = { 'build-dir=s' => 1,
                       'cxx=s' =>   1,
                       'var=s' =>   0,
                     };
@@ -198,7 +200,7 @@ sub cxx_argv_from_argv {
   my $cmd = [$0, @$argv];
   my $dakota_opts = &extract_dakota_opts($cmd);
   &set_env_vars($$dakota_opts{'var'}); # sets source_dir, ...
-  &set_build_dir_from_parts($$dakota_opts{'parts'});
+  &set_build_dir($$dakota_opts{'build-dir'});
   #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
@@ -212,9 +214,6 @@ sub cxx_argv_from_argv {
       $Data::Dumper::Indent = 1;
     }
     my $exit_val;
-   #if ($$precompile_cmd_info{'opts'}{'parts'}) {
-   #  my ($dakota_io_path, $dakota_io) = &dakota_io($precompile_cmd_info);
-   #}
    #$ordered_cc_paths = &start_cmd($precompile_cmd_info);
     $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info);
   }
@@ -298,7 +297,7 @@ sub cmd_info_from_argv {
               'output=s',  # gcc-like
 
               'path-only',
-              'parts=s',
+              'build-dir=s',
               'target-ast', # mainly for debugging
               'target-hdr',
               'target-src',
@@ -312,14 +311,12 @@ sub cmd_info_from_argv {
 sub exec_cmd_info {
   my ($root_cmd) = @_;
   &set_env_vars($$root_cmd{'opts'}{'var'}); # sets source_dir, ...
-  &set_build_dir_from_parts($$root_cmd{'opts'}{'parts'});
+  &set_build_dir($$root_cmd{'opts'}{'build-dir'});
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
+  $$root_cmd{'parts'} = &parts(&parts_path());
   &set_root_cmd($root_cmd);
   my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
 
-  if ($$root_cmd{'opts'}{'parts'}) {
-    $$root_cmd{'parts'} = &parts($$root_cmd{'opts'}{'parts'});
-  }
   if ($$root_cmd{'opts'}{'clean'}) {
     &clean($root_cmd, $dakota_io_path, $dakota_io);
     exit 0;
