@@ -104,8 +104,7 @@ sub translate_dk_to_cc {
 }
 sub build_precompile_cmd_info {
   my ($dakota_opts, $ordered_dk_paths) = @_;
-  my $root_cmd = {};
-  $$root_cmd{'args'} = $ordered_dk_paths;
+  my $root_cmd = { 'inputs' => $ordered_dk_paths };
   if ($$dakota_opts{'parts'}) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'};
   }
@@ -179,10 +178,6 @@ sub ordered_dk_paths {
   }
   return $ordered_dk_paths;
 }
-sub dakota_io_path {
-  my $dakota_io_path = &build_dir() . '/dakota.io';
-  return $dakota_io_path;
-}
 sub is_so_path {
   my ($name) = @_;
   # linux and darwin so-regexs are combined
@@ -218,9 +213,9 @@ sub cxx_argv_from_argv {
     }
     my $exit_val;
    #if ($$precompile_cmd_info{'opts'}{'parts'}) {
-   #  my $dakota_io = &dakota_io($precompile_cmd_info);
+   #  my ($dakota_io_path, $dakota_io) = &dakota_io($precompile_cmd_info);
    #}
-   #($exit_val, $ordered_cc_paths) = &start_cmd($precompile_cmd_info);
+   #$ordered_cc_paths = &start_cmd($precompile_cmd_info);
     $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info);
   }
   if (0 != @$ordered_cc_paths) {
@@ -239,7 +234,7 @@ sub dakota_io {
   my ($root_cmd) = @_;
   my $source_dir = &source_dir();
   my $build_dir =  &build_dir();
-  $$root_cmd{'io'} =         $build_dir . '/dakota.io';
+  $$root_cmd{'io'} = $build_dir . '/dakota.io';
   my $dakota_io_path = $$root_cmd{'io'};
   if (! -e $dakota_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
@@ -254,10 +249,10 @@ sub dakota_io {
   my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
   $$dakota_io{'build-dir'} = &build_dir();
   &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
-  return $dakota_io;
+  return ($dakota_io_path, $dakota_io);
 } # dakota_io
 sub clean {
-  my ($root_cmd, $dakota_io, $dakota_io_path) = @_;
+  my ($root_cmd, $dakota_io_path, $dakota_io) = @_;
   if ($dakota_io) {
     if (0) {
       if ($$dakota_io{'build-dir'} && $$dakota_io{'build-dir'} ne '.') {
@@ -311,7 +306,7 @@ sub cmd_info_from_argv {
 
               #'clean',          # make target like
             );
-  $$root_cmd{'args'} = $argv;
+  $$root_cmd{'inputs'} = $argv;
   return $root_cmd;
 }
 sub exec_cmd_info {
@@ -320,17 +315,15 @@ sub exec_cmd_info {
   &set_build_dir_from_parts($$root_cmd{'opts'}{'parts'});
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   &set_root_cmd($root_cmd);
-  my $dakota_io =      &dakota_io($root_cmd);
-  my $dakota_io_path = &dakota_io_path();
+  my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
 
   if ($$root_cmd{'opts'}{'parts'}) {
     $$root_cmd{'parts'} = &parts($$root_cmd{'opts'}{'parts'});
   }
   if ($$root_cmd{'opts'}{'clean'}) {
-    &clean($root_cmd, $dakota_io, $dakota_io_path);
+    &clean($root_cmd, $dakota_io_path, $dakota_io);
     exit 0;
   }
-  $$root_cmd{'inputs'} = $$root_cmd{'args'};
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
   #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
