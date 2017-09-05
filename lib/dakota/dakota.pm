@@ -502,22 +502,22 @@ sub update_target_srcs_ast_from_all_inputs {
   }
   return $cmd_info;
 }
-sub cc_files {
+sub ordered_cc_paths {
   my ($seq) = @_;
-  my $cc_files = [];
-  foreach my $cc_file (@$seq) {
-    if ($cc_file =~ /$cc_ext$/) {
-      &add_last($cc_files, $cc_file);
+  my $ordered_cc_paths = [];
+  foreach my $cc_path (@$seq) {
+    if (&is_cc_path($cc_path)) {
+      &add_last($ordered_cc_paths, $cc_path);
     }
   }
-  return $cc_files;
+  return $ordered_cc_paths;
 }
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
   $root_cmd = $cmd_info;
   $build_dir = &build_dir();
-  my $cc_files = [];
+  my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if (1) {
     my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
@@ -535,9 +535,9 @@ sub start_cmd {
       !$$cmd_info{'opts'}{'target-hdr'} &&
       !$$cmd_info{'opts'}{'target-src'}) {
     $cmd_info = &loop_cc_from_dk($cmd_info);
-    $cc_files = &cc_files($$cmd_info{'inputs'});
+    $ordered_cc_paths = &ordered_cc_paths($$cmd_info{'inputs'});
   }
-  return $cc_files;
+  return $ordered_cc_paths;
 }
 sub ast_from_so {
   my ($cmd_info, $arg) = @_;

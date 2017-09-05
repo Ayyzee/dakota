@@ -168,7 +168,7 @@ sub extract_dakota_opts {
   }
   return $opts;
 }
-sub dk_paths {
+sub ordered_dk_paths {
   my ($cmd) = @_;
   my $ordered_dk_paths = [];
   foreach my $arg (@$cmd) {
@@ -207,7 +207,7 @@ sub cxx_argv_from_argv {
   #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
-  my $ordered_dk_paths = &dk_paths($cxx_argv);
+  my $ordered_dk_paths = &ordered_dk_paths($cxx_argv);
   my $ordered_cc_paths = [];
   if (scalar @$ordered_dk_paths) {
     my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $ordered_dk_paths);
@@ -294,7 +294,6 @@ sub cmd_info_from_argv {
   my ($argv) = @_;
   my $root_cmd = {
     'asts' => [],
-    'inputs' => [],
     'lib-files' => [],
     'opts' => {
     'var' => [],
@@ -320,10 +319,7 @@ sub exec_cmd_info {
   &set_env_vars($$root_cmd{'opts'}{'var'}); # sets source_dir, ...
   &set_build_dir_from_parts($$root_cmd{'opts'}{'parts'});
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
-  $$root_cmd{'inputs'} = [] if ! $$root_cmd{'inputs'};
   &set_root_cmd($root_cmd);
-
-  my $inputs = &normalize_paths($$root_cmd{'args'});
   my $dakota_io =      &dakota_io($root_cmd);
   my $dakota_io_path = &dakota_io_path();
 
@@ -334,9 +330,7 @@ sub exec_cmd_info {
     &clean($root_cmd, $dakota_io, $dakota_io_path);
     exit 0;
   }
-  $inputs = &normalize_paths($inputs);
-  $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-  &normalize_paths($root_cmd, 'inputs');
+  $$root_cmd{'inputs'} = $$root_cmd{'args'};
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
   #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
