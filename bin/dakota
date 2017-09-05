@@ -340,7 +340,7 @@ sub exec_cmd_info {
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
   #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
-  return (0, $ordered_cc_paths);
+  return $ordered_cc_paths;
 }
 sub start {
   my ($argv) = @_;
