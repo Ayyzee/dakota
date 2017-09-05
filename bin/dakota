@@ -113,6 +113,7 @@ sub build_precompile_cmd_info {
 }
 sub extract_dakota_opts {
   my ($cmd) = @_;
+  my $opts = {};
   #  $var4opt_pat: rhs/value == 1 means opt is scalar
   my $var4opt_pat = { 'parts=s' => 1,
                       'cxx=s' =>   1,
@@ -129,7 +130,6 @@ sub extract_dakota_opts {
       $$var4opt{$opt_pat} = 0;
     }
   }
-  my $info = {};
   my $to_remove = [];
   my $cmd_len = scalar @$cmd;
   for (my $i = 0; $i < @$cmd; ) {
@@ -141,16 +141,16 @@ sub extract_dakota_opts {
         my $rhs = $1;
         die if ! $opt_has_rhs;
         die if $rhs eq '';
-        $$info{$opt} = [] if !exists $$info{$opt};
-        &add_last($$info{$opt}, $rhs);
+        $$opts{$opt} = [] if !exists $$opts{$opt};
+        &add_last($$opts{$opt}, $rhs);
         &add_first($to_remove, $i);
       } elsif ($$cmd[$i] =~ /^--$opt$/) {
-        $$info{$opt} = [] if !exists $$info{$opt};
+        $$opts{$opt} = [] if !exists $$opts{$opt};
         if ($opt_has_rhs) { # --opt rhs
           my $rhs = $$cmd[$i + 1];
           die if ! ($i + 1 < $cmd_len);
           die if $rhs =~ /^-/;
-          &add_last($$info{$opt}, $rhs);
+          &add_last($$opts{$opt}, $rhs);
           &add_first($to_remove, $i);
           &add_first($to_remove, $i + 1);
         } else { # --opt
@@ -164,9 +164,9 @@ sub extract_dakota_opts {
     splice @$cmd, $i, 1;
   }
   foreach my $key (@$scalar_opts) {
-    $$info{$key} = $$info{$key}[0];
+    $$opts{$key} = $$opts{$key}[0];
   }
-  return $info;
+  return $opts;
 }
 sub dk_src_files {
   my ($cmd) = @_;
