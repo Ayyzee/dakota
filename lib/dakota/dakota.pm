@@ -514,7 +514,7 @@ sub cc_files {
 }
 my $root_cmd;
 sub start_cmd {
-  my ($cmd_info, $parts) = @_;
+  my ($cmd_info) = @_;
   $root_cmd = $cmd_info;
   $build_dir = &build_dir();
   my $cc_files = [];

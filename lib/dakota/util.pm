@@ -95,7 +95,6 @@ our @EXPORT= qw(
                  filestr_to_file
                  first
                  flatten
-                 global_vars
                  target_srcs_ast
                  has_kw_args
                  has_kw_arg_names
@@ -141,7 +140,7 @@ our @EXPORT= qw(
                  num_kw_arg_names
                  pann
                  param_types_str
-                 vars
+                 parts
                  path_only
                  prepend_dot_slash
                  platform
@@ -163,7 +162,7 @@ our @EXPORT= qw(
                  root_cmd
                  scalar_from_file
                  scalar_to_file
-                 set_global_vars
+                 set_build_dir_from_parts
                  set_target_srcs_ast
                  set_root_cmd
                  set_src_decl
@@ -634,72 +633,35 @@ sub make_dir_part {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
 }
-sub xxx_dir {
-  my ($dir_key, $default_dir) = @_;
-  my $dir;
-  my $vars = &global_vars();
-  if ($vars && $$vars{$dir_key}) {
-    $dir = $$vars{$dir_key};
-  } else {
-    die if ! $default_dir;
-    $dir = $default_dir;
-  }
-  die if ! $dir;
-  if (-e $dir && ! -d $dir) {
-    die;
-  }
-  if (! -e $dir) {
-    &make_dir($dir, $global_should_echo);
-  }
-  return $dir;
+sub build_dir {
+  return $ENV{'build_dir'};
 }
-sub build_dir { # sub project build dir (current-build-dir)
-  my $default_dir;
-  my $dir = &xxx_dir('build-dir', $default_dir = undef);
-  return $dir;
+sub source_dir {
+  return $ENV{'source_dir'};
 }
-sub source_dir { # sub project source dir (CMAKE_CURRENT_SOURCE_DIR)
-  my $default_dir;
-  my $dir = &xxx_dir('source-dir', $default_dir = undef);
-  return $dir;
-}
-sub target_build_dir { # dakota build dir (cmake has own build dir; it uses phrase "binary dir")
-  my ($cmd_info) = @_;
-  my $build_dir;
-  if ($$cmd_info{'build-dir'}) {
-    $build_dir = $$cmd_info{'build-dir'};
-    #print STDERR "build-dir():     " . &build_dir() . $nl;
-  } else {
-    #die &Dumper($cmd_info);
-    $build_dir = &build_dir();
-  }
-  return $build_dir . '/z';
+sub target_build_dir {
+  my $target_build_dir = &build_dir() . '/z';
+  return $target_build_dir;
 }
 sub target_srcs_ast_path {
-  my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_build_dir($cmd_info) . '/srcs.ast';
+  my $target_srcs_ast_path = &target_build_dir() . '/srcs.ast';
   return $target_srcs_ast_path;
 }
 sub rel_target_hdr_path {
-  my ($cmd_info) = @_;
   my $rel_target_hdr_path = 'z/target' . $h_ext;
   return $rel_target_hdr_path;
 }
 sub target_hdr_path {
-  my ($cmd_info) = @_;
-  my $target_hdr_path = &target_build_dir($cmd_info) . '/target' . $h_ext;
+  my $target_hdr_path = &target_build_dir() . '/target' . $h_ext;
   return $target_hdr_path;
 }
 sub target_src_path {
-  my ($cmd_info) = @_;
-  my $target_src_path = &target_build_dir($cmd_info) . '/target' . $cc_ext;
+  my $target_src_path = &target_build_dir() . '/target' . $cc_ext;
   return $target_src_path;
 }
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    $$cmd_info{'build-dir'} = &dir_part($$cmd_info{'opts'}{'parts'});
-
     my $path;
     if (0) {
     } elsif ($$cmd_info{'opts'}{'target-ast'}) {
@@ -775,19 +737,6 @@ sub kw_args_method_sig {
   my $kw_args = [splice @$param_types, 0, $offset];
   &add_last($kw_args, ['...']);
   return ($$method{'name'}, $kw_args);
-}
-my $global_vars;
-sub global_vars {
-  return $global_vars;
-}
-sub set_global_vars {
-  my ($parts_path) = @_;
-  $global_vars = &vars($parts_path);
-  my $source_dir = $$global_vars{'source-dir'};
-  if ($source_dir ne '.') {
-    $$global_vars{'source-dir'} = $source_dir;
-  }
-  return $global_vars;
 }
 my $target_srcs_ast;
 sub target_srcs_ast {
@@ -1429,43 +1378,19 @@ sub xxx_from_yaml_file {
   }
   return $result;
 }
-sub current_source_dir_from_inputs {
-  my ($inputs) = @_;
-  my $tbl = {};
-  foreach my $input (@$inputs) {
-    if ($input =~ /\.dk$/) {
-      my $dir = $input;
-      while ($dir = &dir_part($dir)) {
-        if (-e "$dir/CMakeLists.txt") {
-          $$tbl{$dir} = 1;
-          last;
-        }
-      }
-    }
-  }
-  my $dirs = [keys %$tbl];
-  if (scalar @$dirs == 1) {
-    return $$dirs[0];
-  } else {
-    my $p1 = pop @$dirs;
-    my $p1_len = length $p1;
-    while (scalar @$dirs) {
-      my $p2 = pop @$dirs;
-      my $p2_len = length $p2;
-      if ($p2_len < $p1_len) {
-        $p1 = $p2;
-        $p1_len = $p2_len
-      } else { die if $p1_len == $p2_len; }
-    }
-    return $p1;
+sub set_build_dir_from_parts {
+  my ($parts) = @_;
+  my $build_dir = &dir_part($parts);
+  $ENV{'build_dir'} = $build_dir;
+  if (! -e $build_dir) {
+    &make_dir($build_dir);
   }
 }
-sub vars {
+sub parts {
   my ($file) = @_;
-  my $result = { 'build-dir' => &dir_part($file) };
+  my $result;
   if (-e $file) {
-    $$result{'parts'} = [split /\s+/, &filestr_from_file($file)];
-    $$result{'source-dir'} = &current_source_dir_from_inputs($$result{'parts'});
+    $result = [split /\s+/, &filestr_from_file($file)];
   }
   return $result;
 }

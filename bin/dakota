@@ -104,11 +104,7 @@ sub translate_dk_to_cc {
 }
 sub build_precompile_cmd_info {
   my ($dakota_opts, $ordered_input_args) = @_;
-  my $vars = &vars($$dakota_opts{'parts'});
-  my $root_cmd = {
-    'build-dir' =>  $$vars{'build-dir'},
-    'source-dir' => $$vars{'source-dir'},
-  };
+  my $root_cmd = {};
   $$root_cmd{'args'} = $ordered_input_args;
   if ($$dakota_opts{'parts'}) {
     $$root_cmd{'opts'}{'parts'} = $$dakota_opts{'parts'};
@@ -178,11 +174,8 @@ sub dk_src_files {
   }
   return $ordered_input_args;
 }
-sub dakota_io_path_from_parts_path {
-  my ($parts_path) = @_;
-  my $vars = &vars($parts_path);
-  my $force;
-  my $dakota_io_path = $$vars{'build-dir'} . '/dakota.io';
+sub dakota_io_path {
+  my $dakota_io_path = &build_dir() . '/dakota.io';
   return $dakota_io_path;
 }
 sub is_so_path {
@@ -192,12 +185,22 @@ sub is_so_path {
   #my $libname = $2 . ".$so_ext";
   return $result;
 }
+sub set_env_vars {
+  my ($kvs) = @_;
+  foreach my $kv (@$kvs) {
+    $kv =~ /^([\w-]+)=(.*)$/;
+    my ($key, $val) = ($1, $2);
+    $ENV{$key} = $val;
+  }
+}
 sub cxx_argv_from_argv {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
   my $dakota_opts = &extract_dakota_opts($cmd);
   $$dakota_opts{'parts'} = $$dakota_opts{'parts'}[0];
   $$dakota_opts{'cxx'} =   $$dakota_opts{'cxx'}[0];
+  &set_env_vars($$dakota_opts{'var'}); # sets source_dir, ...
+  &set_build_dir_from_parts($$dakota_opts{'parts'});
   #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
@@ -212,9 +215,9 @@ sub cxx_argv_from_argv {
     }
     my $exit_val;
    #if ($$precompile_cmd_info{'opts'}{'parts'}) {
-   #  my ($parts, $dakota_io) = &use_vars($precompile_cmd_info);
+   #  my $dakota_io = &dakota_io($precompile_cmd_info);
    #}
-   #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info, $parts);
+   #($exit_val, $cc_paths) = &start_cmd($precompile_cmd_info);
     $cc_paths = &exec_cmd_info($precompile_cmd_info);
   }
   if (0 != @$cc_paths) {
@@ -229,34 +232,27 @@ sub has_cxx_opt {
   }
   return 0;
 }
-sub use_vars {
+sub dakota_io {
   my ($root_cmd) = @_;
-  my $vars = &set_global_vars($$root_cmd{'opts'}{'parts'});
-  if (! -e $$vars{'build-dir'}) {
-    &make_dir($$vars{'build-dir'});
-  }
-  $$root_cmd{'parts'} =      $$vars{'parts'};
-  $$root_cmd{'source-dir'} = $$vars{'source-dir'};
-  $$root_cmd{'build-dir'} =  $$vars{'build-dir'};
-  $$root_cmd{'io'} =         $$vars{'build-dir'} . '/dakota.io';
+  my $source_dir = &source_dir();
+  my $build_dir =  &build_dir();
+  $$root_cmd{'io'} =         $build_dir . '/dakota.io';
   my $dakota_io_path = $$root_cmd{'io'};
   if (! -e $dakota_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_dakota_io = {
       'precompile' => {},
       'cwd' =>        &cwd(),
-      'build-dir' =>  $$vars{'build-dir'},
-      'source-dir' => $$vars{'source-dir'},
+      'source-dir' => $source_dir,
+      'build-dir' =>  $build_dir,
     };
     &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
   }
   my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
-  if ($$vars{'build-dir'}) {
-    $$dakota_io{'build-dir'} = &canon_path($$vars{'build-dir'});
-  }
+  $$dakota_io{'build-dir'} = &build_dir();
   &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
-  return ($vars, $dakota_io);
-} # use_vars
+  return $dakota_io;
+} # dakota_io
 sub clean {
   my ($root_cmd, $dakota_io, $dakota_io_path) = @_;
   if ($dakota_io) {
@@ -318,17 +314,19 @@ sub cmd_info_from_argv {
 }
 sub exec_cmd_info {
   my ($root_cmd) = @_;
+  &set_env_vars($$root_cmd{'opts'}{'var'}); # sets source_dir, ...
+  &set_build_dir_from_parts($$root_cmd{'opts'}{'parts'});
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   $$root_cmd{'inputs'} = [] if ! $$root_cmd{'inputs'};
   &set_root_cmd($root_cmd);
 
   my $inputs = &normalize_paths($$root_cmd{'args'});
-  my ($parts, $dakota_io);
+  my $dakota_io =      &dakota_io($root_cmd);
+  my $dakota_io_path = &dakota_io_path();
 
   if ($$root_cmd{'opts'}{'parts'}) {
-    ($parts, $dakota_io) = &use_vars($root_cmd);
+    $$root_cmd{'parts'} = &parts($$root_cmd{'opts'}{'parts'});
   }
-  my $dakota_io_path = &dakota_io_path_from_parts_path($$root_cmd{'opts'}{'parts'});
   if ($$root_cmd{'opts'}{'clean'}) {
     &clean($root_cmd, $dakota_io, $dakota_io_path);
     exit 0;
@@ -337,13 +335,8 @@ sub exec_cmd_info {
   $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
   &normalize_paths($root_cmd, 'inputs');
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
-  #print STDERR 'parts: ' .  &Dumper($parts);
-  die if ! $$root_cmd{'build-dir'};
-  die if ! $$root_cmd{'source-dir'};
-  die if ! $$parts{'build-dir'};
-  die if ! $$parts{'source-dir'};
   #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
-  my $cc_files = &dakota::dakota::start_cmd($root_cmd, $parts);
+  my $cc_files = &dakota::dakota::start_cmd($root_cmd);
   return (0, $cc_files);
 }
 sub start {
