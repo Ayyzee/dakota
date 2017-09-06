@@ -174,6 +174,38 @@ sub ordered_dk_paths {
   }
   return $ordered_dk_paths;
 }
+sub current_source_dir_from_inputs {
+  my ($inputs) = @_;
+  my $tbl = {};
+  foreach my $input (@$inputs) {
+    if (&is_dk_path($input)) {
+      my $dir = $input;
+      while ($dir = &dir_part($dir)) {
+        #print STDERR $dir . $nl;
+        if (-e "$dir/CMakeLists.txt") {
+          $$tbl{$dir} = 1;
+          last;
+        }
+      }
+    }
+  }
+  my $dirs = [keys %$tbl];
+  if (scalar @$dirs == 1) {
+    return $$dirs[0];
+  } else {
+    my $p1 = pop @$dirs;
+    my $p1_len = length $p1;
+    while (scalar @$dirs) {
+      my $p2 = pop @$dirs;
+      my $p2_len = length $p2;
+      if ($p2_len < $p1_len) {
+        $p1 = $p2;
+        $p1_len = $p2_len
+      } else { die if $p1_len == $p2_len; }
+    }
+    return $p1;
+  }
+}
 sub set_env_vars {
   my ($kvs) = @_;
   foreach my $kv (@$kvs) {
