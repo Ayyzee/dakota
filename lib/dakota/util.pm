@@ -35,6 +35,7 @@ my $gbl_prefix;
 my $gbl_platform;
 my $h_ext;
 my $cc_ext;
+my $so_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -116,6 +117,7 @@ our @EXPORT= qw(
                  is_same_file
                  is_same_src_file
                  is_slots
+                 is_so_path
                  is_src
                  is_src_decl
                  is_src_defn
@@ -1134,6 +1136,23 @@ sub is_dk_path {
     return 0;
   }
 }
+# linux:
+#   libX.so.3.9.4
+#   libX.so.3.9
+#   libX.so.3
+#   libX.so
+# darwin:
+#   libX.3.9.4.so
+#   libX.3.9.so
+#   libX.3.so
+#   libX.so
+sub is_so_path {
+  my ($name) = @_;
+  # linux and darwin so-regexs are combined
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))($so_ext((\.\d+)+)?|((\.\d+)+)?$so_ext)$=; # so-regex
+  #my $libname = $2 . $so_ext;
+  return $result;
+}
 sub normalize_paths {
   my ($in, $key) = @_;
   die if !defined $in;
@@ -1429,6 +1448,7 @@ BEGIN {
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $h_ext = &var($gbl_platform, 'h_ext', undef);
   $cc_ext = &var($gbl_platform, 'cc_ext', undef);
+  $so_ext = &var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
 };
 unless (caller) {
   &start(\@ARGV);

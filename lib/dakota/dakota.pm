@@ -99,23 +99,6 @@ my ($id,  $mid,  $bid,  $tid,
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 
-# linux:
-#   libX.so.3.9.4
-#   libX.so.3.9
-#   libX.so.3
-#   libX.so
-# darwin:
-#   libX.3.9.4.so
-#   libX.3.9.so
-#   libX.3.so
-#   libX.so
-sub is_so_path {
-  my ($name) = @_;
-  # linux and darwin so-regexs are combined
-  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))($so_ext((\.\d+)+)?|((\.\d+)+)?$so_ext)$=; # so-regex
-  #my $libname = $2 . $so_ext;
-  return $result;
-}
 sub is_cc_path {
   my ($arg) = @_;
   if ($arg =~ m/$cc_ext$/) {

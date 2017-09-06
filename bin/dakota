@@ -180,13 +180,6 @@ sub ordered_dk_paths {
   }
   return $ordered_dk_paths;
 }
-sub is_so_path {
-  my ($name) = @_;
-  # linux and darwin so-regexs are combined
-  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
-  #my $libname = $2 . ".$so_ext";
-  return $result;
-}
 sub set_env_vars {
   my ($kvs) = @_;
   foreach my $kv (@$kvs) {
