@@ -89,8 +89,9 @@ sub check_paths {
     die $0 . ': error: ' . $cc_path . ' does not correspond to ' . $dk_path . $nl;
   }
 }
-sub translate_dk_to_cc {
+sub replace_dk_paths_with_cc_paths {
   my ($cmd, $ordered_cc_paths) = @_;
+  return if @$ordered_cc_paths == 0;
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
     die if ! $arg || '' eq $arg;
@@ -99,6 +100,7 @@ sub translate_dk_to_cc {
       die if ! $cc_path || '' eq $cc_path;
       &check_paths($arg, $cc_path);
       $$cmd[$i] = $cc_path;
+      return if @$ordered_cc_paths == 0;
     }
   }
 }
@@ -225,17 +227,12 @@ sub cxx_argv_from_argv {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
   my $dakota_opts = &extract_dakota_opts($cmd);
-  #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
   my $ordered_dk_paths = &ordered_dk_paths($cxx_argv);
-  my $ordered_cc_paths = [];
-  if (scalar @$ordered_dk_paths) {
-    my $precompile_cmd_info = { 'inputs' => $ordered_dk_paths };
-    $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info, $$dakota_opts{'var'});
-  }
-  if (0 != @$ordered_cc_paths) {
-    &translate_dk_to_cc($cxx_argv, $ordered_cc_paths);
+  if (@$ordered_dk_paths != 0) {
+    my $ordered_cc_paths = &exec_cmd_info({ 'inputs' => $ordered_dk_paths }, $$dakota_opts{'var'});
+    &replace_dk_paths_with_cc_paths($cxx_argv, $ordered_cc_paths);
   }
   return $cxx_argv;
 }
@@ -347,12 +344,12 @@ sub exec_cmd_info {
 sub start {
   my ($argv) = @_;
   if (&has_cxx_opt($argv)) {
-    my $cxx_argv = &cxx_argv_from_argv($argv); # calls exec_cmd_info() => start_cmd()
-    my $exit_val = &verbose_exec($cxx_argv); # g++/clang++
+    my $cxx_argv = &cxx_argv_from_argv($argv); # -> exec_cmd_info() -> start_cmd()
+    my $exit_val = &verbose_exec($cxx_argv); # -> g++/clang++
     exit 1 if $exit_val;
-  } else {
+  } else { # --target-ast, --target-hdr, --target-src
     my ($cmd_info, $vars) = &cmd_info_from_argv($argv);
-    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $vars); # calls start_cmd()
+    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $vars); # -> start_cmd()
   }
   exit 0;
 }
