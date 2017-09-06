@@ -14,6 +14,7 @@ execute_process (
 
 add_custom_command (
   OUTPUT ${parts}
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
   COMMAND ${dakota-parts} ${current-build-dir}
     ${srcs}
     ${target-lib-files}
@@ -29,8 +30,8 @@ target_sources (${target} PRIVATE ${target-src})
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  COMMAND ${CMAKE_CXX_COMPILER} --target-src --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS ${parts} ${target-libs} dakota-catalog${CMAKE_EXECUTABLE_SUFFIX}
+  COMMAND ${CMAKE_CXX_COMPILER} --target-src --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 set (compile-defns DKT_TARGET_FILE="${target-output-file}" DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES COMPILE_DEFINITIONS "${compile-defns}")
