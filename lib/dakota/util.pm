@@ -70,14 +70,12 @@ our @EXPORT= qw(
                  as_literal_symbol_interior
                  at
                  basename
-                 set_build_dir
                  build_dir
                  canon_path
                  normalize_paths
                  colin
                  colout
                  cpp_directives
-                 set_source_dir
                  source_dir
                  ct
                  decode_comments
@@ -642,20 +640,10 @@ sub make_dir_part {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
 }
-sub set_build_dir {
-  my ($build_dir) = @_;
-  die if ! $build_dir;
-  $ENV{'build_dir'} = $build_dir;
-}
 sub build_dir {
   my $build_dir = $ENV{'build_dir'};
   die if ! $build_dir;
   return $build_dir;
-}
-sub set_source_dir {
-  my ($source_dir) = @_;
-  die if ! $source_dir;
-  $ENV{'source_dir'} = $source_dir;
 }
 sub source_dir {
   my $source_dir = $ENV{'source_dir'};

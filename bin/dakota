@@ -110,7 +110,7 @@ sub extract_dakota_opts {
   my ($cmd) = @_;
   my $opts = {};
   #  $var4opt_pat: rhs/value == 1 means opt is scalar
-  my $var4opt_pat = { 'build-dir=s' => 1,
+  my $var4opt_pat = {
                       'cxx=s' =>   1,
                       'var=s' =>   0,
                     };
@@ -193,9 +193,7 @@ sub cxx_argv_from_argv {
   my $ordered_cc_paths = [];
   if (scalar @$ordered_dk_paths) {
     my $precompile_cmd_info = { 'inputs' => $ordered_dk_paths };
-    $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info,
-                                       $$dakota_opts{'build-dir'},
-                                       $$dakota_opts{'var'});
+    $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info, $$dakota_opts{'var'});
   }
   if (0 != @$ordered_cc_paths) {
     &translate_dk_to_cc($cxx_argv, $ordered_cc_paths);
@@ -275,7 +273,6 @@ sub cmd_info_from_argv {
               'output=s',  # gcc-like
 
               'path-only',
-              'build-dir=s',
               'target-ast', # mainly for debugging
               'target-hdr',
               'target-src',
@@ -285,19 +282,15 @@ sub cmd_info_from_argv {
             );
   $$root_cmd{'inputs'} = $argv;
 
-  my $build_dir = $$root_cmd{'opts'}{'build-dir'};
-  delete $$root_cmd{'opts'}{'build-dir'};
-
   my $vars = $$root_cmd{'opts'}{'var'};
   delete $$root_cmd{'opts'}{'var'};
-  return ($root_cmd, $build_dir, $vars);
+  return ($root_cmd, $vars);
 }
 sub exec_cmd_info {
-  my ($root_cmd, $build_dir, $vars) = @_;
-  &set_build_dir($build_dir);
+  my ($root_cmd, $vars) = @_;
+  &set_env_vars($vars); # sets source_dir, build_dir, ...
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   $$root_cmd{'parts'} = &parts(&parts_path());
-  &set_env_vars($vars); # sets source_dir, ...
   &set_root_cmd($root_cmd);
   my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
 
@@ -316,8 +309,8 @@ sub start {
     my $exit_val = &verbose_exec($cxx_argv); # g++/clang++
     exit 1 if $exit_val;
   } else {
-    my ($cmd_info, $build_dir, $vars) = &cmd_info_from_argv($argv);
-    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $build_dir, $vars); # calls start_cmd()
+    my ($cmd_info, $vars) = &cmd_info_from_argv($argv);
+    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $vars); # calls start_cmd()
   }
   exit 0;
 }
