@@ -21,7 +21,7 @@ add_custom_command (
   VERBATIM)
 
 execute_process (
-  COMMAND ${CMAKE_CXX_COMPILER} --target-src --path-only --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  COMMAND ${CMAKE_CXX_COMPILER} --target-src --path-only --build-dir ${current-build-dir}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
