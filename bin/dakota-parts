@@ -5,7 +5,7 @@ function intmdt_dir_from_binary_dir() {
   binary_dir=$1
   dir=$(dirname $(dirname $binary_dir))
   name=$(basename $binary_dir)
-  echo "$dir/dkt/$name"
+  echo "$dir/intmd/$name"
 }
 
 binary_dir=$1

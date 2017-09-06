@@ -178,7 +178,7 @@ sub intmdt_dir_from_binary_dir {
   my ($binary_dir) = @_;
   my $dir = &dir_part(&dir_part($binary_dir));
   my $name = &name_part($binary_dir);
-  my $intmdt_dir = $dir . '/dkt/' . $name;
+  my $intmdt_dir = $dir . '/intmd/' . $name;
   return $intmdt_dir;
 }
 sub current_source_dir_from_inputs {

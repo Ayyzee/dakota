@@ -4,7 +4,7 @@ remove-binary-dir() {
   if [[ -e .binary-dir.txt ]]; then
     binary_dir=$(cat .binary-dir.txt)
   else
-    binary_dir=build/cmk
+    binary_dir=zzz/build
   fi
   rm -fr $binary_dir
 }

@@ -7,7 +7,7 @@ ee() {
 if [[ -e .binary-dir.txt ]]; then
   binary_dir=$(cat .binary-dir.txt)
 else
-  binary_dir=build/cmk
+  binary_dir=zzz/build
 fi
 if [[ -e $binary_dir/install_manifest.txt ]]; then
   for file in $(cat $binary_dir/install_manifest.txt); do
