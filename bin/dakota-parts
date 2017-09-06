@@ -1,15 +1,15 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-function intmd_dir_from_binary_dir() {
-  binary_dir=$1
-  dir=$(dirname $(dirname $binary_dir))
-  name=$(basename $binary_dir)
+function intmd_dir_from_build_dir() {
+  build_dir=$1
+  dir=$(dirname $(dirname $build_dir))
+  name=$(basename $build_dir)
   echo "$dir/intmd/$name"
 }
 
-binary_dir=$1
-intmd_dir=$(intmd_dir_from_binary_dir $binary_dir)
+build_dir=$1
+intmd_dir=$(intmd_dir_from_build_dir $build_dir)
 parts="$intmd_dir/parts.txt"
 shift
 

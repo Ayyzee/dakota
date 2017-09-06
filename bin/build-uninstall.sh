@@ -4,13 +4,13 @@ ee() {
   echo $1
   eval $1
 }
-if [[ -e .binary-dir.txt ]]; then
-  binary_dir=$(cat .binary-dir.txt)
+if [[ -e .build-dir.txt ]]; then
+  build_dir=$(cat .build-dir.txt)
 else
-  binary_dir=zzz/build
+  build_dir=zzz/build
 fi
-if [[ -e $binary_dir/install_manifest.txt ]]; then
-  for file in $(cat $binary_dir/install_manifest.txt); do
+if [[ -e $build_dir/install_manifest.txt ]]; then
+  for file in $(cat $build_dir/install_manifest.txt); do
     ee "rm -f $file"
   done
 fi

@@ -70,7 +70,7 @@ our @EXPORT= qw(
                  as_literal_symbol_interior
                  at
                  basename
-                 binary_dir
+                 build_dir
                  intmd_dir
                  canon_path
                  normalize_paths
@@ -657,10 +657,10 @@ sub source_dir {
   die if ! $source_dir;
   return $source_dir;
 }
-sub binary_dir {
-  my $binary_dir = $ENV{'binary_dir'};
-  die if ! $binary_dir;
-  return $binary_dir;
+sub build_dir {
+  my $build_dir = $ENV{'build_dir'};
+  die if ! $build_dir;
+  return $build_dir;
 }
 sub target_intmd_dir {
   my $target_intmd_dir = &intmd_dir() . '/z';

@@ -1,7 +1,7 @@
 *~
 *.dSYM
 .DS_Store
-.binary-dir.txt
+.build-dir.txt
 lib/dakota/compiler.opts
 lib/dakota/linker.opts
 lib/dakota/platform.yaml

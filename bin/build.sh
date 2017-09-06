@@ -1,10 +1,10 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-if [[ ! -e .binary-dir.txt ]]; then
-  binary_dir=zzz/build
-  echo $binary_dir > .binary-dir.txt
+if [[ ! -e .build-dir.txt ]]; then
+  build_dir=zzz/build
+  echo $build_dir > .build-dir.txt
 fi
-binary_dir=$(cat .binary-dir.txt)
+build_dir=$(cat .build-dir.txt)
 jobs=$(getconf _NPROCESSORS_ONLN)
 jobs=$(( jobs + 2 ))
 
@@ -15,9 +15,9 @@ export PATH=$HOME/dakota/bin:$PATH
 generator="${generator:-ninja}"
 generator_opts=
 if   [[ $generator == ninja ]]; then
-  generator_opts="-C $binary_dir -j $jobs"
+  generator_opts="-C $build_dir -j $jobs"
 elif [[ $generator == make  ]]; then
-  generator_opts="-C $binary_dir -j $jobs --no-print-directory"
+  generator_opts="-C $build_dir -j $jobs --no-print-directory"
 fi
 verbose="${verbose:-0}"
 if [[ $verbose -ne 0 ]]; then

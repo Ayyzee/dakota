@@ -1,16 +1,16 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-remove-binary-dir() {
-  if [[ -e .binary-dir.txt ]]; then
-    binary_dir=$(cat .binary-dir.txt)
+remove-build-dir() {
+  if [[ -e .build-dir.txt ]]; then
+    build_dir=$(cat .build-dir.txt)
   else
-    binary_dir=zzz/build
+    build_dir=zzz/build
   fi
-  rm -fr $binary_dir
+  rm -fr $build_dir
 }
 rootdir=..
 $rootdir/bin/build-uninstall.sh
-remove-binary-dir
+remove-build-dir
 rm -fr build/dkt
 $rootdir/bin/cmake-configure.sh
 $rootdir/bin/build.sh $@
