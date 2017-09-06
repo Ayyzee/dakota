@@ -146,6 +146,7 @@ our @EXPORT= qw(
                  param_types_str
                  parts
                  path_only
+                 path_split
                  prepend_dot_slash
                  platform
                  dakota_io_add
@@ -595,12 +596,17 @@ sub basename {
   my $result = $path =~ s=^.*/(.+)$=$1=r;
   return $result;
 }
-sub dir_part {
+sub path_split {
   my ($path) = @_;
   my $parts = [split /\//, $path];
-  &remove_last($parts);
+  my $name = &remove_last($parts);
   my $dir = join '/', @$parts;
   $dir = '.' if $dir eq "";
+  return ($dir, $name);
+}
+sub dir_part {
+  my ($path) = @_;
+  my ($dir, $name) = &path_split($path);
   return $dir;
 }
 sub verbose_exec {
