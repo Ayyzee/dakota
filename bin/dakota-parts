@@ -1,7 +1,15 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-build_dir=$1
+function build_dir_from_binary_dir() {
+  binary_dir=$1
+  dir=$(dirname $(dirname $binary_dir))
+  name=$(basename $binary_dir)
+  echo "$dir/dkt/$name"
+}
+
+binary_dir=$1
+build_dir=$(build_dir_from_binary_dir $binary_dir)
 parts="$build_dir/parts.txt"
 shift
 

@@ -2,10 +2,6 @@
 set (CMAKE_VERBOSE_MAKEFILE $ENV{CMAKE_VERBOSE_MAKEFILE})
 include (${prefix-dir}/lib/dakota/functions.cmake)
 
-dk_current_build_dir (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
-if (DEFINED use-binary-dir-as-build-dir OR DEFINED ENV{DKT_USE_BINARY_DIR_AS_BUILD_DIR})
-  set (current-build-dir ${CMAKE_CURRENT_BINARY_DIR})
-endif ()
 if (NOT target-type)
   set (target-type executable)
 endif ()

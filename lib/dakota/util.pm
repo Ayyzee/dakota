@@ -70,6 +70,7 @@ our @EXPORT= qw(
                  as_literal_symbol_interior
                  at
                  basename
+                 binary_dir
                  build_dir
                  canon_path
                  normalize_paths
@@ -137,6 +138,7 @@ our @EXPORT= qw(
                  method_sig_type_regex
                  min
                  mtime
+                 name_part
                  needs_hex_encoding
                  num_kw_args
                  num_kw_arg_names
@@ -607,6 +609,11 @@ sub dir_part {
   my ($dir, $name) = &path_split($path);
   return $dir;
 }
+sub name_part {
+  my ($path) = @_;
+  my ($dir, $name) = &path_split($path);
+  return $name;
+}
 sub verbose_exec {
   my ($argv) = @_;
   if ($ENV{'DAKOTA_VERBOSE'}) {
@@ -649,6 +656,11 @@ sub source_dir {
   my $source_dir = $ENV{'source_dir'};
   die if ! $source_dir;
   return $source_dir;
+}
+sub binary_dir {
+  my $binary_dir = $ENV{'binary_dir'};
+  die if ! $binary_dir;
+  return $binary_dir;
 }
 sub target_build_dir {
   my $target_build_dir = &build_dir() . '/z';
