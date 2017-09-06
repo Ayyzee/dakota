@@ -1,12 +1,24 @@
 # -*- mode: cmake -*-
 include (${prefix-dir}/lib/dakota/base-cxx.cmake)
-set (parts ${current-build-dir}/parts.txt) # invariant
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
 dk_append_target_property (${target} LINK_FLAGS --cxx ${cxx-compiler} --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options (   ${target} PRIVATE    --cxx ${cxx-compiler} --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts) # ${CMAKE_EXECUTABLE_SUFFIX}
+
+execute_process (
+  COMMAND ${dakota-parts} ${current-build-dir} # --path-only
+  OUTPUT_VARIABLE parts
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+add_custom_command (
+  OUTPUT ${parts}
+  COMMAND ${dakota-parts} ${current-build-dir}
+    ${srcs}
+    ${target-lib-files}
+    ${lib-files}
+  VERBATIM)
 
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --target-src --path-only --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
@@ -31,12 +43,3 @@ add_custom_target (
   COMMAND ${CMAKE_CXX_COMPILER} --target-hdr --build-dir ${current-build-dir} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 add_dependencies (${target} ${target-hdr})
-
-# generate parts.txt
-add_custom_command (
-  OUTPUT ${parts}
-  COMMAND ${dakota-parts} ${parts}
-    ${srcs}
-    ${target-lib-files}
-    ${lib-files}
-  VERBATIM)

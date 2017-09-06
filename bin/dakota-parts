@@ -1,12 +1,17 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-parts=$1
+build_dir=$1
+parts="$build_dir/parts.txt"
 shift
 
-mkdir -p $(dirname $parts)
-cat /dev/null > $parts
+if [[ $# -eq 0 ]]; then
+  echo $parts
+else
+  mkdir -p $(dirname $parts)
+  cat /dev/null > $parts
 
-for arg in $@; do
-  echo $arg >> $parts
-done
+  for arg in $@; do
+    echo $arg >> $parts
+  done
+fi
