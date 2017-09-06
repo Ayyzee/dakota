@@ -498,6 +498,7 @@ sub ordered_cc_paths {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
+  $$cmd_info{'asts'} = [] if ! $$cmd_info{'asts'}; ### not ideal
   $root_cmd = $cmd_info;
   $build_dir = &build_dir();
   my $ordered_cc_paths = [];

@@ -106,12 +106,6 @@ sub parts_path {
   my $parts_path = &build_dir() . '/parts.txt';
   return $parts_path;
 }
-sub build_precompile_cmd_info {
-  my ($dakota_opts, $ordered_dk_paths) = @_;
-  my $root_cmd = { 'inputs' => $ordered_dk_paths };
-  $$root_cmd{'opts'}{'build-dir'} = $$dakota_opts{'build-dir'};
-  return $root_cmd;
-}
 sub extract_dakota_opts {
   my ($cmd) = @_;
   my $opts = {};
@@ -192,23 +186,16 @@ sub cxx_argv_from_argv {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
   my $dakota_opts = &extract_dakota_opts($cmd);
-  &set_env_vars($$dakota_opts{'var'}); # sets source_dir, ...
-  &set_build_dir($$dakota_opts{'build-dir'});
   #print STDERR "dakota_opts{'var'}: " . &Dumper($$dakota_opts{'var'}) if $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = $$dakota_opts{'cxx'};
   my $ordered_dk_paths = &ordered_dk_paths($cxx_argv);
   my $ordered_cc_paths = [];
   if (scalar @$ordered_dk_paths) {
-    my $precompile_cmd_info = &build_precompile_cmd_info($dakota_opts, $ordered_dk_paths);
-    if (0) {
-      $Data::Dumper::Indent = 0;
-      print '# ' . &Dumper($precompile_cmd_info) . $nl;
-      $Data::Dumper::Indent = 1;
-    }
-    my $exit_val;
-   #$ordered_cc_paths = &start_cmd($precompile_cmd_info);
-    $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info);
+    my $precompile_cmd_info = { 'inputs' => $ordered_dk_paths };
+    $ordered_cc_paths = &exec_cmd_info($precompile_cmd_info,
+                                       $$dakota_opts{'build-dir'},
+                                       $$dakota_opts{'var'});
   }
   if (0 != @$ordered_cc_paths) {
     &translate_dk_to_cc($cxx_argv, $ordered_cc_paths);
@@ -280,8 +267,6 @@ sub clean_paths {
 sub cmd_info_from_argv {
   my ($argv) = @_;
   my $root_cmd = {
-    'asts' => [],
-    'lib-files' => [],
     'opts' => {
     'var' => [],
     }
@@ -299,14 +284,20 @@ sub cmd_info_from_argv {
               #'clean',          # make target like
             );
   $$root_cmd{'inputs'} = $argv;
-  return $root_cmd;
+
+  my $build_dir = $$root_cmd{'opts'}{'build-dir'};
+  delete $$root_cmd{'opts'}{'build-dir'};
+
+  my $vars = $$root_cmd{'opts'}{'var'};
+  delete $$root_cmd{'opts'}{'var'};
+  return ($root_cmd, $build_dir, $vars);
 }
 sub exec_cmd_info {
-  my ($root_cmd) = @_;
-  &set_env_vars($$root_cmd{'opts'}{'var'}); # sets source_dir, ...
-  &set_build_dir($$root_cmd{'opts'}{'build-dir'});
+  my ($root_cmd, $build_dir, $vars) = @_;
+  &set_build_dir($build_dir);
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   $$root_cmd{'parts'} = &parts(&parts_path());
+  &set_env_vars($vars); # sets source_dir, ...
   &set_root_cmd($root_cmd);
   my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
 
@@ -315,7 +306,6 @@ sub exec_cmd_info {
     exit 0;
   }
   #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
-  #print STDERR "root_cmd{'opts'}{'var'}: " . &Dumper($$root_cmd{'opts'}{'var'}) if $$root_cmd{'opts'}{'var'};
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
   return $ordered_cc_paths;
 }
@@ -326,8 +316,8 @@ sub start {
     my $exit_val = &verbose_exec($cxx_argv); # g++/clang++
     exit 1 if $exit_val;
   } else {
-    my $cmd_info = &cmd_info_from_argv($argv);
-    my $ordered_cc_paths = &exec_cmd_info($cmd_info); # calls start_cmd()
+    my ($cmd_info, $build_dir, $vars) = &cmd_info_from_argv($argv);
+    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $build_dir, $vars); # calls start_cmd()
   }
   exit 0;
 }
