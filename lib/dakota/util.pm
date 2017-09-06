@@ -71,7 +71,7 @@ our @EXPORT= qw(
                  at
                  basename
                  binary_dir
-                 build_dir
+                 intmdt_dir
                  canon_path
                  normalize_paths
                  colin
@@ -177,7 +177,7 @@ our @EXPORT= qw(
                  sqstr_regex
                  str_from_seq
                  suffix
-                 target_build_dir
+                 target_intmdt_dir
                  target_srcs_ast_path
                  rel_target_hdr_path
                  target_hdr_path
@@ -647,10 +647,10 @@ sub make_dir_part {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
 }
-sub build_dir {
-  my $build_dir = $ENV{'build_dir'};
-  die if ! $build_dir;
-  return $build_dir;
+sub intmdt_dir {
+  my $intmdt_dir = $ENV{'intmdt_dir'};
+  die if ! $intmdt_dir;
+  return $intmdt_dir;
 }
 sub source_dir {
   my $source_dir = $ENV{'source_dir'};
@@ -662,12 +662,12 @@ sub binary_dir {
   die if ! $binary_dir;
   return $binary_dir;
 }
-sub target_build_dir {
-  my $target_build_dir = &build_dir() . '/z';
-  return $target_build_dir;
+sub target_intmdt_dir {
+  my $target_intmdt_dir = &intmdt_dir() . '/z';
+  return $target_intmdt_dir;
 }
 sub target_srcs_ast_path {
-  my $target_srcs_ast_path = &target_build_dir() . '/srcs.ast';
+  my $target_srcs_ast_path = &target_intmdt_dir() . '/srcs.ast';
   return $target_srcs_ast_path;
 }
 sub rel_target_hdr_path {
@@ -675,11 +675,11 @@ sub rel_target_hdr_path {
   return $rel_target_hdr_path;
 }
 sub target_hdr_path {
-  my $target_hdr_path = &target_build_dir() . '/target' . $h_ext;
+  my $target_hdr_path = &target_intmdt_dir() . '/target' . $h_ext;
   return $target_hdr_path;
 }
 sub target_src_path {
-  my $target_src_path = &target_build_dir() . '/target' . $cc_ext;
+  my $target_src_path = &target_intmdt_dir() . '/target' . $cc_ext;
   return $target_src_path;
 }
 sub path_only {

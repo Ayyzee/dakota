@@ -103,7 +103,7 @@ sub translate_dk_to_cc {
   }
 }
 sub parts_path {
-  my $parts_path = &build_dir() . '/parts.txt';
+  my $parts_path = &intmdt_dir() . '/parts.txt';
   return $parts_path;
 }
 sub extract_dakota_opts {
@@ -174,12 +174,12 @@ sub ordered_dk_paths {
   }
   return $ordered_dk_paths;
 }
-sub build_dir_from_binary_dir {
+sub intmdt_dir_from_binary_dir {
   my ($binary_dir) = @_;
   my $dir = &dir_part(&dir_part($binary_dir));
   my $name = &name_part($binary_dir);
-  my $build_dir = $dir . '/dkt/' . $name;
-  return $build_dir;
+  my $intmdt_dir = $dir . '/dkt/' . $name;
+  return $intmdt_dir;
 }
 sub current_source_dir_from_inputs {
   my ($inputs) = @_;
@@ -249,8 +249,8 @@ sub has_cxx_opt {
 sub dakota_io {
   my ($root_cmd) = @_;
   my $source_dir = &source_dir();
-  my $build_dir =  &build_dir();
-  $$root_cmd{'io'} = $build_dir . '/dakota.io';
+  my $intmdt_dir =  &intmdt_dir();
+  $$root_cmd{'io'} = $intmdt_dir . '/dakota.io';
   my $dakota_io_path = $$root_cmd{'io'};
   if (! -e $dakota_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
@@ -258,12 +258,12 @@ sub dakota_io {
       'precompile' => {},
       'cwd' =>        &cwd(),
       'source-dir' => $source_dir,
-      'build-dir' =>  $build_dir,
+      'intmdt-dir' =>  $intmdt_dir,
     };
     &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
   }
   my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
-  $$dakota_io{'build-dir'} = &build_dir();
+  $$dakota_io{'intmdt-dir'} = &intmdt_dir();
   &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
   return ($dakota_io_path, $dakota_io);
 } # dakota_io
@@ -271,9 +271,9 @@ sub clean {
   my ($root_cmd, $dakota_io_path, $dakota_io) = @_;
   if ($dakota_io) {
     if (0) {
-      if ($$dakota_io{'build-dir'} && $$dakota_io{'build-dir'} ne '.') {
-        print "rm -r $$dakota_io{'build-dir'}" . $nl;
-        `rm -r $$dakota_io{'build-dir'}`;
+      if ($$dakota_io{'intmdt-dir'} && $$dakota_io{'intmdt-dir'} ne '.') {
+        print "rm -r $$dakota_io{'intmdt-dir'}" . $nl;
+        `rm -r $$dakota_io{'intmdt-dir'}`;
       }
     }
     if (1) { # cmake writes .o files in its own build dir
@@ -328,8 +328,8 @@ sub cmd_info_from_argv {
 sub exec_cmd_info {
   my ($root_cmd, $vars) = @_;
   &set_env_vars($vars); # sets source_dir, binary_dir, ...
-  if (! $ENV{'build_dir'}) {
-    $ENV{'build_dir'} = &build_dir_from_binary_dir(&binary_dir());
+  if (! $ENV{'intmdt_dir'}) {
+    $ENV{'intmdt_dir'} = &intmdt_dir_from_binary_dir(&binary_dir());
   }
   &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
   $$root_cmd{'parts'} = &parts(&parts_path());

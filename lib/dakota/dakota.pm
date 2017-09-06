@@ -33,7 +33,7 @@ use sort 'stable';
 my $gbl_prefix;
 my $gbl_platform;
 my $extra;
-my $build_dir;
+my $intmdt_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
@@ -336,25 +336,25 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$intmdt_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$intmdt_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$intmdt_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$build_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
+  my $result = &target_src_path($cmd_info) =~ s=^$intmdt_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub dk_parse {
@@ -500,7 +500,7 @@ sub start_cmd {
   my ($cmd_info) = @_;
   $$cmd_info{'asts'} = [] if ! $$cmd_info{'asts'}; ### not ideal
   $root_cmd = $cmd_info;
-  $build_dir = &build_dir();
+  $intmdt_dir = &intmdt_dir();
   my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if (1) {
@@ -762,7 +762,7 @@ sub target_from_ast {
   &make_dir_part($target_src_path, $global_should_echo);
   my ($path, $file_basename, $target_srcs_ast) = ($target_src_path, $target_src_path, undef);
   $path =~ s|/[^/]*$||;
-  $file_basename =~ s|^[^/]*/||;       # strip off leading $build_dir/
+  $file_basename =~ s|^[^/]*/||;       # strip off leading $intmdt_dir/
   # $target_inputs_ast not used, called for side-effect
   my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within target_src_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
