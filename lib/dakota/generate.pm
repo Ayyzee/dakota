@@ -37,7 +37,7 @@ my $emacs_dakota_mode_file_variables = '-*- mode: c++; mode: dakota -*-'; # fall
 
 my $gbl_prefix;
 my $gbl_platform;
-my $intmdt_dir;
+my $intmd_dir;
 my $h_ext;
 my $cc_ext;
 my $nl = "\n";
@@ -117,12 +117,12 @@ my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
-  $intmdt_dir = &intmdt_dir();
+  $intmd_dir = &intmd_dir();
   if ($ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
-    return "$cwd/$intmdt_dir/$name.$ext";
+    return "$cwd/$intmd_dir/$name.$ext";
   } else {
-    return "$intmdt_dir/$name.$ext";
+    return "$intmd_dir/$name.$ext";
   }
 }
 sub empty_klass_defns {
