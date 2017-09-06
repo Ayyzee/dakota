@@ -640,14 +640,19 @@ sub set_build_dir {
   $ENV{'build_dir'} = $build_dir;
 }
 sub build_dir {
-  return $ENV{'build_dir'};
+  my $build_dir = $ENV{'build_dir'};
+  die if ! $build_dir;
+  return $build_dir;
 }
 sub set_source_dir {
   my ($source_dir) = @_;
+  die if ! $source_dir;
   $ENV{'source_dir'} = $source_dir;
 }
 sub source_dir {
-  return $ENV{'source_dir'};
+  my $source_dir = $ENV{'source_dir'};
+  die if ! $source_dir;
+  return $source_dir;
 }
 sub target_build_dir {
   my $target_build_dir = &build_dir() . '/z';
