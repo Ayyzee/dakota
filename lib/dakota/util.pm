@@ -941,15 +941,16 @@ sub is_array {
   }
   return $state;
 }
+my $disable_dakota_io = 1;
 sub dakota_io_from_file {
   my ($dakota_io_path) = @_;
-  return {}; ### disable
+  return {} if $disable_dakota_io;
   my $dakota_io = &scalar_from_file($dakota_io_path);
   return $dakota_io;
 }
 sub dakota_io_to_file {
   my ($dakota_io_path, $dakota_io) = @_;
-  return; ### disable
+  return if $disable_dakota_io;
   &scalar_to_file($dakota_io_path, $dakota_io);
 }
 sub dakota_io_append {
