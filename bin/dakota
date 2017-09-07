@@ -306,8 +306,6 @@ sub cmd_info_from_argv {
     }
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
-              'output=s',  # gcc-like
-
               'path-only',
               'target=s',
               'var=s',
