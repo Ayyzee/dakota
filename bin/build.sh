@@ -5,12 +5,12 @@ if [[ ! -e .build-dir.txt ]]; then
   echo $build_dir > .build-dir.txt
 fi
 build_dir=$(cat .build-dir.txt)
-jobs=$(getconf _NPROCESSORS_ONLN)
-jobs=$(( jobs + 2 ))
-
-if [[ -e jobs.txt ]]; then
-  jobs=$(cat jobs.txt)
+jobs="${jobs:-0}"
+if [[ $jobs -eq 0 ]]; then
+  jobs=$(getconf _NPROCESSORS_ONLN)
+  jobs=$(( jobs + 2 ))
 fi
+
 export PATH=$HOME/dakota/bin:$PATH
 generator="${generator:-ninja}"
 generator_opts=
