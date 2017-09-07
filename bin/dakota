@@ -113,7 +113,7 @@ sub extract_dakota_opts {
   my $opts = {};
   #  $var4opt_pat: rhs/value == 1 means opt is scalar
   my $var4opt_pat = {
-                      'var=s' =>   0,
+                      'var=s' => 0,
                     };
   my $var4opt = {};
   my $scalar_opts = [];
@@ -307,12 +307,11 @@ sub cmd_info_from_argv {
     }
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
-              'path-only',
-              'target=s',
-              'var=s',
-
-              #'clean',          # make target like
-            );
+                       'path-only',
+                       'target=s',
+                       'var=s',
+                       #'clean', # make target like
+                      );
   $$root_cmd{'inputs'} = $argv;
   &set_env_vars($$root_cmd{'opts'}{'var'});
   delete $$root_cmd{'opts'}{'var'};
