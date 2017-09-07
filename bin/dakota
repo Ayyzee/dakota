@@ -227,11 +227,12 @@ sub cxx_argv_from_argv {
   my $cmd = [$0, @$argv];
   my $dakota_opts = &extract_dakota_opts($cmd);
   &set_env_vars($$dakota_opts{'var'});
+  delete $$dakota_opts{'var'};
   my $cxx_argv = [@$cmd];
   $$cxx_argv[0] = &cxx();
   my $ordered_dk_paths = &ordered_dk_paths($cxx_argv);
   if (@$ordered_dk_paths != 0) {
-    my $ordered_cc_paths = &exec_cmd_info({ 'inputs' => $ordered_dk_paths }, []);
+    my $ordered_cc_paths = &exec_cmd_info({ 'inputs' => $ordered_dk_paths });
     &replace_dk_paths_with_cc_paths($cxx_argv, $ordered_cc_paths);
   }
   return $cxx_argv;
@@ -313,14 +314,12 @@ sub cmd_info_from_argv {
               #'clean',          # make target like
             );
   $$root_cmd{'inputs'} = $argv;
-
-  my $vars = $$root_cmd{'opts'}{'var'};
+  &set_env_vars($$root_cmd{'opts'}{'var'});
   delete $$root_cmd{'opts'}{'var'};
-  return ($root_cmd, $vars);
+  return $root_cmd;
 }
 sub exec_cmd_info {
-  my ($root_cmd, $vars) = @_;
-  &set_env_vars($vars); # sets cxx, source_dir, build_dir, ...
+  my ($root_cmd) = @_;
   if (! $ENV{'intmd_dir'}) {
     $ENV{'intmd_dir'} = &intmd_dir_from_build_dir(&build_dir());
   }
@@ -340,8 +339,8 @@ sub exec_cmd_info {
 sub start {
   my ($argv) = @_;
   if (&has_target_opt($argv)) { # --target=ast, --target=hdr, --target=src
-    my ($cmd_info, $vars) = &cmd_info_from_argv($argv);
-    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $vars); # -> start_cmd()
+    my $cmd_info = &cmd_info_from_argv($argv);
+    my $ordered_cc_paths = &exec_cmd_info($cmd_info); # -> start_cmd()
   } else { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o
     my $cxx_argv = &cxx_argv_from_argv($argv); # -> exec_cmd_info() -> start_cmd()
     my $exit_val = &verbose_exec($cxx_argv); # -> g++/clang++
