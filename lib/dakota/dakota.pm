@@ -509,15 +509,14 @@ sub start_cmd {
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
     &set_target_srcs_ast($target_srcs_ast_path);
   }
-  if ($$cmd_info{'opts'}{'target-hdr'}) {
-    &gen_target_hdr($cmd_info);
-  }
-  if ($$cmd_info{'opts'}{'target-src'}) {
-    &gen_target_src($cmd_info);
-  }
-  if (!$$cmd_info{'opts'}{'target-ast'} &&
-      !$$cmd_info{'opts'}{'target-hdr'} &&
-      !$$cmd_info{'opts'}{'target-src'}) {
+  if ($$cmd_info{'opts'}{'target'}) {
+    if (0) {
+    } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+      &gen_target_hdr($cmd_info);
+    } elsif ($$cmd_info{'opts'}{'target'} eq 'src') {
+      &gen_target_src($cmd_info);
+    }
+  } else {
     $cmd_info = &loop_cc_from_dk($cmd_info);
     $ordered_cc_paths = &ordered_cc_paths($$cmd_info{'inputs'});
   }
@@ -620,7 +619,7 @@ sub loop_ast_from_inputs {
       &ordered_set_add($ast_files, $input, __FILE__, __LINE__);
     }
   }
-  #if ($$cmd_info{'opts'}{'target-hdr'}) {
+  #if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
     if (0 != @$ast_files) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
       &check_path($target_srcs_ast_path);
@@ -747,16 +746,17 @@ sub target_src_from_ast {
 sub target_from_ast {
   my ($cmd_info, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
+  die if ! defined $$cmd_info{'opts'}{'target'};
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   my $target_src_path = &target_src_path($cmd_info);
   my $target_hdr_path =  &target_hdr_path($cmd_info);
   &check_path($target_srcs_ast_path);
 
   if ($is_defn) {
-    if ($$cmd_info{'opts'}{'target-src'}) {
+    if ($$cmd_info{'opts'}{'target'} eq 'src') {
       return if !&is_out_of_date($target_srcs_ast_path, $target_src_path);
     }
-  } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
+  } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
     return if !&is_out_of_date($target_srcs_ast_path, $target_hdr_path);
   }
   &make_dir_part($target_src_path, $global_should_echo);

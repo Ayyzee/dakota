@@ -685,13 +685,14 @@ sub target_src_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
+    die if ! $$cmd_info{'opts'}{'target'};
     my $path;
     if (0) {
-    } elsif ($$cmd_info{'opts'}{'target-ast'}) {
+    } elsif ($$cmd_info{'opts'}{'target'} eq 'ast') {
       $path = &target_srcs_ast_path($cmd_info);
-    } elsif ($$cmd_info{'opts'}{'target-hdr'}) {
+    } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
       $path = &target_hdr_path($cmd_info);
-    } elsif ($$cmd_info{'opts'}{'target-src'}) {
+    } elsif ($$cmd_info{'opts'}{'target'} eq 'src') {
       $path = &target_src_path($cmd_info);
     } else {
       die;

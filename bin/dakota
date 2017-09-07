@@ -309,9 +309,7 @@ sub cmd_info_from_argv {
               'output=s',  # gcc-like
 
               'path-only',
-              'target-ast', # mainly for debugging
-              'target-hdr',
-              'target-src',
+              'target=s',
               'var=s',
 
               #'clean',          # make target like
@@ -337,7 +335,7 @@ sub exec_cmd_info {
     &clean($root_cmd, $dakota_io_path, $dakota_io);
     exit 0;
   }
-  #print STDERR 'root_cmd: ' . &Dumper($root_cmd);
+  #print STDERR "root_cmd{'opts'}: " . &Dumper($$root_cmd{'opts'});
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
   return $ordered_cc_paths;
 }
