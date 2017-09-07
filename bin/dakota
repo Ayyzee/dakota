@@ -236,10 +236,10 @@ sub cxx_argv_from_argv {
   }
   return $cxx_argv;
 }
-sub has_cxx_opt {
+sub has_target_opt {
   my ($argv) = @_;
   foreach my $arg (@$argv) {
-    return 1 if $arg =~ /^--cxx(=.*)?$/;
+    return 1 if $arg =~ /^--target(=.*)?$/;
   }
   return 0;
 }
@@ -341,13 +341,13 @@ sub exec_cmd_info {
 }
 sub start {
   my ($argv) = @_;
-  if (&has_cxx_opt($argv)) { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o
+  if (&has_target_opt($argv)) { # --target=ast, --target=hdr, --target=src
+    my ($cmd_info, $vars) = &cmd_info_from_argv($argv);
+    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $vars); # -> start_cmd()
+  } else { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o
     my $cxx_argv = &cxx_argv_from_argv($argv); # -> exec_cmd_info() -> start_cmd()
     my $exit_val = &verbose_exec($cxx_argv); # -> g++/clang++
     exit 1 if $exit_val;
-  } else { # --target=ast, --target=hdr, --target=src
-    my ($cmd_info, $vars) = &cmd_info_from_argv($argv);
-    my $ordered_cc_paths = &exec_cmd_info($cmd_info, $vars); # -> start_cmd()
   }
   exit 0;
 }
