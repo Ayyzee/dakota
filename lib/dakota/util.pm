@@ -77,6 +77,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  cpp_directives
+                 cxx
                  source_dir
                  ct
                  decode_comments
@@ -646,6 +647,11 @@ sub make_dir_part {
   } elsif (0) {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
+}
+sub cxx {
+  my $cxx = $ENV{'cxx'};
+  die if ! $cxx;
+  return $cxx;
 }
 sub intmd_dir {
   my $intmd_dir = $ENV{'intmd_dir'};

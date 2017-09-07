@@ -2,8 +2,8 @@
 include (${prefix-dir}/lib/dakota/base-cxx.cmake)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
-dk_append_target_property (${target} LINK_FLAGS --cxx ${cxx-compiler} --var=build_dir=${CMAKE_CURRENT_BINARY_DIR} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options (   ${target} PRIVATE    --cxx ${cxx-compiler} --var=build_dir=${CMAKE_CURRENT_BINARY_DIR} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR})
+dk_append_target_property (${target} LINK_FLAGS --var=cxx=${cxx-compiler} --var=build_dir=${CMAKE_CURRENT_BINARY_DIR} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options (   ${target} PRIVATE    --var=cxx=${cxx-compiler} --var=build_dir=${CMAKE_CURRENT_BINARY_DIR} --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts) # ${CMAKE_EXECUTABLE_SUFFIX}
 
