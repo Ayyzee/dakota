@@ -175,7 +175,7 @@ sub loop_merged_ast_from_inputs {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
   }
-  if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
+  if ($$cmd_info{'opts'}{'output'}) { # z/srcs.ast ($target_srcs_ast)
     if (1 == @{$$cmd_info{'inputs'}}) {
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } elsif (1 < @{$$cmd_info{'inputs'}}) {

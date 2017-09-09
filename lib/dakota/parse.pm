@@ -265,7 +265,7 @@ sub _ast_merge {
     }
   }
 }
-sub ast_merge {
+sub ast_merge { # used to create/merge z/srcs.ast and z/inputs.ast
   my ($outpath, $argv, $should_translate) = @_;
   my $ast = {};
   my $files = &out_of_date($argv, $outpath);
@@ -1873,7 +1873,7 @@ sub target_inputs_ast {
   #my $reinit = 0;
   #if ($_target_inputs_ast) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
-  my $should_translate;
+  my $should_translate; # create z/inputs.ast from z/srcs.ast and all *.so.ctlg.ast
   $_target_inputs_ast = &ast_merge($target_inputs_ast_path, $asts, $should_translate = 1);
   #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
   return $_target_inputs_ast;
