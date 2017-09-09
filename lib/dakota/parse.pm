@@ -1855,10 +1855,6 @@ sub method {
   }
   return;
 }
-sub target_inputs_ast_path {
-  my $target_inputs_ast_path = &target_intmd_dir() . '/inputs.ast';
-  return $target_inputs_ast_path;
-}
 my $_target_inputs_ast;
 sub target_inputs_ast {
   my ($asts) = @_;

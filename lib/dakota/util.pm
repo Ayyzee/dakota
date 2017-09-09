@@ -179,6 +179,7 @@ our @EXPORT= qw(
                  str_from_seq
                  suffix
                  target_intmd_dir
+                 target_inputs_ast_path
                  target_srcs_ast_path
                  rel_target_hdr_path
                  target_hdr_path
@@ -675,6 +676,10 @@ sub target_intmd_dir {
 sub target_srcs_ast_path {
   my $target_srcs_ast_path = &target_intmd_dir() . '/srcs.ast';
   return $target_srcs_ast_path;
+}
+sub target_inputs_ast_path {
+  my $target_inputs_ast_path = &target_intmd_dir() . '/inputs.ast';
+  return $target_inputs_ast_path;
 }
 sub rel_target_hdr_path {
   my $rel_target_hdr_path = 'z/target' . $h_ext;
