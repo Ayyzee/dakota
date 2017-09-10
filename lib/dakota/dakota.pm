@@ -500,16 +500,14 @@ sub ast_from_so {
   if (!$should_write_ctlg_files) {
     #unlink $ctlg_path;
   }
+  return ($ast_path, undef);
 }
 sub loop_ast_from_so {
   my ($cmd_info) = @_;
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
-      &ast_from_so($cmd_info, $input);
-      my $ctlg_path = &ctlg_path_from_so_path($input);
-      my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
-      $input = &canon_path($input);
+      my ($ast_path, $undef) = &ast_from_so($cmd_info, $input);
     }
   }
   return $cmd_info;
