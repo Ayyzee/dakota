@@ -116,14 +116,6 @@ sub is_dk_src_path {
     return 0;
   }
 }
-sub is_ast_input_path { # dk, ctlg, or so
-  my ($arg) = @_;
-  if (&is_so_path($arg) || &is_dk_src_path($arg)) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 sub is_ast_path { # ast
   my ($arg) = @_;
   if ($arg =~ m/\.ast$/) {
