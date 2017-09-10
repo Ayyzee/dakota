@@ -99,39 +99,6 @@ my ($id,  $mid,  $bid,  $tid,
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 
-sub is_cc_path {
-  my ($arg) = @_;
-  if ($arg =~ m/$cc_ext$/) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_dk_src_path {
-  my ($arg) = @_;
-  if ($arg =~ m/\.dk$/ ||
-      $arg =~ m/\.ctlg(\.\d+)*$/) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_ast_path { # ast
-  my ($arg) = @_;
-  if ($arg =~ m/\.ast$/) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_ctlg_path { # ctlg
-  my ($arg) = @_;
-  if ($arg =~ m/\.ctlg(\.\d+)*$/) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 sub loop_merged_ast_from_inputs {
   my ($cmd_info, $should_echo) = @_; 
   if ($should_echo) {
@@ -143,19 +110,12 @@ sub loop_merged_ast_from_inputs {
   if ($$cmd_info{'asts'}) {
     $ast_files = $$cmd_info{'asts'};
   }
-  my $ast;
+  my ($ast_path, $ast);
   my $root_ast_path;
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
-      $ast = &ast_from_dk($input);
-      my $ast_path;
-      if (&is_dk_path($input)) {
-        $ast_path = &ast_path_from_dk_path($input);
-      } elsif (&is_ctlg_path($input)) {
-        $ast_path = &ast_path_from_ctlg_path($input);
-      } else {
-        die;
-      }
+      ($ast_path, $ast) = &ast_from_dk($input);
+      die if ! $ast_path;
       &check_path($ast_path);
       $root_ast_path = $ast_path;
       &add_last($ast_files, $ast_path); # _from_dk_src_path

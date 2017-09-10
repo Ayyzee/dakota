@@ -2249,6 +2249,12 @@ sub add_object_methods_decls {
 }
 sub ast_from_dk {
   my ($arg) = @_;
+  my $ast_path;
+  if (&is_dk_path($arg)) {
+    $ast_path = &ast_path_from_dk_path($arg);
+  } elsif (&is_ctlg_path($arg)) {
+    $ast_path = &ast_path_from_ctlg_path($arg);
+  }
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &filestr_from_file($gbl_filename);
@@ -2298,7 +2304,7 @@ sub ast_from_dk {
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
   #print &Dumper(&kw_arg_generics());
-  return $result;
+  return ($ast_path, $result);
 }
 sub start {
   my ($argv) = @_;

@@ -104,10 +104,14 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  int_from_str
+                 is_cc_path
                  is_dk_path
+                 is_dk_src_path
                  is_abs
                  is_array_type
+                 is_ast_path
                  is_box_type
+                 is_ctlg_path
                  is_debug
                  is_decl
                  is_exported
@@ -1146,6 +1150,39 @@ sub longest_common_prefix {
 sub dmp {
   my ($ref) = @_;
   print STDERR &Dumper($ref);
+}
+sub is_cc_path {
+  my ($arg) = @_;
+  if ($arg =~ m/$cc_ext$/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_dk_src_path {
+  my ($arg) = @_;
+  if ($arg =~ m/\.dk$/ ||
+      $arg =~ m/\.ctlg(\.\d+)*$/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_ast_path { # ast
+  my ($arg) = @_;
+  if ($arg =~ m/\.ast$/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_ctlg_path { # ctlg
+  my ($arg) = @_;
+  if ($arg =~ m/\.ctlg(\.\d+)*$/) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 sub is_dk_path {
   my ($arg) = @_;
