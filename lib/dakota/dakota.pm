@@ -461,6 +461,7 @@ sub start_cmd {
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
     &set_target_srcs_ast($target_srcs_ast_path);
   }
+  #exit 1;
   if ($$cmd_info{'opts'}{'target'}) {
     if (0) {
     } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
