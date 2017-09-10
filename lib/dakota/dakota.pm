@@ -527,11 +527,8 @@ sub ast_from_inputs {
     'io' =>  $$cmd_info{'io'},
   };
   my $should_echo;
-  my $result = &outfile_from_infiles($ast_cmd, $should_echo = 0);
-  if ($result) {
-    if (0 != @{$$ast_cmd{'asts'} || []}) {
-      my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
-    }
+  my $num_out_of_date_infiles = &outfile_from_infiles($ast_cmd, $should_echo = 0);
+  if ($num_out_of_date_infiles) {
     foreach my $input (@{$$ast_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
@@ -548,7 +545,6 @@ sub ast_from_inputs {
       }
     }
   }
-  return $result;
 }
 sub loop_ast_from_inputs {
   my ($cmd_info) = @_;
@@ -628,7 +624,7 @@ sub cc_from_dk {
       $$ast_cmd{'inputs'} = [ $input ];
       $$ast_cmd{'output'} = $ast_path;
       $$ast_cmd{'io'} =  $$cmd_info{'io'};
-      $num_out_of_date_infiles = &ast_from_inputs($ast_cmd);
+      &ast_from_inputs($ast_cmd);
       &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
     }
     my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
