@@ -422,7 +422,7 @@ sub update_target_srcs_ast_from_all_inputs {
   $$cmd_info{'inputs'} = $$cmd_info{'parts'},
   &check_path($target_srcs_ast_path);
   $cmd_info = &loop_ast_from_so($cmd_info);
-  $cmd_info = &loop_ast_from_inputs($cmd_info);
+  $cmd_info = &loop_ast_from_dk($cmd_info);
   &add_visibility_file($target_srcs_ast_path);
 
   if ($$cmd_info{'asts'}) {
@@ -547,7 +547,7 @@ sub ast_from_inputs {
     }
   }
 }
-sub loop_ast_from_inputs {
+sub loop_ast_from_dk {
   my ($cmd_info) = @_;
   my $ast_files = [];
   foreach my $input (@{$$cmd_info{'inputs'}}) {
@@ -562,8 +562,6 @@ sub loop_ast_from_inputs {
       };
       &ast_from_inputs($ast_cmd);
       &ordered_set_add($ast_files, $ast_path, __FILE__, __LINE__);
-    } elsif (&is_ast_path($input)) {
-      &ordered_set_add($ast_files, $input, __FILE__, __LINE__);
     }
   }
   #if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
@@ -581,7 +579,7 @@ sub loop_ast_from_inputs {
     }
   #}
   return $cmd_info;
-} # loop_ast_from_inputs
+} # loop_ast_from_dk
 sub gen_target_hdr {
   my ($cmd_info) = @_;
   my $is_defn;
