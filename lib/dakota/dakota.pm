@@ -564,7 +564,7 @@ sub loop_ast_from_dk {
       &ordered_set_add($ast_files, $ast_path, __FILE__, __LINE__);
     }
   }
-  #if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+  if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
     if (0 != @$ast_files) {
       my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
       &check_path($target_srcs_ast_path);
@@ -577,7 +577,7 @@ sub loop_ast_from_dk {
       };
       &ast_from_inputs($ast_cmd); # multiple inputs
     }
-  #}
+  }
   return $cmd_info;
 } # loop_ast_from_dk
 sub gen_target_hdr {
