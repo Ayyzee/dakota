@@ -2300,11 +2300,11 @@ sub ast_from_dk {
   &add_generics_used($gbl_root_ast, $gbl_sst_cursor);
 
   my $exported;
-  my $result = &parse_root($gbl_sst_cursor, $exported = 0);
-  &add_object_methods_decls($result);
-  #print STDERR &Dumper($result);
+  my $ast = &parse_root($gbl_sst_cursor, $exported = 0);
+  &add_object_methods_decls($ast);
+  #print STDERR &Dumper($ast);
   #print &Dumper(&kw_arg_generics());
-  return ($ast_path, $result);
+  return ($ast_path, $ast);
 }
 sub start {
   my ($argv) = @_;
