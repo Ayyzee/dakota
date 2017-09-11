@@ -416,9 +416,11 @@ sub update_kw_arg_generics {
 sub update_target_srcs_ast_from_all_inputs {
   my ($cmd_info, $target_srcs_ast_path) = @_;
   my $orig = { 'inputs' => $$cmd_info{'inputs'},
-               'output' => $$cmd_info{'output'},
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
              };
+  if (exists $$cmd_info{'output'}) {
+    $$orig{'output'} = $$cmd_info{'output'},
+  }
   $$cmd_info{'inputs'} = $$cmd_info{'parts'},
   &check_path($target_srcs_ast_path);
   $cmd_info = &loop_ast_from_so($cmd_info);
@@ -429,8 +431,10 @@ sub update_target_srcs_ast_from_all_inputs {
     &update_kw_arg_generics($$cmd_info{'asts'});
   }
   $$cmd_info{'inputs'} = $$orig{'inputs'};
-  $$cmd_info{'output'} = $$orig{'output'};
   $$cmd_info{'opts'} =   $$orig{'opts'};
+  if (exists $$orig{'output'}) {
+    $$cmd_info{'output'} = $$orig{'output'};
+  }
 
   if ($ENV{'DAKOTA_CREATE_AST_ONLY'}) {
     exit 0;
