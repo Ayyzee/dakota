@@ -4,8 +4,10 @@ digraph {
 
   "a.dk" [ color = blue ];
   "b.dk" [ color = blue ];
+  "c.dk" [ color = blue ];
   "libx.so" [ color = blue ];
   "liby.so" [ color = blue ];
+  "libz.so" [ color = blue ];
   "z/target.h" [ color = green ];
   "z/target.cc" [ color = green ];
 
@@ -18,6 +20,9 @@ digraph {
   ".../b.cc.o" -> "b.cc" [ weight = 2 ];
   ".../b.cc.o" -> "z/target.h" [ color = green ];
 
+  ".../c.cc.o" -> "c.cc" [ weight = 2 ];
+  ".../c.cc.o" -> "z/target.h" [ color = green ];
+
   "z/target.h" -> "z/inputs.ast";
   "z/target.cc" -> "z/inputs.ast";
 
@@ -27,35 +32,59 @@ digraph {
   "b.cc" -> "z/inputs.ast";
   "b.cc" -> "b.dk.ast" [ weight = 2 ];
   
+  "c.cc" -> "z/inputs.ast";
+  "c.cc" -> "c.dk.ast" [ weight = 2 ];
+  
   "z/inputs.ast" -> "z/srcs.ast";
   "z/inputs.ast" -> "libx.so.ctlg.ast";
   "z/inputs.ast" -> "liby.so.ctlg.ast";
+  "z/inputs.ast" -> "libz.so.ctlg.ast";
 
   "z/srcs.ast" -> "a.dk.ast" -> "a.dk";
   "z/srcs.ast" -> "b.dk.ast" -> "b.dk";
+  "z/srcs.ast" -> "c.dk.ast" -> "c.dk";
 
   "libx.so.ctlg.ast" -> "libx.so.ctlg" -> "libx.so";
   "liby.so.ctlg.ast" -> "liby.so.ctlg" -> "liby.so";
+  "libz.so.ctlg.ast" -> "libz.so.ctlg" -> "libz.so";
 
   // layout control below
   subgraph {
     graph [ rank = same ];
     "a.dk.ast";
     "b.dk.ast";
+    "c.dk.ast";
     "libx.so.ctlg.ast";
     "liby.so.ctlg.ast";
+    "libz.so.ctlg.ast";
   }
   subgraph {
     graph [ rank = same ];
     "a.dk";
     "b.dk";
+    "c.dk";
     "libx.so";
     "liby.so";
+    "libz.so";
   }
-//   "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = dotted ];
-//   "z/srcs.ast" -> "libx.so.ctlg.ast" [ color = red, style = dotted ];
-//   "z/srcs.ast" -> "liby.so.ctlg.ast" [ color = red, style = dotted ];
-  "a.dk.ast" -> "b.dk.ast" [ color = red, style = dotted ];
-  "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = dotted ];
-  "b.dk.ast" -> "libx.so.ctlg.ast" [ color = red, style = dotted ];
+  subgraph {
+    graph [ rank = same ];
+    "a.cc";
+    "b.cc";
+    "c.cc";
+    "z/target.h";
+    "z/target.cc";
+  }
+  "a.dk.ast" -> "b.dk.ast" [ color = red, style = invis ];
+  "b.dk.ast" -> "c.dk.ast" [ color = red, style = invis ];
+  //
+  "c.dk.ast" -> "libx.so.ctlg.ast" [ color = red, style = invis ];
+  //
+  "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = invis ];
+  "liby.so.ctlg.ast" -> "libz.so.ctlg.ast" [ color = red, style = invis ];
+
+  "a.cc" -> "b.cc" [ color = red, style = invis ];
+  "b.cc" -> "c.cc" [ color = red, style = invis ];
+  "c.cc" -> "z/target.h" [ color = red, style = invis ];
+  "z/target.h" -> "z/target.cc" [ color = red, style = invis ];
 }
