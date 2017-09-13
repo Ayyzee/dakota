@@ -9,23 +9,23 @@ digraph {
   "z/target.h" [ color = green ];
   "z/target.cc" [ color = green ];
 
-  ".../z/target.cc.o" -> "z/target.cc" [ weight = 3 ];
+  ".../z/target.cc.o" -> "z/target.cc" [ weight = 2 ];
   ".../z/target.cc.o" -> "z/target.h" [ color = green ];
 
-  ".../a.cc.o" -> "a.cc" [ weight = 3 ]
+  ".../a.cc.o" -> "a.cc" [ weight = 2 ]
   ".../a.cc.o" -> "z/target.h" [ color = green ];
 
-  ".../b.cc.o" -> "b.cc" [ weight = 3 ];
+  ".../b.cc.o" -> "b.cc" [ weight = 2 ];
   ".../b.cc.o" -> "z/target.h" [ color = green ];
 
   "z/target.h" -> "z/inputs.ast";
   "z/target.cc" -> "z/inputs.ast";
 
   "a.cc" -> "z/inputs.ast";
-  "a.cc" -> "a.dk.ast" [ weight = 3 ];
+  "a.cc" -> "a.dk.ast" [ weight = 2 ];
   
   "b.cc" -> "z/inputs.ast";
-  "b.cc" -> "b.dk.ast" [ weight = 3 ];
+  "b.cc" -> "b.dk.ast" [ weight = 2 ];
   
   "z/inputs.ast" -> "z/srcs.ast";
   "z/inputs.ast" -> "libx.so.ctlg.ast";
@@ -52,7 +52,10 @@ digraph {
     "libx.so";
     "liby.so";
   }
-  "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = invis ];
-  "z/srcs.ast" -> "libx.so.ctlg.ast" [ color = red, style = invis ];
-  "z/srcs.ast" -> "liby.so.ctlg.ast" [ color = red, style = invis ];
+//   "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = dotted ];
+//   "z/srcs.ast" -> "libx.so.ctlg.ast" [ color = red, style = dotted ];
+//   "z/srcs.ast" -> "liby.so.ctlg.ast" [ color = red, style = dotted ];
+  "a.dk.ast" -> "b.dk.ast" [ color = red, style = dotted ];
+  "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = dotted ];
+  "b.dk.ast" -> "libx.so.ctlg.ast" [ color = red, style = dotted ];
 }
