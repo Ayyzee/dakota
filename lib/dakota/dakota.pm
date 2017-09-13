@@ -716,7 +716,6 @@ sub target_from_ast {
   my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within target_src_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
   $target_srcs_ast = &kw_args_translate($target_srcs_ast);
-  $$target_srcs_ast{'should-generate-make'} = 1;
 
   &target::add_extra_symbols($target_srcs_ast);
   &target::add_extra_klass_decls($target_srcs_ast);

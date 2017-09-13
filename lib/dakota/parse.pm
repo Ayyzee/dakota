@@ -2204,7 +2204,6 @@ sub parse_root {
     &remove_generic($gbl_root_ast, 'make');
     &add_generic($gbl_root_ast, 'init');
   }
-  $$gbl_root_ast{'should-generate-make'} = 1; # always generate make()
   return $gbl_root_ast;
 }
 sub add_object_methods_decls_to_klass {
