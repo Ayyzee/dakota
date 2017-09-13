@@ -37,7 +37,7 @@ target_sources (${target} PRIVATE ${target-src})
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts} ${target-libs} dakota-catalog${CMAKE_EXECUTABLE_SUFFIX}
+  DEPENDS ${parts} ${target-libs}
   COMMAND ${CMAKE_CXX_COMPILER} --target src
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
@@ -51,7 +51,7 @@ set_source_files_properties (${target-src} PROPERTIES
 set (target-hdr ${target}.target-hdr)
 # phony target 'target-hdr'
 add_custom_target (${target-hdr}
-  DEPENDS ${parts} ${target-libs} dakota-catalog${CMAKE_EXECUTABLE_SUFFIX}
+  DEPENDS ${parts} ${target-libs}
   COMMAND ${CMAKE_CXX_COMPILER} --target hdr
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
