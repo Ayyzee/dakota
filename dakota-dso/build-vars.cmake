@@ -12,8 +12,6 @@ set (lib-dirs
 set (libs
   dl
 )
-set (target-lib-dirs
-)
 set (target-libs
 )
 set (target-type shared-library)

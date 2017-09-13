@@ -11,8 +11,6 @@ set (lib-dirs
 )
 set (libs
 )
-set (target-lib-dirs
-)
 set (target-libs
   dakota-dso
   dakota-core
