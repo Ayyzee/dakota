@@ -410,7 +410,9 @@ sub update_kw_arg_generics {
   }
   my $path = $$asts[-1]; # only update the parts file ast
   my $ast = &scalar_from_file($path);
-  $$ast{'kw-arg-generics'} = $kw_arg_generics;
+  if (scalar keys %$kw_arg_generics) {
+    $$ast{'kw-arg-generics'} = $kw_arg_generics;
+  }
   &scalar_to_file($path, $ast);
 }
 sub update_target_srcs_ast_from_all_inputs {

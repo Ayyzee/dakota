@@ -297,9 +297,6 @@ my $gbl_filename = undef;
 sub init_ast_from_inputs_vars {
   my ($cmd_info) = @_;
   $gbl_root_ast = {};
-  $$gbl_root_ast{'keywords'} = {};
-  $$gbl_root_ast{'symbols'} =  {};
-
   $gbl_current_ast_scope = $gbl_root_ast;
   $gbl_filename = undef;
 }
