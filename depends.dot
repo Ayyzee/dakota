@@ -4,66 +4,55 @@ digraph {
 
   "a.dk" [ color = blue ];
   "b.dk" [ color = blue ];
-  "c.dk" [ color = blue ];
   "libx.so" [ color = blue ];
   "liby.so" [ color = blue ];
-  "libz.so" [ color = blue ];
   "z/target.h" [ color = green ];
   "z/target.cc" [ color = green ];
 
-  ".../z/target.cc.o" -> "z/target.cc";
+  ".../z/target.cc.o" -> "z/target.cc" [ weight = 3 ];
   ".../z/target.cc.o" -> "z/target.h" [ color = green ];
 
-  ".../z/a.cc.o" -> "a.cc";
-  ".../z/a.cc.o" -> "z/target.h" [ color = green ];
+  ".../a.cc.o" -> "a.cc" [ weight = 3 ]
+  ".../a.cc.o" -> "z/target.h" [ color = green ];
 
-  ".../z/b.cc.o" -> "b.cc";
-  ".../z/b.cc.o" -> "z/target.h" [ color = green ];
-
-  ".../z/c.cc.o" -> "c.cc";
-  ".../z/c.cc.o" -> "z/target.h" [ color = green ];
+  ".../b.cc.o" -> "b.cc" [ weight = 3 ];
+  ".../b.cc.o" -> "z/target.h" [ color = green ];
 
   "z/target.h" -> "z/inputs.ast";
   "z/target.cc" -> "z/inputs.ast";
 
   "a.cc" -> "z/inputs.ast";
-  "a.cc" -> "a.dk.ast";
+  "a.cc" -> "a.dk.ast" [ weight = 3 ];
   
   "b.cc" -> "z/inputs.ast";
-  "b.cc" -> "b.dk.ast";
-  
-  "c.cc" -> "z/inputs.ast";
-  "c.cc" -> "c.dk.ast";
+  "b.cc" -> "b.dk.ast" [ weight = 3 ];
   
   "z/inputs.ast" -> "z/srcs.ast";
   "z/inputs.ast" -> "libx.so.ctlg.ast";
   "z/inputs.ast" -> "liby.so.ctlg.ast";
-  "z/inputs.ast" -> "libz.so.ctlg.ast";
 
   "z/srcs.ast" -> "a.dk.ast" -> "a.dk";
   "z/srcs.ast" -> "b.dk.ast" -> "b.dk";
-  "z/srcs.ast" -> "c.dk.ast" -> "c.dk";
 
   "libx.so.ctlg.ast" -> "libx.so.ctlg" -> "libx.so";
   "liby.so.ctlg.ast" -> "liby.so.ctlg" -> "liby.so";
-  "libz.so.ctlg.ast" -> "libz.so.ctlg" -> "libz.so";
 
+  // layout control below
   subgraph {
     graph [ rank = same ];
     "a.dk.ast";
     "b.dk.ast";
-    "c.dk.ast";
     "libx.so.ctlg.ast";
     "liby.so.ctlg.ast";
-    "libz.so.ctlg.ast";
   }
   subgraph {
     graph [ rank = same ];
     "a.dk";
     "b.dk";
-    "c.dk";
     "libx.so";
     "liby.so";
-    "libz.so";
   }
+  "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = invis ];
+  "z/srcs.ast" -> "libx.so.ctlg.ast" [ color = red, style = invis ];
+  "z/srcs.ast" -> "liby.so.ctlg.ast" [ color = red, style = invis ];
 }
