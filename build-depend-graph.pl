@@ -72,7 +72,6 @@ sub gen_target_hdr_graph {
   my $root = {};
   my ($srcs, $libs) = ({}, {});
   foreach my $input (sort @$inputs) {
-    $input = &basename($input);
     if ($input =~ /\.dk$/) {
       $$srcs{$input} = &ast_path_from_dk_path($input);
     } else {
@@ -110,7 +109,9 @@ sub gen_target_hdr_graph {
   }
   return $root;
 }
-my $inputs = [split(/\s+/, <STDIN>)];
+
+my $inputs = [ split(/\s+/, <STDIN>) ];
+$inputs = [ map { &basename($_) } @$inputs ];
 my $root = &gen_target_hdr_graph($inputs);
 
 if (1) {
