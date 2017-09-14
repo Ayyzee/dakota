@@ -9,32 +9,9 @@ digraph {
   "liby.so" [ color = blue ];
   "libz.so" [ color = blue ];
   "z/target.h" [ color = green ];
-  "z/target.cc" [ color = green ];
-
-  ".../z/target.cc.o" -> "z/target.cc" [ weight = 2 ];
-  ".../z/target.cc.o" -> "z/target.h" [ color = green ];
-
-  ".../a.cc.o" -> "a.cc" [ weight = 2 ]
-  ".../a.cc.o" -> "z/target.h" [ color = green ];
-
-  ".../b.cc.o" -> "b.cc" [ weight = 2 ];
-  ".../b.cc.o" -> "z/target.h" [ color = green ];
-
-  ".../c.cc.o" -> "c.cc" [ weight = 2 ];
-  ".../c.cc.o" -> "z/target.h" [ color = green ];
 
   "z/target.h" -> "z/inputs.ast";
-  "z/target.cc" -> "z/inputs.ast";
 
-  "a.cc" -> "z/inputs.ast";
-  "a.cc" -> "a.dk.ast" [ weight = 2 ];
-  
-  "b.cc" -> "z/inputs.ast";
-  "b.cc" -> "b.dk.ast" [ weight = 2 ];
-  
-  "c.cc" -> "z/inputs.ast";
-  "c.cc" -> "c.dk.ast" [ weight = 2 ];
-  
   "z/inputs.ast" -> "z/srcs.ast";
   "z/inputs.ast" -> "libx.so.ctlg.ast";
   "z/inputs.ast" -> "liby.so.ctlg.ast";
@@ -67,24 +44,4 @@ digraph {
     "liby.so";
     "libz.so";
   }
-  subgraph {
-    graph [ rank = same ];
-    "a.cc";
-    "b.cc";
-    "c.cc";
-    "z/target.h";
-    "z/target.cc";
-  }
-  "a.dk.ast" -> "b.dk.ast" [ color = red, style = invis ];
-  "b.dk.ast" -> "c.dk.ast" [ color = red, style = invis ];
-  //
-  "c.dk.ast" -> "libx.so.ctlg.ast" [ color = red, style = invis ];
-  //
-  "libx.so.ctlg.ast" -> "liby.so.ctlg.ast" [ color = red, style = invis ];
-  "liby.so.ctlg.ast" -> "libz.so.ctlg.ast" [ color = red, style = invis ];
-
-  "a.cc" -> "b.cc" [ color = red, style = invis ];
-  "b.cc" -> "c.cc" [ color = red, style = invis ];
-  "c.cc" -> "z/target.h" [ color = red, style = invis ];
-  "z/target.h" -> "z/target.cc" [ color = red, style = invis ];
 }
