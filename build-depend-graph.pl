@@ -84,25 +84,25 @@ sub gen_target_hdr_graph {
                                   [ '<cmd>', '--target-hdr', '--output', &target_hdr_path(),
                                     &target_inputs_ast_path() ]);
   ###
-  my $inputs_ast_node = &add_node($target_hdr_node,
-                                  &target_inputs_ast_path(),
-                                  [ &target_srcs_ast_path(), @{&asts($libs)} ],
-                                  [ '<cmd>', '--merge-ast', '--output', &target_inputs_ast_path(),
-                                    &target_srcs_ast_path(), @{&asts($libs)} ]);
+  my $target_inputs_ast_node = &add_node($target_hdr_node,
+                                         &target_inputs_ast_path(),
+                                         [ &target_srcs_ast_path(), @{&asts($libs)} ],
+                                         [ '<cmd>', '--merge-ast', '--output', &target_inputs_ast_path(),
+                                           &target_srcs_ast_path(), @{&asts($libs)} ]);
   while (my ($lib, $lib_ast) = each %$libs) {
-    &add_node($inputs_ast_node,
+    &add_node($target_inputs_ast_node,
               $lib_ast,
               [ $lib ],
               [ '<cmd>', '--parse-lib', '--output', $lib_ast, $lib ]);
   }
   ###
-  my $srcs_ast_node = &add_node($inputs_ast_node,
-                                &target_srcs_ast_path(),
-                                [ @{&asts($srcs)} ],
-                                [ '<cmd>', '--merge-ast', '--output', &target_srcs_ast_path(),
-                                  @{&asts($srcs)} ]);
+  my $target_srcs_ast_node = &add_node($target_inputs_ast_node,
+                                       &target_srcs_ast_path(),
+                                       [ @{&asts($srcs)} ],
+                                       [ '<cmd>', '--merge-ast', '--output', &target_srcs_ast_path(),
+                                         @{&asts($srcs)} ]);
   while (my ($src, $src_ast) = each %$srcs) {
-    &add_node($srcs_ast_node,
+    &add_node($target_srcs_ast_node,
               $src_ast,
               [ $src ],
               [ '<cmd>', '--parse-src', '--output', $src_ast, $src ]);
