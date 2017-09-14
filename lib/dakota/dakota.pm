@@ -288,25 +288,25 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
+  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
+  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
+  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_src_path($cmd_info) =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
+  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub dk_parse {
@@ -365,7 +365,7 @@ sub cc_from_dk_core2 {
     } else {
       $cc_path = "$input_dir/$input_name$cc_ext";
     }
-    my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+    my $target_srcs_ast_path = &target_srcs_ast_path();
     my $inc_path = &inc_path_from_dk_path($input);
     my $h_path = $cc_path =~ s/$cc_ext$/$h_ext/r;
     $input = &canon_path($input);
@@ -375,7 +375,7 @@ sub cc_from_dk_core2 {
     &src::add_extra_klass_decls($file_ast);
     &src::add_extra_keywords($file_ast);
     &src::add_extra_generics($file_ast);
-    my $rel_target_hdr_path = &rel_target_hdr_path($cmd_info);
+    my $rel_target_hdr_path = &rel_target_hdr_path();
 
     &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_hdr_path);
     &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_hdr_path); # rel_target_hdr_path not used
@@ -462,7 +462,7 @@ sub start_cmd {
   my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if (1) {
-    my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+    my $target_srcs_ast_path = &target_srcs_ast_path();
     &make_dir_part($target_srcs_ast_path);
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
     &set_target_srcs_ast($target_srcs_ast_path);
@@ -511,7 +511,7 @@ sub ast_from_so {
 }
 sub loop_ast_from_so {
   my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+  my $target_srcs_ast_path = &target_srcs_ast_path();
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
       my ($ast_path, $undef) = &ast_from_so($cmd_info, $input);
@@ -572,7 +572,7 @@ sub loop_ast_from_dk {
   }
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
     if (0 != @$ast_files) {
-      my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+      my $target_srcs_ast_path = &target_srcs_ast_path();
       &check_path($target_srcs_ast_path);
       &ordered_set_add($$cmd_info{'asts'}, $target_srcs_ast_path, __FILE__, __LINE__);
       my $ast_cmd = {
@@ -600,10 +600,10 @@ sub gen_target {
   my ($cmd_info, $is_defn) = @_;
   #die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
-    my $target_src_path = &target_src_path($cmd_info);
-    my $target_hdr_path =  &target_hdr_path($cmd_info);
+    my $target_src_path = &target_src_path();
+    my $target_hdr_path =  &target_hdr_path();
   }
-  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+  my $target_srcs_ast_path = &target_srcs_ast_path();
   &check_path($target_srcs_ast_path);
   $$cmd_info{'ast'} = $target_srcs_ast_path;
   if (!$is_defn) {
@@ -639,7 +639,7 @@ sub cc_from_dk {
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
     $num_out_of_date_infiles = &cc_from_dk_core1($cc_cmd);
     if ($num_out_of_date_infiles) {
-      my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+      my $target_srcs_ast_path = &target_srcs_ast_path();
     }
     $outfile = $$cc_cmd{'output'};
     &dakota_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
@@ -698,9 +698,9 @@ sub target_from_ast {
   my ($cmd_info, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   die if ! defined $$cmd_info{'opts'}{'target'};
-  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
-  my $target_src_path = &target_src_path($cmd_info);
-  my $target_hdr_path =  &target_hdr_path($cmd_info);
+  my $target_srcs_ast_path = &target_srcs_ast_path();
+  my $target_src_path = &target_src_path();
+  my $target_hdr_path =  &target_hdr_path();
   &check_path($target_srcs_ast_path);
 
   if ($is_defn) {

@@ -704,11 +704,11 @@ sub path_only {
     my $path;
     if (0) {
     } elsif ($$cmd_info{'opts'}{'target'} eq 'ast') {
-      $path = &target_srcs_ast_path($cmd_info);
+      $path = &target_srcs_ast_path();
     } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
-      $path = &target_hdr_path($cmd_info);
+      $path = &target_hdr_path();
     } elsif ($$cmd_info{'opts'}{'target'} eq 'src') {
-      $path = &target_src_path($cmd_info);
+      $path = &target_src_path();
     } else {
       die;
     }
