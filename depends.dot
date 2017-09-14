@@ -5,10 +5,17 @@ digraph {
   "a.dk" [ color = blue ];
   "b.dk" [ color = blue ];
   "c.dk" [ color = blue ];
+  "a.dk.ast" [ color = green ];
+  "b.dk.ast" [ color = green ];
+  "c.dk.ast" [ color = green ];
+  "z/srcs.ast" [ color = green ];
+  "z/inputs.ast" [ color = green ];
   "libx.so" [ color = blue ];
   "liby.so" [ color = blue ];
   "libz.so" [ color = blue ];
-  "z/target.h" [ color = green ];
+  "libx.so.ctlg" [ fontcolor = gray, color = gray ];
+  "liby.so.ctlg" [ fontcolor = gray, color = gray ];
+  "libz.so.ctlg" [ fontcolor = gray, color = gray ];
 
   "z/target.h" -> "z/inputs.ast";
 
