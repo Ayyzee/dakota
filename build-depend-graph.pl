@@ -67,7 +67,7 @@ sub asts {
   my ($inputs) = @_;
   return [ values %$inputs ];
 }
-sub gen_target_hdr_graph {
+sub gen_inputs_ast_graph {
   my ($inputs) = @_;
   my $root = {};
   my ($srcs, $libs) = ({}, {});
@@ -78,14 +78,8 @@ sub gen_target_hdr_graph {
       $$libs{$input} = &ast_path_from_so_path($input);
     }
   }
-  my $target_hdr_node = &add_node($root,
-                                  &target_hdr_path(),
-                                  [ &target_inputs_ast_path() ],
-                                  [ '<cmd>', '--target', 'hdr', '--output', &target_hdr_path(),
-                                    &target_inputs_ast_path() ]);
-  ###
   my $lib_asts = &asts($libs);
-  my $target_inputs_ast_node = &add_node($target_hdr_node,
+  my $target_inputs_ast_node = &add_node($root,
                                          &target_inputs_ast_path(),
                                          [ &target_srcs_ast_path(), @$lib_asts ],
                                          [ '<cmd>', '--merge-ast', '--output', &target_inputs_ast_path(),
@@ -114,7 +108,7 @@ sub gen_target_hdr_graph {
 
 my $inputs = [ split(/\s+/, <STDIN>) ];
 $inputs = [ map { &basename($_) } @$inputs ];
-my $root = &gen_target_hdr_graph($inputs);
+my $root = &gen_inputs_ast_graph($inputs);
 
 if (1) {
   sub dump_dot {
