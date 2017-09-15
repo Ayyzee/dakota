@@ -150,7 +150,7 @@ if (1) {
   }
   print 'digraph {' . $nl;
   print '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
-  print '  node  [ shape = rect, style = rounded, height = 0 ];' . $nl;
+  print '  node  [ shape = rect, style = rounded, height = 0, width = 0, fontname = "courier" ];' . $nl;
   print &dump_dot($root);
   print '}' . $nl;
 
