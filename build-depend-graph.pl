@@ -84,11 +84,12 @@ sub gen_target_hdr_graph {
                                   [ '<cmd>', '--target', 'hdr', '--output', &target_hdr_path(),
                                     &target_inputs_ast_path() ]);
   ###
+  my $lib_asts = &asts($libs);
   my $target_inputs_ast_node = &add_node($target_hdr_node,
                                          &target_inputs_ast_path(),
-                                         [ &target_srcs_ast_path(), @{&asts($libs)} ],
+                                         [ &target_srcs_ast_path(), @$lib_asts ],
                                          [ '<cmd>', '--merge-ast', '--output', &target_inputs_ast_path(),
-                                           &target_srcs_ast_path(), @{&asts($libs)} ]);
+                                           &target_srcs_ast_path(), @$lib_asts ]);
   while (my ($lib, $lib_ast) = each %$libs) {
     &add_node($target_inputs_ast_node,
               $lib_ast,
@@ -96,11 +97,12 @@ sub gen_target_hdr_graph {
               [ '<cmd>', '--parse-ctlg', '--output', $lib_ast, $lib ]);
   }
   ###
+  my $src_asts = &asts($srcs);
   my $target_srcs_ast_node = &add_node($target_inputs_ast_node,
                                        &target_srcs_ast_path(),
-                                       [ @{&asts($srcs)} ],
+                                       [ @$src_asts ],
                                        [ '<cmd>', '--merge-ast', '--output', &target_srcs_ast_path(),
-                                         @{&asts($srcs)} ]);
+                                         @$src_asts ]);
   while (my ($src, $src_ast) = each %$srcs) {
     &add_node($target_srcs_ast_node,
               $src_ast,
