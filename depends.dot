@@ -1,6 +1,6 @@
 digraph {
-  graph [ rankdir = LR, dir = back ];
-  node [ shape = rect, style = rounded, width = 1.4 ];
+  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
+  node [ shape = rect, style = rounded, width = 0, height = 0 ];
 
   "a.dk" [ color = blue ];
   "b.dk" [ color = blue ];

@@ -81,7 +81,7 @@ sub gen_target_hdr_graph {
   my $target_hdr_node = &add_node($root,
                                   &target_hdr_path(),
                                   [ &target_inputs_ast_path() ],
-                                  [ '<cmd>', '--target-hdr', '--output', &target_hdr_path(),
+                                  [ '<cmd>', '--target', 'hdr', '--output', &target_hdr_path(),
                                     &target_inputs_ast_path() ]);
   ###
   my $target_inputs_ast_node = &add_node($target_hdr_node,
@@ -93,7 +93,7 @@ sub gen_target_hdr_graph {
     &add_node($target_inputs_ast_node,
               $lib_ast,
               [ $lib ],
-              [ '<cmd>', '--parse-lib', '--output', $lib_ast, $lib ]);
+              [ '<cmd>', '--parse-ctlg', '--output', $lib_ast, $lib ]);
   }
   ###
   my $target_srcs_ast_node = &add_node($target_inputs_ast_node,
