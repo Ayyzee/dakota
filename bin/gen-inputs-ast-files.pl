@@ -224,6 +224,7 @@ sub start {
   my $build_dir = $ARGV[1];
   $intmd_dir = &dir_part($build_dir) . '/intmd/' . &name_part($build_dir);
   my $parts = $intmd_dir . '/parts.txt';
+  die if ! -e $parts;
   undef $/;
   open(my $fh, '<', $parts);
   my $inputs = [ split(/\s+/, <$fh>) ];
