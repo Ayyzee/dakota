@@ -408,12 +408,12 @@ sub update_kw_arg_generics {
       }
     }
   }
-  my $path = $$asts[-1]; # only update the parts file ast
-  my $ast = &scalar_from_file($path);
   if (scalar keys %$kw_arg_generics) {
+    my $path = $$asts[-1]; # only update the parts file ast
+    my $ast = &scalar_from_file($path);
     $$ast{'kw-arg-generics'} = $kw_arg_generics;
+    &scalar_to_file($path, $ast);
   }
-  &scalar_to_file($path, $ast);
 }
 sub update_target_srcs_ast_from_all_inputs {
   my ($cmd_info, $target_srcs_ast_path) = @_;
@@ -429,7 +429,7 @@ sub update_target_srcs_ast_from_all_inputs {
   $cmd_info = &loop_ast_from_dk($cmd_info);
   &add_visibility_file($target_srcs_ast_path);
 
-  if ($$cmd_info{'asts'}) {
+  if ($$cmd_info{'asts'} && $$cmd_info{'asts'}[-1] eq &target_srcs_ast_path()) {
     &update_kw_arg_generics($$cmd_info{'asts'});
   }
   $$cmd_info{'inputs'} = $$orig{'inputs'};
