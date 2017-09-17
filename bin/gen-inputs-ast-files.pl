@@ -186,6 +186,8 @@ sub dump_dot_recursive {
 sub dump_make {
   my ($node) = @_;
   my $result = '';
+  $result .= '.PHONY: all' . $nl
+    . $nl;
   $result .= 'all:';
   foreach my $input (keys %{$$node{'inputs'}}) {
     $result .= " $input";
