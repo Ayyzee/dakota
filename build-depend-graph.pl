@@ -40,9 +40,6 @@ sub target_srcs_ast_path {
 sub target_inputs_ast_path {
   return &target_path('inputs.ast');
 }
-sub target_hdr_path {
-  return &target_path('target.h');
-}
 sub ast_path_from_dk_path {
   my ($dk_path) = @_;
   return &path($dk_path) . '.ast';
@@ -124,56 +121,76 @@ sub gen_inputs_ast_graph {
   }
   return $root;
 }
-
-my $inputs = [ split(/\s+/, <STDIN>) ];
-$inputs = [ map { &basename($_) } @$inputs ];
-my $root = &gen_inputs_ast_graph($inputs);
-
-if (1) {
-  sub dump_dot {
-    my ($node) = @_;
-    my $result = '';
-    my $output = $$node{'output'};
-    foreach my $input (sort keys %{$$node{'inputs'}}) {
-      if ($$node{'inputs'}{$input}) {
-        $result .= &dump_dot($$node{'inputs'}{$input});
-      } else {
-        $result .= "  \"$input\" [ color = blue ];" . $nl;
-      }
-      if ($output) {
-        $result .= "  \"$output\" -> \"$input\";" . $nl;
-      }
+sub dump_dot {
+  my ($node) = @_;
+  my $result = '';
+  $result .= 'digraph {' . $nl;
+  $result .= '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
+  $result .= '  node  [ shape = rect, style = rounded, height = 0, width = 0 ];' . $nl;
+  $result .= '  node  [ fontnames = ps, fontname = courier ];' . $nl
+    . $nl;
+  $result .= &dump_dot_recursive($node);
+  $result .= '}' . $nl;
+  return $result;
+}
+sub dump_dot_recursive {
+  my ($node) = @_;
+  my $result = '';
+  my $output = $$node{'output'};
+  foreach my $input (sort keys %{$$node{'inputs'}}) {
+    if ($$node{'inputs'}{$input}) {
+      $result .= &dump_dot_recursive($$node{'inputs'}{$input});
+    } else {
+      $result .= "  \"$input\" [ color = blue ];" . $nl;
     }
-    return $result;
-  }
-  sub dump_make {
-    my ($node) = @_;
-    my $result = '';
-    my $output = $$node{'output'};
     if ($output) {
-      $result .= "$output:";
-      foreach my $input (sort keys %{$$node{'inputs'}}) {
-        if ($output) {
-          $result .= " $input";
-        }
-      }
-      $result .= $nl;
-      $result .= "\t" . join(' ', @{$$node{'cmd'}}) . $nl;
+      $result .= "  \"$output\" -> \"$input\";" . $nl;
     }
-    foreach my $input (sort keys %{$$node{'inputs'}}) {
-      if ($$node{'inputs'}{$input}) {
-        $result .= &dump_make($$node{'inputs'}{$input});
-      }
-    }
-    return $result;
   }
-  print 'digraph {' . $nl;
-  print '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
-  print '  node  [ shape = rect, style = rounded, height = 0, width = 0 ];' . $nl;
-  print '  node  [ fontnames = ps, fontname = courier ];' . $nl;
-  print &dump_dot($root);
-  print '}' . $nl;
-
+  return $result;
+}
+sub dump_make {
+  my ($node) = @_;
+  my $result = '';
+  $result .= 'all:';
+  foreach my $input (keys %{$$node{'inputs'}}) {
+    $result .= " $input";
+  }
+  $result .= $nl . $nl;
+  $result .= &dump_make_recursive($node);
+  ###
+  return $result;
+}
+sub dump_make_recursive {
+  my ($node) = @_;
+  my $result = '';
+  my $output = $$node{'output'};
+  if ($output) {
+    $result .= "$output:";
+    foreach my $input (sort keys %{$$node{'inputs'}}) {
+      if ($output) {
+        $result .= " $input";
+      }
+    }
+    $result .= $nl;
+    $result .= "\t" . join(' ', @{$$node{'cmd'}}) . $nl;
+  }
+  foreach my $input (sort keys %{$$node{'inputs'}}) {
+    if ($$node{'inputs'}{$input}) {
+      $result .= &dump_make_recursive($$node{'inputs'}{$input});
+    }
+  }
+  return $result;
+}
+sub start {
+  my ($argv) = @_;
+  my $inputs = [ map { &basename($_) } @$argv ];
+  my $root = &gen_inputs_ast_graph($inputs);
+  print STDOUT &dump_dot($root);
   print STDERR &dump_make($root);
   #print STDERR &Dumper($root);
 }
+unless (caller) {
+  &start(\@ARGV);
+}
+1;
