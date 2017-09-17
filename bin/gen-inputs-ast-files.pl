@@ -18,21 +18,44 @@ $Data::Dumper::Sortkeys =  1;
 $Data::Dumper::Indent =    1;   # default = 2
 
 my $nl = "\n";
-undef $/;
 
 ### <<
+my $source_dir;
+my $intmd_dir;
 sub basename {
   my ($path) = @_;
   my $name = $path =~ s=^(.*/)*(.+)$=$2=r;
   return $name;
 }
+sub path_split {
+  my ($path) = @_;
+  my $parts = [split /\//, $path];
+  my $name = pop @$parts;
+  my $dir = join '/', @$parts;
+  $dir = '.' if $dir eq "";
+  return ($dir, $name);
+}
+sub dir_part {
+  my ($path) = @_;
+  my ($dir, $name) = &path_split($path);
+  return $dir;
+}
+sub name_part {
+  my ($path) = @_;
+  my ($dir, $name) = &path_split($path);
+  return $name;
+}
 sub target_path {
   my ($name) = @_;
-  return 'b/z/' . &basename($name);
+  return $intmd_dir . '/z/' . $name =~ s=^$source_dir/==r;
 }
 sub path {
   my ($name) = @_;
-  return 'b/' . &basename($name);
+  return $intmd_dir . '/' . $name =~ s=^$source_dir/==r;
+}
+sub lib_path {
+  my ($name) = @_;
+  return $intmd_dir . '/' . &basename($name);
 }
 sub target_srcs_ast_path {
   return &target_path('srcs.ast');
@@ -46,11 +69,11 @@ sub ast_path_from_dk_path {
 }
 sub ast_path_from_ctlg_path {
   my ($ctlg_path) = @_;
-  return &path($ctlg_path) . '.ast';
+  return $ctlg_path . '.ast';
 }
 sub ctlg_path_from_so_path {
   my ($so_path) = @_;
-  return &path($so_path) . '.ctlg';
+  return &lib_path($so_path) . '.ctlg';
 }
 ### >>
 sub add_node {
@@ -121,16 +144,27 @@ sub gen_inputs_ast_graph {
   }
   return $root;
 }
+# found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
+sub longest_common_prefix {
+  my $path_prefix = shift;
+  for (@_) {
+    chop $path_prefix while (! /^$path_prefix/);
+  }
+  return $path_prefix;
+}
 sub dump_dot {
   my ($node) = @_;
   my $result = '';
   $result .= 'digraph {' . $nl;
   $result .= '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
   $result .= '  node  [ shape = rect, style = rounded, height = 0, width = 0 ];' . $nl;
-  $result .= '  node  [ fontnames = ps, fontname = courier ];' . $nl
-    . $nl;
+  $result .= $nl;
   $result .= &dump_dot_recursive($node);
   $result .= '}' . $nl;
+  if (1) {
+    my $prefix = &longest_common_prefix($source_dir, $intmd_dir);
+    $result =~ s=$prefix==g; # hack to make the graph less noisy
+  }
   return $result;
 }
 sub dump_dot_recursive {
@@ -158,7 +192,6 @@ sub dump_make {
   }
   $result .= $nl . $nl;
   $result .= &dump_make_recursive($node);
-  ###
   return $result;
 }
 sub dump_make_recursive {
@@ -184,7 +217,15 @@ sub dump_make_recursive {
 }
 sub start {
   my ($argv) = @_;
-  my $inputs = [ map { &basename($_) } @$argv ];
+  die if scalar @$argv != 2;
+  $source_dir =   $ARGV[0];
+  my $build_dir = $ARGV[1];
+  $intmd_dir = &dir_part($build_dir) . '/intmd/' . &name_part($build_dir);
+  my $parts = $intmd_dir . '/parts.txt';
+  undef $/;
+  open(my $fh, '<', $parts);
+  my $inputs = [ split(/\s+/, <$fh>) ];
+  close($fh);
   my $root = &gen_inputs_ast_graph($inputs);
   open(my $dot, '>', 'inputs-ast.dot');
   print $dot &dump_dot($root);
