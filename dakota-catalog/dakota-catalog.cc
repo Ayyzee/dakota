@@ -75,7 +75,7 @@ static FUNC usage(str_t progname, option* options) -> int {
     }
     options++;
   }
-  fprintf(stdout, " <> [...]\n");
+  fprintf(stdout, " <> [<> ...]\n");
   return result;
 }
 static FUNC handle_opts(int* argc, char*** argv) -> void {
