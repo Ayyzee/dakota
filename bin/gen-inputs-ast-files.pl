@@ -114,7 +114,7 @@ sub gen_inputs_ast_graph {
   my $target_inputs_ast_node = &add_node($root,
                                          &target_inputs_ast_path(),
                                          [ &target_srcs_ast_path(), @$lib_asts ],
-                                         [ 'dakota.pm', '--merge', '--output', &target_inputs_ast_path(),
+                                         [ 'dakota', '--action', 'merge', '--output', &target_inputs_ast_path(),
                                            &target_srcs_ast_path(), @$lib_asts ]);
   foreach my $lib (@$libs) {
     my $lib_ctlg = &ctlg_path_from_so_path($lib);
@@ -122,7 +122,7 @@ sub gen_inputs_ast_graph {
     my $lib_ast_node = &add_node($target_inputs_ast_node,
                                  $lib_ast,      # output
                                  [ $lib_ctlg ], # inputs
-                                 [ 'dakota.pm', '--parse', '--output', $lib_ast, $lib_ctlg ]);
+                                 [ 'dakota', '--action', 'parse', '--output', $lib_ast, $lib_ctlg ]);
     my $lib_ctlg_node = &add_node($lib_ast_node,
                                   $lib_ctlg, # output
                                   [ $lib ],  # inputs
@@ -133,14 +133,14 @@ sub gen_inputs_ast_graph {
   my $target_srcs_ast_node = &add_node($target_inputs_ast_node,
                                        &target_srcs_ast_path(),
                                        [ @$src_asts ],
-                                       [ 'dakota.pm', '--merge', '--output', &target_srcs_ast_path(),
+                                       [ 'dakota', '--action', 'merge', '--output', &target_srcs_ast_path(),
                                          @$src_asts ]);
   foreach my $src (@$srcs) {
     my $src_ast = &ast_path_from_dk_path($src);
     my $src_ast_node = &add_node($target_srcs_ast_node,
                                  $src_ast,
                                  [ $src ],
-                                 [ 'dakota.pm', '--parse', '--output', $src_ast, $src ]);
+                                 [ 'dakota', '--action', 'parse', '--output', $src_ast, $src ]);
   }
   return $root;
 }
@@ -229,12 +229,18 @@ sub start {
   my $inputs = [ split(/\s+/, <$fh>) ];
   close($fh);
   my $root = &gen_inputs_ast_graph($inputs);
-  open(my $dot, '>', 'inputs-ast.dot');
-  print $dot &dump_dot($root);
-  close($dot);
-  open(my $mk, '>', 'inputs-ast.mk');
-  print $mk &dump_make($root);
-  close($mk);
+  my $inputs_ast_mk = $intmd_dir . '/inputs-ast.mk';
+  open(my $mk_fh, '>', $inputs_ast_mk);
+  print $mk_fh &dump_make($root);
+  close($mk_fh);
+  print $inputs_ast_mk . $nl;
+  if (1) {
+    my $inputs_ast_dot = $intmd_dir . '/inputs-ast.dot';
+    open(my $dot_fh, '>', $inputs_ast_dot);
+    print $dot_fh &dump_dot($root);
+    close($dot_fh);
+    print $inputs_ast_dot . $nl;
+  }
   #print STDERR &Dumper($root);
 }
 unless (caller) {
