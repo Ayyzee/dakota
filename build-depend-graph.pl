@@ -30,6 +30,10 @@ sub target_path {
   my ($name) = @_;
   return 'b/z/' . &basename($name);
 }
+sub path {
+  my ($name) = @_;
+  return 'b/' . &basename($name);
+}
 sub target_srcs_ast_path {
   return &target_path('srcs.ast');
 }
@@ -41,11 +45,15 @@ sub target_hdr_path {
 }
 sub ast_path_from_dk_path {
   my ($dk_path) = @_;
-  return 'b/' . &basename($dk_path) . '.ast';
+  return &path($dk_path) . '.ast';
 }
-sub ast_path_from_so_path {
+sub ast_path_from_ctlg_path {
+  my ($ctlg_path) = @_;
+  return &path($ctlg_path) . '.ast';
+}
+sub ctlg_path_from_so_path {
   my ($so_path) = @_;
-  return 'b/' . &basename($so_path) . '.ctlg.ast';
+  return &path($so_path) . '.ctlg';
 }
 ### >>
 sub add_node {
@@ -63,45 +71,56 @@ sub add_node {
   $$current_node{'inputs'}{$output} = $result;
   return $result;
 }
-sub asts {
-  my ($inputs) = @_;
-  return [ values %$inputs ];
+sub src_asts {
+  my ($srcs) = @_;
+  return [ map { &ast_path_from_dk_path($_) } @$srcs ];
+}
+sub lib_asts {
+  my ($libs) = @_;
+  return [ map { &ast_path_from_ctlg_path(&ctlg_path_from_so_path($_)) } @$libs ];
 }
 sub gen_inputs_ast_graph {
   my ($inputs) = @_;
   my $root = {};
-  my ($srcs, $libs) = ({}, {});
+  my ($srcs, $libs) = ([], []);
   foreach my $input (sort @$inputs) {
     if ($input =~ /\.dk$/) {
-      $$srcs{$input} = &ast_path_from_dk_path($input);
+      push @$srcs, $input;
     } else {
-      $$libs{$input} = &ast_path_from_so_path($input);
+      push @$libs, $input;
     }
   }
-  my $lib_asts = &asts($libs);
+  my $lib_asts = &lib_asts($libs);
   my $target_inputs_ast_node = &add_node($root,
                                          &target_inputs_ast_path(),
                                          [ &target_srcs_ast_path(), @$lib_asts ],
-                                         [ '<cmd>', '--merge-ast', '--output', &target_inputs_ast_path(),
+                                         [ 'dakota.pm', '--merge', '--output', &target_inputs_ast_path(),
                                            &target_srcs_ast_path(), @$lib_asts ]);
-  while (my ($lib, $lib_ast) = each %$libs) {
-    &add_node($target_inputs_ast_node,
-              $lib_ast,
-              [ $lib ],
-              [ '<cmd>', '--parse-ctlg', '--output', $lib_ast, $lib ]);
+  foreach my $lib (@$libs) {
+    my $lib_ctlg = &ctlg_path_from_so_path($lib);
+    my $lib_ast = &ast_path_from_ctlg_path($lib_ctlg);
+    my $lib_ast_node = &add_node($target_inputs_ast_node,
+                                 $lib_ast,      # output
+                                 [ $lib_ctlg ], # inputs
+                                 [ 'dakota.pm', '--parse', '--output', $lib_ast, $lib_ctlg ]);
+    my $lib_ctlg_node = &add_node($lib_ast_node,
+                                  $lib_ctlg, # output
+                                  [ $lib ],  # inputs
+                                  [ 'dakota-catalog', '--output', $lib_ctlg, $lib ]);
   }
   ###
-  my $src_asts = &asts($srcs);
+  my $src_asts = &src_asts($srcs);
   my $target_srcs_ast_node = &add_node($target_inputs_ast_node,
                                        &target_srcs_ast_path(),
                                        [ @$src_asts ],
-                                       [ '<cmd>', '--merge-ast', '--output', &target_srcs_ast_path(),
+                                       [ 'dakota.pm', '--merge', '--output', &target_srcs_ast_path(),
                                          @$src_asts ]);
-  while (my ($src, $src_ast) = each %$srcs) {
-    &add_node($target_srcs_ast_node,
-              $src_ast,
-              [ $src ],
-              [ '<cmd>', '--parse-src', '--output', $src_ast, $src ]);
+  foreach my $src (@$srcs) {
+    my $src_ast = &ast_path_from_dk_path($src);
+    my $src_ast_node = &add_node($target_srcs_ast_node,
+                                 $src_ast,
+                                 [ $src ],
+                                 [ 'dakota.pm', '--parse', '--output', $src_ast, $src ]);
   }
   return $root;
 }
@@ -150,7 +169,8 @@ if (1) {
   }
   print 'digraph {' . $nl;
   print '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
-  print '  node  [ shape = rect, style = rounded, height = 0, width = 0, fontname = "courier" ];' . $nl;
+  print '  node  [ shape = rect, style = rounded, height = 0, width = 0 ];' . $nl;
+  print '  node  [ fontnames = ps, fontname = courier ];' . $nl;
   print &dump_dot($root);
   print '}' . $nl;
 
