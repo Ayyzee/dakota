@@ -186,8 +186,12 @@ sub start {
   my ($argv) = @_;
   my $inputs = [ map { &basename($_) } @$argv ];
   my $root = &gen_inputs_ast_graph($inputs);
-  print STDOUT &dump_dot($root);
-  print STDERR &dump_make($root);
+  open(my $dot, '>', 'inputs-ast.dot');
+  print $dot &dump_dot($root);
+  close($dot);
+  open(my $mk, '>', 'inputs-ast.mk');
+  print $mk &dump_make($root);
+  close($mk);
   #print STDERR &Dumper($root);
 }
 unless (caller) {
