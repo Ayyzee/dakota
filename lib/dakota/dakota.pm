@@ -115,24 +115,23 @@ sub loop_merged_ast_from_inputs {
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
       ($ast_path, $ast) = &ast_from_dk($input);
-      die if ! $ast_path;
-      &check_path($ast_path);
-      $root_ast_path = $ast_path;
-      &add_last($ast_files, $ast_path); # _from_dk_src_path
     } elsif (&is_ast_path($input)) {
-      $ast = &scalar_from_file($input);
-      $root_ast_path = $input;
-      &add_last($ast_files, $input);
+      $ast_path = $input;
+      $ast = &scalar_from_file($ast_path);
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
+    $root_ast_path = $ast_path;
+    &add_last($ast_files, $ast_path);
   }
-  if ($$cmd_info{'opts'}{'output'}) { # z/srcs.ast ($target_srcs_ast)
-    if (1 == @{$$cmd_info{'inputs'}}) {
-      &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
-    } elsif (1 < @{$$cmd_info{'inputs'}}) {
+  if ($$cmd_info{'opts'}{'output'}) {
+    if ($$cmd_info{'opts'}{'output'} eq &target_srcs_ast_path()) { # z/srcs.ast ($target_srcs_ast)
       my $should_translate;
       &ast_merge($$cmd_info{'opts'}{'output'}, $ast_files, $should_translate = 0);
+    } elsif (1 == @{$$cmd_info{'inputs'}}) {
+      &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
+    } else {
+      die;
     }
   }
 } # loop_merged_ast_from_inputs
@@ -453,6 +452,18 @@ sub ordered_cc_paths {
   }
   return $ordered_cc_paths;
 }
+sub asts_from_parts {
+  my ($paths) = @_;
+  my $asts = [];
+  foreach my $path (@$paths) {
+    if (&is_so_path($path)) {
+      my $ast_path = &ast_path_from_ctlg_path(&ctlg_path_from_so_path($path));
+      &add_last($asts, $ast_path);
+    }
+  }
+  &add_last($asts, &target_srcs_ast_path());
+  return $asts;
+}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
@@ -467,6 +478,7 @@ sub start_cmd {
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
     &set_target_srcs_ast($target_srcs_ast_path);
   }
+  $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
   #exit 1;
   if ($$cmd_info{'opts'}{'target'}) {
     if (0) {
