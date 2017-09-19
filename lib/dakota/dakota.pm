@@ -467,7 +467,7 @@ sub asts_from_parts {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  $$cmd_info{'asts'} = [] if ! $$cmd_info{'asts'}; ### not ideal
+  my $asts = &asts_from_parts($$cmd_info{'parts'});
   $root_cmd = $cmd_info;
   $intmd_dir = &intmd_dir();
   my $ordered_cc_paths = [];
@@ -477,8 +477,9 @@ sub start_cmd {
     &make_dir_part($target_srcs_ast_path);
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
     &set_target_srcs_ast($target_srcs_ast_path);
+    &target_inputs_ast($asts);
   #}
-  $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+  $$cmd_info{'asts'} = &asts_from_parts($asts);
   #exit 1;
   if ($$cmd_info{'opts'}{'target'}) {
     if (0) {
