@@ -1384,6 +1384,7 @@ sub write_filestr_to_file {
   print FILE $filestr;
   flock FILE, LOCK_UN or die;
   close FILE            or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
+  #print STDERR "written: $file" . $nl;
 }
 sub echo_output_path {
   my ($file, $filestr_sig, $filestr) = @_;
@@ -1403,7 +1404,17 @@ sub echo_output_path {
 }
 sub filestr_to_file {
   my ($filestr, $file, $should_echo) = @_;
-  &write_filestr_to_file($filestr, $file);
+  my $filestr_sig = &digsig($filestr);
+  if (-e $file) {
+    my $output_filestr_sig = &digsig(&filestr_from_file($file));
+    if ($output_filestr_sig ne $filestr_sig) {
+      &write_filestr_to_file($filestr, $file);
+    } else {
+      #print STDERR "not written: $file" . $nl;
+    }
+  } else {
+    &write_filestr_to_file($filestr, $file);
+  }
   if (0) {
     my $filestr_sig = &digsig($filestr);
     my $file_md5 = "$file.md5";
