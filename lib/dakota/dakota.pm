@@ -473,12 +473,10 @@ sub start_cmd {
   my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   #if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
-  if (1) {
     my $target_srcs_ast_path = &target_srcs_ast_path();
     &make_dir_part($target_srcs_ast_path);
-    $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
+    $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
     &set_target_srcs_ast($target_srcs_ast_path);
-  }
   #}
   $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
   #exit 1;
@@ -486,10 +484,13 @@ sub start_cmd {
     if (0) {
     } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
       &gen_target_hdr($cmd_info);
+      #exit 1;
     } elsif ($$cmd_info{'opts'}{'target'} eq 'src') {
+      #exit 1;
       &gen_target_src($cmd_info);
     }
   } else {
+    #exit 1;
     $cmd_info = &loop_cc_from_dk($cmd_info);
     $ordered_cc_paths = &ordered_cc_paths($$cmd_info{'inputs'});
   }
