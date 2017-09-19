@@ -393,27 +393,6 @@ sub gcc_library_from_library_name {
     return "-l$library_name";
   }
 }
-sub update_kw_arg_generics {
-  my ($asts) = @_;
-  my $kw_arg_generics = {};
-  foreach my $path (@$asts) {
-    my $ast = &scalar_from_file($path);
-    my $tbl = $$ast{'kw-arg-generics'};
-    if ($tbl) {
-      while (my ($name, $params_tbl) = each(%$tbl)) {
-        while (my ($params_str, $params) = each(%$params_tbl)) {
-          $$kw_arg_generics{$name}{$params_str} = $params;
-        }
-      }
-    }
-  }
-  if (scalar keys %$kw_arg_generics) {
-    my $path = $$asts[-1]; # only update the parts file ast
-    my $ast = &scalar_from_file($path);
-    $$ast{'kw-arg-generics'} = $kw_arg_generics;
-    &scalar_to_file($path, $ast);
-  }
-}
 sub update_target_srcs_ast_from_all_inputs {
   my ($cmd_info, $target_srcs_ast_path) = @_;
   my $orig = { 'inputs' => $$cmd_info{'inputs'},
@@ -427,10 +406,6 @@ sub update_target_srcs_ast_from_all_inputs {
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_dk($cmd_info);
   &add_visibility_file($target_srcs_ast_path);
-
-  if ($$cmd_info{'asts'} && $$cmd_info{'asts'}[-1] eq &target_srcs_ast_path()) {
-    &update_kw_arg_generics($$cmd_info{'asts'});
-  }
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'opts'} =   $$orig{'opts'};
   if (exists $$orig{'output'}) {
