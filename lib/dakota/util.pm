@@ -1311,7 +1311,9 @@ sub split_path {
 }
 sub deep_copy {
   my ($ref) = @_;
-  return eval &Dumper($ref);
+  my $result = eval &Dumper($ref);
+  die if ! $result;
+  return $result;
 }
 sub do_json {
   my ($path) = @_;
@@ -1319,7 +1321,9 @@ sub do_json {
   open(my $fh, "<", $path);
   my $str = <$fh>;
   close($fh);
-  return eval($str);
+  my $result = eval($str);
+  die if ! $result;
+  return $result;
 }
 sub remove_name_va_scope {
   my ($method) = @_;
@@ -1438,6 +1442,7 @@ sub scalar_from_file {
   die if ! -e $file;
   my $filestr = &filestr_from_file($file);
   my $result = eval $filestr;
+  die if ! $result;
   return $result;
 }
 sub xxx_from_yaml_file {
