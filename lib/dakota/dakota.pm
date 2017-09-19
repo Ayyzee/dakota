@@ -106,9 +106,9 @@ sub loop_merged_ast_from_inputs {
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   &init_ast_from_inputs_vars($cmd_info);
-  my $ast_files = [];
+  my $asts = [];
   if ($$cmd_info{'asts'}) {
-    $ast_files = $$cmd_info{'asts'};
+    $asts = $$cmd_info{'asts'};
   }
   my ($ast_path, $ast);
   my $root_ast_path;
@@ -122,12 +122,12 @@ sub loop_merged_ast_from_inputs {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
     $root_ast_path = $ast_path;
-    &add_last($ast_files, $ast_path);
+    &add_last($asts, $ast_path);
   }
   if ($$cmd_info{'opts'}{'output'}) {
     if ($$cmd_info{'opts'}{'output'} eq &target_srcs_ast_path()) { # z/srcs.ast ($target_srcs_ast)
       my $should_translate;
-      &ast_merge($$cmd_info{'opts'}{'output'}, $ast_files, $should_translate = 0);
+      &ast_merge($$cmd_info{'opts'}{'output'}, $asts, $should_translate = 0);
     } elsif (1 == @{$$cmd_info{'inputs'}}) {
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } else {
@@ -322,11 +322,9 @@ sub cc_from_dk_core2 {
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   my $inputs = [];
-  my $asts;
+  my $asts = [];
   if ($$cmd_info{'asts'}) {
     $asts = $$cmd_info{'asts'};
-  } else {
-    $asts = [];
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_ast_path($input)) {
@@ -546,7 +544,7 @@ sub ast_from_inputs {
 }
 sub loop_ast_from_dk {
   my ($cmd_info) = @_;
-  my $ast_files = [];
+  my $asts = [];
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
       my $ast_path = &ast_path_from_dk_path($input);
@@ -558,11 +556,11 @@ sub loop_ast_from_dk {
         'inputs' => [ $input ],
       };
       &ast_from_inputs($ast_cmd);
-      &ordered_set_add($ast_files, $ast_path, __FILE__, __LINE__);
+      &ordered_set_add($asts, $ast_path, __FILE__, __LINE__);
     }
   }
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
-    if (0 != @$ast_files) {
+    if (0 != @$asts) {
       my $target_srcs_ast_path = &target_srcs_ast_path();
       &check_path($target_srcs_ast_path);
       &ordered_set_add($$cmd_info{'asts'}, $target_srcs_ast_path, __FILE__, __LINE__);
@@ -570,7 +568,7 @@ sub loop_ast_from_dk {
         'opts' =>        $$cmd_info{'opts'},
         'io' =>  $$cmd_info{'io'},
         'output' => $target_srcs_ast_path,
-        'inputs' => $ast_files,
+        'inputs' => $asts,
       };
       &ast_from_inputs($ast_cmd); # multiple inputs
     }
