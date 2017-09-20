@@ -1434,13 +1434,17 @@ sub scalar_to_file {
   if (!defined $ref) {
     die __FILE__ . ':' . __LINE__ . ": ERROR: scalar_to_file(\"$file\", \$ref): \$ref undefined" . $nl;
   }
-  my $refstr = '# -*- mode: perl -*-' . $nl . &Dumper($ref);
+  my $refstr = '';
+  if (scalar keys %$ref) {
+    $refstr = '# -*- mode: perl -*-' . $nl . &Dumper($ref);
+  }
   &filestr_to_file($refstr, $file);
 }
 sub scalar_from_file {
   my ($file) = @_;
   die if ! -e $file;
   my $filestr = &filestr_from_file($file);
+  $filestr = '{}' if $filestr eq '';
   my $result = eval $filestr;
   die if ! $result;
   return $result;
