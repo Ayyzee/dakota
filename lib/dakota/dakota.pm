@@ -336,11 +336,11 @@ sub cc_from_dk_core2 {
   $$cmd_info{'asts'} = $asts;
   $$cmd_info{'inputs'} = $inputs;
 
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within cc_from_dk_core2
   my $num_inputs = @{$$cmd_info{'inputs'}};
   if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
   }
+  my $target_inputs_ast = &target_inputs_ast(); # within cc_from_dk_core2
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my $ast_path;
     if (&is_so_path($input)) {
@@ -710,8 +710,6 @@ sub target_from_ast {
   my ($path, $file_basename, $target_srcs_ast) = ($target_src_path, $target_src_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $intmd_dir/
-  # $target_inputs_ast not used, called for side-effect
-  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within target_src_from_ast
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
   $target_srcs_ast = &kw_args_translate($target_srcs_ast);
 
@@ -724,6 +722,7 @@ sub target_from_ast {
   &src::add_extra_keywords($target_srcs_ast);
   &src::add_extra_generics($target_srcs_ast);
 
+  my $target_inputs_ast = &target_inputs_ast(); # within target_src_from_ast
   if ($is_defn) {
     &generate_target_defn($target_src_path, $target_srcs_ast, $target_inputs_ast);
     &dakota_io_assign($$cmd_info{'io'}, 'target-src', $target_src_path);

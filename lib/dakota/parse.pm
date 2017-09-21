@@ -1855,6 +1855,7 @@ sub method {
 my $_target_inputs_ast;
 sub target_inputs_ast {
   my ($asts) = @_;
+ #print STDERR &Dumper($asts) if $asts;
   return $_target_inputs_ast if $_target_inputs_ast;
   my $target_inputs_ast_path = &target_inputs_ast_path();
   if (-e $target_inputs_ast_path) {
