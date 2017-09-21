@@ -446,25 +446,24 @@ sub start_cmd {
   $intmd_dir = &intmd_dir();
   my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
-  if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
-    my $target_srcs_ast_path = &target_srcs_ast_path();
-    &make_dir_part($target_srcs_ast_path);
-    $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
-    $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
-    &target_inputs_ast($$cmd_info{'asts'});
-  } else { $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'}); }
-  #exit 1;
   if ($$cmd_info{'opts'}{'target'}) {
-    if (0) {
-    } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+    # target=hdr
+    if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+      my $target_srcs_ast_path = &target_srcs_ast_path();
+      &make_dir_part($target_srcs_ast_path);
+      $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
+      $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+      &target_inputs_ast($$cmd_info{'asts'});
       &gen_target_hdr($cmd_info);
-      #exit 1;
-    } elsif ($$cmd_info{'opts'}{'target'} eq 'src') {
-      #exit 1;
+    } else {
+      $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+    }
+    # target=src
+    if ($$cmd_info{'opts'}{'target'} eq 'src') {
       &gen_target_src($cmd_info);
     }
   } else {
-    #exit 1;
+    # replace dk-paths with cc-paths
     $cmd_info = &loop_cc_from_dk($cmd_info);
     $ordered_cc_paths = &ordered_cc_paths($$cmd_info{'inputs'});
   }
