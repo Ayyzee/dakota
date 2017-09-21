@@ -450,7 +450,6 @@ sub start_cmd {
     my $target_srcs_ast_path = &target_srcs_ast_path();
     &make_dir_part($target_srcs_ast_path);
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
-    &set_target_srcs_ast($target_srcs_ast_path);
     $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
     &target_inputs_ast($$cmd_info{'asts'});
   #} else { $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'}); }

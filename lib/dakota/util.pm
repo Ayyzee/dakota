@@ -172,7 +172,6 @@ our @EXPORT= qw(
                  root_cmd
                  scalar_from_file
                  scalar_to_file
-                 set_target_srcs_ast
                  set_root_cmd
                  set_src_decl
                  set_src_defn
@@ -779,11 +778,9 @@ sub kw_args_method_sig {
 }
 my $target_srcs_ast;
 sub target_srcs_ast {
-  return $target_srcs_ast;
-}
-sub set_target_srcs_ast {
-  my ($target_srcs_ast_path) = @_;
-  $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
+  if (! $target_srcs_ast) {
+    $target_srcs_ast = &scalar_from_file(&target_srcs_ast_path());
+  }
   return $target_srcs_ast;
 }
 my $gbl_src_file = undef;
