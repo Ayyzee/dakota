@@ -428,7 +428,7 @@ sub ordered_cc_paths {
 # should only be called after all the target asts have been created
 sub asts_from_parts {
   my ($paths) = @_;
-  my $asts = [];
+  my $asts = [ &target_srcs_ast_path() ];
   foreach my $path (@$paths) {
     if (&is_so_path($path)) {
       my $ctlg_path = &ctlg_path_from_so_path($path);
@@ -437,7 +437,6 @@ sub asts_from_parts {
       }
     }
   }
-  &add_last($asts, &target_srcs_ast_path());
   return $asts;
 }
 my $root_cmd;
@@ -570,7 +569,6 @@ sub loop_ast_from_dk {
     if (0 != @$asts) {
       my $target_srcs_ast_path = &target_srcs_ast_path();
       &check_path($target_srcs_ast_path);
-      &ordered_set_add($$cmd_info{'asts'}, $target_srcs_ast_path, __FILE__, __LINE__);
       my $ast_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'io' =>  $$cmd_info{'io'},
