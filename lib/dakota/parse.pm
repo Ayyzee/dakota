@@ -272,6 +272,9 @@ sub ast_merge { # used to create/merge z/srcs.ast and z/inputs.ast
   if (-e $outpath) {
     $ast = &scalar_from_file($outpath);
     if (0 == scalar @$files) {
+      if ($should_translate) {
+        $ast = &kw_args_translate($ast);
+      }
       return $ast;
     }
   }
