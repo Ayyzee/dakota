@@ -99,8 +99,14 @@ my ($id,  $mid,  $bid,  $tid,
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 
+# output=foo.dk.ast, inputs=[foo.dk]
+# or
+# output=xxx.ctlg.ast, inputs=[xxx.ctlg]
+# or
+# output=srcs.ast, inputs=[foo.dk.ast, bar.dk.ast, ...]
 sub loop_merged_ast_from_inputs {
   my ($cmd_info, $should_echo) = @_; 
+  die if ! $$cmd_info{'opts'}{'output'};
   if ($should_echo) {
     print STDERR '  &loop_merged_ast_from_inputs --output ' .
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
@@ -111,7 +117,6 @@ sub loop_merged_ast_from_inputs {
     $asts = $$cmd_info{'asts'};
   }
   my ($ast_path, $ast);
-  my $root_ast_path;
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
       ($ast_path, $ast) = &ast_from_dk($input);
@@ -121,13 +126,12 @@ sub loop_merged_ast_from_inputs {
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
-    $root_ast_path = $ast_path;
     &add_last($asts, $ast_path);
   }
   if ($$cmd_info{'opts'}{'output'}) {
     if ($$cmd_info{'opts'}{'output'} eq &target_srcs_ast_path()) { # z/srcs.ast ($target_srcs_ast)
       my $should_translate;
-      &ast_merge($$cmd_info{'opts'}{'output'}, $asts, $should_translate = 0);
+      &ast_merge(&target_srcs_ast_path(), $asts, $should_translate = 0);
     } elsif (1 == @{$$cmd_info{'inputs'}}) {
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } else {
@@ -362,7 +366,6 @@ sub cc_from_dk_core2 {
     } else {
       $cc_path = "$input_dir/$input_name$cc_ext";
     }
-    my $target_srcs_ast_path = &target_srcs_ast_path();
     my $inc_path = &inc_path_from_dk_path($input);
     my $h_path = $cc_path =~ s/$cc_ext$/$h_ext/r;
     $input = &canon_path($input);
@@ -632,9 +635,6 @@ sub cc_from_dk {
     $$cc_cmd{'asts'} = $$cmd_info{'asts'};
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
     $num_out_of_date_infiles = &cc_from_dk_core1($cc_cmd);
-    if ($num_out_of_date_infiles) {
-      my $target_srcs_ast_path = &target_srcs_ast_path();
-    }
     $outfile = $$cc_cmd{'output'};
     &dakota_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
   }
