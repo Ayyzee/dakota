@@ -1379,7 +1379,7 @@ sub unwrap_seq {
   $seq =~ s/\s+/ /gs;
   return $seq;
 }
-sub write_filestr_to_file {
+sub _filestr_to_file {
   my ($filestr, $file) = @_;
   &make_dir_part($file);
   open FILE, ">", $file or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
@@ -1412,17 +1412,17 @@ sub filestr_to_file {
   if (-e $file) {
     my $output_filestr_sig = &digsig(&filestr_from_file($file));
     if ($output_filestr_sig ne $filestr_sig) {
-      &write_filestr_to_file($filestr, $file);
+      &_filestr_to_file($filestr, $file);
     } else {
       #print STDERR "not written: $file" . $nl;
     }
   } else {
-    &write_filestr_to_file($filestr, $file);
+    &_filestr_to_file($filestr, $file);
   }
   if (0) {
     my $filestr_sig = &digsig($filestr);
     my $file_md5 = "$file.md5";
-    &write_filestr_to_file($filestr_sig . $nl, $file_md5);
+    &_filestr_to_file($filestr_sig . $nl, $file_md5);
     &echo_output_path($file, $filestr_sig, $filestr) if $should_echo;
   }
 }
