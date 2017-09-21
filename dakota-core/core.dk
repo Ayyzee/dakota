@@ -866,7 +866,7 @@ static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   return;
 }
 [[unused]] static func remove-ext(char-t* path) -> char-t* {
-  char-t* dot = strrchr(cast(const char-t*)path, '.');
+  char-t* dot = cast(char-t*)strrchr(cast(const char-t*)path, '.');
   if (dot != nullptr)
     *dot = NUL;
   assert-valid-str(path);
