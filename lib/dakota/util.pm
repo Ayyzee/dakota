@@ -1382,6 +1382,7 @@ sub unwrap_seq {
 sub _filestr_to_file {
   my ($filestr, $file) = @_;
   &make_dir_part($file);
+  #sleep 1;
   open FILE, ">", $file or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
   flock FILE, LOCK_EX or die;
   truncate FILE, 0;
