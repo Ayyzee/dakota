@@ -425,13 +425,16 @@ sub ordered_cc_paths {
   }
   return $ordered_cc_paths;
 }
+# should only be called after all the target asts have been created
 sub asts_from_parts {
   my ($paths) = @_;
   my $asts = [];
   foreach my $path (@$paths) {
     if (&is_so_path($path)) {
-      my $ast_path = &ast_path_from_ctlg_path(&ctlg_path_from_so_path($path));
-      &add_last($asts, $ast_path);
+      my $ctlg_path = &ctlg_path_from_so_path($path);
+      if (-s $ctlg_path) {
+        &add_last($asts, &ast_path_from_ctlg_path($ctlg_path));
+      }
     }
   }
   &add_last($asts, &target_srcs_ast_path());
@@ -440,7 +443,6 @@ sub asts_from_parts {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  my $asts = &asts_from_parts($$cmd_info{'parts'});
   $root_cmd = $cmd_info;
   $intmd_dir = &intmd_dir();
   my $ordered_cc_paths = [];
@@ -450,9 +452,9 @@ sub start_cmd {
     &make_dir_part($target_srcs_ast_path);
     $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
     &set_target_srcs_ast($target_srcs_ast_path);
-    &target_inputs_ast($asts);
-  #}
-  $$cmd_info{'asts'} = &asts_from_parts($asts);
+    $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+    &target_inputs_ast($$cmd_info{'asts'});
+  #} else { $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'}); }
   #exit 1;
   if ($$cmd_info{'opts'}{'target'}) {
     if (0) {
@@ -485,16 +487,19 @@ sub ast_from_so {
   }
   $$ctlg_cmd{'inputs'} = [ $arg ];
   &ctlg_from_so($ctlg_cmd);
-  my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
-  &check_path($ast_path);
-  &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
-  my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$ast_cmd{'output'} = $ast_path;
-  $$ast_cmd{'inputs'} = [ $ctlg_path ];
-  $$ast_cmd{'io'} =  $$cmd_info{'io'};
-  &ast_from_inputs($ast_cmd);
-  if (!$should_write_ctlg_files) {
-    #unlink $ctlg_path;
+  my $ast_path;
+  if (-s $ctlg_path) { # no ast path is created when ctlg path is a zero length file
+    $ast_path = &ast_path_from_ctlg_path($ctlg_path);
+    &check_path($ast_path);
+    &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
+    my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
+    $$ast_cmd{'output'} = $ast_path;
+    $$ast_cmd{'inputs'} = [ $ctlg_path ];
+    $$ast_cmd{'io'} =  $$cmd_info{'io'};
+    &ast_from_inputs($ast_cmd);
+    if (!$should_write_ctlg_files) {
+      #unlink $ctlg_path;
+    }
   }
   return ($ast_path, undef);
 }
@@ -556,7 +561,9 @@ sub loop_ast_from_dk {
         'inputs' => [ $input ],
       };
       &ast_from_inputs($ast_cmd);
-      &ordered_set_add($asts, $ast_path, __FILE__, __LINE__);
+      if (-s $ast_path) {
+        &ordered_set_add($asts, $ast_path, __FILE__, __LINE__);
+      }
     }
   }
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
@@ -619,7 +626,9 @@ sub cc_from_dk {
       $$ast_cmd{'output'} = $ast_path;
       $$ast_cmd{'io'} =  $$cmd_info{'io'};
       &ast_from_inputs($ast_cmd);
-      &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
+      if (-s $ast_path) {
+        &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
+      }
     }
     my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$cc_cmd{'inputs'} = [ $input ];
