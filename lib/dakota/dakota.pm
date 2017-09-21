@@ -452,12 +452,16 @@ sub start_cmd {
   if ($$cmd_info{'opts'}{'target'}) {
     # target=hdr
     if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+      my $start_run = time();
       my $target_srcs_ast_path = &target_srcs_ast_path();
       &make_dir_part($target_srcs_ast_path);
       $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
       $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
       &target_inputs_ast($$cmd_info{'asts'});
       &gen_target_hdr($cmd_info);
+      my $end_run = time();
+      my $run_time = $end_run - $start_run;
+      print "elapsed target=hdr: ${run_time}s" . $nl;
     } else {
       $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
     }
