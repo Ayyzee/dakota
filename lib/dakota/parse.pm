@@ -2302,6 +2302,7 @@ sub ast_from_dk {
 
   my $exported;
   my $ast = &parse_root($gbl_sst_cursor, $exported = 0);
+  &scalar_to_file($ast_path, $ast);
   &add_object_methods_decls($ast);
   #print STDERR &Dumper($ast);
   #print &Dumper(&kw_arg_generics());

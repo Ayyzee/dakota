@@ -133,7 +133,6 @@ sub loop_merged_ast_from_inputs {
       my $should_translate;
       &ast_merge(&target_srcs_ast_path(), $asts, $should_translate = 0);
     } elsif (1 == @{$$cmd_info{'inputs'}}) {
-      &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } else {
       die;
     }
