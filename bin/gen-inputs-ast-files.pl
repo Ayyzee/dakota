@@ -225,20 +225,29 @@ sub start {
   open(my $fh, '<', $parts);
   my $inputs = [ split(/\s+/, <$fh>) ];
   close($fh);
-  my $root = &gen_inputs_ast_graph($inputs);
   my $inputs_ast_mk = $intmd_dir . '/inputs-ast.mk';
-  open(my $mk_fh, '>', $inputs_ast_mk);
-  print $mk_fh &dump_make($root);
-  close($mk_fh);
-  #print $inputs_ast_mk . $nl;
+  my $root = &write_inputs_ast_mk($inputs, $inputs_ast_mk);
   if (1) {
     my $inputs_ast_dot = $intmd_dir . '/inputs-ast.dot';
-    open(my $dot_fh, '>', $inputs_ast_dot);
-    print $dot_fh &dump_dot($root);
-    close($dot_fh);
-    #print $inputs_ast_dot . $nl;
+    &write_inputs_ast_dot($root, $inputs_ast_dot);
   }
   #print STDERR &Dumper($root);
+}
+sub write_inputs_ast_mk {
+  my ($inputs, $output) = @_;
+  my $root = &gen_inputs_ast_graph($inputs);
+  open(my $fh, '>', $output);
+  print $fh &dump_make($root);
+  close($fh);
+  #print $output . $nl;
+  return $root;
+}
+sub write_inputs_ast_dot {
+  my ($root, $output) = @_;
+  open(my $fh, '>', $output);
+  print $fh &dump_dot($root);
+  close($fh);
+  #print $output . $nl;
 }
 unless (caller) {
   &start(\@ARGV);
