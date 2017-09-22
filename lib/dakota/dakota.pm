@@ -406,12 +406,12 @@ sub ordered_cc_paths {
 }
 # should only be called after all the target ast paths have been created
 sub ast_paths_from_parts {
-  my ($paths) = @_;
+  my ($paths, $force) = @_;
   my $ast_paths = [ &target_srcs_ast_path() ];
   foreach my $path (@$paths) {
     if (&is_so_path($path)) {
       my $ctlg_path = &ctlg_path_from_so_path($path);
-      if (-s $ctlg_path) {
+      if (($force && $force != 0) || -s $ctlg_path) {
         &add_last($ast_paths, &ast_path_from_ctlg_path($ctlg_path));
       }
     }
@@ -636,7 +636,7 @@ sub cc_from_dk {
       $$ast_cmd{'output'} = $ast_path;
       $$ast_cmd{'io'} =  $$cmd_info{'io'};
       &ast_from_inputs($ast_cmd);
-      if (-s $ast_path) {
+      if (-s $ast_path) { # only add ast paths that exist and are non-zero length
         &ordered_set_add($$cmd_info{'ast-paths'}, $ast_path, __FILE__, __LINE__);
       }
     }
