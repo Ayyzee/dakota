@@ -2249,12 +2249,16 @@ sub add_object_methods_decls {
   }
 }
 sub ast_from_dk {
-  my ($path) = @_;
-  my $ast_path;
-  if (&is_dk_path($path)) {
-    $ast_path = &ast_path_from_dk_path($path);
-  } elsif (&is_ctlg_path($path)) {
-    $ast_path = &ast_path_from_ctlg_path($path);
+  my ($path, $ast_path) = @_;
+  if (! $ast_path) {
+    if (0) {
+    } elsif (&is_dk_path($path)) {
+      $ast_path = &ast_path_from_dk_path($path);
+    } elsif (&is_ctlg_path($path)) {
+      $ast_path = &ast_path_from_ctlg_path($path);
+    } else {
+      die;
+    }
   }
   $gbl_filename = $path;
   #print STDERR &sst::filestr($gbl_sst);

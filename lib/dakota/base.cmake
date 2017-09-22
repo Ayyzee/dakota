@@ -12,6 +12,7 @@ target_compile_options (${target} PRIVATE
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts) # ${CMAKE_EXECUTABLE_SUFFIX}
+dk_find_program (gen-inputs-ast-files gen-inputs-ast-files.pl)
 
 execute_process (
   COMMAND ${dakota-parts} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
@@ -51,9 +52,17 @@ set_source_files_properties (${target-src} PROPERTIES
 set (target-hdr ${target}.target-hdr)
 # phony target 'target-hdr'
 add_custom_target (${target-hdr}
-  DEPENDS ${parts} ${target-libs}
+  DEPENDS ${parts} ${target-libs} ${target-inputs-ast}
   COMMAND ${CMAKE_CXX_COMPILER} --target hdr
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 add_dependencies (${target} ${target-hdr})
+
+set (target-inputs-ast ${target}.target-inputs-ast)
+# phony target 'target-inputs-ast'
+add_custom_target (${target-inputs-ast}
+  DEPENDS ${parts} ${target-libs}
+  COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  VERBATIM)
+add_dependencies (${target-hdr} ${target-inputs-ast})

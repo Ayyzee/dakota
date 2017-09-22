@@ -237,10 +237,10 @@ sub cxx_argv_from_argv {
   }
   return $cxx_argv;
 }
-sub has_target_opt {
+sub has_target_action_opt {
   my ($argv) = @_;
   foreach my $arg (@$argv) {
-    return 1 if $arg =~ /^--target(=.*)?$/;
+    return 1 if $arg =~ /^--(target|action)(=.*)?$/;
   }
   return 0;
 }
@@ -308,6 +308,7 @@ sub cmd_info_from_argv {
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
                        'path-only',
+                       'action=s', 'output=s', # output only used for action=parse and action=merge
                        'target=s',
                        'var=s',
                        #'clean', # make target like
@@ -322,14 +323,16 @@ sub exec_cmd_info {
   if (! $ENV{'intmd_dir'}) {
     $ENV{'intmd_dir'} = &intmd_dir_from_build_dir(&build_dir());
   }
-  &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
-  $$root_cmd{'parts'} = &parts(&parts_path());
-  &set_root_cmd($root_cmd);
-  my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
+  if (! $$root_cmd{'opts'}{'action'}) {
+    &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
+    $$root_cmd{'parts'} = &parts(&parts_path());
+    &set_root_cmd($root_cmd);
+    my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
 
-  if ($$root_cmd{'opts'}{'clean'}) {
-    &clean($root_cmd, $dakota_io_path, $dakota_io);
-    exit 0;
+    if ($$root_cmd{'opts'}{'clean'}) {
+      &clean($root_cmd, $dakota_io_path, $dakota_io);
+      exit 0;
+    }
   }
   #print STDERR "root_cmd{'opts'}: " . &Dumper($$root_cmd{'opts'});
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
@@ -337,7 +340,7 @@ sub exec_cmd_info {
 }
 sub start {
   my ($argv) = @_;
-  if (&has_target_opt($argv)) { # --target=ast, --target=hdr, --target=src
+  if (&has_target_action_opt($argv)) { # --target=ast, --target=hdr, --target=src, --action=parse, --action=merge
     my $cmd_info = &cmd_info_from_argv($argv);
     my $ordered_cc_paths = &exec_cmd_info($cmd_info); # -> start_cmd()
   } else { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o

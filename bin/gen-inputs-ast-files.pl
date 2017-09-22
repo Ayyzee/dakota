@@ -236,11 +236,9 @@ sub start {
     open(my $dot_fh, '>', $inputs_ast_dot);
     print $dot_fh &dump_dot($root);
     close($dot_fh);
-    print $inputs_ast_dot . $nl;
+    #print $inputs_ast_dot . $nl;
   }
   #print STDERR &Dumper($root);
-  my $ret_val = system(('make', '-f', $inputs_ast_mk));
-  exit 1 if $ret_val;
 }
 unless (caller) {
   &start(\@ARGV);

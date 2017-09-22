@@ -26,6 +26,7 @@ package dakota::dakota;
 
 use strict;
 use warnings;
+use Time::HiRes;
 use Cwd;
 use Fcntl qw(:DEFAULT :flock);
 use sort 'stable';
@@ -393,30 +394,6 @@ sub gcc_library_from_library_name {
     return "-l$library_name";
   }
 }
-sub update_target_srcs_ast_from_all_inputs {
-  my ($cmd_info, $target_srcs_ast_path) = @_;
-  my $orig = { 'inputs' => $$cmd_info{'inputs'},
-               'opts' =>   &deep_copy($$cmd_info{'opts'}),
-             };
-  if (exists $$cmd_info{'output'}) {
-    $$orig{'output'} = $$cmd_info{'output'},
-  }
-  $$cmd_info{'inputs'} = $$cmd_info{'parts'},
-  &check_path($target_srcs_ast_path);
-  $cmd_info = &loop_ast_from_so($cmd_info);
-  $cmd_info = &loop_ast_from_dk($cmd_info);
-  &add_visibility_file($target_srcs_ast_path);
-  $$cmd_info{'inputs'} = $$orig{'inputs'};
-  $$cmd_info{'opts'} =   $$orig{'opts'};
-  if (exists $$orig{'output'}) {
-    $$cmd_info{'output'} = $$orig{'output'};
-  }
-
-  if ($ENV{'DAKOTA_CREATE_AST_ONLY'}) {
-    exit 0;
-  }
-  return $cmd_info;
-}
 sub ordered_cc_paths {
   my ($seq) = @_;
   my $ordered_cc_paths = [];
@@ -441,33 +418,109 @@ sub asts_from_parts {
   }
   return $asts;
 }
+sub asts_from_inputs {
+  my ($inputs) = @_;
+  my $srcs_ast;
+  my $asts = [];
+  foreach my $input (@$inputs) {
+    if ($input =~ /\.ctlg\.ast$/) {
+      &add_last($asts, $input);
+    } elsif ($input =~ /srcs\.ast$/) {
+      $srcs_ast = $input;
+    }
+  }
+  die if ! $srcs_ast;
+  &add_last($asts, $srcs_ast);
+  return $asts;
+}
+sub is_target_inputs_ast_path {
+  my ($path) = @_;
+  return $path eq &target_inputs_ast_path();
+}
+sub cmd_line_action_parse {
+  my ($input, $output) = @_;
+  my ($ast_path, $ast) = &ast_from_dk($input, $output);
+}
+sub cmd_line_action_merge {
+  my ($inputs, $output) = @_;
+  my $output_base = &name_part($output);
+  die if $output_base ne 'srcs.ast' && $output_base ne 'inputs.ast';
+  if ($output_base eq 'inputs.ast') {
+    my $asts = &asts_from_inputs($inputs);
+    #&update_kw_arg_generics($asts); # ctlg.ast first, then srcs.ast
+  }
+  my $should_translate = ($output_base eq 'inputs.ast');
+  &ast_merge($output, $inputs, $should_translate);
+  if ($output_base eq 'srcs.ast') {
+    &add_visibility_file($output);
+  }
+}
+sub num_cpus {
+  my $result = `getconf _NPROCESSORS_ONLN`;
+  chomp $result;
+  return $result;
+}
+sub gen_target_ast {
+  my ($cmd_info) = @_;
+  my $inputs_ast_mk = $intmd_dir . '/inputs-ast.mk';
+  my $jobs = &num_cpus() + 2;
+  my $exit_val = &verbose_exec(['make', '-s', '-j', $jobs, '-f', $inputs_ast_mk]);
+  exit 1 if $exit_val;
+}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
+  my $ordered_cc_paths = [];
+  if ($$cmd_info{'opts'}{'action'}) {
+    if (0) {
+    } elsif ($$cmd_info{'opts'}{'action'} eq 'parse') {
+      die if scalar @{$$cmd_info{'inputs'}} != 1;
+      &cmd_line_action_parse($$cmd_info{'inputs'}[0], $$cmd_info{'opts'}{'output'});
+    } elsif ($$cmd_info{'opts'}{'action'} eq 'merge') {
+      die if scalar @{$$cmd_info{'inputs'}} == 0;
+      my $t0 = Time::HiRes::time();
+      &cmd_line_action_merge($$cmd_info{'inputs'}, $$cmd_info{'opts'}{'output'});
+      my $t1 = Time::HiRes::time();
+      my $run_time = $t1 - $t0;
+      #printf "elapsed action=merge: %.1fs\n", $run_time;
+    }
+    return $ordered_cc_paths = [];
+  }
   $root_cmd = $cmd_info;
   $intmd_dir = &intmd_dir();
-  my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'opts'}{'target'}) {
+    # target=ast
+    if ($$cmd_info{'opts'}{'target'} eq 'ast') {
+      my $t0 = Time::HiRes::time();
+      &gen_target_ast($cmd_info);
+      my $t1 = Time::HiRes::time();
+      printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
+      return $ordered_cc_paths = [];
+    }
     # target=hdr
     if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
-      my $start_run = time();
-      my $target_srcs_ast_path = &target_srcs_ast_path();
-      &make_dir_part($target_srcs_ast_path);
-      $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
+      my $t0 = Time::HiRes::time();
+      &gen_target_ast($cmd_info);
+      my $t1 = Time::HiRes::time();
+      printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
+
       $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
-      &target_inputs_ast($$cmd_info{'asts'});
       &gen_target_hdr($cmd_info);
-      my $end_run = time();
-      my $run_time = $end_run - $start_run;
-      print "elapsed target=hdr: ${run_time}s" . $nl;
-    } else {
-      $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+      my $t2 = Time::HiRes::time();
+      printf "elapsed target=hdr: %.1fs\n", $t2 - $t1;
+      return $ordered_cc_paths = [];
     }
     # target=src
     if ($$cmd_info{'opts'}{'target'} eq 'src') {
+      my $t0 = Time::HiRes::time();
+      $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
       &gen_target_src($cmd_info);
+      my $t1 = Time::HiRes::time();
+      printf "elapsed target=src: %.1fs\n", $t1 - $t0;
+      return $ordered_cc_paths = [];
     }
+    die;
   } else {
     # replace dk-paths with cc-paths
     $cmd_info = &loop_cc_from_dk($cmd_info);
@@ -506,16 +559,6 @@ sub ast_from_so {
   }
   return ($ast_path, undef);
 }
-sub loop_ast_from_so {
-  my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_srcs_ast_path();
-  foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if (&is_so_path($input)) {
-      my ($ast_path, $undef) = &ast_from_so($cmd_info, $input);
-    }
-  }
-  return $cmd_info;
-} # loop_ast_from_so
 sub check_path {
   my ($path) = @_;
   die if $path =~ m=^build/build/=;
@@ -550,40 +593,6 @@ sub ast_from_inputs {
     }
   }
 }
-sub loop_ast_from_dk {
-  my ($cmd_info) = @_;
-  my $asts = [];
-  foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if (&is_dk_src_path($input)) {
-      my $ast_path = &ast_path_from_dk_path($input);
-      &check_path($ast_path);
-      my $ast_cmd = {
-        'opts' =>        $$cmd_info{'opts'},
-        'io' =>  $$cmd_info{'io'},
-        'output' => $ast_path,
-        'inputs' => [ $input ],
-      };
-      &ast_from_inputs($ast_cmd);
-      if (-s $ast_path) {
-        &ordered_set_add($asts, $ast_path, __FILE__, __LINE__);
-      }
-    }
-  }
-  if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'target'} eq 'hdr') {
-    if (0 != @$asts) {
-      my $target_srcs_ast_path = &target_srcs_ast_path();
-      &check_path($target_srcs_ast_path);
-      my $ast_cmd = {
-        'opts' =>        $$cmd_info{'opts'},
-        'io' =>  $$cmd_info{'io'},
-        'output' => $target_srcs_ast_path,
-        'inputs' => $asts,
-      };
-      &ast_from_inputs($ast_cmd); # multiple inputs
-    }
-  }
-  return $cmd_info;
-} # loop_ast_from_dk
 sub gen_target_hdr {
   my ($cmd_info) = @_;
   my $is_defn;
