@@ -114,33 +114,31 @@ sub gen_inputs_ast_graph {
   my $target_inputs_ast_node = &add_node($root,
                                          &target_inputs_ast_path(),
                                          [ &target_srcs_ast_path(), @$lib_asts ],
-                                         [ 'dakota', '--action', 'merge', '--output', &target_inputs_ast_path(),
-                                           &target_srcs_ast_path(), @$lib_asts ]);
+                                         [ 'dakota', '--action', 'merge', '--output', '$@', '$?' ]);
   foreach my $lib (@$libs) {
     my $lib_ctlg = &ctlg_path_from_so_path($lib);
     my $lib_ast = &ast_path_from_ctlg_path($lib_ctlg);
     my $lib_ast_node = &add_node($target_inputs_ast_node,
                                  $lib_ast,      # output
                                  [ $lib_ctlg ], # inputs
-                                 [ 'dakota', '--action', 'parse', '--output', $lib_ast, $lib_ctlg ]);
+                                 [ 'dakota', '--action', 'parse', '--output', '$@', '$<' ]);
     my $lib_ctlg_node = &add_node($lib_ast_node,
                                   $lib_ctlg, # output
                                   [ $lib ],  # inputs
-                                  [ 'dakota-catalog', '--output', $lib_ctlg, $lib ]);
+                                  [ 'dakota-catalog', '--output', '$@', '$<' ]);
   }
   ###
   my $src_asts = &src_asts($srcs);
   my $target_srcs_ast_node = &add_node($target_inputs_ast_node,
                                        &target_srcs_ast_path(),
                                        [ @$src_asts ],
-                                       [ 'dakota', '--action', 'merge', '--output', &target_srcs_ast_path(),
-                                         @$src_asts ]);
+                                       [ 'dakota', '--action', 'merge', '--output', '$@', '$?' ]);
   foreach my $src (@$srcs) {
     my $src_ast = &ast_path_from_dk_path($src);
     my $src_ast_node = &add_node($target_srcs_ast_node,
                                  $src_ast,
                                  [ $src ],
-                                 [ 'dakota', '--action', 'parse', '--output', $src_ast, $src ]);
+                                 [ 'dakota', '--action', 'parse', '--output', '$@', '$<' ]);
   }
   return $root;
 }
@@ -201,13 +199,10 @@ sub dump_make_recursive {
   my $result = '';
   my $output = $$node{'output'};
   if ($output) {
-    $result .= "$output:";
-    foreach my $input (sort keys %{$$node{'inputs'}}) {
-      if ($output) {
-        $result .= " $input";
-      }
-    }
-    $result .= $nl;
+    my $num_inputs = scalar keys %{$$node{'inputs'}};
+    my $d = " \\\n";
+    $result .= "$output:" . $d;
+    $result .= join($d, sort keys %{$$node{'inputs'}}) . $nl;
     $result .= "\t" . join(' ', @{$$node{'cmd'}}) . $nl;
   }
   foreach my $input (sort keys %{$$node{'inputs'}}) {
@@ -222,9 +217,9 @@ sub start {
   die if scalar @$argv != 2;
   $source_dir =   $ARGV[0];
   my $build_dir = $ARGV[1];
-  $intmd_dir = &dir_part($build_dir) . '/intmd/' . &name_part($build_dir);
+  $intmd_dir = &dir_part(&dir_part($build_dir)) . '/intmd/' . &name_part($build_dir);
   my $parts = $intmd_dir . '/parts.txt';
-  die if ! -e $parts;
+  die &name_part($0) . ": error: missing $parts" . $nl if ! -e $parts;
   undef $/;
   open(my $fh, '<', $parts);
   my $inputs = [ split(/\s+/, <$fh>) ];
@@ -234,7 +229,7 @@ sub start {
   open(my $mk_fh, '>', $inputs_ast_mk);
   print $mk_fh &dump_make($root);
   close($mk_fh);
-  print $inputs_ast_mk . $nl;
+  #print $inputs_ast_mk . $nl;
   if (1) {
     my $inputs_ast_dot = $intmd_dir . '/inputs-ast.dot';
     open(my $dot_fh, '>', $inputs_ast_dot);
@@ -243,6 +238,7 @@ sub start {
     print $inputs_ast_dot . $nl;
   }
   #print STDERR &Dumper($root);
+  system(('make', '-f', $inputs_ast_mk)) or die;
 }
 unless (caller) {
   &start(\@ARGV);
