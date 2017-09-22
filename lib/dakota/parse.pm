@@ -2249,14 +2249,14 @@ sub add_object_methods_decls {
   }
 }
 sub ast_from_dk {
-  my ($arg) = @_;
+  my ($path) = @_;
   my $ast_path;
-  if (&is_dk_path($arg)) {
-    $ast_path = &ast_path_from_dk_path($arg);
-  } elsif (&is_ctlg_path($arg)) {
-    $ast_path = &ast_path_from_ctlg_path($arg);
+  if (&is_dk_path($path)) {
+    $ast_path = &ast_path_from_dk_path($path);
+  } elsif (&is_ctlg_path($path)) {
+    $ast_path = &ast_path_from_ctlg_path($path);
   }
-  $gbl_filename = $arg;
+  $gbl_filename = $path;
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &filestr_from_file($gbl_filename);
   while (m/#(($uint)([uUiI](32|64|128))?)/g) {
