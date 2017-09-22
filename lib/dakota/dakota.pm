@@ -113,9 +113,9 @@ sub loop_merged_ast_from_inputs {
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   &init_ast_from_inputs_vars($cmd_info);
-  my $asts = [];
-  if ($$cmd_info{'asts'}) {
-    $asts = $$cmd_info{'asts'};
+  my $ast_paths = [];
+  if ($$cmd_info{'ast-paths'}) {
+    $ast_paths = $$cmd_info{'ast-paths'};
   }
   my ($ast_path, $ast);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
@@ -127,12 +127,12 @@ sub loop_merged_ast_from_inputs {
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
-    &add_last($asts, $ast_path);
+    &add_last($ast_paths, $ast_path);
   }
   if ($$cmd_info{'opts'}{'output'}) {
     if ($$cmd_info{'opts'}{'output'} eq &target_srcs_ast_path()) { # z/srcs.ast ($target_srcs_ast)
       my $should_translate;
-      &ast_merge(&target_srcs_ast_path(), $asts, $should_translate = 0);
+      &ast_merge(&target_srcs_ast_path(), $ast_paths, $should_translate = 0);
     } elsif (1 == @{$$cmd_info{'inputs'}}) {
     } else {
       die;
@@ -326,18 +326,18 @@ sub cc_from_dk_core2 {
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   my $inputs = [];
-  my $asts = [];
-  if ($$cmd_info{'asts'}) {
-    $asts = $$cmd_info{'asts'};
+  my $ast_paths = [];
+  if ($$cmd_info{'ast-paths'}) {
+    $ast_paths = $$cmd_info{'ast-paths'};
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_ast_path($input)) {
-      &add_last($asts, $input);
+      &add_last($ast_paths, $input);
     } else {
       &add_last($inputs, $input);
     }
   }
-  $$cmd_info{'asts'} = $asts;
+  $$cmd_info{'ast-paths'} = $ast_paths;
   $$cmd_info{'inputs'} = $inputs;
 
   my $num_inputs = @{$$cmd_info{'inputs'}};
@@ -404,34 +404,34 @@ sub ordered_cc_paths {
   }
   return $ordered_cc_paths;
 }
-# should only be called after all the target asts have been created
-sub asts_from_parts {
+# should only be called after all the target ast paths have been created
+sub ast_paths_from_parts {
   my ($paths) = @_;
-  my $asts = [ &target_srcs_ast_path() ];
+  my $ast_paths = [ &target_srcs_ast_path() ];
   foreach my $path (@$paths) {
     if (&is_so_path($path)) {
       my $ctlg_path = &ctlg_path_from_so_path($path);
       if (-s $ctlg_path) {
-        &add_last($asts, &ast_path_from_ctlg_path($ctlg_path));
+        &add_last($ast_paths, &ast_path_from_ctlg_path($ctlg_path));
       }
     }
   }
-  return $asts;
+  return $ast_paths;
 }
-sub asts_from_inputs {
+sub ast_paths_from_inputs {
   my ($inputs) = @_;
   my $srcs_ast;
-  my $asts = [];
+  my $ast_paths = [];
   foreach my $input (@$inputs) {
     if ($input =~ /\.ctlg\.ast$/) {
-      &add_last($asts, $input);
+      &add_last($ast_paths, $input);
     } elsif ($input =~ /srcs\.ast$/) {
       $srcs_ast = $input;
     }
   }
   die if ! $srcs_ast;
-  &add_last($asts, $srcs_ast);
-  return $asts;
+  &add_last($ast_paths, $srcs_ast);
+  return $ast_paths;
 }
 sub is_target_inputs_ast_path {
   my ($path) = @_;
@@ -446,8 +446,7 @@ sub cmd_line_action_merge {
   my $output_base = &name_part($output);
   die if $output_base ne 'srcs.ast' && $output_base ne 'inputs.ast';
   if ($output_base eq 'inputs.ast') {
-    my $asts = &asts_from_inputs($inputs);
-    #&update_kw_arg_generics($asts); # ctlg.ast first, then srcs.ast
+    my $ast_paths = &ast_paths_from_inputs($inputs);
   }
   my $should_translate = ($output_base eq 'inputs.ast');
   &ast_merge($output, $inputs, $should_translate);
@@ -505,7 +504,7 @@ sub start_cmd {
       my $t1 = Time::HiRes::time();
       printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
 
-      $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+      $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_hdr($cmd_info);
       my $t2 = Time::HiRes::time();
       printf "elapsed target=hdr: %.1fs\n", $t2 - $t1;
@@ -514,7 +513,7 @@ sub start_cmd {
     # target=src
     if ($$cmd_info{'opts'}{'target'} eq 'src') {
       my $t0 = Time::HiRes::time();
-      $$cmd_info{'asts'} = &asts_from_parts($$cmd_info{'parts'});
+      $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_src($cmd_info);
       my $t1 = Time::HiRes::time();
       printf "elapsed target=src: %.1fs\n", $t1 - $t0;
@@ -547,7 +546,7 @@ sub ast_from_so {
   if (-s $ctlg_path) { # no ast path is created when ctlg path is a zero length file
     $ast_path = &ast_path_from_ctlg_path($ctlg_path);
     &check_path($ast_path);
-    &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
+    &ordered_set_add($$cmd_info{'ast-paths'}, $ast_path, __FILE__, __LINE__);
     my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$ast_cmd{'output'} = $ast_path;
     $$ast_cmd{'inputs'} = [ $ctlg_path ];
@@ -638,13 +637,13 @@ sub cc_from_dk {
       $$ast_cmd{'io'} =  $$cmd_info{'io'};
       &ast_from_inputs($ast_cmd);
       if (-s $ast_path) {
-        &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
+        &ordered_set_add($$cmd_info{'ast-paths'}, $ast_path, __FILE__, __LINE__);
       }
     }
     my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$cc_cmd{'inputs'} = [ $input ];
     $$cc_cmd{'output'} = $src_path;
-    $$cc_cmd{'asts'} = $$cmd_info{'asts'};
+    $$cc_cmd{'ast-paths'} = $$cmd_info{'ast-paths'};
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
     $num_out_of_date_infiles = &cc_from_dk_core1($cc_cmd);
     $outfile = $$cc_cmd{'output'};
@@ -684,7 +683,7 @@ sub cc_from_dk_core1 {
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cc_cmd{'io'} =  $$cmd_info{'io'};
   $$cc_cmd{'cmd'} = '&cc_from_dk_core2';
-  $$cc_cmd{'asts'} = $$cmd_info{'asts'};
+  $$cc_cmd{'ast-paths'} = $$cmd_info{'ast-paths'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
   $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
@@ -702,7 +701,7 @@ sub target_src_from_ast {
 }
 sub target_from_ast {
   my ($cmd_info, $is_defn) = @_;
-  die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
+  die if ! defined $$cmd_info{'ast-paths'} || 0 == @{$$cmd_info{'ast-paths'}};
   die if ! defined $$cmd_info{'opts'}{'target'};
   my $target_srcs_ast_path = &target_srcs_ast_path();
   my $target_src_path = &target_src_path();

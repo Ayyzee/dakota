@@ -320,7 +320,7 @@ sub argv_from_cmd_info {
   if ($$cmd_info{'output-directory'}) {
     &add_last($argv, ('--output-directory', $$cmd_info{'output-directory'}));
   }
-  foreach my $infile (@{$$cmd_info{'asts'}}) {
+  foreach my $infile (@{$$cmd_info{'ast-paths'}}) {
     &add_last($argv, $infile);
   }
   foreach my $infile (@{$$cmd_info{'inputs'}}) {
@@ -1857,22 +1857,22 @@ sub method {
 }
 my $_target_inputs_ast;
 sub target_inputs_ast {
-  my ($asts) = @_;
- #print STDERR &Dumper($asts) if $asts;
-  die if $asts && $_target_inputs_ast;
+  my ($ast_paths) = @_;
+ #print STDERR &Dumper($ast_paths) if $ast_paths;
+  die if $ast_paths && $_target_inputs_ast;
   return $_target_inputs_ast if $_target_inputs_ast;
   my $target_inputs_ast_path = &target_inputs_ast_path();
   if (-e $target_inputs_ast_path) {
     $_target_inputs_ast = &scalar_from_file($target_inputs_ast_path);
     return $_target_inputs_ast;
   }
-  die if !$asts;
+  die if !$ast_paths;
   if (0) { print STDERR "target_inputs_ast()" . $nl; }
   #my $reinit = 0;
   #if ($_target_inputs_ast) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
   my $should_translate; # create z/inputs.ast from z/srcs.ast and all *.so.ctlg.ast
-  $_target_inputs_ast = &ast_merge($target_inputs_ast_path, $asts, $should_translate = 1);
+  $_target_inputs_ast = &ast_merge($target_inputs_ast_path, $ast_paths, $should_translate = 1);
   #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
   return $_target_inputs_ast;
 }
@@ -1889,7 +1889,7 @@ sub generics::klass_type_from_klass_name { ###
     $klass_type = 'trait';
   } else {
     my $root_cmd = &root_cmd();
-    my $ast_path_var = [join '::', @{$$root_cmd{'asts'}}];
+    my $ast_path_var = [join '::', @{$$root_cmd{'ast-paths'}}];
     die __FILE__, ":", __LINE__,
       ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
@@ -1909,7 +1909,7 @@ sub generics::klass_ast_from_klass_name {
     $klass_ast = $$target_inputs_ast{'traits'}{$klass_name};
   } else {
     my $root_cmd = &root_cmd();
-    my $ast_path_var = [join '::', @{$$root_cmd{'asts'} || []}];
+    my $ast_path_var = [join '::', @{$$root_cmd{'ast-paths'} || []}];
     die __FILE__, ":", __LINE__,
       ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
