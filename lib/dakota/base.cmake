@@ -63,6 +63,6 @@ set (target-inputs-ast ${target}.target-inputs-ast)
 # phony target 'target-inputs-ast'
 add_custom_target (${target-inputs-ast}
   DEPENDS ${parts} ${target-libs}
-  COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 add_dependencies (${target-hdr} ${target-inputs-ast})

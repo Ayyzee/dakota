@@ -461,9 +461,9 @@ sub num_cpus {
 }
 sub gen_target_ast {
   my ($cmd_info) = @_;
-  my $inputs_ast_mk = $intmd_dir . '/inputs-ast.mk';
+  my $inputs_mk = $intmd_dir . '/z/inputs.mk';
   my $jobs = &num_cpus() + 2;
-  my $exit_val = &verbose_exec(['make', '-s', '-j', $jobs, '-f', $inputs_ast_mk]);
+  my $exit_val = &verbose_exec(['make', '-s', '-j', $jobs, '-f', $inputs_mk]);
   exit 1 if $exit_val;
 }
 my $root_cmd;

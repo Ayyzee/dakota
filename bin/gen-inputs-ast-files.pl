@@ -9,6 +9,8 @@
 use strict;
 use warnings;
 
+use Cwd;
+
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
 $Data::Dumper::Deepcopy =  1;
@@ -208,39 +210,47 @@ sub dump_make_recursive {
   }
   return $result;
 }
-sub write_inputs_ast_mk {
-  my ($inputs, $output) = @_;
-  my $root = &gen_inputs_ast_graph($inputs);
+sub write_inputs_mk {
+  my ($root, $output) = @_;
   open(my $fh, '>', $output);
   print $fh &dump_make($root);
   close($fh);
   #print $output . $nl;
-  return $root;
 }
-sub write_inputs_ast_dot {
+sub write_inputs_dot {
   my ($root, $output) = @_;
   open(my $fh, '>', $output);
   print $fh &dump_dot($root);
   close($fh);
   #print $output . $nl;
 }
+sub make_dirname {
+  my ($path) = @_;
+  my $dirname = &dirname($path);
+  `mkdir -p $dirname`;
+}
 sub start {
   my ($argv) = @_;
-  die if scalar @$argv != 2;
-  $source_dir = $ARGV[0];
-  $build_dir =  $ARGV[1];
+  $build_dir =  $$argv[0];
   $intmd_dir = &dirname(&dirname($build_dir)) . '/intmd/' . &basename($build_dir);
+  my $inputs_mk = $intmd_dir . '/z/inputs.mk';
+  &make_dirname($inputs_mk);
+  if (scalar @$argv == 1) { # --path-only
+    print &getcwd() . '/' . $inputs_mk . $nl;
+    exit 0;
+  }
+  $source_dir = $$argv[1];
   my $parts = $intmd_dir . '/parts.txt';
   die &basename($0) . ": error: missing $parts" . $nl if ! -e $parts;
   undef $/;
   open(my $fh, '<', $parts);
   my $inputs = [ split(/\s+/, <$fh>) ];
   close($fh);
-  my $inputs_ast_mk = $intmd_dir . '/inputs-ast.mk';
-  my $root = &write_inputs_ast_mk($inputs, $inputs_ast_mk);
+  my $root = &gen_inputs_ast_graph($inputs);
+  &write_inputs_mk($root, $inputs_mk);
   if (1) {
-    my $inputs_ast_dot = $intmd_dir . '/inputs-ast.dot';
-    &write_inputs_ast_dot($root, $inputs_ast_dot);
+    my $inputs_dot = $intmd_dir . '/z/inputs.dot';
+    &write_inputs_dot($root, $inputs_dot);
   }
   #print STDERR &Dumper($root);
 }
