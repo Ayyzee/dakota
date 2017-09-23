@@ -69,7 +69,6 @@ our @EXPORT= qw(
                  as_literal_symbol
                  as_literal_symbol_interior
                  at
-                 basename
                  build_dir
                  intmd_dir
                  canon_path
@@ -595,11 +594,6 @@ sub dqstr_regex {
 sub sqstr_regex {
 # not-escaped ' .*? not-escaped '
   return qr/(?<!\\)'.*?(?<!\\)'/;
-}
-sub basename {
-  my ($path) = @_;
-  my $result = $path =~ s=^.*/(.+)$=$1=r;
-  return $result;
 }
 sub path_split {
   my ($path) = @_;

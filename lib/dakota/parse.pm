@@ -338,7 +338,7 @@ sub inc_path_from_dk_path {
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
-  $in_path = &basename($in_path);
+  $in_path = &name_part($in_path);
   $in_path =~ s/$so_ext((\.\d+)+)$/$so_ext/;
   my $vers = $1;
   my $out_path = &out_path_from_in_path('ctlg_path_from_so_path', $in_path);
