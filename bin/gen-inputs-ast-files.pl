@@ -208,6 +208,22 @@ sub dump_make_recursive {
   }
   return $result;
 }
+sub write_inputs_ast_mk {
+  my ($inputs, $output) = @_;
+  my $root = &gen_inputs_ast_graph($inputs);
+  open(my $fh, '>', $output);
+  print $fh &dump_make($root);
+  close($fh);
+  #print $output . $nl;
+  return $root;
+}
+sub write_inputs_ast_dot {
+  my ($root, $output) = @_;
+  open(my $fh, '>', $output);
+  print $fh &dump_dot($root);
+  close($fh);
+  #print $output . $nl;
+}
 sub start {
   my ($argv) = @_;
   die if scalar @$argv != 2;
@@ -227,22 +243,6 @@ sub start {
     &write_inputs_ast_dot($root, $inputs_ast_dot);
   }
   #print STDERR &Dumper($root);
-}
-sub write_inputs_ast_mk {
-  my ($inputs, $output) = @_;
-  my $root = &gen_inputs_ast_graph($inputs);
-  open(my $fh, '>', $output);
-  print $fh &dump_make($root);
-  close($fh);
-  #print $output . $nl;
-  return $root;
-}
-sub write_inputs_ast_dot {
-  my ($root, $output) = @_;
-  open(my $fh, '>', $output);
-  print $fh &dump_dot($root);
-  close($fh);
-  #print $output . $nl;
 }
 unless (caller) {
   &start(\@ARGV);
