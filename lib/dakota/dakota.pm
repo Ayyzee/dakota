@@ -443,7 +443,7 @@ sub cmd_line_action_parse {
 }
 sub cmd_line_action_merge {
   my ($inputs, $output) = @_;
-  my $output_base = &name_part($output);
+  my $output_base = &basename($output);
   die if $output_base ne 'srcs.ast' && $output_base ne 'inputs.ast';
   if ($output_base eq 'inputs.ast') {
     my $ast_paths = &ast_paths_from_inputs($inputs);
@@ -715,7 +715,7 @@ sub target_from_ast {
   } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
     return if !&is_out_of_date($target_srcs_ast_path, $target_hdr_path);
   }
-  &make_dir_part($target_src_path, $global_should_echo);
+  &make_dirname($target_src_path, $global_should_echo);
   my ($path, $file_basename, $target_srcs_ast) = ($target_src_path, $target_src_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $intmd_dir/
@@ -748,13 +748,13 @@ sub verbose_exec_cmd_info {
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
-  &make_dir_part($outfile, $should_echo);
+  &make_dirname($outfile, $should_echo);
   my $file_db = {};
   my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile, $file_db);
   my $num_out_of_date_infiles = scalar @$infiles;
   if (0 != $num_out_of_date_infiles) {
     #print STDERR "outfile=$outfile, infiles=[ " . join(' ', @$infiles) . ' ]' . $nl;
-    &make_dir_part($$cmd_info{'output'}, $should_echo);
+    &make_dirname($$cmd_info{'output'}, $should_echo);
     if ($show_outfile_info) {
       print "MK $$cmd_info{'output'}\n";
     }

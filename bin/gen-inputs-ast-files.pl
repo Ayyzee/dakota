@@ -23,11 +23,6 @@ my $nl = "\n";
 my $source_dir;
 my $build_dir;
 my $intmd_dir;
-sub basename {
-  my ($path) = @_;
-  my $name = $path =~ s=^(.*/)*(.+)$=$2=r;
-  return $name;
-}
 sub path_split {
   my ($path) = @_;
   my $parts = [split /\//, $path];
@@ -36,12 +31,12 @@ sub path_split {
   $dir = '.' if $dir eq "";
   return ($dir, $name);
 }
-sub dir_part {
+sub dirname {
   my ($path) = @_;
   my ($dir, $name) = &path_split($path);
   return $dir;
 }
-sub name_part {
+sub basename {
   my ($path) = @_;
   my ($dir, $name) = &path_split($path);
   return $name;
@@ -218,9 +213,9 @@ sub start {
   die if scalar @$argv != 2;
   $source_dir = $ARGV[0];
   $build_dir =  $ARGV[1];
-  $intmd_dir = &dir_part(&dir_part($build_dir)) . '/intmd/' . &name_part($build_dir);
+  $intmd_dir = &dirname(&dirname($build_dir)) . '/intmd/' . &basename($build_dir);
   my $parts = $intmd_dir . '/parts.txt';
-  die &name_part($0) . ": error: missing $parts" . $nl if ! -e $parts;
+  die &basename($0) . ": error: missing $parts" . $nl if ! -e $parts;
   undef $/;
   open(my $fh, '<', $parts);
   my $inputs = [ split(/\s+/, <$fh>) ];

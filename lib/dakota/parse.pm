@@ -338,7 +338,7 @@ sub inc_path_from_dk_path {
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
-  $in_path = &name_part($in_path);
+  $in_path = &basename($in_path);
   $in_path =~ s/$so_ext((\.\d+)+)$/$so_ext/;
   my $vers = $1;
   my $out_path = &out_path_from_in_path('ctlg_path_from_so_path', $in_path);
@@ -566,7 +566,7 @@ sub trait {
   }
   $gbl_current_ast_scope = $$gbl_current_ast_scope{'traits'}{$construct_name};
   $$gbl_current_ast_scope{'module'} = $gbl_current_module;
-  $$gbl_current_ast_scope{'file'} = &name_part($$gbl_sst_cursor{'sst'}{'file'}); # trait scope
+  $$gbl_current_ast_scope{'file'} = &basename($$gbl_sst_cursor{'sst'}{'file'}); # trait scope
 
   my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -834,7 +834,7 @@ sub slots {
         &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
       }
       $$gbl_current_ast_scope{'slots'}{'cat-info'} = [];
-      $$gbl_current_ast_scope{'slots'}{'file'} = &name_part($$gbl_sst_cursor{'sst'}{'file'}); # slots scope
+      $$gbl_current_ast_scope{'slots'}{'file'} = &basename($$gbl_sst_cursor{'sst'}{'file'}); # slots scope
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $slots_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
@@ -1224,7 +1224,7 @@ sub klass {
   }
   $gbl_current_ast_scope = $$gbl_current_ast_scope{'klasses'}{$construct_name};
   $$gbl_current_ast_scope{'module'} = $gbl_current_module;
-  $$gbl_current_ast_scope{'file'} = &name_part($$gbl_sst_cursor{'sst'}{'file'}); # klass scope
+  $$gbl_current_ast_scope{'file'} = &basename($$gbl_sst_cursor{'sst'}{'file'}); # klass scope
 
   my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {

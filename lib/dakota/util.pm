@@ -83,7 +83,7 @@ our @EXPORT= qw(
                  decode_strings
                  deep_copy
                  digsig
-                 dir_part
+                 dirname
                  dk_mangle
                  dk_mangle_seq
                  dmp
@@ -136,13 +136,13 @@ our @EXPORT= qw(
                  kw_args_method_sig
                  last
                  make_dir
-                 make_dir_part
+                 make_dirname
                  max
                  method_sig_regex
                  method_sig_type_regex
                  min
                  mtime
-                 name_part
+                 basename
                  needs_hex_encoding
                  num_kw_args
                  num_kw_arg_names
@@ -603,12 +603,12 @@ sub path_split {
   $dir = '.' if $dir eq "";
   return ($dir, $name);
 }
-sub dir_part {
+sub dirname {
   my ($path) = @_;
   my ($dir, $name) = &path_split($path);
   return $dir;
 }
-sub name_part {
+sub basename {
   my ($path) = @_;
   my ($dir, $name) = &path_split($path);
   return $name;
@@ -637,13 +637,13 @@ sub make_dir {
     exit 1 if $exit_val;
   }
 }
-sub make_dir_part {
+sub make_dirname {
   my ($path, $should_echo) = @_;
-  my $dir_part = &dir_part($path);
-  if ('.' ne $dir_part) {
-    &make_dir($dir_part, $should_echo);
+  my $dirname = &dirname($path);
+  if ('.' ne $dirname) {
+    &make_dir($dirname, $should_echo);
   } elsif (0) {
-    print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
+    print STDERR $0 . ': warning: skipping: make_dirname(' . $path . ')' . $nl;
   }
 }
 sub cxx {
@@ -1372,7 +1372,7 @@ sub unwrap_seq {
 }
 sub _filestr_to_file {
   my ($filestr, $file) = @_;
-  &make_dir_part($file);
+  &make_dirname($file);
   #sleep 1;
   open FILE, ">", $file or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
   flock FILE, LOCK_EX or die;
