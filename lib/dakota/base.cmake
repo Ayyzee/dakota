@@ -29,6 +29,11 @@ add_custom_command (
   VERBATIM)
 
 execute_process (
+  COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
+  OUTPUT_VARIABLE target-inputs-ast
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --target src --path-only
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   OUTPUT_VARIABLE target-src
@@ -38,7 +43,7 @@ target_sources (${target} PRIVATE ${target-src})
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts} ${target-libs}
+  DEPENDS ${parts} ${target-libs} ${target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --target src
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
@@ -59,10 +64,8 @@ add_custom_target (${target-hdr}
   VERBATIM)
 add_dependencies (${target} ${target-hdr})
 
-set (target-inputs-ast ${target}.target-inputs-ast)
-# phony target 'target-inputs-ast'
-add_custom_target (${target-inputs-ast}
+add_custom_command (
+  OUTPUT  ${target-inputs-ast}
   DEPENDS ${parts} ${target-libs}
   COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
-add_dependencies (${target-hdr} ${target-inputs-ast})
