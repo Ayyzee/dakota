@@ -12,7 +12,7 @@ target_compile_options (${target} PRIVATE
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts) # ${CMAKE_EXECUTABLE_SUFFIX}
-dk_find_program (gen-inputs-ast-files gen-inputs-ast-files.pl)
+dk_find_program (gen-target-inputs-ast gen-target-inputs-ast.pl)
 
 execute_process (
   COMMAND ${dakota-parts} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
@@ -29,7 +29,7 @@ add_custom_command (
   VERBATIM)
 
 execute_process (
-  COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
+  COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
   OUTPUT_VARIABLE target-inputs-ast
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -67,5 +67,5 @@ add_dependencies (${target} ${target-hdr})
 add_custom_command (
   OUTPUT  ${target-inputs-ast}
   DEPENDS ${parts} ${target-libs}
-  COMMAND ${gen-inputs-ast-files} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
+  COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
