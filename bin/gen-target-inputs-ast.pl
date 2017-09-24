@@ -236,7 +236,7 @@ sub start {
   my $inputs_mk = $intmd_dir . '/z/inputs.mk';
   &make_dirname($inputs_mk);
   if (scalar @$argv == 1) { # --path-only
-    print &getcwd() . '/' . $inputs_mk . $nl;
+    print $inputs_mk . $nl;
     exit 0;
   }
   $source_dir = $$argv[1];
