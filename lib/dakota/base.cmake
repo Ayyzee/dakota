@@ -19,16 +19,6 @@ execute_process (
   OUTPUT_VARIABLE parts
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-add_custom_command (
-  OUTPUT ${parts}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
-  COMMAND ${dakota-parts} ${CMAKE_CURRENT_BINARY_DIR}
-    ${srcs}
-    ${target-lib-files}
-    ${lib-files}
-  VERBATIM
-  USES_TERMINAL)
-
 execute_process (
   COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
   OUTPUT_VARIABLE target-inputs-ast
@@ -49,7 +39,16 @@ execute_process (
 
 file (RELATIVE_PATH rel-target-hdr ${CMAKE_CURRENT_BINARY_DIR} ${target-hdr})
 
-# generate target-src
+add_custom_command (
+  OUTPUT ${parts}
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
+  COMMAND ${dakota-parts} ${CMAKE_CURRENT_BINARY_DIR}
+    ${srcs}
+    ${target-lib-files}
+    ${lib-files}
+  VERBATIM
+  USES_TERMINAL)
+
 add_custom_command (
   OUTPUT ${target-src}
   DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
