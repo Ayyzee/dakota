@@ -26,8 +26,8 @@ add_custom_command (
     ${srcs}
     ${target-lib-files}
     ${lib-files}
-  COMMENT "Generating ${rel-parts}"
-  VERBATIM)
+  VERBATIM
+  USES_TERMINAL)
 
 execute_process (
   COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
@@ -47,9 +47,7 @@ execute_process (
   OUTPUT_VARIABLE target-hdr
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-file (RELATIVE_PATH rel-parts      ${root-dir} ${parts})
-file (RELATIVE_PATH rel-target-hdr ${root-dir} ${target-hdr})
-file (RELATIVE_PATH rel-target-src ${root-dir} ${target-src})
+file (RELATIVE_PATH rel-target-hdr ${CMAKE_CURRENT_BINARY_DIR} ${target-hdr})
 
 # generate target-src
 add_custom_command (
@@ -58,8 +56,8 @@ add_custom_command (
   COMMAND ${CMAKE_CXX_COMPILER} --target src
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Generating ${rel-target-src}"
-  VERBATIM)
+  VERBATIM
+  USES_TERMINAL)
 set (compile-defns
   DKT_TARGET_FILE="${target-output-file}"
   DKT_TARGET_TYPE="${target-type}")
@@ -74,11 +72,13 @@ add_custom_target (${custom-target-hdr}
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Generating ${rel-target-hdr}"
-  VERBATIM)
+  VERBATIM
+  USES_TERMINAL)
 add_dependencies (${target} ${custom-target-hdr})
 
 add_custom_command (
   OUTPUT  ${target-inputs-ast}
   DEPENDS ${parts} ${target-libs}
   COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
-  VERBATIM)
+  VERBATIM
+  USES_TERMINAL)
