@@ -11,11 +11,12 @@ target_compile_options (${target} PRIVATE
   --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
-dk_find_program (dakota-parts dakota-parts) # ${CMAKE_EXECUTABLE_SUFFIX}
+dk_find_program (dakota-parts dakota-parts.pl)
 dk_find_program (gen-target-inputs-ast gen-target-inputs-ast.pl)
 
 execute_process (
-  COMMAND ${dakota-parts} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
+  COMMAND ${dakota-parts} --path-only
+    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   OUTPUT_VARIABLE parts
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -43,7 +44,8 @@ file (RELATIVE_PATH rel-target-hdr ${CMAKE_CURRENT_BINARY_DIR} ${target-hdr})
 add_custom_command (
   OUTPUT ${parts}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
-  COMMAND ${dakota-parts} ${CMAKE_CURRENT_BINARY_DIR}
+  COMMAND ${dakota-parts}
+    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     ${srcs}
     ${target-lib-files}
     ${lib-files}
