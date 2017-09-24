@@ -8,8 +8,35 @@
 
 use strict;
 use warnings;
-
+use sort 'stable';
 use Cwd;
+
+my $gbl_prefix;
+my $nl = "\n";
+
+sub dk_prefix {
+  my ($path) = @_;
+  $path =~ s|//+|/|;
+  $path =~ s|/\./+|/|;
+  $path =~ s|^./||;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &dk_prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!" . $nl;
+  }
+}
+
+BEGIN {
+  $gbl_prefix = &dk_prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
+};
+use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+
+use dakota::dakota;
+use dakota::parse;
+use dakota::util;
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
@@ -19,61 +46,6 @@ $Data::Dumper::Useqq =     1;
 $Data::Dumper::Sortkeys =  1;
 $Data::Dumper::Indent =    1;   # default = 2
 
-my $nl = "\n";
-
-### <<
-my $source_dir;
-my $build_dir;
-my $intmd_dir;
-sub path_split {
-  my ($path) = @_;
-  my $parts = [split /\//, $path];
-  my $name = pop @$parts;
-  my $dir = join '/', @$parts;
-  $dir = '.' if $dir eq "";
-  return ($dir, $name);
-}
-sub dirname {
-  my ($path) = @_;
-  my ($dir, $name) = &path_split($path);
-  return $dir;
-}
-sub basename {
-  my ($path) = @_;
-  my ($dir, $name) = &path_split($path);
-  return $name;
-}
-sub target_path {
-  my ($name) = @_;
-  return $intmd_dir . '/z/' . $name =~ s=^$source_dir/==r;
-}
-sub path {
-  my ($name) = @_;
-  return $intmd_dir . '/' . $name =~ s=^$source_dir/==r;
-}
-sub lib_path {
-  my ($name) = @_;
-  return $intmd_dir . '/' . &basename($name);
-}
-sub target_srcs_ast_path {
-  return &target_path('srcs.ast');
-}
-sub target_inputs_ast_path {
-  return &target_path('inputs.ast');
-}
-sub ast_path_from_dk_path {
-  my ($dk_path) = @_;
-  return &path($dk_path) . '.ast';
-}
-sub ast_path_from_ctlg_path {
-  my ($ctlg_path) = @_;
-  return $ctlg_path . '.ast';
-}
-sub ctlg_path_from_so_path {
-  my ($so_path) = @_;
-  return &lib_path($so_path) . '.ctlg';
-}
-### >>
 sub add_node {
   my ($current_node,
       $output,
@@ -108,6 +80,8 @@ sub gen_inputs_ast_graph {
       push @$libs, $input;
     }
   }
+  my $build_dir =  &build_dir();
+  my $source_dir = &source_dir();
   my $lib_asts = &lib_asts($libs);
   my $target_inputs_ast_node = &add_node($root,
                                          &target_inputs_ast_path(),
@@ -158,7 +132,7 @@ sub dump_dot {
   $result .= &dump_dot_recursive($node);
   $result .= '}' . $nl;
   if (1) {
-    my $prefix = &longest_common_prefix($source_dir, $intmd_dir);
+    my $prefix = &longest_common_prefix(&source_dir(), &intmd_dir());
     $result =~ s=$prefix==g; # hack to make the graph less noisy
   }
   return $result;
@@ -224,22 +198,20 @@ sub write_inputs_dot {
   close($fh);
   #print $output . $nl;
 }
-sub make_dirname {
-  my ($path) = @_;
-  my $dirname = &dirname($path);
-  `mkdir -p $dirname`;
-}
 sub start {
   my ($argv) = @_;
-  $build_dir =  $$argv[0];
-  $intmd_dir = &dirname(&dirname($build_dir)) . '/intmd/' . &basename($build_dir);
+  my $build_dir =  $$argv[0];
+  $ENV{'build_dir'} = $build_dir;
+  my $intmd_dir = &dirname(&dirname($build_dir)) . '/intmd/' . &basename($build_dir);
+  $ENV{'intmd_dir'} = $intmd_dir;
   my $inputs_mk = $intmd_dir . '/z/inputs.mk';
   &make_dirname($inputs_mk);
   if (scalar @$argv == 1) { # --path-only
     print $inputs_mk . $nl;
     exit 0;
   }
-  $source_dir = $$argv[1];
+  my $source_dir = $$argv[1];
+  $ENV{'source_dir'} = $source_dir;
   my $parts = $intmd_dir . '/parts.txt';
   die &basename($0) . ": error: missing $parts" . $nl if ! -e $parts;
   undef $/;
