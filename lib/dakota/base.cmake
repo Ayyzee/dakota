@@ -26,6 +26,7 @@ add_custom_command (
     ${srcs}
     ${target-lib-files}
     ${lib-files}
+  COMMENT "Generating ${rel-parts}"
   VERBATIM)
 
 execute_process (
@@ -40,13 +41,24 @@ execute_process (
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
 
+execute_process (
+  COMMAND ${CMAKE_CXX_COMPILER} --target hdr --path-only
+    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+  OUTPUT_VARIABLE target-hdr
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+file (RELATIVE_PATH rel-parts      ${root-dir} ${parts})
+file (RELATIVE_PATH rel-target-hdr ${root-dir} ${target-hdr})
+file (RELATIVE_PATH rel-target-src ${root-dir} ${target-src})
+
 # generate target-src
 add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts} ${target-libs} ${target-hdr}
+  DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --target src
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  COMMENT "Generating ${rel-target-src}"
   VERBATIM)
 set (compile-defns
   DKT_TARGET_FILE="${target-output-file}"
@@ -54,15 +66,16 @@ set (compile-defns
 set_source_files_properties (${target-src} PROPERTIES
   COMPILE_DEFINITIONS "${compile-defns}")
 
-set (target-hdr ${target}.target-hdr)
-# phony target 'target-hdr'
-add_custom_target (${target-hdr}
+set (custom-target-hdr ${target}.custom-target-hdr)
+# phony target 'custom-target-hdr'
+add_custom_target (${custom-target-hdr}
   DEPENDS ${parts} ${target-libs} ${target-inputs-ast}
   COMMAND ${CMAKE_CXX_COMPILER} --target hdr
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  COMMENT "Generating ${rel-target-hdr}"
   VERBATIM)
-add_dependencies (${target} ${target-hdr})
+add_dependencies (${target} ${custom-target-hdr})
 
 add_custom_command (
   OUTPUT  ${target-inputs-ast}
