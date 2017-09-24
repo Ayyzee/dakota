@@ -350,10 +350,8 @@ sub cc_from_dk_core2 {
     if (&is_so_path($input)) {
       my $ctlg_path = &ctlg_path_from_so_path($input);
       $ast_path = &ast_path_from_ctlg_path($ctlg_path);
-      &check_path($ast_path);
     } elsif (&is_dk_src_path($input)) {
       $ast_path = &ast_path_from_dk_path($input);
-      &check_path($ast_path);
     } else {
       #print "skipping $input, line=" . __LINE__ . $nl;
     }
@@ -545,7 +543,6 @@ sub ast_from_so {
   my $ast_path;
   if (-s $ctlg_path) { # no ast path is created when ctlg path is a zero length file
     $ast_path = &ast_path_from_ctlg_path($ctlg_path);
-    &check_path($ast_path);
     &ordered_set_add($$cmd_info{'ast-paths'}, $ast_path, __FILE__, __LINE__);
     my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$ast_cmd{'output'} = $ast_path;
@@ -557,11 +554,6 @@ sub ast_from_so {
     }
   }
   return ($ast_path, undef);
-}
-sub check_path {
-  my ($path) = @_;
-  die if $path =~ m=^build/build/=;
-  die if $path =~ m=^build/+{rt|user}/build/=;
 }
 sub ast_from_inputs {
   my ($cmd_info) = @_;
@@ -579,13 +571,10 @@ sub ast_from_inputs {
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
         my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
-        &check_path($ast_path);
       } elsif (&is_dk_path($input)) {
         my $ast_path = &ast_path_from_dk_path($input);
-        &check_path($ast_path);
       } elsif (&is_ctlg_path($input)) {
         my $ast_path = &ast_path_from_ctlg_path($input);
-        &check_path($ast_path);
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
       }
@@ -610,7 +599,6 @@ sub gen_target {
     my $target_hdr_path =  &target_hdr_path();
   }
   my $target_srcs_ast_path = &target_srcs_ast_path();
-  &check_path($target_srcs_ast_path);
   $$cmd_info{'ast'} = $target_srcs_ast_path;
   if (!$is_defn) {
     &target_hdr_from_ast($cmd_info);
@@ -630,7 +618,6 @@ sub cc_from_dk {
     my $src_path = &cc_path_from_dk_path($input);
     my $h_path = &h_path_from_src_path($src_path);
     if (!$want_separate_ast_pass) {
-      &check_path($ast_path);
       my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ast_cmd{'inputs'} = [ $input ];
       $$ast_cmd{'output'} = $ast_path;
@@ -706,7 +693,6 @@ sub target_from_ast {
   my $target_srcs_ast_path = &target_srcs_ast_path();
   my $target_src_path = &target_src_path();
   my $target_hdr_path =  &target_hdr_path();
-  &check_path($target_srcs_ast_path);
 
   if ($is_defn) {
     if ($$cmd_info{'opts'}{'target'} eq 'src') {
@@ -824,7 +810,6 @@ sub precompiled_inputs {
         $input = &canon_path($input);
       } elsif (&is_dk_src_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
-        &check_path($ast_path);
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
       }
