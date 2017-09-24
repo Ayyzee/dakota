@@ -46,6 +46,9 @@ $Data::Dumper::Useqq =     1;
 $Data::Dumper::Sortkeys =  1;
 $Data::Dumper::Indent =    1;   # default = 2
 
+use Getopt::Long qw(GetOptionsFromArray);
+$Getopt::Long::ignorecase = 0;
+
 sub add_node {
   my ($current_node,
       $output,
@@ -113,14 +116,6 @@ sub gen_inputs_ast_graph {
                                  [ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]);
   }
   return $root;
-}
-# found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
-sub longest_common_prefix {
-  my $path_prefix = shift;
-  for (@_) {
-    chop $path_prefix while (! /^$path_prefix/);
-  }
-  return $path_prefix;
 }
 sub dump_dot {
   my ($node) = @_;
@@ -198,20 +193,32 @@ sub write_inputs_dot {
   close($fh);
   #print $output . $nl;
 }
+sub cmd_info_from_argv {
+  my ($argv) = @_;
+  my $root_cmd = {
+    'opts' => {
+    'var' => [],
+    }
+  };
+  &GetOptionsFromArray($argv, $$root_cmd{'opts'},
+                       'path-only',
+                       'var=s',
+                      );
+  $$root_cmd{'inputs'} = $argv; # this should always be empty
+  &set_env_vars($$root_cmd{'opts'}{'var'});
+  delete $$root_cmd{'opts'}{'var'};
+  return $root_cmd;
+}
 sub start {
   my ($argv) = @_;
-  my $build_dir =  $$argv[0];
-  $ENV{'build_dir'} = $build_dir;
-  my $intmd_dir = &dirname(&dirname($build_dir)) . '/intmd/' . &basename($build_dir);
-  $ENV{'intmd_dir'} = $intmd_dir;
+  my $cmd_info = &cmd_info_from_argv($argv);
+  my $intmd_dir = &intmd_dir();
   my $inputs_mk = $intmd_dir . '/z/inputs.mk';
   &make_dirname($inputs_mk);
-  if (scalar @$argv == 1) { # --path-only
+  if ($$cmd_info{'opts'}{'path-only'}) {
     print $inputs_mk . $nl;
     exit 0;
   }
-  my $source_dir = $$argv[1];
-  $ENV{'source_dir'} = $source_dir;
   my $parts = $intmd_dir . '/parts.txt';
   die &basename($0) . ": error: missing $parts" . $nl if ! -e $parts;
   undef $/;

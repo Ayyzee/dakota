@@ -20,7 +20,8 @@ execute_process (
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process (
-  COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} # --path-only
+  COMMAND ${gen-target-inputs-ast} --path-only
+    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   OUTPUT_VARIABLE target-inputs-ast
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -78,6 +79,8 @@ add_dependencies (${target} ${custom-target-hdr})
 add_custom_command (
   OUTPUT  ${target-inputs-ast}
   DEPENDS ${parts} ${target-libs}
-  COMMAND ${gen-target-inputs-ast} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
+  COMMAND ${gen-target-inputs-ast}
+    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM
   USES_TERMINAL)

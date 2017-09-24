@@ -175,13 +175,6 @@ sub ordered_dk_paths {
   }
   return $ordered_dk_paths;
 }
-sub intmd_dir_from_build_dir {
-  my ($build_dir) = @_;
-  my $dir = &dirname(&dirname($build_dir));
-  my $name = &basename($build_dir);
-  my $intmd_dir = $dir . '/intmd/' . $name;
-  return $intmd_dir;
-}
 sub current_source_dir_from_inputs {
   my ($inputs) = @_;
   my $tbl = {};
@@ -212,14 +205,6 @@ sub current_source_dir_from_inputs {
       } else { die if $p1_len == $p2_len; }
     }
     return $p1;
-  }
-}
-sub set_env_vars {
-  my ($kvs) = @_;
-  foreach my $kv (@$kvs) {
-    $kv =~ /^([\w-]+)=(.*)$/;
-    my ($key, $val) = ($1, $2);
-    $ENV{$key} = $val;
   }
 }
 sub cxx_argv_from_argv {
@@ -320,9 +305,6 @@ sub cmd_info_from_argv {
 }
 sub exec_cmd_info {
   my ($root_cmd) = @_;
-  if (! $ENV{'intmd_dir'}) {
-    $ENV{'intmd_dir'} = &intmd_dir_from_build_dir(&build_dir());
-  }
   if (! $$root_cmd{'opts'}{'action'}) {
     &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
     $$root_cmd{'parts'} = &parts(&parts_path());

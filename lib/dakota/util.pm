@@ -103,6 +103,7 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  int_from_str
+                 intmd_dir_from_build_dir
                  is_cc_path
                  is_dk_path
                  is_dk_src_path
@@ -135,6 +136,7 @@ our @EXPORT= qw(
                  kw_arg_placeholders
                  kw_args_method_sig
                  last
+                 longest_common_prefix
                  make_dir
                  make_dirname
                  max
@@ -171,6 +173,7 @@ our @EXPORT= qw(
                  root_cmd
                  scalar_from_file
                  scalar_to_file
+                 set_env_vars
                  set_root_cmd
                  set_src_decl
                  set_src_defn
@@ -646,6 +649,22 @@ sub make_dirname {
     print STDERR $0 . ': warning: skipping: make_dirname(' . $path . ')' . $nl;
   }
 }
+sub set_env_vars {
+  my ($kvs) = @_;
+  foreach my $kv (@$kvs) {
+    $kv =~ /^([\w-]+)=(.*)$/;
+    my ($key, $val) = ($1, $2);
+    $ENV{$key} = $val;
+  }
+}
+sub intmd_dir_from_build_dir {
+  my ($build_dir) = @_;
+  my $dir = &dirname(&dirname($build_dir));
+  my $name = &basename($build_dir);
+  my $intmd_dir = $dir . '/intmd/' . $name;
+  $ENV{'intmd_dir'} = $intmd_dir;
+  return $intmd_dir;
+}
 sub cxx {
   my $cxx = $ENV{'cxx'};
   die if ! $cxx;
@@ -653,6 +672,7 @@ sub cxx {
 }
 sub intmd_dir {
   my $intmd_dir = $ENV{'intmd_dir'};
+  $intmd_dir = &intmd_dir_from_build_dir(&build_dir()) if ! $intmd_dir;
   die if ! $intmd_dir;
   return $intmd_dir;
 }
