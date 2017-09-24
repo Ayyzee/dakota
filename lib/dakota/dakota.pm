@@ -467,6 +467,7 @@ sub gen_target_ast {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
+  my $echo_elapsed_time = 1;
   my $ordered_cc_paths = [];
   if ($$cmd_info{'opts'}{'action'}) {
     if (0) {
@@ -479,7 +480,9 @@ sub start_cmd {
       &cmd_line_action_merge($$cmd_info{'inputs'}, $$cmd_info{'opts'}{'output'});
       my $t1 = Time::HiRes::time();
       my $run_time = $t1 - $t0;
-      #printf "elapsed action=merge: %.1fs\n", $run_time;
+      if ($echo_elapsed_time) {
+        #printf "elapsed action=merge: %.1fs\n", $run_time;
+      }
     }
     return $ordered_cc_paths = [];
   }
@@ -492,7 +495,9 @@ sub start_cmd {
       my $t0 = Time::HiRes::time();
       &gen_target_ast($cmd_info);
       my $t1 = Time::HiRes::time();
-      printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
+      if ($echo_elapsed_time) {
+        printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
+      }
       return $ordered_cc_paths = [];
     }
     # target=hdr
@@ -500,12 +505,15 @@ sub start_cmd {
       my $t0 = Time::HiRes::time();
       &gen_target_ast($cmd_info);
       my $t1 = Time::HiRes::time();
-      printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
-
+      if ($echo_elapsed_time) {
+        printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
+      }
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_hdr($cmd_info);
       my $t2 = Time::HiRes::time();
-      printf "elapsed target=hdr: %.1fs\n", $t2 - $t1;
+      if ($echo_elapsed_time) {
+        printf "elapsed target=hdr: %.1fs\n", $t2 - $t1;
+      }
       return $ordered_cc_paths = [];
     }
     # target=src
@@ -514,7 +522,9 @@ sub start_cmd {
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_src($cmd_info);
       my $t1 = Time::HiRes::time();
-      printf "elapsed target=src: %.1fs\n", $t1 - $t0;
+      if ($echo_elapsed_time) {
+        printf "elapsed target=src: %.1fs\n", $t1 - $t0;
+      }
       return $ordered_cc_paths = [];
     }
     die;
