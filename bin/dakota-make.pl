@@ -131,16 +131,21 @@ sub gen_dot_body {
   foreach my $dep (@$deps) {
     my $lhss = $$dep[0];
     my $rhss = $$dep[1];
+    my $order_only_rhss = $$dep[2];
     foreach my $lhs (@$lhss) {
       foreach my $rhs (@$rhss) {
         $result .= "  \"$lhs\" -> \"$rhs\"";
-        if (! &is_target_o_path($lhs) && &is_target_hdr_path($rhs)) {
-          $result .= ' [ color = gray, style = dashed ]';
+        if (0) {
         } elsif (&is_target_o_path($lhs)) {
           $result .= ' [ color = magenta ]';
         } elsif (&is_dk_o_path($lhs) && &is_dk_path($rhs)) {
           $result .= ' [ color = blue ]';
         }
+        $result .= ';' . $nl;
+      }
+      foreach my $rhs (@$order_only_rhss) {
+        $result .= "  \"$lhs\" -> \"$rhs\" [ color = gray, style = dashed ]";
+        ###
         $result .= ';' . $nl;
       }
     }
@@ -166,7 +171,8 @@ sub gen_make_body {
   foreach my $dep (@$deps) {
     my $lhss = $$dep[0];
     my $rhss = $$dep[1];
-    my $cmd =  $$dep[2];
+    my $order_only_rhss =  $$dep[2];
+    my $cmd =  $$dep[3];
     my $d = $nl;
     foreach my $lhs (@$lhss) {
       $result .= $d . $lhs;
@@ -175,6 +181,12 @@ sub gen_make_body {
     $result .= ' :';
     foreach my $rhs (@$rhss) {
       $result .= $d . $rhs;
+    }
+    if (scalar @$order_only_rhss) {
+      $result .= ' |';
+      foreach my $rhs (@$order_only_rhss) {
+        $result .= $d . $rhs;
+      }
     }
     $result .= $nl;
   }
@@ -231,26 +243,25 @@ sub start {
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
   &add_last($o_paths, $target_o_path);
-  &add_last($deps, [[$target_path], $o_paths, []]);
-  &add_last($deps, [[$target_o_path], [$target_src_path], []]);
-  &add_last($deps, [$o_paths, [$target_hdr_path], []]);
+  &add_last($deps, [[$target_path], $o_paths, [], []]);
+  &add_last($deps, [[$target_o_path], [$target_hdr_path, $target_src_path], [], []]);
+  &add_last($deps, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
   foreach my $dk_path (@$dk_paths) {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
-    &add_last($deps, [[$dk_o_path], [$dk_path], []]);
+    &add_last($deps, [[$dk_o_path], [$dk_path], [], []]);
   }
-  my $inputs_ast_lhs = [$target_hdr_path, $target_src_path];
-  &add_last($deps, [$inputs_ast_lhs, [$target_inputs_ast_path], []]);
-  &add_last($deps, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], []]);
-  &add_last($deps, [[$target_srcs_ast_path], [@$dk_ast_paths], []]);
+  &add_last($deps, [[$target_hdr_path, $target_src_path], [$target_inputs_ast_path], [], []]);
+  &add_last($deps, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [], []]);
+  &add_last($deps, [[$target_srcs_ast_path], [@$dk_ast_paths], [], []]);
   foreach my $dk_path (@$dk_paths) {
     my $dk_ast_path = &ast_path_from_dk_path($dk_path);
-    &add_last($deps, [[$dk_ast_path], [$dk_path], []]);
+    &add_last($deps, [[$dk_ast_path], [$dk_path], [], []]);
   }
   foreach my $so_path (@$so_paths) {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
     my $so_ctlg_ast_path = &ast_path_from_ctlg_path($so_ctlg_path);
-    &add_last($deps, [[$so_ctlg_ast_path], [$so_ctlg_path], []]);
-    &add_last($deps, [[$so_ctlg_path], [$so_path], []]);
+    &add_last($deps, [[$so_ctlg_ast_path], [$so_ctlg_path], [], []]);
+    &add_last($deps, [[$so_ctlg_path], [$so_path], [], []]);
   }
   my $target_mk = &gen_make($deps);
   &write_target_mk($target_mk);
