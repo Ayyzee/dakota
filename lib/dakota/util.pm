@@ -183,6 +183,7 @@ our @EXPORT= qw(
                  sqstr_regex
                  str_from_seq
                  suffix
+                 target_build_dir
                  target_intmd_dir
                  target_inputs_ast_path
                  target_srcs_ast_path
@@ -685,6 +686,10 @@ sub build_dir {
   my $build_dir = $ENV{'build_dir'};
   die if ! $build_dir;
   return $build_dir;
+}
+sub target_build_dir {
+  my $target_build_dir = &build_dir() . '/z';
+  return $target_build_dir;
 }
 sub target_intmd_dir {
   my $target_intmd_dir = &intmd_dir() . '/z';

@@ -78,6 +78,9 @@ our @EXPORT= qw(
                  target_klass_func_defns_path
                  target_generic_func_decls_path
                  target_generic_func_defns_path
+                 is_target_inputs_ast_path
+                 is_target_hdr_path
+                 is_target_src_path
              );
 
 use Data::Dumper;
@@ -430,6 +433,14 @@ sub ast_paths_from_inputs {
   die if ! $srcs_ast;
   &add_last($ast_paths, $srcs_ast);
   return $ast_paths;
+}
+sub is_target_hdr_path {
+  my ($path) = @_;
+  return $path eq &target_hdr_path();
+}
+sub is_target_src_path {
+  my ($path) = @_;
+  return $path eq &target_src_path();
 }
 sub is_target_inputs_ast_path {
   my ($path) = @_;
