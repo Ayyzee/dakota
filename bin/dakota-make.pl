@@ -86,13 +86,13 @@ sub o_path_from_dk_path {
   return $result;
 }
 sub gen_dot {
-  my ($deps) = @_;
+  my ($rules) = @_;
   my $result = '';
   $result .= 'digraph {' . $nl;
   $result .= '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
   $result .= '  node  [ shape = rect, style = rounded, height = 0, width = 0 ];' . $nl;
   $result .= $nl;
-  $result .= &gen_dot_body($deps);
+  $result .= &gen_dot_body($rules);
   $result .= '}' . $nl;
   if (1) {
     my $prefix = &longest_common_prefix(&source_dir(), &intmd_dir());
@@ -101,9 +101,9 @@ sub gen_dot {
   return $result;
 }
 sub gen_dot_body {
-  my ($deps) = @_;
+  my ($rules) = @_;
   my $result = '';
-  my $root = $$deps[0][0][0];
+  my $root = $$rules[0][0][0];
   my $target_hdr_path = &target_hdr_path();
   my $target_src_path = &target_src_path();
   my $target_o_path =   &target_o_path();
@@ -114,10 +114,10 @@ sub gen_dot_body {
     "  \"$target_src_path\" [ color = magenta ];" . $nl .
     "  \"$target_o_path\" [ color = magenta ];" . $nl .
     $nl;
-  for (my $i = 0; $i < scalar @$deps; $i++) {
-    for (my $j = 0; $j < scalar @{$$deps[$i]}; $j++) {
-      for (my $k = 0; $k < scalar @{$$deps[$i][$j]}; $k++) {
-        my $path = $$deps[$i][$j][$k];
+  for (my $i = 0; $i < scalar @$rules; $i++) {
+    for (my $j = 0; $j < scalar @{$$rules[$i]}; $j++) {
+      for (my $k = 0; $k < scalar @{$$rules[$i][$j]}; $k++) {
+        my $path = $$rules[$i][$j][$k];
         if (0) {
         } elsif (&is_dk_path($path)) {
           $result .= "  \"$path\" [ color = blue ];" . $nl;
@@ -128,23 +128,23 @@ sub gen_dot_body {
     }
   }
   }
-  foreach my $dep (@$deps) {
-    my $lhss = $$dep[0];
-    my $rhss = $$dep[1];
-    my $order_only_rhss = $$dep[2];
-    foreach my $lhs (@$lhss) {
-      foreach my $rhs (@$rhss) {
-        $result .= "  \"$lhs\" -> \"$rhs\"";
+  foreach my $rule (@$rules) {
+    my $tgts =               $$rule[0];
+    my $prereqs =            $$rule[1];
+    my $order_only_prereqs = $$rule[2];
+    foreach my $tgt (@$tgts) {
+      foreach my $prereq (@$prereqs) {
+        $result .= "  \"$tgt\" -> \"$prereq\"";
         if (0) {
-        } elsif (&is_target_o_path($lhs)) {
+        } elsif (&is_target_o_path($tgt)) {
           $result .= ' [ color = magenta ]';
-        } elsif (&is_dk_o_path($lhs) && &is_dk_path($rhs)) {
+        } elsif (&is_dk_o_path($tgt) && &is_dk_path($prereq)) {
           $result .= ' [ color = blue ]';
         }
         $result .= ';' . $nl;
       }
-      foreach my $rhs (@$order_only_rhss) {
-        $result .= "  \"$lhs\" -> \"$rhs\" [ color = gray, style = dashed ]";
+      foreach my $prereq (@$order_only_prereqs) {
+        $result .= "  \"$tgt\" -> \"$prereq\" [ color = gray, style = dashed ]";
         ###
         $result .= ';' . $nl;
       }
@@ -153,39 +153,39 @@ sub gen_dot_body {
   return $result;
 }
 sub gen_make {
-  my ($deps) = @_;
+  my ($rules) = @_;
   my $result = '';
-  my $root = $$deps[0][0][0];
+  my $root = $$rules[0][0][0];
   $result .=
     ".PHONY: all" . $nl .
     $nl .
     "all: $root" . $nl;
   ###
-  $result .= &gen_make_body($deps);
+  $result .= &gen_make_body($rules);
   ###
   return $result;
 }
 sub gen_make_body {
-  my ($deps) = @_;
+  my ($rules) = @_;
   my $result = '';
-  foreach my $dep (@$deps) {
-    my $lhss = $$dep[0];
-    my $rhss = $$dep[1];
-    my $order_only_rhss =  $$dep[2];
-    my $cmd =  $$dep[3];
+  foreach my $rule (@$rules) {
+    my $tgts =               $$rule[0];
+    my $prereqs =            $$rule[1];
+    my $order_only_prereqs = $$rule[2];
+    my $recipe =             $$rule[3];
     my $d = $nl;
-    foreach my $lhs (@$lhss) {
-      $result .= $d . $lhs;
+    foreach my $tgt (@$tgts) {
+      $result .= $d . $tgt;
       $d = " \\\n";
     }
     $result .= ' :';
-    foreach my $rhs (@$rhss) {
-      $result .= $d . $rhs;
+    foreach my $prereq (@$prereqs) {
+      $result .= $d . $prereq;
     }
-    if (scalar @$order_only_rhss) {
+    if (scalar @$order_only_prereqs) {
       $result .= ' |';
-      foreach my $rhs (@$order_only_rhss) {
-        $result .= $d . $rhs;
+      foreach my $prereq (@$order_only_prereqs) {
+        $result .= $d . $prereq;
       }
     }
     $result .= $nl;
@@ -213,20 +213,18 @@ sub start {
   my $cmd_info = &cmd_info_from_argv($argv);
   my $target_path = $$cmd_info{'opts'}{'target-path'};
   #print &Dumper($cmd_info);
-  my $deps = [];
+  my $rules = [];
   my $dk_paths = [];
   my $so_paths = [];
   my $so_ctlg_ast_paths = [];
   my $dk_o_paths = [];
   my $dk_ast_paths = [];
-  my $o_paths = [];
   foreach my $path (@{$$cmd_info{'parts'}}) {
     if (&is_dk_path($path)) {
       &add_last($dk_paths, $path);
 
       my $dk_o_path = &o_path_from_dk_path($path);
       &add_last($dk_o_paths, $dk_o_path);
-      &add_last($o_paths, $dk_o_path);
 
       my $dk_ast_path = &ast_path_from_dk_path($path);
       &add_last($dk_ast_paths, $dk_ast_path);
@@ -242,35 +240,35 @@ sub start {
   my $target_o_path =          &target_o_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
-  &add_last($o_paths, $target_o_path);
-  &add_last($deps, [[$target_path], $o_paths, [], []]);
-  &add_last($deps, [[$target_o_path], [$target_hdr_path, $target_src_path], [], []]);
-  &add_last($deps, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
+  &add_last($rules, [[$target_path], $dk_o_paths, [], []]);
+  &add_last($rules, [[$target_path], [$target_o_path], [], []]);
+  &add_last($rules, [[$target_o_path], [$target_hdr_path, $target_src_path], [], []]);
+  &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
   foreach my $dk_path (@$dk_paths) {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
-    &add_last($deps, [[$dk_o_path], [$dk_path], [], []]);
+    &add_last($rules, [[$dk_o_path], [$dk_path], [], []]);
   }
-  &add_last($deps, [[$target_hdr_path, $target_src_path], [$target_inputs_ast_path], [], []]);
-  &add_last($deps, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [], []]);
-  &add_last($deps, [[$target_srcs_ast_path], [@$dk_ast_paths], [], []]);
+  &add_last($rules, [[$target_hdr_path, $target_src_path], [$target_inputs_ast_path], [], []]);
+  &add_last($rules, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [], []]);
+  &add_last($rules, [[$target_srcs_ast_path], [@$dk_ast_paths], [], []]);
   foreach my $dk_path (@$dk_paths) {
     my $dk_ast_path = &ast_path_from_dk_path($dk_path);
-    &add_last($deps, [[$dk_ast_path], [$dk_path], [], []]);
+    &add_last($rules, [[$dk_ast_path], [$dk_path], [], []]);
   }
   foreach my $so_path (@$so_paths) {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
     my $so_ctlg_ast_path = &ast_path_from_ctlg_path($so_ctlg_path);
-    &add_last($deps, [[$so_ctlg_ast_path], [$so_ctlg_path], [], []]);
-    &add_last($deps, [[$so_ctlg_path], [$so_path], [], []]);
+    &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [], []]);
+    &add_last($rules, [[$so_ctlg_path], [$so_path], [], []]);
   }
-  my $target_mk = &gen_make($deps);
+  my $target_mk = &gen_make($rules);
   &write_target_mk($target_mk);
   if (1) {
-    my $target_dot = &gen_dot($deps);
+    my $target_dot = &gen_dot($rules);
     &write_target_dot($target_dot);
     #print $target_dot;
   }
-  #print STDERR &Dumper($deps);
+  #print STDERR &Dumper($rules);
   #print STDERR $target_mk;
 }
 unless (caller) {
