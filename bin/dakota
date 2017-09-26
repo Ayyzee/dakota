@@ -104,10 +104,6 @@ sub replace_dk_paths_with_cc_paths {
     }
   }
 }
-sub parts_path {
-  my $parts_path = &intmd_dir() . '/parts.txt';
-  return $parts_path;
-}
 sub extract_dakota_opts {
   my ($cmd) = @_;
   my $opts = {};

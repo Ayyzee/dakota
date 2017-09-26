@@ -57,7 +57,6 @@ sub cmd_info_from_argv {
     }
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
-                       'parts=s',
                        'path-only',
                        'root-tgt=s',
                        'var=s',
@@ -65,8 +64,14 @@ sub cmd_info_from_argv {
   $$root_cmd{'inputs'} = $argv; # this should always be empty
   &set_env_vars($$root_cmd{'opts'}{'var'});
   delete $$root_cmd{'opts'}{'var'};
-  $$root_cmd{'parts'} = &parts($$root_cmd{'opts'}{'parts'});
+  $$root_cmd{'parts'} = &parts(&parts_path());
   return $root_cmd;
+}
+sub build_mk_path {
+  return &intmd_dir() . '/build.mk';
+}
+sub build_dot_path {
+  return &intmd_dir() . '/build.dot';
 }
 sub target_o_path {
   my $result = &target_build_dir() . '/target.cc.o';
@@ -192,18 +197,18 @@ sub gen_make_body {
   }
   return $result;
 }
-sub write_target_mk {
+sub write_build_mk {
   my ($str) = @_;
-  my $output = &intmd_dir() . '/target.mk';
+  my $output = &build_mk_path();
   open(my $fh, '>', $output);
   print $fh $str;
   close($fh);
   #print $output . $nl;
   return $output;
 }
-sub write_target_dot {
+sub write_build_dot {
   my ($str) = @_;
-  my $output = &intmd_dir() . '/target.dot';
+  my $output = &build_dot_path();
   open(my $fh, '>', $output);
   print $fh $str;
   close($fh);
@@ -283,17 +288,21 @@ sub gen_rules {
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
+  if ($$cmd_info{'opts'}{'path-only'}) {
+    print &build_mk_path() . $nl;
+    exit 0;
+  }
   #print &Dumper($cmd_info);
   my $rules = &gen_rules($$cmd_info{'opts'}{'root-tgt'}, $$cmd_info{'parts'});
-  my $target_mk = &gen_make($rules);
-  my $out_path = &write_target_mk($target_mk);
+  my $build_mk = &gen_make($rules);
+  my $out_path = &write_build_mk($build_mk);
   if (1) {
-    my $target_dot = &gen_dot($rules, $out_path);
-    &write_target_dot($target_dot);
-    #print $target_dot;
+    my $build_dot = &gen_dot($rules, $out_path);
+    &write_build_dot($build_dot);
+    #print $build_dot;
   }
   #print STDERR &Dumper($rules);
-  #print STDERR $target_mk;
+  #print STDERR $build_mk;
 }
 unless (caller) {
   &start(\@ARGV);

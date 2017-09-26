@@ -151,6 +151,7 @@ our @EXPORT= qw(
                  pann
                  param_types_str
                  parts
+                 parts_path
                  path_only
                  path_split
                  prepend_dot_slash
@@ -714,6 +715,10 @@ sub target_hdr_path {
 sub target_src_path {
   my $target_src_path = &target_intmd_dir() . '/target' . $cc_ext;
   return $target_src_path;
+}
+sub parts_path {
+  my $parts_path = &intmd_dir() . '/parts.txt';
+  return $parts_path;
 }
 sub path_only {
   my ($cmd_info) = @_;
