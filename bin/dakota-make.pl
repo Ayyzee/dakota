@@ -243,14 +243,14 @@ sub gen_rules {
   my $target_hdr_path =        &target_hdr_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
-  my $root_tgt_file = &basename($root_tgt);
+  my $root_tgt_name = &basename($root_tgt);
   my $rules = [];
   if (&is_so_path($root_tgt)) {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path], [],
-                       [ 'dakota', '-dynamiclib', '--cxx=clang++', '-std=c++1z', "-DDKT_TARGET_TYPE=\"shared-library\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
+                       [ 'dakota', '-dynamiclib', '--cxx=clang++', '-std=c++1z', "-DDKT_TARGET_TYPE=\"shared-library\"", "-DDKT_TARGET_NAME=\"$root_tgt_name\"", '-o', '$@', '$^' ]]);
   } else {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths,$target_o_path], [],
-                       [ 'dakota', '--cxx=clang++', '-std=c++1z', "-DDKT_TARGET_TYPE=\"executable\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
+                       [ 'dakota', '--cxx=clang++', '-std=c++1z', "-DDKT_TARGET_TYPE=\"executable\"", "-DDKT_TARGET_NAME=\"$root_tgt_name\"", '-o', '$@', '$^' ]]);
   }
   if (1) {
     # force gen of target.cc to happen after all *.dk.o are compiled

@@ -61,7 +61,7 @@ add_custom_command (
   VERBATIM
   USES_TERMINAL)
 set (compile-defns
-  DKT_TARGET_FILE="${target-output-file}"
+  DKT_TARGET_NAME="${target-output-file}"
   DKT_TARGET_TYPE="${target-type}")
 set_source_files_properties (${target-src} PROPERTIES
   COMPILE_DEFINITIONS "${compile-defns}")
