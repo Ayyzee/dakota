@@ -1495,10 +1495,24 @@ sub xxx_from_yaml_file {
 }
 sub parts {
   my ($file) = @_;
-  my $result;
+  my $file_dir = &dirname($file);
+  my $result = [];
   if (-e $file) {
-    $result = [split /\s+/, &filestr_from_file($file)];
+    my $paths = [split /\s+/, &filestr_from_file($file)];
+    foreach my $path (@$paths) {
+      my $abs_path = $path;
+      if (! &is_abs($path)) {
+        $abs_path = &cwd() . '/' . $path;
+        if (! -e $abs_path) {
+          $abs_path = $file_dir . '/' . $path;
+        }
+      }
+      $abs_path = File::Spec->canonpath($abs_path);
+      die if ! -e $abs_path;
+      &add_last($result, $abs_path);
+    }
   }
+  die if ! scalar @$result;
   return $result;
 }
 sub platform {
