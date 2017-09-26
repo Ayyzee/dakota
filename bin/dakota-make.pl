@@ -59,7 +59,7 @@ sub cmd_info_from_argv {
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
                        'parts=s',
                        'path-only',
-                       'target-path=s',
+                       'root-tgt=s',
                        'var=s',
                       );
   $$root_cmd{'inputs'} = $argv; # this should always be empty
@@ -86,14 +86,14 @@ sub o_path_from_dk_path {
   return $result;
 }
 sub gen_dot {
-  my ($rules) = @_;
+  my ($rules, $out_path) = @_;
   my $result = '';
-  $result .= 'digraph {' . $nl;
-  $result .= '  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];' . $nl;
-  $result .= '  node  [ shape = rect, style = rounded, height = 0, width = 0 ];' . $nl;
+  $result .= "digraph {" . $nl;
+  $result .= "  graph [ rankdir = LR, dir = back, label = \"$out_path\", fontcolor = red, nodesep = 0.03 ];" . $nl;
+  $result .= "  node  [ shape = rect, style = rounded, height = 0, width = 0 ];" . $nl;
   $result .= $nl;
   $result .= &gen_dot_body($rules);
-  $result .= '}' . $nl;
+  $result .= "}" . $nl;
   if (1) {
     my $prefix = &longest_common_prefix(&source_dir(), &intmd_dir());
     $result =~ s=$prefix==g; # hack to make the graph less noisy
@@ -199,6 +199,7 @@ sub write_target_mk {
   print $fh $str;
   close($fh);
   #print $output . $nl;
+  return $output;
 }
 sub write_target_dot {
   my ($str) = @_;
@@ -207,11 +208,12 @@ sub write_target_dot {
   print $fh $str;
   close($fh);
   #print $output . $nl;
+  return $output;
 }
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
-  my $target_path = $$cmd_info{'opts'}{'target-path'};
+  my $root_tgt = $$cmd_info{'opts'}{'root-tgt'};
   #print &Dumper($cmd_info);
   my $dk_paths = [];
   my $so_paths = [];
@@ -240,8 +242,8 @@ sub start {
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
   my $rules = [];
-  &add_last($rules, [[$target_path], $dk_o_paths, [], []]);
-  &add_last($rules, [[$target_path], [$target_o_path], [], []]);
+  &add_last($rules, [[$root_tgt], $dk_o_paths, [], []]);
+  &add_last($rules, [[$root_tgt], [$target_o_path], [], []]);
   &add_last($rules, [[$target_o_path], [$target_hdr_path, $target_src_path], [], []]);
   &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
   foreach my $dk_path (@$dk_paths) {
@@ -262,9 +264,9 @@ sub start {
     &add_last($rules, [[$so_ctlg_path], [$so_path], [], []]);
   }
   my $target_mk = &gen_make($rules);
-  &write_target_mk($target_mk);
+  my $out_path = &write_target_mk($target_mk);
   if (1) {
-    my $target_dot = &gen_dot($rules);
+    my $target_dot = &gen_dot($rules, $out_path);
     &write_target_dot($target_dot);
     #print $target_dot;
   }
