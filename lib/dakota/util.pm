@@ -70,6 +70,8 @@ our @EXPORT= qw(
                  as_literal_symbol_interior
                  at
                  build_dir
+                 build_dot_path
+                 build_mk_path
                  intmd_dir
                  canon_path
                  normalize_paths
@@ -687,6 +689,12 @@ sub build_dir {
   my $build_dir = $ENV{'build_dir'};
   die if ! $build_dir;
   return $build_dir;
+}
+sub build_dot_path {
+  return &intmd_dir() . '/build.dot';
+}
+sub build_mk_path {
+  return &intmd_dir() . '/build.mk';
 }
 sub target_build_dir {
   my $target_build_dir = &build_dir() . '/z';

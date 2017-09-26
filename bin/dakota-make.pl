@@ -69,12 +69,6 @@ sub cmd_info_from_argv {
   }
   return $root_cmd;
 }
-sub build_mk_path {
-  return &intmd_dir() . '/build.mk';
-}
-sub build_dot_path {
-  return &intmd_dir() . '/build.dot';
-}
 sub target_o_path {
   my $result = &target_build_dir() . '/target.cc.o';
   return $result;
