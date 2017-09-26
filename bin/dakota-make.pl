@@ -82,7 +82,7 @@ sub is_target_o_path {
 }
 sub o_path_from_dk_path {
   my ($dk_path) = @_;
-  my $result = $dk_path . '.o';
+  my $result = &build_dir() . '/' . &basename($dk_path) . '.o';
   return $result;
 }
 sub gen_dot {
