@@ -213,7 +213,6 @@ sub start {
   my $cmd_info = &cmd_info_from_argv($argv);
   my $target_path = $$cmd_info{'opts'}{'target-path'};
   #print &Dumper($cmd_info);
-  my $rules = [];
   my $dk_paths = [];
   my $so_paths = [];
   my $so_ctlg_ast_paths = [];
@@ -235,11 +234,12 @@ sub start {
       &add_last($so_ctlg_ast_paths, $so_ctlg_ast_path);
     }
   }
-  my $target_hdr_path =        &target_hdr_path();
-  my $target_src_path =        &target_src_path();
   my $target_o_path =          &target_o_path();
+  my $target_src_path =        &target_src_path();
+  my $target_hdr_path =        &target_hdr_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
+  my $rules = [];
   &add_last($rules, [[$target_path], $dk_o_paths, [], []]);
   &add_last($rules, [[$target_path], [$target_o_path], [], []]);
   &add_last($rules, [[$target_o_path], [$target_hdr_path, $target_src_path], [], []]);
