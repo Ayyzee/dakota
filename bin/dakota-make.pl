@@ -247,10 +247,10 @@ sub gen_rules {
   my $rules = [];
   if (&is_so_path($root_tgt)) {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path], [],
-                       [ 'dakota', '-dynamiclib', '--cxx=clang++', "-DDKT_TARGET_TYPE=\"shared-library\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
+                       [ 'dakota', '-dynamiclib', '--cxx=clang++', '-std=c++1z', "-DDKT_TARGET_TYPE=\"shared-library\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
   } else {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths,$target_o_path], [],
-                       [ 'dakota', '--cxx=clang++', "-DDKT_TARGET_TYPE=\"executable\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
+                       [ 'dakota', '--cxx=clang++', '-std=c++1z', "-DDKT_TARGET_TYPE=\"executable\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
   }
   if (1) {
     # force gen of target.cc to happen after all *.dk.o are compiled
