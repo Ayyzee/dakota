@@ -86,7 +86,11 @@ sub gen_inputs_ast_graph {
   my $build_dir =  &build_dir();
   my $source_dir = &source_dir();
   my $lib_asts = &lib_asts($libs);
-  my $target_inputs_ast_node = &add_node($root,
+  my $target_hdr_node = &add_node($root,
+                                  &target_hdr_path(),
+                                  [ &target_inputs_ast_path() ],
+                                  [ 'dakota', '--target', 'hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]);
+  my $target_inputs_ast_node = &add_node($target_hdr_node,
                                          &target_inputs_ast_path(),
                                          [ &target_srcs_ast_path(), @$lib_asts ],
                                          [ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]);
@@ -179,14 +183,14 @@ sub dump_make_recursive {
   }
   return $result;
 }
-sub write_inputs_mk {
+sub write_build_mk {
   my ($root, $output) = @_;
   open(my $fh, '>', $output);
   print $fh &dump_make($root);
   close($fh);
   #print $output . $nl;
 }
-sub write_inputs_dot {
+sub write_build_dot {
   my ($root, $output) = @_;
   open(my $fh, '>', $output);
   print $fh &dump_dot($root);
@@ -213,10 +217,10 @@ sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
   my $intmd_dir = &intmd_dir();
-  my $inputs_mk = $intmd_dir . '/z/inputs.mk';
-  &make_dirname($inputs_mk);
+  my $build_mk = $intmd_dir . '/build.mk';
+  &make_dirname($build_mk);
   if ($$cmd_info{'opts'}{'path-only'}) {
-    print $inputs_mk . $nl;
+    print $build_mk . $nl;
     exit 0;
   }
   my $parts = $intmd_dir . '/parts.txt';
@@ -226,10 +230,10 @@ sub start {
   my $inputs = [ split(/\s+/, <$fh>) ];
   close($fh);
   my $root = &gen_inputs_ast_graph($inputs);
-  &write_inputs_mk($root, $inputs_mk);
+  &write_build_mk($root, $build_mk);
   if (1) {
-    my $inputs_dot = $intmd_dir . '/z/inputs.dot';
-    &write_inputs_dot($root, $inputs_dot);
+    my $build_dot = $intmd_dir . '/build.dot';
+    &write_build_dot($root, $build_dot);
   }
   #print STDERR &Dumper($root);
 }
