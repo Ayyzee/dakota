@@ -207,17 +207,14 @@ sub write_target_dot {
   #print $output . $nl;
   return $output;
 }
-sub start {
-  my ($argv) = @_;
-  my $cmd_info = &cmd_info_from_argv($argv);
-  my $root_tgt = $$cmd_info{'opts'}{'root-tgt'};
-  #print &Dumper($cmd_info);
+sub gen_rules {
+  my ($root_tgt, $parts) = @_;
   my $dk_paths = [];
   my $so_paths = [];
   my $so_ctlg_ast_paths = [];
   my $dk_o_paths = [];
   my $dk_ast_paths = [];
-  foreach my $path (@{$$cmd_info{'parts'}}) {
+  foreach my $path (@$parts) {
     if (&is_dk_path($path)) {
       &add_last($dk_paths, $path);
 
@@ -242,6 +239,7 @@ sub start {
   &add_last($rules, [[$root_tgt], $dk_o_paths, [], []]);
   &add_last($rules, [[$root_tgt], [$target_o_path], [], []]);
   if (1) {
+    # force gen of target.cc to happen after all *.dk.o are compiled
     &add_last($rules, [[$target_src_path], [], $dk_o_paths, []]);
   }
   &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], []]);
@@ -263,6 +261,13 @@ sub start {
     &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [], []]);
     &add_last($rules, [[$so_ctlg_path], [$so_path], [], []]);
   }
+  return $rules;
+}
+sub start {
+  my ($argv) = @_;
+  my $cmd_info = &cmd_info_from_argv($argv);
+  #print &Dumper($cmd_info);
+  my $rules = &gen_rules($$cmd_info{'opts'}{'root-tgt'}, $$cmd_info{'parts'});
   my $target_mk = &gen_make($rules);
   my $out_path = &write_target_mk($target_mk);
   if (1) {
