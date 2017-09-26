@@ -186,6 +186,9 @@ sub gen_make_body {
       }
     }
     $result .= $nl;
+    if (scalar @$recipe) {
+      $result .= "\t" . join(' ', @$recipe) . $nl;
+    }
   }
   return $result;
 }
@@ -209,6 +212,8 @@ sub write_target_dot {
 }
 sub gen_rules {
   my ($root_tgt, $parts) = @_;
+  my $build_dir =  &build_dir();
+  my $source_dir = &source_dir();
   my $dk_paths = [];
   my $so_paths = [];
   my $so_ctlg_ast_paths = [];
@@ -233,29 +238,45 @@ sub gen_rules {
   my $target_hdr_path =        &target_hdr_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
+  my $root_tgt_file = &basename($root_tgt);
   my $rules = [];
-  &add_last($rules, [[$root_tgt], $dk_o_paths, [], []]);
-  &add_last($rules, [[$root_tgt], [$target_o_path], [], []]);
+  if (&is_so_path($root_tgt)) {
+    &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path], [],
+                       [ 'dakota', '-dynamiclib', '--cxx=clang++', "-DDKT_TARGET_TYPE=\"shared-library\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
+  } else {
+    &add_last($rules, [[$root_tgt], [@$dk_o_paths,$target_o_path], [],
+                       [ 'dakota', '--cxx=clang++', "-DDKT_TARGET_TYPE=\"executable\"", "-DDKT_TARGET_FILE=\"$root_tgt_file\"", '-o', '$@', '$^' ]]);
+  }
   if (1) {
     # force gen of target.cc to happen after all *.dk.o are compiled
     &add_last($rules, [[$target_src_path], [], $dk_o_paths, []]); # using order-only prereqs
   }
-  &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], []]);
+  &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], # using order-only prereqs
+                     ['dakota', '-c', '--cxx=clang++', '-std=c++1z', '-fPIC', '-o', '$@', '$<']]);
   &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
-  &add_last($rules, [[$target_hdr_path, $target_src_path], [$target_inputs_ast_path], [], []]);
-  &add_last($rules, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [], []]);
-  &add_last($rules, [[$target_srcs_ast_path], [@$dk_ast_paths], [], []]);
+  &add_last($rules, [[$target_hdr_path], [$target_inputs_ast_path], [],
+                     [ 'dakota', '--target', 'hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]]);
+  &add_last($rules, [[$target_src_path], [$target_inputs_ast_path], [],
+                     [ 'dakota', '--target', 'src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]]);
+  &add_last($rules, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [],
+                     [ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]]);
+  &add_last($rules, [[$target_srcs_ast_path], [@$dk_ast_paths], [],
+                     [ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]]);
   foreach my $dk_path (@$dk_paths) {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
     my $dk_ast_path = &ast_path_from_dk_path($dk_path);
-    &add_last($rules, [[$dk_o_path], [$dk_path], [], []]);
-    &add_last($rules, [[$dk_ast_path], [$dk_path], [], []]);
+    &add_last($rules, [[$dk_o_path], [$dk_path], [],
+                       ['dakota', '-c', '--cxx=clang++', '-std=c++1z', '-fPIC', '-o', '$@', '$<']]);
+    &add_last($rules, [[$dk_ast_path], [$dk_path], [],
+                       [ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]]);
   }
   foreach my $so_path (@$so_paths) {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
     my $so_ctlg_ast_path = &ast_path_from_ctlg_path($so_ctlg_path);
-    &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [], []]);
-    &add_last($rules, [[$so_ctlg_path], [$so_path], [], []]);
+    &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [],
+                       [ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]]);
+    &add_last($rules, [[$so_ctlg_path], [$so_path], [],
+                       ['dakota-catalog', '--output', '$@', '$<']]);
   }
   return $rules;
 }
