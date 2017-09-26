@@ -72,9 +72,9 @@ sub target_o_path {
   my $result = &target_build_dir() . '/target.cc.o';
   return $result;
 }
-sub is_dk_o_path {
+sub is_o_path {
   my ($path) = @_;
-  return $path =~ /\.dk\.o$/;
+  return $path =~ /\.o$/;
 }
 sub is_target_o_path {
   my ($path) = @_;
@@ -135,10 +135,7 @@ sub gen_dot_body {
     foreach my $tgt (@$tgts) {
       foreach my $prereq (@$prereqs) {
         $result .= "  \"$tgt\" -> \"$prereq\"";
-        if (0) {
-        } elsif (&is_target_o_path($tgt)) {
-          $result .= ' [ color = magenta ]';
-        } elsif (&is_dk_o_path($tgt) && &is_dk_path($prereq)) {
+        if (&is_o_path($tgt)) {
           $result .= ' [ color = blue ]';
         }
         $result .= ';' . $nl;
@@ -244,7 +241,7 @@ sub start {
   my $rules = [];
   &add_last($rules, [[$root_tgt], $dk_o_paths, [], []]);
   &add_last($rules, [[$root_tgt], [$target_o_path], [], []]);
-  &add_last($rules, [[$target_o_path], [$target_hdr_path, $target_src_path], [], []]);
+  &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], []]);
   &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
   foreach my $dk_path (@$dk_paths) {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
