@@ -717,7 +717,7 @@ sub target_src_path {
   return $target_src_path;
 }
 sub parts_path {
-  my $parts_path = &intmd_dir() . '/parts.txt';
+  my $parts_path = &source_dir() . '/parts.txt';
   return $parts_path;
 }
 sub path_only {

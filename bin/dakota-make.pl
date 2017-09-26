@@ -64,7 +64,9 @@ sub cmd_info_from_argv {
   $$root_cmd{'inputs'} = $argv; # this should always be empty
   &set_env_vars($$root_cmd{'opts'}{'var'});
   delete $$root_cmd{'opts'}{'var'};
-  $$root_cmd{'parts'} = &parts(&parts_path());
+  if (! $$root_cmd{'opts'}{'path-only'}) {
+    $$root_cmd{'parts'} = &parts(&parts_path());
+  }
   return $root_cmd;
 }
 sub build_mk_path {

@@ -68,12 +68,12 @@ sub cmd_info_from_argv {
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
-  my $parts = &intmd_dir . '/parts.txt';
+  my $parts = &parts_path();
   if ($$cmd_info{'opts'}{'path-only'}) {
     print $parts . $nl;
     exit 0;
   }
-  &make_dirname($parts);
+  #&make_dirname($parts);
   my $outstr = '';
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     $outstr .= $input . $nl;

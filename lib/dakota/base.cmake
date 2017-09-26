@@ -16,7 +16,7 @@ dk_find_program (dakota-make dakota-make.pl)
 
 execute_process (
   COMMAND ${dakota-parts} --path-only
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   OUTPUT_VARIABLE parts
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -45,7 +45,7 @@ add_custom_command (
   OUTPUT ${parts}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
   COMMAND ${dakota-parts}
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     ${srcs}
     ${target-lib-files}
     ${lib-files}
