@@ -241,6 +241,9 @@ sub start {
   my $rules = [];
   &add_last($rules, [[$root_tgt], $dk_o_paths, [], []]);
   &add_last($rules, [[$root_tgt], [$target_o_path], [], []]);
+  if (1) {
+    &add_last($rules, [[$target_src_path], [], $dk_o_paths, []]);
+  }
   &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], []]);
   &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
   foreach my $dk_path (@$dk_paths) {
