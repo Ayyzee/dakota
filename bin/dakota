@@ -318,7 +318,7 @@ sub exec_cmd_info {
 }
 sub start {
   my ($argv) = @_;
-  if (&has_target_action_opt($argv)) { # --target=ast, --target=hdr, --target=src, --action=parse, --action=merge
+  if (&has_target_action_opt($argv)) { # --target=hdr, --target=src, --action=parse, --action=merge
     my $cmd_info = &cmd_info_from_argv($argv);
     my $ordered_cc_paths = &exec_cmd_info($cmd_info); # -> start_cmd()
   } else { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o

@@ -501,16 +501,6 @@ sub start_cmd {
   $intmd_dir = &intmd_dir();
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'opts'}{'target'}) {
-    # target=ast
-    if ($$cmd_info{'opts'}{'target'} eq 'ast') {
-      my $t0 = Time::HiRes::time();
-      &gen_target_ast($cmd_info);
-      my $t1 = Time::HiRes::time();
-      if ($echo_elapsed_time) {
-        printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
-      }
-      return $ordered_cc_paths = [];
-    }
     # target=hdr
     if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
       my $t0 = Time::HiRes::time();
