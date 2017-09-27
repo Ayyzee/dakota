@@ -178,6 +178,17 @@ sub gen_make_body {
     my $prereqs =            $$rule[1];
     my $order_only_prereqs = $$rule[2];
     my $recipe =             $$rule[3];
+    my $common_tgt;
+    my $common_tgt_dir;
+    if ($$tgts[0] =~ /(\.ctlg|\.ctlg\.ast)$/) {
+      $common_tgt_dir = &dirname($$tgts[0]);
+      $common_tgt = 'seen-' . $$tgts[0];
+    }
+    if ($common_tgt) {
+      $result .= "ifndef $common_tgt" . $nl;
+      $result .= "$common_tgt := 1" . $nl;
+      $result .= "\$(shell mkdir -p $common_tgt_dir)" . $nl;
+    }
     my $d = $nl;
     foreach my $tgt (@$tgts) {
       $result .= $d . $tgt;
@@ -196,6 +207,9 @@ sub gen_make_body {
     $result .= $nl;
     if (scalar @$recipe) {
       $result .= "\t" . join(' ', @$recipe) . $nl;
+    }
+    if ($common_tgt) {
+      $result .= "endif" . $nl;
     }
   }
   return $result;
@@ -288,7 +302,7 @@ sub gen_rules {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
     my $so_ctlg_ast_path = &ast_path_from_ctlg_path($so_ctlg_path);
     &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [],
-                       [ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]]);
+                       [ 'dakota', '--action', 'parse', '--output', '$@', '$<' ]]);
     &add_last($rules, [[$so_ctlg_path], [$so_path], [],
                        [ 'dakota-catalog', '--output', '$@', '$<' ]]);
   }

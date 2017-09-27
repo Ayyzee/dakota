@@ -26,7 +26,6 @@ package dakota::dakota;
 
 use strict;
 use warnings;
-use Time::HiRes;
 use Cwd;
 use Fcntl qw(:DEFAULT :flock);
 use sort 'stable';
@@ -470,17 +469,14 @@ sub num_cpus {
 }
 sub gen_target_ast {
   my ($cmd_info) = @_;
-  my $jobs = [];
-  if (! $ENV{'nojobs'}) {
-    $jobs = [ '-j', &num_cpus() + 2 ];
-  }
-  my $exit_val = &verbose_exec(['make', '-s', @$jobs, '-f', &build_mk_path(), &target_inputs_ast_path()]);
+  return if $ENV{'skip_submake'};
+  my $jobs = &num_cpus() + 2;
+  my $exit_val = &verbose_exec(['make', '-s', '-j', $jobs, '-f', &build_mk_path(), &target_inputs_ast_path()]);
   exit 1 if $exit_val;
 }
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  my $echo_elapsed_time = 1;
   my $ordered_cc_paths = [];
   if ($$cmd_info{'opts'}{'action'}) {
     if (0) {
@@ -489,13 +485,7 @@ sub start_cmd {
       &cmd_line_action_parse($$cmd_info{'inputs'}[0], $$cmd_info{'opts'}{'output'});
     } elsif ($$cmd_info{'opts'}{'action'} eq 'merge') {
       die if scalar @{$$cmd_info{'inputs'}} == 0;
-      my $t0 = Time::HiRes::time();
       &cmd_line_action_merge($$cmd_info{'inputs'}, $$cmd_info{'opts'}{'output'});
-      my $t1 = Time::HiRes::time();
-      my $run_time = $t1 - $t0;
-      if ($echo_elapsed_time) {
-        #printf "elapsed action=merge: %.1fs\n", $run_time;
-      }
     }
     return $ordered_cc_paths = [];
   }
@@ -505,29 +495,15 @@ sub start_cmd {
   if ($$cmd_info{'opts'}{'target'}) {
     # target=hdr
     if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
-      my $t0 = Time::HiRes::time();
       &gen_target_ast($cmd_info);
-      my $t1 = Time::HiRes::time();
-      if ($echo_elapsed_time) {
-        printf "elapsed target=ast: %.1fs\n", $t1 - $t0;
-      }
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_hdr($cmd_info);
-      my $t2 = Time::HiRes::time();
-      if ($echo_elapsed_time) {
-        printf "elapsed target=hdr: %.1fs\n", $t2 - $t1;
-      }
       return $ordered_cc_paths = [];
     }
     # target=src
     if ($$cmd_info{'opts'}{'target'} eq 'src') {
-      my $t0 = Time::HiRes::time();
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_src($cmd_info);
-      my $t1 = Time::HiRes::time();
-      if ($echo_elapsed_time) {
-        printf "elapsed target=src: %.1fs\n", $t1 - $t0;
-      }
       return $ordered_cc_paths = [];
     }
     die;
