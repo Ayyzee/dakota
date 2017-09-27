@@ -470,8 +470,11 @@ sub num_cpus {
 }
 sub gen_target_ast {
   my ($cmd_info) = @_;
-  my $jobs = &num_cpus() + 2;
-  my $exit_val = &verbose_exec(['make', '-s', '-j', $jobs, '-f', &build_mk_path(), &target_inputs_ast_path()]);
+  my $jobs = [];
+  if (! $ENV{'nojobs'}) {
+    $jobs = [ '-j', &num_cpus() + 2 ];
+  }
+  my $exit_val = &verbose_exec(['make', '-s', @$jobs, '-f', &build_mk_path(), &target_inputs_ast_path()]);
   exit 1 if $exit_val;
 }
 my $root_cmd;
