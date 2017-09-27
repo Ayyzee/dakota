@@ -1515,7 +1515,7 @@ sub parts {
           $abs_path = $file_dir . '/' . $path;
         }
       }
-      $abs_path = File::Spec->canonpath($abs_path);
+      $abs_path = &canon_path($abs_path);
       die if ! -e $abs_path;
       &add_last($result, $abs_path);
     }
