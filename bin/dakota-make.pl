@@ -154,15 +154,18 @@ sub gen_dot_body {
 }
 sub gen_make {
   my ($rules) = @_;
+  my $intmd_dir =  &intmd_dir();
+  my $build_dir =  &build_dir();
   my $result = '';
   my $root = $$rules[0][0][0];
   $result .=
+    "\$(shell mkdir -p $intmd_dir/z)" . $nl .
+    "\$(shell mkdir -p $build_dir/z)" . $nl .
+    $nl .
     ".PHONY: all" . $nl .
     $nl .
-    "all: $root" . $nl;
-  ###
-  $result .= &gen_make_body($rules);
-  ###
+    "all: $root" . $nl .
+    $result .= &gen_make_body($rules);
   return $result;
 }
 sub gen_make_body {
