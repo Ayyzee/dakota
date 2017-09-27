@@ -164,6 +164,8 @@ sub gen_make {
   my $phony_root = &basename($root);
   $phony_root =~ s#\.(so|dylib)$##;
   $result .=
+    '# -*- mode: makefile -*-' . $nl .
+    $nl .
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
     "\$(shell mkdir -p \$HOME$root_dir)" . $nl .
