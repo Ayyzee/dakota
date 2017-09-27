@@ -691,10 +691,10 @@ sub build_dir {
   return $build_dir;
 }
 sub build_dot_path {
-  return &intmd_dir() . '/build.dot';
+  return &source_dir() . '/build.dot';
 }
 sub build_mk_path {
-  return &intmd_dir() . '/build.mk';
+  return &source_dir() . '/build.mk';
 }
 sub target_build_dir {
   my $target_build_dir = &build_dir() . '/z';

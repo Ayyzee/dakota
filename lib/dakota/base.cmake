@@ -22,7 +22,7 @@ execute_process (
 
 execute_process (
   COMMAND ${dakota-make} --path-only
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   OUTPUT_VARIABLE build-mk
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
