@@ -11,4 +11,5 @@ set -o xtrace
 rm -rf zzz
 export generator=ninja
 ./root-build.sh config
-./root-build.sh dakota-dso dakota-catalog dakota-core dakota
+./root-build.sh dakota-dso dakota-catalog
+./root-build.sh dakota-core dakota
