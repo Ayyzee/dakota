@@ -90,9 +90,8 @@ sub o_path_from_dk_path {
 sub gen_dot {
   my ($rules, $out_path) = @_;
   my $result = '';
-  $result .= "digraph {" . $nl;
+  $result .= "digraph { graph [ label = \"$out_path\", fontcolor = red ]" . $nl;
   $result .= "  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];" . $nl;
-  $result .= "  graph [ label = \"$out_path\", fontcolor = red ];" . $nl;
   $result .= "  node  [ shape = rect, style = rounded, height = 0, width = 0 ];" . $nl;
   $result .= $nl;
   $result .= &gen_dot_body($rules);
@@ -140,6 +139,8 @@ sub gen_dot_body {
         $result .= "  \"$tgt\" -> \"$prereq\"";
         if (&is_o_path($tgt)) {
           $result .= ' [ color = blue ]';
+        } elsif (&is_ctlg_path($tgt) || &is_ctlg_path($prereq)) {
+          $result .= ' [ color = green ]';
         }
         $result .= ';' . $nl;
       }
