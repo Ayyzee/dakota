@@ -165,15 +165,12 @@ sub gen_make {
   $result .=
     '# -*- mode: makefile -*-' . $nl .
     $nl .
+    "root-dir ?= .." . $nl .
+    "include \${root-dir}/rules.mk" . $nl .
+    $nl .
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
     "\$(shell mkdir -p \$\$HOME/.dkt$root_tgt_dir)" . $nl .
-    $nl .
-    "%.ctlg :" . $nl .
-    "\t" . 'dakota-catalog --output $@ $<' . $nl .
-    $nl .
-    "%.ctlg.ast : %.ctlg" . $nl .
-    "\t" . 'dakota --action parse --output $@ $<' . $nl .
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
