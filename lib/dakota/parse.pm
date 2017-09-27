@@ -77,7 +77,6 @@ my $patterns = {
   'ast_path_from_dk_path'   => '$(intmd_dir)/%.dk.ast   : $(source_dir)/%.dk',
 
   'ctlg_path_from_so_path'  => '$(intmd_dir)/%$(so_ext).ctlg : %$(so_ext)',
-  'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -338,18 +337,16 @@ sub inc_path_from_dk_path {
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
-  $in_path = &basename($in_path);
-  $in_path =~ s/$so_ext((\.\d+)+)$/$so_ext/;
-  my $vers = $1;
-  my $out_path = &out_path_from_in_path('ctlg_path_from_so_path', $in_path);
-  if (defined $vers) {
-    $out_path =~ s/\.ctlg$/.ctlg$vers/;
+  my $out_path = $ENV{'HOME'} . '/.dkt' . $in_path . '.ctlg';
+  my $out_dir = &dirname($out_path);
+  if (! -d $out_dir) {
+    &make_dir($out_dir);
   }
   return $out_path;
 }
 sub ast_path_from_ctlg_path {
   my ($in_path) = @_;
-  my $out_path = &out_path_from_in_path('ast_path_from_ctlg_path', $in_path);
+  my $out_path = $in_path . '.ast';
   return $out_path;
 }
 sub ast_path_from_dk_path {

@@ -96,9 +96,10 @@ sub gen_dot {
   $result .= $nl;
   $result .= &gen_dot_body($rules);
   $result .= "}" . $nl;
-  if (1) {
-    my $prefix = &longest_common_prefix(&source_dir(), &intmd_dir());
-    $result =~ s=$prefix==g; # hack to make the graph less noisy
+  if (1) { # hack to make the graph less noisy
+    my $prefix = $ENV{'HOME'};
+    $result =~ s#"$prefix/#"#g;
+    $result =~ s#$prefix/#/HOME/#g;
   }
   return $result;
 }
