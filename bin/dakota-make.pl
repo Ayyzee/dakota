@@ -258,7 +258,7 @@ sub gen_rules {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths,$target_o_path], [],
                        [ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]]);
   }
-  if (1) {
+  if (0) {
     # force gen of target.cc to happen after all *.dk.o are compiled
     &add_last($rules, [[$target_src_path], [], $dk_o_paths, []]); # using order-only prereqs
   }
