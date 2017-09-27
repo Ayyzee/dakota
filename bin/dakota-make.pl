@@ -159,16 +159,15 @@ sub gen_make {
   my $intmd_dir =  &intmd_dir();
   my $build_dir =  &build_dir();
   my $result = '';
-  my $root = $$rules[0][0][0];
-  my $root_dir =   &dirname($root);
-  my $phony_root = &basename($root);
-  $phony_root =~ s#\.(so|dylib)$##;
+  my $root_tgt = $$rules[0][0][0];
+  my $root_tgt_dir =   &dirname($root_tgt);
+  my $phony_root_tgt = &basename($root_tgt) =~ s#\.(so|dylib)$##r;
   $result .=
     '# -*- mode: makefile -*-' . $nl .
     $nl .
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
-    "\$(shell mkdir -p \$\$HOME/.dkt$root_dir)" . $nl .
+    "\$(shell mkdir -p \$\$HOME/.dkt$root_tgt_dir)" . $nl .
     $nl .
     "%.ctlg :" . $nl .
     "\t" . 'dakota-catalog --output $@ $<' . $nl .
@@ -176,10 +175,10 @@ sub gen_make {
     "%.ctlg.ast : %.ctlg" . $nl .
     "\t" . 'dakota --action parse --output $@ $<' . $nl .
     $nl .
-    ".PHONY : all $phony_root" . $nl .
+    ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
-    "all : $phony_root" . $nl .
-    "$phony_root : $root" . $nl .
+    "all : $phony_root_tgt" . $nl .
+    "$phony_root_tgt : $root_tgt" . $nl .
     $result .= &gen_make_body($rules);
   return $result;
 }
