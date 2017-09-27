@@ -168,7 +168,7 @@ sub gen_make {
     $nl .
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
-    "\$(shell mkdir -p \$HOME$root_dir)" . $nl .
+    "\$(shell mkdir -p \$\$HOME/.dkt$root_dir)" . $nl .
     $nl .
     "%.ctlg :" . $nl .
     "\t" . 'dakota-catalog --output $@ $<' . $nl .
