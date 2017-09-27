@@ -1502,7 +1502,7 @@ sub xxx_from_yaml_file {
   return $result;
 }
 sub parts {
-  my ($file) = @_;
+  my ($file, $force) = @_;
   my $file_dir = &dirname($file);
   my $result = [];
   if (-e $file) {
@@ -1516,7 +1516,7 @@ sub parts {
         }
       }
       $abs_path = &canon_path($abs_path);
-      die if ! -e $abs_path;
+      die if ! $force && ! -e $abs_path;
       &add_last($result, $abs_path);
     }
   }

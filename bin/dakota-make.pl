@@ -65,7 +65,8 @@ sub cmd_info_from_argv {
   &set_env_vars($$root_cmd{'opts'}{'var'});
   delete $$root_cmd{'opts'}{'var'};
   if (! $$root_cmd{'opts'}{'path-only'}) {
-    $$root_cmd{'parts'} = &parts(&parts_path());
+    my $force;
+    $$root_cmd{'parts'} = &parts(&parts_path(), $force = 1);
   }
   return $root_cmd;
 }
@@ -90,7 +91,8 @@ sub gen_dot {
   my ($rules, $out_path) = @_;
   my $result = '';
   $result .= "digraph {" . $nl;
-  $result .= "  graph [ rankdir = LR, dir = back, label = \"$out_path\", fontcolor = red, nodesep = 0.03 ];" . $nl;
+  $result .= "  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];" . $nl;
+  $result .= "  graph [ label = \"$out_path\", fontcolor = red ];" . $nl;
   $result .= "  node  [ shape = rect, style = rounded, height = 0, width = 0 ];" . $nl;
   $result .= $nl;
   $result .= &gen_dot_body($rules);
