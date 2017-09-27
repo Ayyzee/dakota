@@ -140,7 +140,7 @@ sub gen_dot_body {
         $result .= "  \"$tgt\" -> \"$prereq\"";
         if (&is_o_path($tgt)) {
           $result .= ' [ color = blue ]';
-        } elsif (&is_ctlg_path($tgt) || &is_ctlg_path($prereq)) {
+        } elsif (&is_so_path($prereq)) {
           $result .= ' [ color = green ]';
         }
         $result .= ';' . $nl;
@@ -160,13 +160,24 @@ sub gen_make {
   my $build_dir =  &build_dir();
   my $result = '';
   my $root = $$rules[0][0][0];
+  my $root_dir =   &dirname($root);
+  my $phony_root = &basename($root);
+  $phony_root =~ s#\.(so|dylib)$##;
   $result .=
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
+    "\$(shell mkdir -p \$HOME$root_dir)" . $nl .
     $nl .
-    ".PHONY: all" . $nl .
+    "%.ctlg :" . $nl .
+    "\t" . 'dakota-catalog --output $@ $<' . $nl .
     $nl .
-    "all: $root" . $nl .
+    "%.ctlg.ast : %.ctlg" . $nl .
+    "\t" . 'dakota --action parse --output $@ $<' . $nl .
+    $nl .
+    ".PHONY : all $phony_root" . $nl .
+    $nl .
+    "all : $phony_root" . $nl .
+    "$phony_root : $root" . $nl .
     $result .= &gen_make_body($rules);
   return $result;
 }
@@ -178,17 +189,6 @@ sub gen_make_body {
     my $prereqs =            $$rule[1];
     my $order_only_prereqs = $$rule[2];
     my $recipe =             $$rule[3];
-    my $common_tgt;
-    my $common_tgt_dir;
-    if ($$tgts[0] =~ /(\.ctlg|\.ctlg\.ast)$/) {
-      $common_tgt_dir = &dirname($$tgts[0]);
-      $common_tgt = 'seen-' . $$tgts[0];
-    }
-    if ($common_tgt) {
-      $result .= "ifndef $common_tgt" . $nl;
-      $result .= "$common_tgt := 1" . $nl;
-      $result .= "\$(shell mkdir -p $common_tgt_dir)" . $nl;
-    }
     my $d = $nl;
     foreach my $tgt (@$tgts) {
       $result .= $d . $tgt;
@@ -207,9 +207,6 @@ sub gen_make_body {
     $result .= $nl;
     if (scalar @$recipe) {
       $result .= "\t" . join(' ', @$recipe) . $nl;
-    }
-    if ($common_tgt) {
-      $result .= "endif" . $nl;
     }
   }
   return $result;
@@ -302,9 +299,11 @@ sub gen_rules {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
     my $so_ctlg_ast_path = &ast_path_from_ctlg_path($so_ctlg_path);
     &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [],
-                       [ 'dakota', '--action', 'parse', '--output', '$@', '$<' ]]);
+                       []]);
+                      #[ 'dakota', '--action', 'parse', '--output', '$@', '$<' ]]);
     &add_last($rules, [[$so_ctlg_path], [$so_path], [],
-                       [ 'dakota-catalog', '--output', '$@', '$<' ]]);
+                       []]);
+                      #[ 'dakota-catalog', '--output', '$@', '$<' ]]);
   }
   return $rules;
 }
