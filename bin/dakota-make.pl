@@ -58,7 +58,7 @@ sub cmd_info_from_argv {
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
                        'path-only',
-                       'root-tgt=s',
+                       'target=s',
                        'var=s',
                       );
   $$root_cmd{'inputs'} = $argv; # this should always be empty
@@ -332,7 +332,7 @@ sub start {
     exit 0;
   }
   #print &Dumper($cmd_info);
-  my $rules = &gen_rules($$cmd_info{'opts'}{'root-tgt'}, $$cmd_info{'parts'});
+  my $rules = &gen_rules($$cmd_info{'opts'}{'target'}, $$cmd_info{'parts'});
   my $build_mk = &gen_make($rules);
   my $out_path = &write_build_mk($build_mk);
   if (1) {
