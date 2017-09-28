@@ -1,6 +1,8 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-dakota-make.sh
+for tgt in dakota-core dakota; do
+  dakota-make.pl --var=build_dir=/Users/robert/dakota/zzz/build/$tgt --var=source_dir=/Users/robert/dakota/$tgt --root-tgt /Users/robert/dakota/lib/lib$tgt.dylib #--parts /Users/robert/dakota/$tgt/parts.txt
+done
 rm -rf zzz
 SECONDS=0
 skip_submake=1 make $@ -j 10 -f build.mk
