@@ -174,14 +174,14 @@ sub gen_make {
     $nl .
     "include \${root-dir}/rules.mk" . $nl .
     $nl .
-    "\$(shell mkdir -p $intmd_dir/z)" . $nl .
-    "\$(shell mkdir -p $build_dir/z)" . $nl .
+    "\$(shell mkdir -p \${intmd-dir}/z)" . $nl .
+    "\$(shell mkdir -p \${build-dir}/z)" . $nl .
     "\$(shell mkdir -p \$\$HOME/.dkt$root_tgt_dir)" . $nl .
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
     "all : $phony_root_tgt" . $nl .
-    "$phony_root_tgt : $root_tgt" . $nl .
+    "$phony_root_tgt : $root_tgt" . $nl;
     $result .= &gen_make_body($rules);
   return $result;
 }
