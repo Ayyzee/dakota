@@ -258,48 +258,61 @@ sub gen_rules {
       &add_last($so_ctlg_ast_paths, $so_ctlg_ast_path);
     }
   }
+  my $root_tgt_name = &basename($root_tgt);
+  my $root_tgt_type;
+  if (&is_so_path($root_tgt)) {
+    $root_tgt_type = 'shared-library';
+  } else {
+    $root_tgt_type = 'executable';
+  }
+  my $gbl_recipes = {
+    'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
+    'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]],
+    'compile-dk' =>          [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
+                                '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
+    'compile-cc' =>          [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
+                                "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"",
+                                '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
+    'gen-target-hdr' =>      [[ 'dakota', '--target', 'hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]],
+    'gen-target-src' =>      [[ 'dakota', '--target', 'src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]],
+    'link-shared-library' => [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]],
+    'link-executable' =>     [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]],
+  };
   my $target_o_path =          &target_o_path();
   my $target_src_path =        &target_src_path();
   my $target_hdr_path =        &target_hdr_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
-  my $root_tgt_name = &basename($root_tgt);
-  my $root_tgt_type;
   my $rules = [];
   if (&is_so_path($root_tgt)) {
-    $root_tgt_type = 'shared-library';
     &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path], [],
-                       [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]]]);
+                       $$gbl_recipes{'link-shared-library'}]);
   } else {
-    $root_tgt_type = 'executable';
     &add_last($rules, [[$root_tgt], [@$dk_o_paths,$target_o_path], [],
-                       [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]]]);
+                       $$gbl_recipes{'link-executable'}]);
   }
   if (0) {
     # force gen of target.cc to happen after all *.dk.o are compiled
     &add_last($rules, [[$target_src_path], [], $dk_o_paths, [[]]]); # using order-only prereqs
   }
   &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], # using order-only prereqs
-                     [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
-                       "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"", 
-                       '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]]]);
+                     $$gbl_recipes{'compile-cc'}]);
   &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], [[]]]); # using order-only prereqs
   &add_last($rules, [[$target_hdr_path], [$target_inputs_ast_path], [],
-                     [[ 'dakota', '--target', 'hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]]]);
+                     $$gbl_recipes{'gen-target-hdr'}]);
   &add_last($rules, [[$target_src_path], [$target_inputs_ast_path], [],
-                     [[ 'dakota', '--target', 'src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]]]);
+                     $$gbl_recipes{'gen-target-src'}]);
   &add_last($rules, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [],
-                     [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]]]);
+                     $$gbl_recipes{'merge'}]);
   &add_last($rules, [[$target_srcs_ast_path], [@$dk_ast_paths], [],
-                     [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]]]);
+                     $$gbl_recipes{'merge'}]);
   foreach my $dk_path (@$dk_paths) {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
     my $dk_ast_path = &ast_path_from_dk_path($dk_path);
     &add_last($rules, [[$dk_o_path], [$dk_path], [],
-                       [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
-                        '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]]]);
+                       $$gbl_recipes{'compile-dk'}]);
     &add_last($rules, [[$dk_ast_path], [$dk_path], [],
-                       [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]]]);
+                       $$gbl_recipes{'parse'} ]);
   }
   foreach my $so_path (@$so_paths) {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
