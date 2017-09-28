@@ -218,10 +218,10 @@ sub cxx_argv_from_argv {
   }
   return $cxx_argv;
 }
-sub has_target_action_opt {
+sub has_action_opt {
   my ($argv) = @_;
   foreach my $arg (@$argv) {
-    return 1 if $arg =~ /^--(target|action)(=.*)?$/;
+    return 1 if $arg =~ /^--action(=.*)?$/;
   }
   return 0;
 }
@@ -289,8 +289,8 @@ sub cmd_info_from_argv {
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
                        'path-only',
-                       'action=s', 'output=s', # output only used for action=parse and action=merge
-                       'target=s',
+                       'action=s',
+                       'output=s', # output only used for action=parse and action=merge
                        'var=s',
                        #'clean', # make target like
                       );
@@ -318,7 +318,7 @@ sub exec_cmd_info {
 }
 sub start {
   my ($argv) = @_;
-  if (&has_target_action_opt($argv)) { # --target=hdr, --target=src, --action=parse, --action=merge
+  if (&has_action_opt($argv)) { # --action=gen-target-hdr, --action=gen-target-src, --action=parse, --action=merge
     my $cmd_info = &cmd_info_from_argv($argv);
     my $ordered_cc_paths = &exec_cmd_info($cmd_info); # -> start_cmd()
   } else { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o

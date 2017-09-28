@@ -731,14 +731,12 @@ sub parts_path {
 sub path_only {
   my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
-    die if ! $$cmd_info{'opts'}{'target'};
+    die if ! $$cmd_info{'opts'}{'action'};
     my $path;
     if (0) {
-    } elsif ($$cmd_info{'opts'}{'target'} eq 'ast') {
-      $path = &target_srcs_ast_path();
-    } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+    } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
       $path = &target_hdr_path();
-    } elsif ($$cmd_info{'opts'}{'target'} eq 'src') {
+    } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
       $path = &target_src_path();
     } else {
       die;

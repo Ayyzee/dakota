@@ -27,14 +27,14 @@ execute_process (
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process (
-  COMMAND ${CMAKE_CXX_COMPILER} --target src --path-only
+  COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src --path-only
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
 
 execute_process (
-  COMMAND ${CMAKE_CXX_COMPILER} --target hdr --path-only
+  COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-hdr --path-only
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   OUTPUT_VARIABLE target-hdr
   OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -55,7 +55,7 @@ add_custom_command (
 add_custom_command (
   OUTPUT ${target-src}
   DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
-  COMMAND ${CMAKE_CXX_COMPILER} --target src
+  COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM
@@ -70,7 +70,7 @@ set (custom-target-hdr ${target}.custom-target-hdr)
 # phony target 'custom-target-hdr'
 add_custom_target (${custom-target-hdr}
   DEPENDS ${parts} ${target-libs} ${build-mk}
-  COMMAND ${CMAKE_CXX_COMPILER} --target hdr
+  COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-hdr
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Generating ${rel-target-hdr}"

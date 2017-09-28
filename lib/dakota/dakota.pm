@@ -478,6 +478,8 @@ my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
   my $ordered_cc_paths = [];
+  $root_cmd = $cmd_info;
+  $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'opts'}{'action'}) {
     if (0) {
     } elsif ($$cmd_info{'opts'}{'action'} eq 'parse') {
@@ -486,27 +488,17 @@ sub start_cmd {
     } elsif ($$cmd_info{'opts'}{'action'} eq 'merge') {
       die if scalar @{$$cmd_info{'inputs'}} == 0;
       &cmd_line_action_merge($$cmd_info{'inputs'}, $$cmd_info{'opts'}{'output'});
-    }
-    return $ordered_cc_paths = [];
-  }
-  $root_cmd = $cmd_info;
-  $intmd_dir = &intmd_dir();
-  $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
-  if ($$cmd_info{'opts'}{'target'}) {
-    # target=hdr
-    if ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+    } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
+      $intmd_dir = &intmd_dir(); # to set global var
       &gen_target_ast($cmd_info);
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_hdr($cmd_info);
-      return $ordered_cc_paths = [];
-    }
-    # target=src
-    if ($$cmd_info{'opts'}{'target'} eq 'src') {
+    } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
+      $intmd_dir = &intmd_dir(); # to set global var
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_src($cmd_info);
-      return $ordered_cc_paths = [];
     }
-    die;
+    return $ordered_cc_paths = [];
   } else {
     # replace dk-paths with cc-paths
     $cmd_info = &loop_cc_from_dk($cmd_info);
@@ -678,16 +670,16 @@ sub target_src_from_ast {
 sub target_from_ast {
   my ($cmd_info, $is_defn) = @_;
   die if ! defined $$cmd_info{'ast-paths'} || 0 == @{$$cmd_info{'ast-paths'}};
-  die if ! defined $$cmd_info{'opts'}{'target'};
+  die if ! defined $$cmd_info{'opts'}{'action'};
   my $target_srcs_ast_path = &target_srcs_ast_path();
   my $target_src_path = &target_src_path();
   my $target_hdr_path =  &target_hdr_path();
 
   if ($is_defn) {
-    if ($$cmd_info{'opts'}{'target'} eq 'src') {
+    if ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
       return if !&is_out_of_date($target_srcs_ast_path, $target_src_path);
     }
-  } elsif ($$cmd_info{'opts'}{'target'} eq 'hdr') {
+  } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
     return if !&is_out_of_date($target_srcs_ast_path, $target_hdr_path);
   }
   &make_dirname($target_src_path, $global_should_echo);

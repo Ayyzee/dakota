@@ -273,8 +273,8 @@ sub gen_rules {
     'compile-cc' =>          [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
                                 "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"",
                                 '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
-    'gen-target-hdr' =>      [[ 'dakota', '--target', 'hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]],
-    'gen-target-src' =>      [[ 'dakota', '--target', 'src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]],
+    'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]],
+    'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir" ]],
     'link-shared-library' => [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]],
     'link-executable' =>     [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]],
   };
