@@ -156,6 +156,7 @@ sub gen_dot_body {
 }
 sub gen_make {
   my ($rules) = @_;
+  my $source_dir = &source_dir();
   my $intmd_dir =  &intmd_dir();
   my $build_dir =  &build_dir();
   my $result = '';
@@ -166,6 +167,11 @@ sub gen_make {
     '# -*- mode: makefile -*-' . $nl .
     $nl .
     "root-dir ?= .." . $nl .
+    $nl .
+    "source-dir := $source_dir" . $nl .
+    "intmd-dir :=  $intmd_dir" . $nl .
+    "build-dir :=  $build_dir" . $nl .
+    $nl .
     "include \${root-dir}/rules.mk" . $nl .
     $nl .
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
@@ -229,8 +235,8 @@ sub write_build_dot {
 }
 sub gen_rules {
   my ($root_tgt, $parts) = @_;
-  my $build_dir =  &build_dir();
   my $source_dir = &source_dir();
+  my $build_dir =  &build_dir();
   my $dk_paths = [];
   my $so_paths = [];
   my $so_ctlg_ast_paths = [];
