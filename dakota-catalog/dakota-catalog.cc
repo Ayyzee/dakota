@@ -144,13 +144,30 @@ static FUNC file_exists(str_t path, int flags = O_RDONLY) -> bool {
   }
   return state;
 }
+static FUNC file_size(const char* path) -> ssize_t {
+  FILE* file = fopen(path, "r");
+  if (file == nullptr) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
+  int n = fseek(file, 0L, SEEK_END);
+  if (n == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
+  ssize_t s = ftell(file);
+  if (s == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
+  n = fclose(file);
+  if (n == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
+  return s;
+}
+// this is a hackhack: it only checks for zero length files
+// a future implementation should take an md5 of both files and compare
+// these md5s are likely to be cached in the filesystem for faster comparison
+static FUNC have_same_contents(const char* path1, const char* path2) -> bool {
+  return file_size(path1) == 0 && file_size(path2) == 0;
+}
 static FUNC create_empty_file(str_t path) -> int_t {
   assert(path != nullptr);
   assert(path[0] != NUL);
   int fd = open(path, O_CREAT | O_TRUNC, 0644);
   if (fd == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
   int n = close(fd);
-  if (n == -1) non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
+  if (n == -1) exit_fail_with_msg("ERROR: %s: \"%s\"\n", path, strerror(errno));
   return 0;
 }
 // 1: try to spawn() path
@@ -216,8 +233,15 @@ FUNC main(int argc, char** argv) -> int {
   if (opts.output != nullptr) {
     if (strcmp(opts.output, tmp_output) != 0) {
       assert(tmp_output[0] != NUL);
-      int n = rename(tmp_output, opts.output);
-      if (n == -1) exit_value = non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
+      if (file_exists(opts.output) &&
+          have_same_contents(opts.output, tmp_output)) {
+        // preserve timestamp when possible
+        int n = unlink(tmp_output);
+        if (n == -1) exit_value = non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", tmp_output, strerror(errno));
+      } else {
+        int n = rename(tmp_output, opts.output);
+        if (n == -1) exit_value = non_exit_fail_with_msg("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
+      }
     }
   }
   return exit_value;
