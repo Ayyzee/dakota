@@ -301,7 +301,7 @@ sub cmd_info_from_argv {
 }
 sub exec_cmd_info {
   my ($root_cmd) = @_;
-  if (! $$root_cmd{'opts'}{'action'}) {
+  if (! $$root_cmd{'opts'}{'action'} || ($$root_cmd{'opts'}{'action'} ne 'merge' && $$root_cmd{'opts'}{'action'} ne 'parse')) {
     &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
     $$root_cmd{'parts'} = &parts(&parts_path());
     &set_root_cmd($root_cmd);
