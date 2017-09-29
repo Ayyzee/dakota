@@ -84,6 +84,7 @@ add_custom_command (
   DEPENDS ${parts} ${target-libs}
   COMMAND ${dakota-make}
     --target=${target-output-path}
+    --var=root_source_dir=${root-dir}
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM
