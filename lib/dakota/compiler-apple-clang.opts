@@ -1,4 +1,7 @@
+-fsanitize=address
 -fno-common
+-fPIC
+-std=gnu++1z
 --warn-no-dollar-in-identifier-extension
 --warn-no-multichar
 --warn-everything
@@ -16,4 +19,3 @@
 --warn-no-padded
 --warn-no-unknown-warning-option
 --warn-no-unused-command-line-argument
--fsanitize=address

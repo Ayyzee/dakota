@@ -238,6 +238,7 @@ sub write_build_dot {
 }
 sub gen_rules {
   my ($root_tgt, $parts) = @_;
+  my $root_source_dir = $ENV{'root_source_dir'};
   my $source_dir = &source_dir();
   my $build_dir =  &build_dir();
   my $dk_paths = [];
@@ -269,13 +270,13 @@ sub gen_rules {
   my $gbl_recipes = {
     'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
     'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]],
-    'compile' =>             [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
-                                "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"",
-                                '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
     'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
     'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
-    'link-shared-library' => [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^' ]],
-    'link-executable' =>     [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^' ]],
+    'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
+                                "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"",
+                                "-I$source_dir", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
+    'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', '-o', '$@', '$^' ]],
+    'link-executable' =>     [[ 'dakota', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', '-o', '$@', '$^' ]],
   };
   my $target_o_path =          &target_o_path();
   my $target_src_path =        &target_src_path();
@@ -289,10 +290,6 @@ sub gen_rules {
   } else {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path, @$so_paths], [],
                        $$gbl_recipes{'link-executable'}]);
-  }
-  if (0) {
-    # force gen of target.cc to happen after all *.dk.o are compiled
-    &add_last($rules, [[$target_src_path], [], $dk_o_paths, [[]]]); # using order-only prereqs
   }
   &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], # using order-only prereqs
                      $$gbl_recipes{'compile'}]);

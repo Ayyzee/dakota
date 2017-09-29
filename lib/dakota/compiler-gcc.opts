@@ -1,4 +1,7 @@
+-fsanitize=address
 -fno-common
+-fPIC
+-std=gnu++1z
 --warn-no-dollar-in-identifier-extension
 --warn-no-multichar
 --all-warnings
@@ -21,4 +24,3 @@
 --warn-no-missing-field-initializers
 --warn-no-cast-qual
 --warn-no-switch-default
--fsanitize=address
