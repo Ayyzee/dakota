@@ -607,7 +607,6 @@ sub cc_from_dk {
     $$cc_cmd{'io'} =  $$cmd_info{'io'};
     $num_out_of_date_infiles = &cc_from_dk_core1($cc_cmd);
     $outfile = $$cc_cmd{'output'};
-    &dakota_io_add($$cmd_info{'io'}, 'precompile', $input, $outfile);
   }
   return $outfile;
 } # cc_from_dk
@@ -693,7 +692,6 @@ sub target_from_ast {
   my $target_inputs_ast = &target_inputs_ast(); # within target_src_from_ast
   if ($is_defn) {
     &generate_target_defn($target_src_path, $target_srcs_ast, $target_inputs_ast);
-    &dakota_io_assign($$cmd_info{'io'}, 'target-src', $target_src_path);
   } else {
     &generate_target_decl($target_hdr_path, $target_srcs_ast, $target_inputs_ast);
   }

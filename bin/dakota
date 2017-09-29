@@ -225,61 +225,6 @@ sub has_action_opt {
   }
   return 0;
 }
-sub dakota_io {
-  my ($root_cmd) = @_;
-  my $source_dir = &source_dir();
-  my $intmd_dir =  &intmd_dir();
-  $$root_cmd{'io'} = $intmd_dir . '/dakota.io';
-  my $dakota_io_path = $$root_cmd{'io'};
-  if (! -e $dakota_io_path) {
-    # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
-    my $default_dakota_io = {
-      'precompile' => {},
-      'cwd' =>        &cwd(),
-      'source-dir' => $source_dir,
-      'intmd-dir' =>  $intmd_dir,
-    };
-    &dakota::util::dakota_io_to_file($dakota_io_path, $default_dakota_io);
-  }
-  my $dakota_io = &dakota::util::dakota_io_from_file($dakota_io_path);
-  $$dakota_io{'intmd-dir'} = &intmd_dir();
-  &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
-  return ($dakota_io_path, $dakota_io);
-} # dakota_io
-sub clean {
-  my ($root_cmd, $dakota_io_path, $dakota_io) = @_;
-  if ($dakota_io) {
-    if (0) {
-      if ($$dakota_io{'intmd-dir'} && $$dakota_io{'intmd-dir'} ne '.') {
-        print "rm -r $$dakota_io{'intmd-dir'}" . $nl;
-        `rm -r $$dakota_io{'intmd-dir'}`;
-      }
-    }
-    if (1) { # cmake writes .o files in its own build dir
-      &clean_paths($dakota_io, $dakota_io_path, 'precompile', 'target-src');
-    }
-  }
-}
-sub clean_paths {
-  my ($dakota_io, $dakota_io_path, $key, $extra_key) = @_;
-  my $values = [values %{$$dakota_io{$key}}];
-  $$dakota_io{$key} = {};
-  if ($extra_key && $$dakota_io{$extra_key}) {
-    &add_last($values, $$dakota_io{$extra_key});
-    delete $$dakota_io{$extra_key};
-  }
-  my $remove = {};
-  foreach my $out_path (@$values) {
-    if (-e $out_path) {
-      $$remove{$out_path} = undef;
-    }
-  }
-  &dakota::util::dakota_io_to_file($dakota_io_path, $dakota_io);
-  foreach my $path (sort keys %$remove) {
-    print "rm $path" . $nl;
-    unlink $path;
-  }
-}
 sub cmd_info_from_argv {
   my ($argv) = @_;
   my $root_cmd = {
@@ -292,7 +237,6 @@ sub cmd_info_from_argv {
                        'action=s',
                        'output=s', # output only used for action=parse and action=merge
                        'var=s',
-                       #'clean', # make target like
                       );
   $$root_cmd{'inputs'} = $argv;
   &set_env_vars($$root_cmd{'opts'}{'var'});
@@ -305,12 +249,6 @@ sub exec_cmd_info {
     &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
     $$root_cmd{'parts'} = &parts(&parts_path());
     &set_root_cmd($root_cmd);
-    my ($dakota_io_path, $dakota_io) = &dakota_io($root_cmd);
-
-    if ($$root_cmd{'opts'}{'clean'}) {
-      &clean($root_cmd, $dakota_io_path, $dakota_io);
-      exit 0;
-    }
   }
   #print STDERR "root_cmd{'opts'}: " . &Dumper($$root_cmd{'opts'});
   my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);

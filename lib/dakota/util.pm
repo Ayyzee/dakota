@@ -158,12 +158,6 @@ our @EXPORT= qw(
                  path_split
                  prepend_dot_slash
                  platform
-                 dakota_io_add
-                 dakota_io_append
-                 dakota_io_assign
-                 dakota_io_from_file
-                 dakota_io_remove
-                 dakota_io_to_file
                  remove_extra_whitespace
                  remove_first
                  remove_last
@@ -976,72 +970,6 @@ sub is_array {
     $state = 0;
   }
   return $state;
-}
-my $disable_dakota_io = 1;
-sub dakota_io_from_file {
-  my ($dakota_io_path) = @_;
-  return {} if $disable_dakota_io;
-  my $dakota_io = &scalar_from_file($dakota_io_path);
-  return $dakota_io;
-}
-sub dakota_io_to_file {
-  my ($dakota_io_path, $dakota_io) = @_;
-  return if $disable_dakota_io;
-  &scalar_to_file($dakota_io_path, $dakota_io);
-}
-sub dakota_io_append {
-  my ($line) = @_;
-  $$line[-1] = 'undef' if ! $$line[-1];
-  #print STDERR join(' ', @$line) . $nl;
-}
-sub dakota_io_assign {
-  my ($dakota_io_path, $key, $value) = @_;
-  $value = &canon_path($value);
-  my $dakota_io = &dakota_io_from_file($dakota_io_path);
-  if (! $$dakota_io{$key} || $value ne $$dakota_io{$key}) {
-    &dakota_io_append([$key, $value]);
-    $$dakota_io{$key} = $value;
-    &dakota_io_to_file($dakota_io_path, $dakota_io);
-  }
-}
-sub dakota_io_remove {
-  my ($dakota_io, $key, $input) = @_;
-  if (&is_array($input)) {
-    foreach my $in (@$input) {
-      $in = &canon_path($in);
-      if ($$dakota_io{$key}{$in}) {
-        delete $$dakota_io{$key}{$in};
-      }
-    }
-  } else {
-    if ($$dakota_io{$key}{$input}) {
-      delete $$dakota_io{$key}{$input};
-    }
-  }
-}
-sub dakota_io_path_remove {
-  my ($dakota_io_path, $key, $input) = @_;
-  my $dakota_io = &dakota_io_from_file($dakota_io_path);
-  &dakota_io_remove($dakota_io, $key, $input);
-  &dakota_io_to_file($dakota_io_path, $dakota_io);
-}
-sub dakota_io_add {
-  my ($dakota_io_path, $key, $input, $depend) = @_;
-  $depend = &canon_path($depend);
-  my $dakota_io = &dakota_io_from_file($dakota_io_path);
-  $depend = &canon_path($depend);
-  if (&is_array($input)) {
-    foreach my $in (@$input) {
-      $in = &canon_path($in);
-      &dakota_io_append([$key, $in, $depend]);
-      $$dakota_io{$key}{$in} = $depend;
-    }
-  } else {
-    $input = &canon_path($input);
-    &dakota_io_append([$key, $input, $depend]);
-    $$dakota_io{$key}{$input} = $depend;
-  }
-  &dakota_io_to_file($dakota_io_path, $dakota_io);
 }
 sub is_va {
   my ($method) = @_;
