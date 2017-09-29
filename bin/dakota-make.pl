@@ -269,9 +269,7 @@ sub gen_rules {
   my $gbl_recipes = {
     'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
     'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]],
-    'compile-dk' =>          [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
-                                '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
-    'compile-cc' =>          [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
+    'compile' =>             [[ 'dakota', '-c', '-Wno-multichar', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
                                 "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"",
                                 '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
     'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
@@ -297,7 +295,7 @@ sub gen_rules {
     &add_last($rules, [[$target_src_path], [], $dk_o_paths, [[]]]); # using order-only prereqs
   }
   &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], # using order-only prereqs
-                     $$gbl_recipes{'compile-cc'}]);
+                     $$gbl_recipes{'compile'}]);
   &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], [[]]]); # using order-only prereqs
   &add_last($rules, [[$target_hdr_path], [$target_inputs_ast_path], [],
                      $$gbl_recipes{'gen-target-hdr'}]);
@@ -311,7 +309,7 @@ sub gen_rules {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
     my $dk_ast_path = &ast_path_from_dk_path($dk_path);
     &add_last($rules, [[$dk_o_path], [$dk_path], [],
-                       $$gbl_recipes{'compile-dk'}]);
+                       $$gbl_recipes{'compile'}]);
     &add_last($rules, [[$dk_ast_path], [$dk_path], [],
                        $$gbl_recipes{'parse'} ]);
   }
