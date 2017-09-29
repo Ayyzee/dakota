@@ -68,12 +68,13 @@ set_source_files_properties (${target-src} PROPERTIES
 
 include (ProcessorCount)
 ProcessorCount (processor-count)
+math (EXPR jobs "${processor-count} + 2")
 
 set (custom-target-hdr ${target}.custom-target-hdr)
 # phony target 'custom-target-hdr'
 add_custom_target (${custom-target-hdr}
   DEPENDS ${parts} ${target-libs} ${build-mk}
-  COMMAND make -s -j ${processor-count} -f ${build-mk} ${target-hdr}
+  COMMAND make -s -j ${jobs} -f ${build-mk} ${target-hdr}
   COMMENT "Generating ${rel-target-hdr}"
   VERBATIM
   USES_TERMINAL)
