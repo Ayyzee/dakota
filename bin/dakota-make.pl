@@ -281,15 +281,15 @@ sub gen_rules {
                                 '-std=c++1z', "-I$source_dir", "-I$source_dir/../include", '-std=c++1z', '-fPIC', '-o', '$@', '$<' ]],
     'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
     'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
-    'link-shared-library' => [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]],
-    'link-executable' =>     [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^', @$so_paths ]],
+    'link-shared-library' => [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^' ]],
+    'link-executable' =>     [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^' ]],
   };
   my $rules = [];
   if (&is_so_path($root_tgt)) {
-    &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path], [],
+    &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path, @$so_paths], [],
                        $$gbl_recipes{'link-shared-library'}]);
   } else {
-    &add_last($rules, [[$root_tgt], [@$dk_o_paths,$target_o_path], [],
+    &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path, @$so_paths], [],
                        $$gbl_recipes{'link-executable'}]);
   }
   if (0) {
