@@ -213,7 +213,7 @@ sub cxx_argv_from_argv {
   $$cxx_argv[0] = &cxx();
   my $ordered_dk_paths = &ordered_dk_paths($cxx_argv);
   if (@$ordered_dk_paths != 0) {
-    my $ordered_cc_paths = &exec_cmd_info({ 'inputs' => $ordered_dk_paths });
+    my $ordered_cc_paths = &dakota::dakota::start_cmd({ 'inputs' => $ordered_dk_paths });
     &replace_dk_paths_with_cc_paths($cxx_argv, $ordered_cc_paths);
   }
   return $cxx_argv;
@@ -243,24 +243,13 @@ sub cmd_info_from_argv {
   delete $$root_cmd{'opts'}{'var'};
   return $root_cmd;
 }
-sub exec_cmd_info {
-  my ($root_cmd) = @_;
-  if (! $$root_cmd{'opts'}{'action'} || ($$root_cmd{'opts'}{'action'} ne 'merge' && $$root_cmd{'opts'}{'action'} ne 'parse')) {
-    &path_only($root_cmd) if $$root_cmd{'opts'}{'path-only'};
-    $$root_cmd{'parts'} = &parts(&parts_path());
-    &set_root_cmd($root_cmd);
-  }
-  #print STDERR "root_cmd{'opts'}: " . &Dumper($$root_cmd{'opts'});
-  my $ordered_cc_paths = &dakota::dakota::start_cmd($root_cmd);
-  return $ordered_cc_paths;
-}
 sub start {
   my ($argv) = @_;
   if (&has_action_opt($argv)) { # --action=gen-target-hdr, --action=gen-target-src, --action=parse, --action=merge
     my $cmd_info = &cmd_info_from_argv($argv);
-    my $ordered_cc_paths = &exec_cmd_info($cmd_info); # -> start_cmd()
+    my $ordered_cc_paths = &dakota::dakota::start_cmd($cmd_info);
   } else { # --output foo.dk.o foo.dk, --output <shared-library | executable> *.dk.o
-    my $cxx_argv = &cxx_argv_from_argv($argv); # -> exec_cmd_info() -> start_cmd()
+    my $cxx_argv = &cxx_argv_from_argv($argv); # -> start_cmd()
     my $exit_val = &verbose_exec($cxx_argv); # -> g++/clang++
     exit 1 if $exit_val;
   }
