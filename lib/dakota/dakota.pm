@@ -466,22 +466,22 @@ sub cmd_line_action_merge {
   }
 }
 sub make_gen_target_cmd_info {
-  my ($output, $action) = @_;
+  my ($inputs, $output, $action) = @_;
   my $cmd_info = { 'opts' => { 'action' => $action } };
-  $$cmd_info{'inputs'} = [];
+  $$cmd_info{'inputs'} = $inputs;
   $$cmd_info{'output'} = $output;
   $$cmd_info{'parts'} = &parts(&parts_path());
   $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
   &set_root_cmd($cmd_info);
 }
 sub cmd_line_action_gen_target_hdr {
-  my ($output) = @_;
-  my $cmd_info = &make_gen_target_cmd_info($output, 'gen-target-hdr');
+  my ($inputs, $output) = @_;
+  my $cmd_info = &make_gen_target_cmd_info($inputs, $output, 'gen-target-hdr');
   &gen_target_hdr($cmd_info);
 }
 sub cmd_line_action_gen_target_src {
-  my ($output) = @_;
-  my $cmd_info = &make_gen_target_cmd_info($output, 'gen-target-src');
+  my ($inputs, $output) = @_;
+  my $cmd_info = &make_gen_target_cmd_info($inputs, $output, 'gen-target-src');
   &gen_target_src($cmd_info);
 }
 sub num_cpus {
@@ -508,7 +508,7 @@ sub start_cmd {
         exit 0;
       }
       $$cmd_info{'output'} = $target_hdr_path if ! $$cmd_info{'output'}; # set the default value
-      &cmd_line_action_gen_target_hdr($$cmd_info{'output'});
+      &cmd_line_action_gen_target_hdr($$cmd_info{'inputs'}, $$cmd_info{'output'});
     } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
       my $target_src_path = &target_src_path();
       if ($$cmd_info{'opts'}{'path-only'}) {
@@ -516,7 +516,7 @@ sub start_cmd {
         exit 0;
       }
       $$cmd_info{'output'} = $target_src_path if ! $$cmd_info{'output'}; # set the default value
-      &cmd_line_action_gen_target_src($$cmd_info{'output'});
+      &cmd_line_action_gen_target_src($$cmd_info{'inputs'}, $$cmd_info{'output'});
     } else { die; }
     return $ordered_cc_paths = [];
   } else {
