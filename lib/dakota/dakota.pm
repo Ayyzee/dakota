@@ -467,29 +467,9 @@ sub num_cpus {
   chomp $result;
   return $result;
 }
-sub path_only {
-  my ($cmd_info) = @_;
-  if ($$cmd_info{'opts'}{'path-only'}) {
-    die if ! $$cmd_info{'opts'}{'action'};
-    my $path;
-    if (0) {
-    } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
-      $path = &target_hdr_path();
-    } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
-      $path = &target_src_path();
-    } else {
-      die;
-    }
-    print $path . $nl;
-    return 0;
-  }
-}
-my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
   my $ordered_cc_paths = [];
-  $root_cmd = $cmd_info;
-  exit(&path_only($root_cmd)) if $$root_cmd{'opts'}{'path-only'};
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'opts'}{'action'}) {
     if (0) {
@@ -500,12 +480,24 @@ sub start_cmd {
       die if scalar @{$$cmd_info{'inputs'}} == 0;
       &cmd_line_action_merge($$cmd_info{'inputs'}, $$cmd_info{'opts'}{'output'});
     } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
+      my $target_hdr_path = &target_hdr_path();
+      if ($$cmd_info{'opts'}{'path-only'}) {
+        print $target_hdr_path . $nl;
+        exit 0;
+      }
+      $$cmd_info{'output'} = $target_hdr_path if ! $$cmd_info{'output'}; # set the default value
       $intmd_dir = &intmd_dir(); # to set global var
       &set_root_cmd($cmd_info);
       $$cmd_info{'parts'} = &parts(&parts_path());
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_hdr($cmd_info);
     } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
+      my $target_src_path = &target_src_path();
+      if ($$cmd_info{'opts'}{'path-only'}) {
+        print $target_src_path . $nl;
+        exit 0;
+      }
+      $$cmd_info{'output'} = $target_src_path if ! $$cmd_info{'output'}; # set the default value
       $intmd_dir = &intmd_dir(); # to set global var
       &set_root_cmd($cmd_info);
       $$cmd_info{'parts'} = &parts(&parts_path());
