@@ -5,6 +5,6 @@ for tgt in dakota-core dakota; do
 done
 rm -rf zzz
 SECONDS=0
-skip_submake=1 make $@ -j 10 -f build.mk
+make $@ -j 10 -f build.mk
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"

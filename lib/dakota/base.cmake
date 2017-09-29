@@ -66,13 +66,14 @@ set (compile-defns
 set_source_files_properties (${target-src} PROPERTIES
   COMPILE_DEFINITIONS "${compile-defns}")
 
+include (ProcessorCount)
+ProcessorCount (processor-count)
+
 set (custom-target-hdr ${target}.custom-target-hdr)
 # phony target 'custom-target-hdr'
 add_custom_target (${custom-target-hdr}
   DEPENDS ${parts} ${target-libs} ${build-mk}
-  COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-hdr
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
-    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  COMMAND make -s -j ${processor-count} -f ${build-mk} ${target-hdr}
   COMMENT "Generating ${rel-target-hdr}"
   VERBATIM
   USES_TERMINAL)

@@ -467,13 +467,6 @@ sub num_cpus {
   chomp $result;
   return $result;
 }
-sub gen_target_ast {
-  my ($cmd_info) = @_;
-  return if $ENV{'skip_submake'};
-  my $jobs = &num_cpus() + 2;
-  my $exit_val = &verbose_exec(['make', '-s', '-j', $jobs, '-f', &build_mk_path(), &target_inputs_ast_path()]);
-  exit 1 if $exit_val;
-}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
@@ -490,7 +483,6 @@ sub start_cmd {
       &cmd_line_action_merge($$cmd_info{'inputs'}, $$cmd_info{'opts'}{'output'});
     } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
       $intmd_dir = &intmd_dir(); # to set global var
-      &gen_target_ast($cmd_info);
       $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
       &gen_target_hdr($cmd_info);
     } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
