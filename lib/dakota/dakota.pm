@@ -33,7 +33,6 @@ use sort 'stable';
 my $gbl_prefix;
 my $gbl_platform;
 my $extra;
-my $intmd_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
@@ -293,24 +292,28 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $intmd_dir = &intmd_dir();
   my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $intmd_dir = &intmd_dir();
   my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $intmd_dir = &intmd_dir();
   my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $intmd_dir = &intmd_dir();
   my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
@@ -462,6 +465,25 @@ sub cmd_line_action_merge {
     &add_visibility_file($output);
   }
 }
+sub make_gen_target_cmd_info {
+  my ($output, $action) = @_;
+  my $cmd_info = { 'opts' => { 'action' => $action } };
+  $$cmd_info{'inputs'} = [];
+  $$cmd_info{'output'} = $output;
+  $$cmd_info{'parts'} = &parts(&parts_path());
+  $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
+  &set_root_cmd($cmd_info);
+}
+sub cmd_line_action_gen_target_hdr {
+  my ($output) = @_;
+  my $cmd_info = &make_gen_target_cmd_info($output, 'gen-target-hdr');
+  &gen_target_hdr($cmd_info);
+}
+sub cmd_line_action_gen_target_src {
+  my ($output) = @_;
+  my $cmd_info = &make_gen_target_cmd_info($output, 'gen-target-src');
+  &gen_target_src($cmd_info);
+}
 sub num_cpus {
   my $result = `getconf _NPROCESSORS_ONLN`;
   chomp $result;
@@ -486,11 +508,7 @@ sub start_cmd {
         exit 0;
       }
       $$cmd_info{'output'} = $target_hdr_path if ! $$cmd_info{'output'}; # set the default value
-      $intmd_dir = &intmd_dir(); # to set global var
-      &set_root_cmd($cmd_info);
-      $$cmd_info{'parts'} = &parts(&parts_path());
-      $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
-      &gen_target_hdr($cmd_info);
+      &cmd_line_action_gen_target_hdr($$cmd_info{'output'});
     } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
       my $target_src_path = &target_src_path();
       if ($$cmd_info{'opts'}{'path-only'}) {
@@ -498,12 +516,8 @@ sub start_cmd {
         exit 0;
       }
       $$cmd_info{'output'} = $target_src_path if ! $$cmd_info{'output'}; # set the default value
-      $intmd_dir = &intmd_dir(); # to set global var
-      &set_root_cmd($cmd_info);
-      $$cmd_info{'parts'} = &parts(&parts_path());
-      $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
-      &gen_target_src($cmd_info);
-    }
+      &cmd_line_action_gen_target_src($$cmd_info{'output'});
+    } else { die; }
     return $ordered_cc_paths = [];
   } else {
     # replace dk-paths with cc-paths
