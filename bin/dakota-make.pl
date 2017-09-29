@@ -266,11 +266,6 @@ sub gen_rules {
   } else {
     $root_tgt_type = 'executable';
   }
-  my $target_o_path =          &target_o_path();
-  my $target_src_path =        &target_src_path();
-  my $target_hdr_path =        &target_hdr_path();
-  my $target_inputs_ast_path = &target_inputs_ast_path();
-  my $target_srcs_ast_path =   &target_srcs_ast_path();
   my $gbl_recipes = {
     'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
     'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]],
@@ -284,6 +279,11 @@ sub gen_rules {
     'link-shared-library' => [[ 'dakota', '-dynamiclib', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^' ]],
     'link-executable' =>     [[ 'dakota', '--var=cxx=clang++', '-std=c++1z', '-o', '$@', '$^' ]],
   };
+  my $target_o_path =          &target_o_path();
+  my $target_src_path =        &target_src_path();
+  my $target_hdr_path =        &target_hdr_path();
+  my $target_inputs_ast_path = &target_inputs_ast_path();
+  my $target_srcs_ast_path =   &target_srcs_ast_path();
   my $rules = [];
   if (&is_so_path($root_tgt)) {
     &add_last($rules, [[$root_tgt], [@$dk_o_paths, $target_o_path, @$so_paths], [],
