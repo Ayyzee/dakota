@@ -1142,7 +1142,8 @@ sub is_dk_path {
 sub is_so_path {
   my ($name) = @_;
   # linux and darwin so-regexs are combined
-  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))($so_ext((\.\d+)+)?|((\.\d+)+)?$so_ext)$=; # so-regex
+  my $so_ext_re = qr/(?:so|dylib)/;
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))($so_ext_re((\.\d+)+)?|((\.\d+)+)?$so_ext_re)$=;
   #my $libname = $2 . $so_ext;
   return $result;
 }
