@@ -581,10 +581,6 @@ sub gen_target_src {
 sub gen_target {
   my ($cmd_info, $is_defn) = @_;
   #die if ! $$cmd_info{'output'};
-  if ($$cmd_info{'output'}) {
-    my $target_src_path = &target_src_path();
-    my $target_hdr_path =  &target_hdr_path();
-  }
   my $target_srcs_ast_path = &target_srcs_ast_path();
   $$cmd_info{'ast'} = $target_srcs_ast_path;
   if (!$is_defn) {
@@ -674,23 +670,20 @@ sub target_src_from_ast {
 }
 sub target_from_ast {
   my ($cmd_info, $is_defn) = @_;
+  die if ! defined $$cmd_info{'output'};
   die if ! defined $$cmd_info{'ast-paths'} || 0 == @{$$cmd_info{'ast-paths'}};
   die if ! defined $$cmd_info{'opts'}{'action'};
   my $target_srcs_ast_path = &target_srcs_ast_path();
-  my $target_src_path = &target_src_path();
-  my $target_hdr_path =  &target_hdr_path();
 
   if ($is_defn) {
     if ($$cmd_info{'opts'}{'action'} eq 'gen-target-hdr') {
-      return if !&is_out_of_date($target_srcs_ast_path, $target_src_path);
+      return if !&is_out_of_date($target_srcs_ast_path, $$cmd_info{'output'});
     }
   } elsif ($$cmd_info{'opts'}{'action'} eq 'gen-target-src') {
-    return if !&is_out_of_date($target_srcs_ast_path, $target_hdr_path);
+    return if !&is_out_of_date($target_srcs_ast_path, $$cmd_info{'output'});
   }
-  &make_dirname($target_src_path, $global_should_echo);
-  my ($path, $file_basename, $target_srcs_ast) = ($target_src_path, $target_src_path, undef);
-  $path =~ s|/[^/]*$||;
-  $file_basename =~ s|^[^/]*/||;       # strip off leading $intmd_dir/
+  &make_dirname($$cmd_info{'output'}, $global_should_echo);
+  my $target_srcs_ast;
   $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
   $target_srcs_ast = &kw_args_translate($target_srcs_ast);
 
@@ -705,9 +698,9 @@ sub target_from_ast {
 
   my $target_inputs_ast = &target_inputs_ast(); # within target_src_from_ast
   if ($is_defn) {
-    &generate_target_defn($target_src_path, $target_srcs_ast, $target_inputs_ast);
+    &generate_target_defn($$cmd_info{'output'}, $target_srcs_ast, $target_inputs_ast);
   } else {
-    &generate_target_decl($target_hdr_path, $target_srcs_ast, $target_inputs_ast);
+    &generate_target_decl($$cmd_info{'output'}, $target_srcs_ast, $target_inputs_ast);
   }
 }
 sub verbose_exec_cmd_info {
