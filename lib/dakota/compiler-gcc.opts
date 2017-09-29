@@ -1,7 +1,7 @@
 -fsanitize=address
 -fno-common
 -fPIC
--std=gnu++1z
+-std=c++1z
 --warn-no-dollar-in-identifier-extension
 --warn-no-multichar
 --all-warnings
