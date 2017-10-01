@@ -275,8 +275,8 @@ sub gen_rules {
     'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
                                 "-DDKT_TARGET_TYPE=\\\"$root_tgt_type\\\"", "-DDKT_TARGET_NAME=\\\"$root_tgt_name\\\"",
                                 "-I$source_dir", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
-    'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', '-o', '$@', '$^' ]],
-    'link-executable' =>     [[ 'dakota', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', '-o', '$@', '$^' ]],
+    'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-install_name', '@rpath/$(notdir $@)', '-o', '$@', '$^' ]],
+    'link-executable' =>     [[ 'dakota', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-o', '$@', '$^' ]],
   };
   my $target_o_path =          &target_o_path();
   my $target_src_path =        &target_src_path();
