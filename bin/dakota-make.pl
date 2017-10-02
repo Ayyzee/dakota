@@ -91,6 +91,12 @@ sub o_path_from_dk_path {
   my $result = &build_dir() . '/' . &basename($dk_path) . '.o';
   return $result;
 }
+sub is_exe_path {
+  my ($path) = @_;
+  my $state = 1;
+  $state = 0 if $path =~ /\..+$/;
+  return $state;
+}
 sub gen_dot {
   my ($rules, $out_path) = @_;
   my $result = '';
@@ -144,7 +150,7 @@ sub gen_dot_body {
         $result .= "  \"$tgt\" -> \"$prereq\"";
         if (&is_o_path($tgt)) {
           $result .= ' [ color = blue ]';
-        } elsif (&is_so_path($prereq)) {
+        } elsif ((&is_exe_path($tgt) || &is_so_path($tgt)) && (&is_exe_path($prereq) || &is_so_path($prereq))) {
           $result .= ' [ color = green ]';
         }
         $result .= ';' . $nl;

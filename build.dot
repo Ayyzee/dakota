@@ -495,7 +495,7 @@ digraph { graph [ label = "dakota/dakota-core/build.mk", fontcolor = red ]
   "dakota/zzz/build/dakota-core/vector.dk.o" -> "dakota/dakota-core/vector.dk" [ color = blue ];
   "dakota/zzz/intmd/dakota-core/vector.dk.ast" -> "dakota/dakota-core/vector.dk";
   ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg.ast" -> ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg";
-  ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib" [ color = green ];
+  ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib";
 
 
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
@@ -690,9 +690,9 @@ digraph { graph [ label = "dakota/dakota-core/build.mk", fontcolor = red ]
   "dakota/zzz/build/dakota/xml-object-output-stream.dk.o" -> "dakota/dakota/xml-object-output-stream.dk" [ color = blue ];
   "dakota/zzz/intmd/dakota/xml-object-output-stream.dk.ast" -> "dakota/dakota/xml-object-output-stream.dk";
   ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg.ast" -> ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg";
-  ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib" [ color = green ];
+  ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib";
   ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg";
-  ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib" [ color = green ];
+  ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
 
 
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
@@ -721,7 +721,7 @@ digraph { graph [ label = "dakota/dakota-core/build.mk", fontcolor = red ]
   "dakota/zzz/build/exe-core/exe.dk.o" -> "dakota/exe-core/exe.dk" [ color = blue ];
   "dakota/zzz/intmd/exe-core/exe.dk.ast" -> "dakota/exe-core/exe.dk";
   ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg";
-  ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib" [ color = green ];
+  ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
 
 
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
@@ -754,8 +754,8 @@ digraph { graph [ label = "dakota/dakota-core/build.mk", fontcolor = red ]
   "dakota/zzz/build/exe/exe.dk.o" -> "dakota/exe/exe.dk" [ color = blue ];
   "dakota/zzz/intmd/exe/exe.dk.ast" -> "dakota/exe/exe.dk";
   ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg";
-  ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib" [ color = green ];
+  ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
   ".dkt/HOME/dakota/lib/libdakota.dylib.ctlg.ast" -> ".dkt/HOME/dakota/lib/libdakota.dylib.ctlg";
-  ".dkt/HOME/dakota/lib/libdakota.dylib.ctlg" -> "dakota/lib/libdakota.dylib" [ color = green ];
+  ".dkt/HOME/dakota/lib/libdakota.dylib.ctlg" -> "dakota/lib/libdakota.dylib";
 
 }
