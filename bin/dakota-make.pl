@@ -294,6 +294,8 @@ sub gen_rules {
   } else {
     $root_tgt_type = 'executable';
   }
+  # -dynamiclib on darwin, -shared on linux
+  # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
     'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
     'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]],
