@@ -640,7 +640,7 @@ sub generate_target_runtime {
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
   $target_src_str .= $nl;
-  $target_src_str .= "[[read-only]] static symbol-t name = dk-intern(DKT-TARGET-NAME);" . $nl;
+  $target_src_str .= "[[read-only]] static symbol-t name = #UNKNOWN;" . $nl;
   $target_src_str .= "[[read-only]] static symbol-t type = dk-intern(DKT-TARGET-TYPE);" . $nl;
   $target_src_str .= $nl;
   #my $col;
