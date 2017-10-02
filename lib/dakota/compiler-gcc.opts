@@ -2,6 +2,8 @@
 -fno-common
 -fPIC
 -std=c++1z
+--debug=3
+--optimize=0
 --warn-no-dollar-in-identifier-extension
 --warn-no-multichar
 --all-warnings
