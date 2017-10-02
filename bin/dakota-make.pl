@@ -63,10 +63,6 @@ sub cmd_info_from_argv {
                       );
   $$root_cmd{'inputs'} = $argv; # this should always be empty
   &set_env_vars($$root_cmd{'opts'}{'var'});
-  my ($intmd_dir, $build_dir) = &dirs(&source_dir(), $ENV{'root_source_dir'}, $ENV{'root_build_dir'});
-  $ENV{'intmd_dir'} = $intmd_dir;
-  $ENV{'build_dir'} = $build_dir;
-
   delete $$root_cmd{'opts'}{'var'};
   if (! $$root_cmd{'opts'}{'path-only'}) {
     my $force;
@@ -357,6 +353,9 @@ sub start {
     print &build_mk_path() . $nl;
     exit 0;
   }
+  my ($intmd_dir, $build_dir) = &dirs(&source_dir(), $ENV{'root_source_dir'}, $ENV{'root_build_dir'});
+  $ENV{'intmd_dir'} = $intmd_dir;
+  $ENV{'build_dir'} = $build_dir;
   #print &Dumper($cmd_info);
   my ($rules, $so_paths) = &gen_rules($$cmd_info{'opts'}{'target'}, $$cmd_info{'parts'});
   my $build_mk = &gen_make($rules, $so_paths);

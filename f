@@ -32,7 +32,7 @@ SECONDS=0
 make $@ -j $jobs -f build.mk libdakota
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"
-set -o xtrace
 make $@ -j $jobs -f build.mk exe-core exe
+set -o xtrace
 bin/exe-core
 bin/exe
