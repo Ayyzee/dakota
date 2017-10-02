@@ -63,6 +63,10 @@ sub cmd_info_from_argv {
                       );
   $$root_cmd{'inputs'} = $argv; # this should always be empty
   &set_env_vars($$root_cmd{'opts'}{'var'});
+  my ($intmd_dir, $build_dir) = &dirs(&source_dir(), $ENV{'root_source_dir'}, $ENV{'root_build_dir'});
+  $ENV{'intmd_dir'} = $intmd_dir;
+  $ENV{'build_dir'} = $build_dir;
+
   delete $$root_cmd{'opts'}{'var'};
   if (! $$root_cmd{'opts'}{'path-only'}) {
     my $force;
@@ -154,30 +158,51 @@ sub gen_dot_body {
   }
   return $result;
 }
+sub dirs {
+  my ($source_dir, $root_source_dir, $root_build_dir) = @_;
+  # build_dir
+  my $rel_source_dir = $source_dir =~ s#^$root_source_dir/##r;
+  my $build_dir = $root_build_dir . '/' . $rel_source_dir;
+  # intmd_dir
+  my $intmd_dir = &dirname($root_build_dir) . '/intmd/' . $rel_source_dir;
+  return ($intmd_dir, $build_dir)
+}
 sub gen_make {
-  my ($rules) = @_;
+  my ($rules, $so_paths) = @_;
   my $root_source_dir = $ENV{'root_source_dir'};
   my $source_dir = &source_dir();
   my $intmd_dir =  &intmd_dir();
   my $build_dir =  &build_dir();
   my $result = '';
   my $root_tgt = $$rules[0][0][0];
-  my $root_tgt_dir =   &dirname($root_tgt);
   my $phony_root_tgt = &basename($root_tgt) =~ s#\.(so|dylib)$##r;
   $result .=
     '# -*- mode: makefile -*-' . $nl .
     $nl .
-    "root-source-dir := $root_source_dir" . $nl .
+    '%.ctlg :' . $nl .
+    "\t" . 'dakota-catalog --output $@ $<' . $nl .
     $nl .
-    "source-dir := $source_dir" . $nl .
-    "intmd-dir :=  $intmd_dir" . $nl .
-    "build-dir :=  $build_dir" . $nl .
+    '%.ctlg.ast : %.ctlg' . $nl .
+    "\t" . 'dakota --action parse --output $@ $<' . $nl .
     $nl .
-    "include \${root-source-dir}/rules.mk" . $nl .
+    "intmd-dir := $intmd_dir" . $nl .
+    "build-dir := $build_dir" . $nl .
     $nl .
     "\$(shell mkdir -p \${intmd-dir}/z)" . $nl .
-    "\$(shell mkdir -p \${build-dir}/z)" . $nl .
-    "\$(shell mkdir -p \$\$HOME/.dkt$root_tgt_dir)" . $nl .
+    "\$(shell mkdir -p \${build-dir}/z)" . $nl;
+  my $dirs = {};
+  if (&is_so_path($root_tgt)) {
+    my $dir = &dirname($root_tgt);
+    $$dirs{$dir} = 1;
+  }
+  foreach my $so_path (@$so_paths) {
+    my $dir = &dirname($so_path);
+    $$dirs{$dir} = 1;
+  }
+  foreach my $dir (keys %$dirs) {
+    $result .= "\$(shell mkdir -p \$\$HOME/.dkt$dir)" . $nl;
+  }
+  $result .=
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
@@ -318,7 +343,7 @@ sub gen_rules {
     &add_last($rules, [[$so_ctlg_path], [$so_path], [],
                        [[]]]);
   }
-  return $rules;
+  return ($rules, $so_paths);
 }
 sub start {
   my ($argv) = @_;
@@ -328,8 +353,8 @@ sub start {
     exit 0;
   }
   #print &Dumper($cmd_info);
-  my $rules = &gen_rules($$cmd_info{'opts'}{'target'}, $$cmd_info{'parts'});
-  my $build_mk = &gen_make($rules);
+  my ($rules, $so_paths) = &gen_rules($$cmd_info{'opts'}{'target'}, $$cmd_info{'parts'});
+  my $build_mk = &gen_make($rules, $so_paths);
   my $out_path = &write_build_mk($build_mk);
   if (1) {
     my $build_dot = &gen_dot($rules, $out_path);
