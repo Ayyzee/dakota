@@ -3,12 +3,12 @@ include (${prefix-dir}/lib/dakota/base-cxx.cmake)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
 dk_append_target_property (${target} LINK_FLAGS
-  --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   --var=cxx=${cxx-compiler})
 target_compile_options (${target} PRIVATE
-  --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts.pl)
@@ -56,8 +56,8 @@ add_custom_command (
   OUTPUT ${target-src}
   DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   VERBATIM
   USES_TERMINAL)
 
@@ -79,9 +79,9 @@ add_custom_command (
   OUTPUT  ${build-mk}
   DEPENDS ${parts} ${target-libs}
   COMMAND ${dakota-make}
-    --target=${target-output-path}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=root_source_dir=${root-source-dir}
     --var=root_build_dir=${root-build-dir}
-    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --target=${target-output-path}
   VERBATIM
   USES_TERMINAL)
