@@ -244,8 +244,8 @@ sub gen_make_body {
     }
     $result .= $nl;
     foreach my $recipe (@$recipes) {
-      if (scalar @$recipe) {
-        $result .= "\t" . join(' ', @$recipe) . $nl;
+      if (length $recipe) {
+        $result .= "\t" . $recipe . $nl;
       }
     }
   }
@@ -303,14 +303,13 @@ sub gen_rules {
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
-    'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
-    'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$?' ]],
-    'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
-    'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
-    'compile' =>             [[ 'dakota', '-c', "\@\${prefix}/lib/dakota/compiler.opts", "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--var=cxx=clang++',
-                                "-I\${source_dir}", "-I\${prefix}/include", '-o', '$@', '$<' ]],
-    'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@\${prefix}/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,\${prefix}/lib", '-install_name', '@rpath/$(notdir $@)', '-o', '$@', '$^' ]],
-    'link-executable' =>     [[ 'dakota', "\@\${prefix}/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,\${prefix}/lib", '-o', '$@', '$^' ]],
+    'parse' =>               [ "dakota --action parse --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$<" ],
+    'merge' =>               [ "dakota --action merge --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$?" ],
+    'gen-target-hdr' =>      [ "dakota --action gen-target-hdr --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$<" ],
+    'gen-target-src' =>      [ "dakota --action gen-target-src --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$<" ],
+    'compile' =>             [ "dakota -c \@\${prefix}/lib/dakota/compiler.opts --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --var=cxx=clang++ -I\${source_dir} -I\${prefix}/include -o \$@ \$<" ],
+    'link-shared-library' => [ "dakota -dynamiclib \@\${prefix}/lib/dakota/linker.opts --var=cxx=clang++ -Wl,-rpath,\${prefix}/lib -install_name \"\@rpath/\$(notdir \$@)\" -o \$@ \$^" ],
+    'link-executable' =>     [ "dakota \@\${prefix}/lib/dakota/linker.opts --var=cxx=clang++ -Wl,-rpath,\${prefix}/lib -o \$@ \$^" ],
   };
   my $target_o_path =          &target_o_path();
   my $target_src_path =        &target_src_path();
@@ -327,7 +326,7 @@ sub gen_rules {
   }
   &add_last($rules, [[$target_o_path], [$target_src_path], [$target_hdr_path], # using order-only prereqs
                      $$gbl_recipes{'compile'}]);
-  &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], [[]]]); # using order-only prereqs
+  &add_last($rules, [$dk_o_paths, [], [$target_hdr_path], []]); # using order-only prereqs
   &add_last($rules, [[$target_hdr_path], [$target_inputs_ast_path], [],
                      $$gbl_recipes{'gen-target-hdr'}]);
   &add_last($rules, [[$target_src_path], [$target_inputs_ast_path], [],
@@ -348,9 +347,9 @@ sub gen_rules {
     my $so_ctlg_path = &ctlg_path_from_so_path($so_path);
     my $so_ctlg_ast_path = &ast_path_from_ctlg_path($so_ctlg_path);
     &add_last($rules, [[$so_ctlg_ast_path], [$so_ctlg_path], [],
-                       [[]]]);
+                       []]);
     &add_last($rules, [[$so_ctlg_path], [$so_path], [],
-                       [[]]]);
+                       []]);
   }
   return ($rules, $so_paths);
 }
