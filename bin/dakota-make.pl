@@ -204,10 +204,13 @@ sub gen_make {
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
     $nl .
-    "$root_tgt $target_hdr_path : prefix := /Users/robert/dakota" . $nl .
-    "$root_tgt $target_hdr_path : source_dir := $source_dir" . $nl .
-    "$root_tgt $target_hdr_path : intmd_dir := $intmd_dir" . $nl .
-    "$root_tgt $target_hdr_path : build_dir := $build_dir" . $nl .
+    "$root_tgt \\\n$target_hdr_path : prefix := /Users/robert/dakota" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : source_dir := $source_dir" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : intmd_dir := $intmd_dir" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : build_dir := $build_dir" . $nl .
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
