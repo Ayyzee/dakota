@@ -86,7 +86,6 @@ our @EXPORT= qw(
                  deep_copy
                  digsig
                  dirname
-                 dirs
                  dk_mangle
                  dk_mangle_seq
                  dmp
@@ -664,6 +663,12 @@ sub set_env_vars {
     $kv =~ /^([\w-]+)=(.*)$/;
     my ($key, $val) = ($1, $2);
     &check_set_env_var($key, $val);
+  }
+  my $source_dir =      $ENV{'source_dir'};
+  my $root_source_dir = $ENV{'root_source_dir'};
+  my $root_build_dir =  $ENV{'root_build_dir'};
+  if ($source_dir && $root_source_dir && $root_build_dir) {
+    &dirs($source_dir, $root_source_dir, $root_build_dir);
   }
 }
 sub intmd_dir_from_build_dir {

@@ -351,7 +351,6 @@ sub start {
     print &build_mk_path() . $nl;
     exit 0;
   }
-  my ($intmd_dir, $build_dir) = &dirs(&source_dir(), &root_source_dir(), &root_build_dir());
   #print &Dumper($cmd_info);
   my ($rules, $so_paths) = &gen_rules($$cmd_info{'opts'}{'target'}, $$cmd_info{'parts'});
   my $build_mk = &gen_make($rules, $so_paths);
