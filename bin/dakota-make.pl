@@ -299,12 +299,12 @@ sub gen_rules {
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
-    'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$<' ]],
-    'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$?' ]],
-    'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$<' ]],
-    'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$<' ]],
-    'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--var=cxx=clang++',
-                                "-I\${source-dir}", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
+    'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
+    'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$?' ]],
+    'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
+    'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
+    'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--var=cxx=clang++',
+                                "-I\${source_dir}", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
     'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-install_name', '@rpath/$(notdir $@)', '-o', '$@', '$^' ]],
     'link-executable' =>     [[ 'dakota', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-o', '$@', '$^' ]],
   };
