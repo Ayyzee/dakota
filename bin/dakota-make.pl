@@ -187,13 +187,7 @@ sub gen_make {
     $nl .
     '%.ctlg.ast : %.ctlg' . $nl .
     "\t" . 'dakota --action parse --output $@ $<' . $nl .
-    $nl .
-    "$root_tgt $target_hdr_path : source-dir := $source_dir" . $nl .
-    "$root_tgt $target_hdr_path : intmd-dir := $intmd_dir" . $nl .
-    "$root_tgt $target_hdr_path : build-dir := $build_dir" . $nl .
-    $nl .
-    "\$(shell mkdir -p $intmd_dir/z)" . $nl .
-    "\$(shell mkdir -p $build_dir/z)" . $nl;
+    $nl;
   my $dirs = {};
   if (&is_so_path($root_tgt)) {
     my $dir = &dirname($root_tgt);
@@ -207,12 +201,18 @@ sub gen_make {
     $result .= "\$(shell mkdir -p \$\$HOME/.dkt$dir)" . $nl;
   }
   $result .=
+    "\$(shell mkdir -p $intmd_dir/z)" . $nl .
+    "\$(shell mkdir -p $build_dir/z)" . $nl .
+    $nl .
+    "$root_tgt $target_hdr_path : source-dir := $source_dir" . $nl .
+    "$root_tgt $target_hdr_path : intmd-dir := $intmd_dir" . $nl .
+    "$root_tgt $target_hdr_path : build-dir := $build_dir" . $nl .
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
     "all : $phony_root_tgt" . $nl .
     "$phony_root_tgt : $root_tgt" . $nl;
-    $result .= &gen_make_body($rules);
+  $result .= &gen_make_body($rules);
   return $result;
 }
 sub gen_make_body {
