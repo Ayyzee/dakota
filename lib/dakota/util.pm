@@ -105,7 +105,6 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  int_from_str
-                 intmd_dir_from_build_dir
                  is_cc_path
                  is_dk_path
                  is_dk_src_path
@@ -672,14 +671,6 @@ sub set_env_vars {
     &dirs($source_dir, $root_source_dir, $root_build_dir);
   }
 }
-sub intmd_dir_from_build_dir {
-  my ($build_dir) = @_;
-  my $dir = &dirname(&dirname($build_dir));
-  my $name = &basename($build_dir);
-  my $intmd_dir = $dir . '/intmd/' . $name;
-  &check_set_env_var('intmd_dir', $intmd_dir);
-  return $intmd_dir;
-}
 sub dirs {
   my ($source_dir, $root_source_dir, $root_build_dir) = @_;
   &check_set_env_var('source_dir',      $source_dir);
@@ -701,7 +692,6 @@ sub cxx {
 }
 sub intmd_dir {
   my $dir = $ENV{'intmd_dir'};
-  $dir = &intmd_dir_from_build_dir(&build_dir()) if ! $dir;
   die if ! $dir;
   return $dir;
 }

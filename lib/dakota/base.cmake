@@ -8,7 +8,8 @@ dk_append_target_property (${target} LINK_FLAGS
   --var=cxx=${cxx-compiler})
 target_compile_options (${target} PRIVATE
   --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-  --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+  --var=root_source_dir=${root-source-dir}
+  --var=root_build_dir=${root-build-dir}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts.pl)
@@ -28,14 +29,18 @@ execute_process (
 
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src --path-only
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+    --var=root_source_dir=${root-source-dir}
+    --var=root_build_dir=${root-build-dir}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
 
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-hdr --path-only
-    --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
+    --var=root_source_dir=${root-source-dir}
+    --var=root_build_dir=${root-build-dir}
+    --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   OUTPUT_VARIABLE target-hdr
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -56,6 +61,8 @@ add_custom_command (
   OUTPUT ${target-src}
   DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src
+    --var=root_source_dir=${root-source-dir}
+    --var=root_build_dir=${root-build-dir}
     --var=source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=build_dir=${CMAKE_CURRENT_BINARY_DIR}
   VERBATIM
