@@ -255,4 +255,6 @@ sub start {
   }
   exit 0;
 }
-&start(\@ARGV);
+unless (caller) {
+  &start(\@ARGV);
+}

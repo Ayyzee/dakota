@@ -363,8 +363,8 @@ sub start {
   }
   #print STDERR &Dumper($rules);
   #print STDERR $build_mk;
+  exit 0;
 }
 unless (caller) {
   &start(\@ARGV);
 }
-1;
