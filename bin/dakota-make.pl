@@ -162,10 +162,12 @@ sub gen_dot_body {
 }
 sub gen_make {
   my ($rules, $so_paths) = @_;
-  my $root_source_dir = $ENV{'root_source_dir'};
-  my $source_dir = &source_dir();
-  my $intmd_dir =  &intmd_dir();
-  my $build_dir =  &build_dir();
+  my $root_source_dir = &root_source_dir();
+  my $root_intmd_dir =  &root_intmd_dir();
+  my $root_build_dir =  &root_build_dir();
+  my $source_dir =      &source_dir();
+  my $intmd_dir =       &intmd_dir();
+  my $build_dir =       &build_dir();
   my $result = '';
   my $root_tgt = $$rules[0][0][0];
   my $target_hdr_path = &target_hdr_path();
@@ -196,6 +198,12 @@ sub gen_make {
     "\$(shell mkdir -p $build_dir/z)" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : prefix := /Users/robert/dakota" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : root_source_dir := $root_source_dir" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : root_intmd_dir := $root_intmd_dir" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : root_build_dir := $root_build_dir" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : source_dir := $source_dir" . $nl .
     $nl .
@@ -262,9 +270,6 @@ sub write_build_dot {
 }
 sub gen_rules {
   my ($root_tgt, $parts) = @_;
-  my $root_source_dir = $ENV{'root_source_dir'};
-  my $source_dir = &source_dir();
-  my $build_dir =  &build_dir();
   my $dk_paths = [];
   my $so_paths = [];
   my $so_ctlg_ast_paths = [];
