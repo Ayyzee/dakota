@@ -2,10 +2,10 @@
 set (macros
 )
 set (include-dirs
-  ${root-dir}/include
+  ${root-source-dir}/include
 )
 set (install-include-files
-  ${root-dir}/include/dakota-dso.h
+  ${root-source-dir}/include/dakota-dso.h
 )
 set (lib-dirs
 )

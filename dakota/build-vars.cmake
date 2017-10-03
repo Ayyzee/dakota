@@ -2,10 +2,10 @@
 set (macros
 )
 set (bin-dirs
-  ${root-dir}/bin
+  ${root-source-dir}/bin
 )
 set (include-dirs
-  ${root-dir}/include
+  ${root-source-dir}/include
 )
 set (lib-dirs
 )

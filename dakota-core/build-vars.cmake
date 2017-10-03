@@ -2,11 +2,11 @@
 set (macros
 )
 set (bin-dirs
-  ${root-dir}/bin
+  ${root-source-dir}/bin
 )
 set (include-dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${root-dir}/include
+  ${root-source-dir}/include
 )
 set (lib-dirs
 )

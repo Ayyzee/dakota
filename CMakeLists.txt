@@ -2,7 +2,8 @@
 cmake_minimum_required (VERSION 3.9)
 project (dakota-lang-project LANGUAGES CXX)
 
-set (root-dir   ${${PROJECT_NAME}_SOURCE_DIR})
+set (root-source-dir ${${PROJECT_NAME}_SOURCE_DIR})
+set (root-build-dir  ${${PROJECT_NAME}_BINARY_DIR})
 set (prefix-dir ${${PROJECT_NAME}_SOURCE_DIR})
 
 add_subdirectory (dakota-dso)
