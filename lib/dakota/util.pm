@@ -716,8 +716,8 @@ sub build_dir {
   return $dir;
 }
 sub root_intmd_dir {
-  my $dir;
-  die;
+  my $dir = $ENV{'root_intmd_dir'};
+  die if ! $dir;
   return $dir;
 }
 sub root_source_dir {
@@ -736,12 +736,13 @@ sub build_dot_path {
 sub build_mk_path {
   return &source_dir() . '/build.mk';
 }
+my $rel_target_dir_name = 'z';
 sub target_build_dir {
-  my $dir = &build_dir() . '/z';
+  my $dir = &build_dir() . '/' . $rel_target_dir_name;
   return $dir;
 }
 sub target_intmd_dir {
-  my $dir = &intmd_dir() . '/z';
+  my $dir = &intmd_dir() . '/' . $rel_target_dir_name;
   return $dir;
 }
 sub target_srcs_ast_path {
@@ -753,7 +754,7 @@ sub target_inputs_ast_path {
   return $path;
 }
 sub rel_target_hdr_path {
-  my $rel_path = 'z/target' . $h_ext;
+  my $rel_path = $rel_target_dir_name . '/target' . $h_ext;
   return $rel_path;
 }
 sub target_hdr_path {
