@@ -204,9 +204,10 @@ sub gen_make {
     "\$(shell mkdir -p $intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $build_dir/z)" . $nl .
     $nl .
-    "$root_tgt $target_hdr_path : source-dir := $source_dir" . $nl .
-    "$root_tgt $target_hdr_path : intmd-dir := $intmd_dir" . $nl .
-    "$root_tgt $target_hdr_path : build-dir := $build_dir" . $nl .
+    "$root_tgt $target_hdr_path : prefix := /Users/robert/dakota" . $nl .
+    "$root_tgt $target_hdr_path : source_dir := $source_dir" . $nl .
+    "$root_tgt $target_hdr_path : intmd_dir := $intmd_dir" . $nl .
+    "$root_tgt $target_hdr_path : build_dir := $build_dir" . $nl .
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
@@ -303,10 +304,10 @@ sub gen_rules {
     'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$?' ]],
     'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
     'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--output', '$@', '$<' ]],
-    'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--var=cxx=clang++',
-                                "-I\${source_dir}", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
-    'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-install_name', '@rpath/$(notdir $@)', '-o', '$@', '$^' ]],
-    'link-executable' =>     [[ 'dakota', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-o', '$@', '$^' ]],
+    'compile' =>             [[ 'dakota', '-c', "\@\${prefix}/lib/dakota/compiler.opts", "--var=source_dir=\${source_dir}", "--var=build_dir=\${build_dir}", '--var=cxx=clang++',
+                                "-I\${source_dir}", "-I\${prefix}/include", '-o', '$@', '$<' ]],
+    'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@\${prefix}/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,\${prefix}/lib", '-install_name', '@rpath/$(notdir $@)', '-o', '$@', '$^' ]],
+    'link-executable' =>     [[ 'dakota', "\@\${prefix}/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,\${prefix}/lib", '-o', '$@', '$^' ]],
   };
   my $target_o_path =          &target_o_path();
   my $target_src_path =        &target_src_path();
