@@ -668,20 +668,20 @@ sub cxx {
   return $cxx;
 }
 sub intmd_dir {
-  my $intmd_dir = $ENV{'intmd_dir'};
-  $intmd_dir = &intmd_dir_from_build_dir(&build_dir()) if ! $intmd_dir;
-  die if ! $intmd_dir;
-  return $intmd_dir;
+  my $dir = $ENV{'intmd_dir'};
+  $dir = &intmd_dir_from_build_dir(&build_dir()) if ! $dir;
+  die if ! $dir;
+  return $dir;
 }
 sub source_dir {
-  my $source_dir = $ENV{'source_dir'};
-  die if ! $source_dir;
-  return $source_dir;
+  my $dir = $ENV{'source_dir'};
+  die if ! $dir;
+  return $dir;
 }
 sub build_dir {
-  my $build_dir = $ENV{'build_dir'};
-  die if ! $build_dir;
-  return $build_dir;
+  my $dir = $ENV{'build_dir'};
+  die if ! $dir;
+  return $dir;
 }
 sub build_dot_path {
   return &source_dir() . '/build.dot';
@@ -690,36 +690,36 @@ sub build_mk_path {
   return &source_dir() . '/build.mk';
 }
 sub target_build_dir {
-  my $target_build_dir = &build_dir() . '/z';
-  return $target_build_dir;
+  my $dir = &build_dir() . '/z';
+  return $dir;
 }
 sub target_intmd_dir {
-  my $target_intmd_dir = &intmd_dir() . '/z';
-  return $target_intmd_dir;
+  my $dir = &intmd_dir() . '/z';
+  return $dir;
 }
 sub target_srcs_ast_path {
-  my $target_srcs_ast_path = &target_intmd_dir() . '/srcs.ast';
-  return $target_srcs_ast_path;
+  my $path = &target_intmd_dir() . '/srcs.ast';
+  return $path;
 }
 sub target_inputs_ast_path {
-  my $target_inputs_ast_path = &target_intmd_dir() . '/inputs.ast';
-  return $target_inputs_ast_path;
+  my $path = &target_intmd_dir() . '/inputs.ast';
+  return $path;
 }
 sub rel_target_hdr_path {
-  my $rel_target_hdr_path = 'z/target' . $h_ext;
-  return $rel_target_hdr_path;
+  my $rel_path = 'z/target' . $h_ext;
+  return $rel_path;
 }
 sub target_hdr_path {
-  my $target_hdr_path = &target_intmd_dir() . '/target' . $h_ext;
-  return $target_hdr_path;
+  my $path = &target_intmd_dir() . '/target' . $h_ext;
+  return $path;
 }
 sub target_src_path {
-  my $target_src_path = &target_intmd_dir() . '/target' . $cc_ext;
-  return $target_src_path;
+  my $path = &target_intmd_dir() . '/target' . $cc_ext;
+  return $path;
 }
 sub parts_path {
-  my $parts_path = &source_dir() . '/parts.txt';
-  return $parts_path;
+  my $path = &source_dir() . '/parts.txt';
+  return $path;
 }
 
 # 1. cmd line
