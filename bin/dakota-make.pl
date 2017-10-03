@@ -296,14 +296,15 @@ sub gen_rules {
   } else {
     $root_tgt_type = 'executable';
   }
+  my $all_dir_vars = '--var=source_dir=${source_dir} --var=root_source_dir=${root_source_dir} --var=root_build_dir=${root_build_dir}';
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
-    'parse' =>               [ "dakota --action parse --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$<" ],
-    'merge' =>               [ "dakota --action merge --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$?" ],
-    'gen-target-hdr' =>      [ "dakota --action gen-target-hdr --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$<" ],
-    'gen-target-src' =>      [ "dakota --action gen-target-src --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --output \$@ \$<" ],
-    'compile' =>             [ "dakota -c \@\${prefix}/lib/dakota/compiler.opts --var=source_dir=\${source_dir} --var=build_dir=\${build_dir} --var=cxx=clang++ -I\${source_dir} -I\${prefix}/include -o \$@ \$<" ],
+    'parse' =>               [ "dakota --action parse $all_dir_vars --output \$@ \$<" ],
+    'merge' =>               [ "dakota --action merge $all_dir_vars --output \$@ \$?" ],
+    'gen-target-hdr' =>      [ "dakota --action gen-target-hdr $all_dir_vars --output \$@ \$<" ],
+    'gen-target-src' =>      [ "dakota --action gen-target-src $all_dir_vars --output \$@ \$<" ],
+    'compile' =>             [ "dakota -c \@\${prefix}/lib/dakota/compiler.opts $all_dir_vars --var=cxx=clang++ -I\${source_dir} -I\${prefix}/include -o \$@ \$<" ],
     'link-shared-library' => [ "dakota -dynamiclib \@\${prefix}/lib/dakota/linker.opts --var=cxx=clang++ -Wl,-rpath,\${prefix}/lib -install_name \"\@rpath/\$(notdir \$@)\" -o \$@ \$^" ],
     'link-executable' =>     [ "dakota \@\${prefix}/lib/dakota/linker.opts --var=cxx=clang++ -Wl,-rpath,\${prefix}/lib -o \$@ \$^" ],
   };
