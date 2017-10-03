@@ -177,6 +177,7 @@ sub gen_make {
   my $build_dir =  &build_dir();
   my $result = '';
   my $root_tgt = $$rules[0][0][0];
+  my $target_hdr_path = &target_hdr_path();
   my $phony_root_tgt = &basename($root_tgt) =~ s#\.(so|dylib)$##r;
   $result .=
     '# -*- mode: makefile -*-' . $nl .
@@ -187,11 +188,12 @@ sub gen_make {
     '%.ctlg.ast : %.ctlg' . $nl .
     "\t" . 'dakota --action parse --output $@ $<' . $nl .
     $nl .
-    "intmd-dir := $intmd_dir" . $nl .
-    "build-dir := $build_dir" . $nl .
+    "$root_tgt $target_hdr_path : source-dir := $source_dir" . $nl .
+    "$root_tgt $target_hdr_path : intmd-dir := $intmd_dir" . $nl .
+    "$root_tgt $target_hdr_path : build-dir := $build_dir" . $nl .
     $nl .
-    "\$(shell mkdir -p \${intmd-dir}/z)" . $nl .
-    "\$(shell mkdir -p \${build-dir}/z)" . $nl;
+    "\$(shell mkdir -p $intmd_dir/z)" . $nl .
+    "\$(shell mkdir -p $build_dir/z)" . $nl;
   my $dirs = {};
   if (&is_so_path($root_tgt)) {
     my $dir = &dirname($root_tgt);
@@ -297,12 +299,12 @@ sub gen_rules {
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
-    'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
-    'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$?' ]],
-    'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
-    'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--output', '$@', '$<' ]],
-    'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=$source_dir", "--var=build_dir=$build_dir", '--var=cxx=clang++',
-                                "-I$source_dir", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
+    'parse' =>               [[ 'dakota', '--action', 'parse', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$<' ]],
+    'merge' =>               [[ 'dakota', '--action', 'merge', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$?' ]],
+    'gen-target-hdr' =>      [[ 'dakota', '--action', 'gen-target-hdr', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$<' ]],
+    'gen-target-src' =>      [[ 'dakota', '--action', 'gen-target-src', "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--output', '$@', '$<' ]],
+    'compile' =>             [[ 'dakota', '-c', "\@$root_source_dir/lib/dakota/compiler.opts", "--var=source_dir=\${source-dir}", "--var=build_dir=\${build-dir}", '--var=cxx=clang++',
+                                "-I\${source-dir}", "-I$root_source_dir/include", '-o', '$@', '$<' ]],
     'link-shared-library' => [[ 'dakota', '-dynamiclib', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-install_name', '@rpath/$(notdir $@)', '-o', '$@', '$^' ]],
     'link-executable' =>     [[ 'dakota', "\@$root_source_dir/lib/dakota/linker.opts", '--var=cxx=clang++', "-Wl,-rpath,$root_source_dir/lib", '-o', '$@', '$^' ]],
   };
