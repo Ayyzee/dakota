@@ -651,6 +651,7 @@ sub make_dirname {
 }
 sub check_set_env_var {
   my ($key, $val) = @_;
+  die if ! $key;
   if ($ENV{$key}) {
     die "env var $key=$ENV{$key}, can't set to $val\n" if $ENV{$key} ne $val;
   } else {
