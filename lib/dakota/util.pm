@@ -86,6 +86,7 @@ our @EXPORT= qw(
                  deep_copy
                  digsig
                  dirname
+                 dirs
                  dk_mangle
                  dk_mangle_seq
                  dmp
@@ -166,7 +167,10 @@ our @EXPORT= qw(
                  replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  rewrite_scoped_int_uint
+                 root_build_dir
                  root_cmd
+                 root_intmd_dir
+                 root_source_dir
                  scalar_from_file
                  scalar_to_file
                  set_env_vars
@@ -646,12 +650,20 @@ sub make_dirname {
     print STDERR $0 . ': warning: skipping: make_dirname(' . $path . ')' . $nl;
   }
 }
+sub check_set_env_var {
+  my ($key, $val) = @_;
+  if ($ENV{$key}) {
+    die "env var $key=$ENV{$key}, can't set to $val\n" if $ENV{$key} ne $val;
+  } else {
+    $ENV{$key} = $val;
+  }
+}
 sub set_env_vars {
   my ($kvs) = @_;
   foreach my $kv (@$kvs) {
     $kv =~ /^([\w-]+)=(.*)$/;
     my ($key, $val) = ($1, $2);
-    $ENV{$key} = $val;
+    &check_set_env_var($key, $val);
   }
 }
 sub intmd_dir_from_build_dir {
@@ -659,8 +671,22 @@ sub intmd_dir_from_build_dir {
   my $dir = &dirname(&dirname($build_dir));
   my $name = &basename($build_dir);
   my $intmd_dir = $dir . '/intmd/' . $name;
-  $ENV{'intmd_dir'} = $intmd_dir;
+  &check_set_env_var('intmd_dir', $intmd_dir);
   return $intmd_dir;
+}
+sub dirs {
+  my ($source_dir, $root_source_dir, $root_build_dir) = @_;
+  &check_set_env_var('source_dir',      $source_dir);
+  &check_set_env_var('root_source_dir', $root_source_dir);
+  &check_set_env_var('root_build_dir',  $root_build_dir);
+  my $rel_source_dir = $source_dir =~ s#^$root_source_dir/##r;
+  my $build_dir = $root_build_dir . '/' . $rel_source_dir;
+  my $root_intmd_dir = &dirname($root_build_dir) . '/intmd';
+  my $intmd_dir = $root_intmd_dir . '/' . $rel_source_dir;
+  &check_set_env_var('build_dir',      $build_dir);
+  &check_set_env_var('intmd_dir',      $intmd_dir);
+  &check_set_env_var('root_intmd_dir', $root_intmd_dir);
+  return ($intmd_dir, $build_dir);
 }
 sub cxx {
   my $cxx = $ENV{'cxx'};
@@ -680,6 +706,21 @@ sub source_dir {
 }
 sub build_dir {
   my $dir = $ENV{'build_dir'};
+  die if ! $dir;
+  return $dir;
+}
+sub root_intmd_dir {
+  my $dir;
+  die;
+  return $dir;
+}
+sub root_source_dir {
+  my $dir = $ENV{'root_source_dir'};
+  die if ! $dir;
+  return $dir;
+}
+sub root_build_dir {
+  my $dir = $ENV{'root_build_dir'};
   die if ! $dir;
   return $dir;
 }

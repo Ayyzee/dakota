@@ -160,15 +160,6 @@ sub gen_dot_body {
   }
   return $result;
 }
-sub dirs {
-  my ($source_dir, $root_source_dir, $root_build_dir) = @_;
-  # build_dir
-  my $rel_source_dir = $source_dir =~ s#^$root_source_dir/##r;
-  my $build_dir = $root_build_dir . '/' . $rel_source_dir;
-  # intmd_dir
-  my $intmd_dir = &dirname($root_build_dir) . '/intmd/' . $rel_source_dir;
-  return ($intmd_dir, $build_dir)
-}
 sub gen_make {
   my ($rules, $so_paths) = @_;
   my $root_source_dir = $ENV{'root_source_dir'};
@@ -360,9 +351,7 @@ sub start {
     print &build_mk_path() . $nl;
     exit 0;
   }
-  my ($intmd_dir, $build_dir) = &dirs(&source_dir(), $ENV{'root_source_dir'}, $ENV{'root_build_dir'});
-  $ENV{'intmd_dir'} = $intmd_dir;
-  $ENV{'build_dir'} = $build_dir;
+  my ($intmd_dir, $build_dir) = &dirs(&source_dir(), &root_source_dir(), &root_build_dir());
   #print &Dumper($cmd_info);
   my ($rules, $so_paths) = &gen_rules($$cmd_info{'opts'}{'target'}, $$cmd_info{'parts'});
   my $build_mk = &gen_make($rules, $so_paths);
