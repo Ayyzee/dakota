@@ -198,7 +198,7 @@ sub gen_make {
     "\$(shell mkdir -p $current_intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $current_build_dir/z)" . $nl .
     $nl .
-    "$root_tgt \\\n$target_hdr_path : cxx := clang++" . $nl .
+    "$root_tgt \\\n$target_hdr_path : cxx := /usr/bin/clang++" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : prefix := /Users/robert/dakota" . $nl .
     $nl .
