@@ -150,6 +150,7 @@ sub add_visibility_file {
 my $debug_exported = 0;
 sub add_visibility {
   my ($ast) = @_;
+  return if ! exists $$ast{'modules'};
   my $debug = 0;
   my $names = [keys %{$$ast{'modules'}}];
   foreach my $name (@$names) {
