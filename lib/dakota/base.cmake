@@ -4,7 +4,6 @@ set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
 dk_append_target_property (${target} LINK_FLAGS
   --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-  --var=current_build_dir=${CMAKE_CURRENT_BINARY_DIR}
   --var=cxx=${cxx-compiler})
 target_compile_options (${target} PRIVATE
   --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
@@ -29,18 +28,18 @@ execute_process (
 
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src --path-only
+    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source-dir}
     --var=build_dir=${build-dir}
-    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
 
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-hdr --path-only
+    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source-dir}
     --var=build_dir=${build-dir}
-    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   OUTPUT_VARIABLE target-hdr
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -61,10 +60,9 @@ add_custom_command (
   OUTPUT ${target-src}
   DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src
+    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source-dir}
     --var=build_dir=${build-dir}
-    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=current_build_dir=${CMAKE_CURRENT_BINARY_DIR}
   VERBATIM
   USES_TERMINAL)
 
