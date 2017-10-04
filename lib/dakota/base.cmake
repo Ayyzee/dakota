@@ -11,8 +11,8 @@ target_compile_options (${target} PRIVATE
   --var=build_dir=${build-dir}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
-dk_find_program (dakota-parts dakota-parts.pl)
-dk_find_program (dakota-make dakota-make.pl)
+dk_find_program (dakota-parts dakota-parts)
+dk_find_program (dakota-make dakota-make)
 
 execute_process (
   COMMAND ${dakota-parts} --path-only
