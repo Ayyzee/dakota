@@ -181,12 +181,6 @@ sub gen_make {
   my $phony_root_tgt = &basename($root_tgt) =~ s#\.(so|dylib)$##r;
   $result .=
     '# -*- mode: makefile -*-' . $nl .
-    $nl .
-    '%.ctlg :' . $nl .
-    "\t" . '${dakota-catalog} --output $@ $<' . $nl .
-    $nl .
-    '%.ctlg.ast : %.ctlg' . $nl .
-    "\t" . '${dakota} --action parse --output $@ $<' . $nl .
     $nl;
   my $dirs = {};
   if (&is_so_path($root_tgt)) {
@@ -206,17 +200,23 @@ sub gen_make {
     $nl .
     "$root_tgt \\\n$target_hdr_path : cxx := clang++" . $nl .
     $nl .
-    "$root_tgt \\\n$target_hdr_path : dakota := dakota" . $nl .
-    $nl .
-    "$root_tgt \\\n$target_hdr_path : dakota-catalog := dakota-catalog" . $nl .
-    $nl .
     "$root_tgt \\\n$target_hdr_path : prefix := /Users/robert/dakota" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : dakota := \${prefix}/bin/dakota" . $nl .
+    $nl .
+    "$root_tgt \\\n$target_hdr_path : dakota-catalog := \${prefix}/bin/dakota-catalog" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : source_dir := $source_dir" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : root_source_dir := $root_source_dir" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : root_build_dir := $root_build_dir" . $nl .
+    $nl .
+    '%.ctlg :' . $nl .
+    "\t" . '${dakota-catalog} --output $@ $<' . $nl .
+    $nl .
+    '%.ctlg.ast : %.ctlg' . $nl .
+    "\t" . '${dakota} --action parse --output $@ $<' . $nl .
     $nl .
     ".PHONY : all $phony_root_tgt" . $nl .
     $nl .
