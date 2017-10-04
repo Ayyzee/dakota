@@ -116,22 +116,29 @@ sub gen_dot_body {
   my $target_hdr_path = &target_hdr_path();
   my $target_src_path = &target_src_path();
   my $target_o_path =   &target_o_path();
+  my $nodes = {};
   if (1) {
   $result .=
     "  \"$root\" [ color = green ];" . $nl .
-    "  \"$target_hdr_path\" [ color = magenta ];" . $nl .
-    "  \"$target_src_path\" [ color = magenta ];" . $nl .
-    "  \"$target_o_path\" [ color = magenta ];" . $nl .
     $nl;
   for (my $i = 0; $i < scalar @$rules; $i++) {
-    for (my $j = 0; $j < scalar @{$$rules[$i]}; $j++) {
-      for (my $k = 0; $k < scalar @{$$rules[$i][$j]}; $k++) {
-        my $path = $$rules[$i][$j][$k];
-        if (0) {
-        } elsif (&is_dk_path($path)) {
-          $result .= "  \"$path\" [ color = blue ];" . $nl;
-        } elsif (&is_so_path($path)) {
-          $result .= "  \"$path\" [ color = green ];" . $nl;
+    for (my $j = 0; $j < 3; $j++) {
+      foreach my $path (@{$$rules[$i][$j]}) {
+        if (! $$nodes{$path}) {
+          $$nodes{$path} = 1;
+          my $name = &basename($path);
+          if (0) {
+          } elsif (&is_dk_path($path)) {
+            $result .= "  \"$path\" [ label = \"$name\", color = blue ];" . $nl;
+          } elsif (&is_so_path($path)) {
+            $result .= "  \"$path\" [ label = \"$name\", color = green ];" . $nl;
+          } elsif ($path eq $target_hdr_path ||
+                   $path eq $target_src_path ||
+                   $path eq $target_o_path) {
+            $result .= "  \"$path\" [ label = \"$name\", color = magenta ];" . $nl;
+          } else {
+            $result .= "  \"$path\" [ label = \"$name\" ];" . $nl;
+          }
         }
       }
     }
