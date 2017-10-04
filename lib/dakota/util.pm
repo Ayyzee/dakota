@@ -69,17 +69,17 @@ our @EXPORT= qw(
                  as_literal_symbol
                  as_literal_symbol_interior
                  at
-                 build_dir
+                 current_build_dir
                  build_dot_path
                  build_mk_path
-                 intmd_dir
+                 current_intmd_dir
                  canon_path
                  normalize_paths
                  colin
                  colout
                  cpp_directives
                  cxx
-                 source_dir
+                 current_source_dir
                  ct
                  decode_comments
                  decode_strings
@@ -165,10 +165,10 @@ our @EXPORT= qw(
                  replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  rewrite_scoped_int_uint
-                 root_build_dir
+                 build_dir
                  root_cmd
-                 root_intmd_dir
-                 root_source_dir
+                 intmd_dir
+                 source_dir
                  scalar_from_file
                  scalar_to_file
                  set_env_vars
@@ -181,8 +181,8 @@ our @EXPORT= qw(
                  sqstr_regex
                  str_from_seq
                  suffix
-                 target_build_dir
-                 target_intmd_dir
+                 target_current_build_dir
+                 target_current_intmd_dir
                  target_inputs_ast_path
                  target_srcs_ast_path
                  rel_target_hdr_path
@@ -664,31 +664,46 @@ sub set_env_vars {
     my ($key, $val) = ($1, $2);
     &check_set_env_var($key, $val);
   }
-  my $source_dir =      $ENV{'source_dir'};
-  my $root_source_dir = $ENV{'root_source_dir'};
-  my $root_build_dir =  $ENV{'root_build_dir'};
-  if ($source_dir && $root_source_dir && $root_build_dir) {
-    &dirs($source_dir, $root_source_dir, $root_build_dir);
+  my $current_source_dir =      $ENV{'current_source_dir'};
+  my $source_dir = $ENV{'source_dir'};
+  my $build_dir =  $ENV{'build_dir'};
+  if ($current_source_dir && $source_dir && $build_dir) {
+    &dirs($current_source_dir, $source_dir, $build_dir);
   }
 }
 sub dirs {
-  my ($source_dir, $root_source_dir, $root_build_dir) = @_;
-  &check_set_env_var('source_dir',      $source_dir);
-  &check_set_env_var('root_source_dir', $root_source_dir);
-  &check_set_env_var('root_build_dir',  $root_build_dir);
-  my $rel_source_dir = $source_dir =~ s#^$root_source_dir/##r;
-  my $build_dir = $root_build_dir . '/' . $rel_source_dir;
-  my $root_intmd_dir = &dirname($root_build_dir) . '/intmd';
-  my $intmd_dir = $root_intmd_dir . '/' . $rel_source_dir;
-  &check_set_env_var('build_dir',      $build_dir);
-  &check_set_env_var('intmd_dir',      $intmd_dir);
-  &check_set_env_var('root_intmd_dir', $root_intmd_dir);
-  return ($intmd_dir, $build_dir);
+  my ($current_source_dir, $source_dir, $build_dir) = @_;
+  &check_set_env_var('current_source_dir',      $current_source_dir);
+  &check_set_env_var('source_dir', $source_dir);
+  &check_set_env_var('build_dir',  $build_dir);
+  my $rel_current_source_dir = $current_source_dir =~ s#^$source_dir/##r;
+  my $current_build_dir = $build_dir . '/' . $rel_current_source_dir;
+  my $intmd_dir = &dirname($build_dir) . '/intmd';
+  my $current_intmd_dir = $intmd_dir . '/' . $rel_current_source_dir;
+  &check_set_env_var('current_build_dir',      $current_build_dir);
+  &check_set_env_var('current_intmd_dir',      $current_intmd_dir);
+  &check_set_env_var('intmd_dir', $intmd_dir);
+  return ($current_intmd_dir, $current_build_dir);
 }
 sub cxx {
   my $cxx = $ENV{'cxx'};
   die if ! $cxx;
   return $cxx;
+}
+sub current_intmd_dir {
+  my $dir = $ENV{'current_intmd_dir'};
+  die if ! $dir;
+  return $dir;
+}
+sub current_source_dir {
+  my $dir = $ENV{'current_source_dir'};
+  die if ! $dir;
+  return $dir;
+}
+sub current_build_dir {
+  my $dir = $ENV{'current_build_dir'};
+  die if ! $dir;
+  return $dir;
 }
 sub intmd_dir {
   my $dir = $ENV{'intmd_dir'};
@@ -705,42 +720,27 @@ sub build_dir {
   die if ! $dir;
   return $dir;
 }
-sub root_intmd_dir {
-  my $dir = $ENV{'root_intmd_dir'};
-  die if ! $dir;
-  return $dir;
-}
-sub root_source_dir {
-  my $dir = $ENV{'root_source_dir'};
-  die if ! $dir;
-  return $dir;
-}
-sub root_build_dir {
-  my $dir = $ENV{'root_build_dir'};
-  die if ! $dir;
-  return $dir;
-}
 sub build_dot_path {
-  return &source_dir() . '/build.dot';
+  return &current_source_dir() . '/build.dot';
 }
 sub build_mk_path {
-  return &source_dir() . '/build.mk';
+  return &current_source_dir() . '/build.mk';
 }
 my $rel_target_dir_name = 'z';
-sub target_build_dir {
-  my $dir = &build_dir() . '/' . $rel_target_dir_name;
+sub target_current_build_dir {
+  my $dir = &current_build_dir() . '/' . $rel_target_dir_name;
   return $dir;
 }
-sub target_intmd_dir {
-  my $dir = &intmd_dir() . '/' . $rel_target_dir_name;
+sub target_current_intmd_dir {
+  my $dir = &current_intmd_dir() . '/' . $rel_target_dir_name;
   return $dir;
 }
 sub target_srcs_ast_path {
-  my $path = &target_intmd_dir() . '/srcs.ast';
+  my $path = &target_current_intmd_dir() . '/srcs.ast';
   return $path;
 }
 sub target_inputs_ast_path {
-  my $path = &target_intmd_dir() . '/inputs.ast';
+  my $path = &target_current_intmd_dir() . '/inputs.ast';
   return $path;
 }
 sub rel_target_hdr_path {
@@ -748,15 +748,15 @@ sub rel_target_hdr_path {
   return $rel_path;
 }
 sub target_hdr_path {
-  my $path = &target_intmd_dir() . '/target' . $h_ext;
+  my $path = &target_current_intmd_dir() . '/target' . $h_ext;
   return $path;
 }
 sub target_src_path {
-  my $path = &target_intmd_dir() . '/target' . $cc_ext;
+  my $path = &target_current_intmd_dir() . '/target' . $cc_ext;
   return $path;
 }
 sub parts_path {
-  my $path = &source_dir() . '/parts.txt';
+  my $path = &current_source_dir() . '/parts.txt';
   return $path;
 }
 

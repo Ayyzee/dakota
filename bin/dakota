@@ -171,7 +171,7 @@ sub ordered_dk_paths {
   }
   return $ordered_dk_paths;
 }
-sub source_dir_from_inputs {
+sub current_source_dir_from_inputs {
   my ($inputs) = @_;
   my $tbl = {};
   foreach my $input (@$inputs) {

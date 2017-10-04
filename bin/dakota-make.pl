@@ -71,7 +71,7 @@ sub cmd_info_from_argv {
   return $root_cmd;
 }
 sub target_o_path {
-  my $result = &target_build_dir() . '/target.cc.o';
+  my $result = &target_current_build_dir() . '/target.cc.o';
   return $result;
 }
 sub is_o_path {
@@ -84,7 +84,7 @@ sub is_target_o_path {
 }
 sub o_path_from_dk_path {
   my ($dk_path) = @_;
-  my $result = &build_dir() . '/' . &basename($dk_path) . '.o';
+  my $result = &current_build_dir() . '/' . &basename($dk_path) . '.o';
   return $result;
 }
 sub is_exe_path {
@@ -169,12 +169,12 @@ sub gen_dot_body {
 }
 sub gen_make {
   my ($rules, $so_paths) = @_;
-  my $root_source_dir = &root_source_dir();
-  my $root_intmd_dir =  &root_intmd_dir();
-  my $root_build_dir =  &root_build_dir();
-  my $source_dir =      &source_dir();
-  my $intmd_dir =       &intmd_dir();
-  my $build_dir =       &build_dir();
+  my $source_dir =         &source_dir();
+  my $intmd_dir =          &intmd_dir();
+  my $build_dir =          &build_dir();
+  my $current_source_dir = &current_source_dir();
+  my $current_intmd_dir =  &current_intmd_dir();
+  my $current_build_dir =  &current_build_dir();
   my $result = '';
   my $root_tgt = $$rules[0][0][0];
   my $target_hdr_path = &target_hdr_path();
@@ -195,8 +195,8 @@ sub gen_make {
     $result .= "\$(shell mkdir -p \$\$HOME/.dkt$dir)" . $nl;
   }
   $result .=
-    "\$(shell mkdir -p $intmd_dir/z)" . $nl .
-    "\$(shell mkdir -p $build_dir/z)" . $nl .
+    "\$(shell mkdir -p $current_intmd_dir/z)" . $nl .
+    "\$(shell mkdir -p $current_build_dir/z)" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : cxx := clang++" . $nl .
     $nl .
@@ -206,11 +206,11 @@ sub gen_make {
     $nl .
     "$root_tgt \\\n$target_hdr_path : dakota-catalog := \${prefix}/bin/dakota-catalog" . $nl .
     $nl .
+    "$root_tgt \\\n$target_hdr_path : current_source_dir := $current_source_dir" . $nl .
+    $nl .
     "$root_tgt \\\n$target_hdr_path : source_dir := $source_dir" . $nl .
     $nl .
-    "$root_tgt \\\n$target_hdr_path : root_source_dir := $root_source_dir" . $nl .
-    $nl .
-    "$root_tgt \\\n$target_hdr_path : root_build_dir := $root_build_dir" . $nl .
+    "$root_tgt \\\n$target_hdr_path : build_dir := $build_dir" . $nl .
     $nl .
     '%.ctlg :' . $nl .
     "\t" . '${dakota-catalog} --output $@ $<' . $nl .
@@ -303,7 +303,7 @@ sub gen_rules {
   } else {
     $root_tgt_type = 'executable';
   }
-  my $all_dir_vars = '--var=source_dir=${source_dir} --var=root_source_dir=${root_source_dir} --var=root_build_dir=${root_build_dir}';
+  my $all_dir_vars = '--var=current_source_dir=${current_source_dir} --var=source_dir=${source_dir} --var=build_dir=${build_dir}';
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
@@ -311,7 +311,7 @@ sub gen_rules {
     'merge' =>               [ "\${dakota} --action merge $all_dir_vars --output \$@ \$?" ],
     'gen-target-hdr' =>      [ "\${dakota} --action gen-target-hdr $all_dir_vars --output \$@ \$<" ],
     'gen-target-src' =>      [ "\${dakota} --action gen-target-src $all_dir_vars --output \$@ \$<" ],
-    'compile' =>             [ "\${dakota} -c \@\${prefix}/lib/dakota/compiler.opts $all_dir_vars --var=cxx=\${cxx} -I\${source_dir} -I\${prefix}/include -o \$@ \$<" ],
+    'compile' =>             [ "\${dakota} -c \@\${prefix}/lib/dakota/compiler.opts $all_dir_vars --var=cxx=\${cxx} -I\${current_source_dir} -I\${prefix}/include -o \$@ \$<" ],
     'link-shared-library' => [ "\${dakota} -dynamiclib \@\${prefix}/lib/dakota/linker.opts --var=cxx=\${cxx} -Wl,-rpath,\${prefix}/lib -install_name \"\@rpath/\$(notdir \$@)\" -o \$@ \$^" ],
     'link-executable' =>     [ "\${dakota} \@\${prefix}/lib/dakota/linker.opts --var=cxx=\${cxx} -Wl,-rpath,\${prefix}/lib -o \$@ \$^" ],
   };

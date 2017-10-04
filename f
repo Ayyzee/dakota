@@ -10,17 +10,17 @@ exe_targets=(
 )
 cat /dev/null > build.mk
 for tgt in ${so_targets[@]}; do
-  dakota-make.pl --var=root_source_dir=/Users/robert/dakota \
-                 --var=source_dir=/Users/robert/dakota/$tgt \
-                 --var=root_build_dir=/Users/robert/dakota/zzz/build \
+  dakota-make.pl --var=source_dir=/Users/robert/dakota \
+                 --var=current_source_dir=/Users/robert/dakota/$tgt \
+                 --var=build_dir=/Users/robert/dakota/zzz/build \
                  --target /Users/robert/dakota/lib/lib$tgt.dylib
                  #--parts /Users/robert/dakota/$tgt/parts.txt
   echo "include $tgt/build.mk" >> build.mk
 done
 for tgt in ${exe_targets[@]}; do
-  dakota-make.pl --var=root_source_dir=/Users/robert/dakota \
-                 --var=source_dir=/Users/robert/dakota/$tgt \
-                 --var=root_build_dir=/Users/robert/dakota/zzz/build \
+  dakota-make.pl --var=source_dir=/Users/robert/dakota \
+                 --var=current_source_dir=/Users/robert/dakota/$tgt \
+                 --var=build_dir=/Users/robert/dakota/zzz/build \
                  --target /Users/robert/dakota/bin/$tgt
                  #--parts /Users/robert/dakota/$tgt/parts.txt
   echo "include $tgt/build.mk" >> build.mk

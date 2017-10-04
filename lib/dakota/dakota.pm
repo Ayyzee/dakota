@@ -292,29 +292,29 @@ sub default_cmd_info {
 sub target_klass_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $intmd_dir = &intmd_dir();
-  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
+  my $current_intmd_dir = &current_intmd_dir();
+  my $result = &target_src_path() =~ s=^$current_intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-decls.inc=r;
   return $result;
 }
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $intmd_dir = &intmd_dir();
-  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
+  my $current_intmd_dir = &current_intmd_dir();
+  my $result = &target_src_path() =~ s=^$current_intmd_dir/\+/(.+?)$cc_ext$=$1-klass-func-defns.inc=r;
   return $result;
 }
 sub target_generic_func_decls_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $intmd_dir = &intmd_dir();
-  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
+  my $current_intmd_dir = &current_intmd_dir();
+  my $result = &target_src_path() =~ s=^$current_intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $intmd_dir = &intmd_dir();
-  my $result = &target_src_path() =~ s=^$intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
+  my $current_intmd_dir = &current_intmd_dir();
+  my $result = &target_src_path() =~ s=^$current_intmd_dir/\+/(.+?)$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub dk_parse {

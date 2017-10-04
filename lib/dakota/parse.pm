@@ -30,8 +30,8 @@ use sort 'stable';
 
 my $gbl_platform;
 my $gbl_used;
-my $source_dir;
-my $intmd_dir;
+my $current_source_dir;
+my $current_intmd_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
@@ -72,11 +72,11 @@ sub h_path_from_src_path {
   return $h_path;
 }
 my $patterns = {
-  'cc_path_from_dk_path'    => '$(intmd_dir)/%$(cc_ext) : $(source_dir)/%.dk',
-  'inc_path_from_dk_path'   => '$(intmd_dir)/%.inc      : $(source_dir)/%.dk',
-  'ast_path_from_dk_path'   => '$(intmd_dir)/%.dk.ast   : $(source_dir)/%.dk',
+  'cc_path_from_dk_path'    => '$(current_intmd_dir)/%$(cc_ext) : $(current_source_dir)/%.dk',
+  'inc_path_from_dk_path'   => '$(current_intmd_dir)/%.inc      : $(current_source_dir)/%.dk',
+  'ast_path_from_dk_path'   => '$(current_intmd_dir)/%.dk.ast   : $(current_source_dir)/%.dk',
 
-  'ctlg_path_from_so_path'  => '$(intmd_dir)/%$(so_ext).ctlg : %$(so_ext)',
+  'ctlg_path_from_so_path'  => '$(current_intmd_dir)/%$(so_ext).ctlg : %$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -366,8 +366,8 @@ sub var_perl_from_make { # convert variable syntax to perl from make
 }
 sub expand {
   my ($str) = @_;
-  $source_dir if 0;
-  $intmd_dir if 0;
+  $current_source_dir if 0;
+  $current_intmd_dir if 0;
   $cc_ext if 0;
   $o_ext  if 0;
   $so_ext if 0;
@@ -391,8 +391,8 @@ sub out_path_from_in_path {
   if (&is_dk_path($path_in)) {
     $path_in = &prepend_dot_slash($path_in);
   }
-  $source_dir = &source_dir();
-  $intmd_dir = &intmd_dir();
+  $current_source_dir = &current_source_dir();
+  $current_intmd_dir = &current_intmd_dir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
