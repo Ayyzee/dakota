@@ -2,7 +2,7 @@ digraph {
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
-  "dakota/lib/libdakota-core.dylib" [ color = green ];
+  "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
 
   "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
   "dakota/zzz/build/dakota-core/bit-vector.dk.o" [ label = "bit-vector.dk.o" ];
@@ -572,7 +572,7 @@ digraph {
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
-  "dakota/lib/libdakota.dylib" [ color = green ];
+  "dakota/lib/libdakota.dylib" [ label = "libdakota.dylib", color = green ];
 
   "dakota/lib/libdakota.dylib" [ label = "libdakota.dylib", color = green ];
   "dakota/zzz/build/dakota/ascii-number-klass.dk.o" [ label = "ascii-number-klass.dk.o" ];
@@ -797,7 +797,7 @@ digraph {
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
-  "dakota/bin/exe-core" [ color = green ];
+  "dakota/bin/exe-core" [ label = "exe-core", color = green ];
 
   "dakota/bin/exe-core" [ label = "exe-core" ];
   "dakota/zzz/build/exe-core/exe.dk.o" [ label = "exe.dk.o" ];
@@ -831,7 +831,7 @@ digraph {
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
-  "dakota/bin/exe" [ color = green ];
+  "dakota/bin/exe" [ label = "exe", color = green ];
 
   "dakota/bin/exe" [ label = "exe" ];
   "dakota/zzz/build/exe/exe.dk.o" [ label = "exe.dk.o" ];

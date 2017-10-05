@@ -112,21 +112,22 @@ sub gen_dot {
 sub gen_dot_body {
   my ($rules) = @_;
   my $result = '';
-  my $root = $$rules[0][0][0];
+  my $path = $$rules[0][0][0];
   my $target_hdr_path = &target_hdr_path();
   my $target_src_path = &target_src_path();
   my $target_o_path =   &target_o_path();
   my $nodes = {};
   if (1) {
+    my $name = &basename($path);
   $result .=
-    "  \"$root\" [ color = green ];" . $nl .
+    "  \"$path\" [ label = \"$name\", color = green ];" . $nl .
     $nl;
   for (my $i = 0; $i < scalar @$rules; $i++) {
     for (my $j = 0; $j < 3; $j++) {
-      foreach my $path (@{$$rules[$i][$j]}) {
+      foreach $path (@{$$rules[$i][$j]}) {
         if (! $$nodes{$path}) {
           $$nodes{$path} = 1;
-          my $name = &basename($path);
+          $name = &basename($path);
           if (0) {
           } elsif (&is_dk_path($path)) {
             $result .= "  \"$path\" [ label = \"$name\", color = blue ];" . $nl;
