@@ -112,13 +112,19 @@ sub gen_dot {
 sub gen_dot_body {
   my ($rules) = @_;
   my $result = '';
-  my $path = $$rules[0][0][0];
+  $result .= &gen_dot_body_nodes($rules);
+  $result .= &gen_dot_body_edges($rules);
+  return $result;
+}
+sub gen_dot_body_nodes {
+  my ($rules) = @_;
+  my $result = '';
   my $target_hdr_path = &target_hdr_path();
   my $target_src_path = &target_src_path();
   my $target_o_path =   &target_o_path();
   my $nodes = {};
-  if (1) {
-    my $name = &basename($path);
+  my $path = $$rules[0][0][0];
+  my $name = &basename($path);
   $result .=
     "  \"$path\" [ label = \"$name\", color = green ];" . $nl .
     $nl;
@@ -144,7 +150,11 @@ sub gen_dot_body {
       }
     }
   }
-  }
+  return $result;
+}
+sub gen_dot_body_edges {
+  my ($rules) = @_;
+  my $result = '';
   foreach my $rule (@$rules) {
     my $tgts =               $$rule[0];
     my $prereqs =            $$rule[1];
