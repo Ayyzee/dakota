@@ -105,7 +105,7 @@ sub gen_dot {
   if (1) { # hack to make the graph less noisy
     my $prefix = $ENV{'HOME'};
     $result =~ s#"$prefix/#"#g;
-    $result =~ s#$prefix/#/HOME/#g;
+    $result =~ s#\.dkt$prefix#.dkt#g;
   }
   return $result;
 }
