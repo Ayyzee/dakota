@@ -155,6 +155,8 @@ sub gen_dot_body {
           $result .= ' [ color = blue ]';
         } elsif ((&is_exe_path($tgt) || &is_so_path($tgt)) && (&is_exe_path($prereq) || &is_so_path($prereq))) {
           $result .= ' [ color = green ]';
+        } elsif ($prereq =~ /\.ctlg\.ast$/) {
+          $result .= ' [ color = red ]';
         }
         $result .= ';' . $nl;
       }

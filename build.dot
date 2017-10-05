@@ -360,7 +360,7 @@ digraph {
   "dakota/zzz/intmd/dakota-core/z/target.h" -> "dakota/zzz/intmd/dakota-core/z/inputs.ast";
   "dakota/zzz/intmd/dakota-core/z/target.cc" -> "dakota/zzz/intmd/dakota-core/z/inputs.ast";
   "dakota/zzz/intmd/dakota-core/z/inputs.ast" -> "dakota/zzz/intmd/dakota-core/z/srcs.ast";
-  "dakota/zzz/intmd/dakota-core/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg.ast";
+  "dakota/zzz/intmd/dakota-core/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg.ast" [ color = red ];
   "dakota/zzz/intmd/dakota-core/z/srcs.ast" -> "dakota/zzz/intmd/dakota-core/bit-vector.dk.ast";
   "dakota/zzz/intmd/dakota-core/z/srcs.ast" -> "dakota/zzz/intmd/dakota-core/boole.dk.ast";
   "dakota/zzz/intmd/dakota-core/z/srcs.ast" -> "dakota/zzz/intmd/dakota-core/char.dk.ast";
@@ -714,8 +714,8 @@ digraph {
   "dakota/zzz/intmd/dakota/z/target.h" -> "dakota/zzz/intmd/dakota/z/inputs.ast";
   "dakota/zzz/intmd/dakota/z/target.cc" -> "dakota/zzz/intmd/dakota/z/inputs.ast";
   "dakota/zzz/intmd/dakota/z/inputs.ast" -> "dakota/zzz/intmd/dakota/z/srcs.ast";
-  "dakota/zzz/intmd/dakota/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg.ast";
-  "dakota/zzz/intmd/dakota/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast";
+  "dakota/zzz/intmd/dakota/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-dso.dylib.ctlg.ast" [ color = red ];
+  "dakota/zzz/intmd/dakota/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast" [ color = red ];
   "dakota/zzz/intmd/dakota/z/srcs.ast" -> "dakota/zzz/intmd/dakota/ascii-number-klass.dk.ast";
   "dakota/zzz/intmd/dakota/z/srcs.ast" -> "dakota/zzz/intmd/dakota/ascii-number.dk.ast";
   "dakota/zzz/intmd/dakota/z/srcs.ast" -> "dakota/zzz/intmd/dakota/dakota.dk.ast";
@@ -820,7 +820,7 @@ digraph {
   "dakota/zzz/intmd/exe-core/z/target.h" -> "dakota/zzz/intmd/exe-core/z/inputs.ast";
   "dakota/zzz/intmd/exe-core/z/target.cc" -> "dakota/zzz/intmd/exe-core/z/inputs.ast";
   "dakota/zzz/intmd/exe-core/z/inputs.ast" -> "dakota/zzz/intmd/exe-core/z/srcs.ast";
-  "dakota/zzz/intmd/exe-core/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast";
+  "dakota/zzz/intmd/exe-core/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast" [ color = red ];
   "dakota/zzz/intmd/exe-core/z/srcs.ast" -> "dakota/zzz/intmd/exe-core/exe.dk.ast";
   "dakota/zzz/build/exe-core/exe.dk.o" -> "dakota/exe-core/exe.dk" [ color = blue ];
   "dakota/zzz/intmd/exe-core/exe.dk.ast" -> "dakota/exe-core/exe.dk";
@@ -858,8 +858,8 @@ digraph {
   "dakota/zzz/intmd/exe/z/target.h" -> "dakota/zzz/intmd/exe/z/inputs.ast";
   "dakota/zzz/intmd/exe/z/target.cc" -> "dakota/zzz/intmd/exe/z/inputs.ast";
   "dakota/zzz/intmd/exe/z/inputs.ast" -> "dakota/zzz/intmd/exe/z/srcs.ast";
-  "dakota/zzz/intmd/exe/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast";
-  "dakota/zzz/intmd/exe/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota.dylib.ctlg.ast";
+  "dakota/zzz/intmd/exe/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota-core.dylib.ctlg.ast" [ color = red ];
+  "dakota/zzz/intmd/exe/z/inputs.ast" -> ".dkt/HOME/dakota/lib/libdakota.dylib.ctlg.ast" [ color = red ];
   "dakota/zzz/intmd/exe/z/srcs.ast" -> "dakota/zzz/intmd/exe/exe.dk.ast";
   "dakota/zzz/build/exe/exe.dk.o" -> "dakota/exe/exe.dk" [ color = blue ];
   "dakota/zzz/intmd/exe/exe.dk.ast" -> "dakota/exe/exe.dk";
