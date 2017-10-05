@@ -96,7 +96,7 @@ sub is_exe_path {
 sub gen_dot {
   my ($rules, $out_path) = @_;
   my $result = '';
-  $result .= "digraph { graph [ label = \"$out_path\", fontcolor = red ]" . $nl;
+  $result .= "digraph {" . $nl;
   $result .= "  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];" . $nl;
   $result .= "  node  [ shape = rect, style = rounded, height = 0, width = 0 ];" . $nl;
   $result .= $nl;

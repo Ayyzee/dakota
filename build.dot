@@ -1,4 +1,4 @@
-digraph { graph [ label = "dakota/dakota-core/build.mk", fontcolor = red ]
+digraph {
   graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
