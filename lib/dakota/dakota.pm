@@ -490,11 +490,13 @@ sub num_cpus {
   chomp $result;
   return $result;
 }
+use Time::HiRes;
 sub start_cmd {
   my ($cmd_info) = @_;
   my $ordered_cc_paths = [];
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'} if $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'opts'}{'action'}) {
+    my $t0 = Time::HiRes::time();
     if (0) {
     } elsif ($$cmd_info{'opts'}{'action'} eq 'parse') {
       die if scalar @{$$cmd_info{'inputs'}} != 1;
@@ -519,6 +521,21 @@ sub start_cmd {
       $$cmd_info{'output'} = $target_src_path if ! $$cmd_info{'output'}; # set the default value
       &cmd_line_action_gen_target_src($$cmd_info{'inputs'}, $$cmd_info{'output'});
     } else { die; }
+    my $t1 = Time::HiRes::time();
+    if (! $ENV{'silent'} && $$cmd_info{'opts'}{'action'} ne 'parse') {
+      my $pad = '';
+      my $path;
+      if ($$cmd_info{'opts'}{'action'} eq 'merge') {
+        $path = $$cmd_info{'output'};
+        $pad = ' ' x 9;
+      } else {
+        $path = $$cmd_info{'inputs'}[0];
+      }
+      my $cwd = &cwd();
+      $path =~ s#^$cwd/##;
+      my $str = sprintf("elapsed: %4.1fs: %s: %s%s\n", $t1 - $t0, $$cmd_info{'opts'}{'action'}, $pad, $path);
+      print STDERR $str;
+    }
     return $ordered_cc_paths = [];
   } else {
     # replace dk-paths with cc-paths
