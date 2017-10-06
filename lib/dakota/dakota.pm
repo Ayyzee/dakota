@@ -524,12 +524,10 @@ sub start_cmd {
     my $t1 = Time::HiRes::time();
     if (! $ENV{'silent'} && $$cmd_info{'opts'}{'action'} ne 'parse') {
       my $pad = '';
-      my $path;
+      my $path = $$cmd_info{'output'};
+      die if ! $path;
       if ($$cmd_info{'opts'}{'action'} eq 'merge') {
-        $path = $$cmd_info{'output'};
         $pad = ' ' x 9;
-      } else {
-        $path = $$cmd_info{'inputs'}[0];
       }
       my $cwd = &cwd();
       $path =~ s#^$cwd/##;
