@@ -1,8 +1,6 @@
 digraph {
-  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
+  graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
-
-  "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
 
   "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
   "dakota/zzz/build/dakota-core/bit-vector.dk.o" [ label = "bit-vector.dk.o" ];
@@ -217,6 +215,7 @@ digraph {
   "dakota/dakota-core/unbox-illegal-klass-exception.dk" [ label = "unbox-illegal-klass-exception.dk", color = blue ];
   "dakota/dakota-core/vector.dk" [ label = "vector.dk", color = blue ];
   ".dkt/dakota/lib/libdakota-dso.dylib.ctlg" [ label = "libdakota-dso.dylib.ctlg" ];
+
   "dakota/lib/libdakota-core.dylib" -> "dakota/zzz/build/dakota-core/bit-vector.dk.o";
   "dakota/lib/libdakota-core.dylib" -> "dakota/zzz/build/dakota-core/boole.dk.o";
   "dakota/lib/libdakota-core.dylib" -> "dakota/zzz/build/dakota-core/char.dk.o";
@@ -569,10 +568,8 @@ digraph {
   ".dkt/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib";
 
 
-  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
+  graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
-
-  "dakota/lib/libdakota.dylib" [ label = "libdakota.dylib", color = green ];
 
   "dakota/lib/libdakota.dylib" [ label = "libdakota.dylib", color = green ];
   "dakota/zzz/build/dakota/ascii-number-klass.dk.o" [ label = "ascii-number-klass.dk.o" ];
@@ -658,6 +655,7 @@ digraph {
   "dakota/dakota/xml-object-output-stream.dk" [ label = "xml-object-output-stream.dk", color = blue ];
   ".dkt/dakota/lib/libdakota-dso.dylib.ctlg" [ label = "libdakota-dso.dylib.ctlg" ];
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" [ label = "libdakota-core.dylib.ctlg" ];
+
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/ascii-number-klass.dk.o";
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/ascii-number.dk.o";
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/dakota.dk.o";
@@ -794,12 +792,10 @@ digraph {
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
 
 
-  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
+  graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
   "dakota/bin/exe-core" [ label = "exe-core", color = green ];
-
-  "dakota/bin/exe-core" [ label = "exe-core" ];
   "dakota/zzz/build/exe-core/exe.dk.o" [ label = "exe.dk.o" ];
   "dakota/zzz/build/exe-core/z/target.cc.o" [ label = "target.cc.o", color = magenta ];
   "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
@@ -811,6 +807,7 @@ digraph {
   "dakota/zzz/intmd/exe-core/exe.dk.ast" [ label = "exe.dk.ast" ];
   "dakota/exe-core/exe.dk" [ label = "exe.dk", color = blue ];
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" [ label = "libdakota-core.dylib.ctlg" ];
+
   "dakota/bin/exe-core" -> "dakota/zzz/build/exe-core/exe.dk.o";
   "dakota/bin/exe-core" -> "dakota/zzz/build/exe-core/z/target.cc.o";
   "dakota/bin/exe-core" -> "dakota/lib/libdakota-core.dylib" [ color = green ];
@@ -828,12 +825,10 @@ digraph {
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
 
 
-  graph [ rankdir = LR, dir = back, nodesep = 0.03 ];
+  graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
   "dakota/bin/exe" [ label = "exe", color = green ];
-
-  "dakota/bin/exe" [ label = "exe" ];
   "dakota/zzz/build/exe/exe.dk.o" [ label = "exe.dk.o" ];
   "dakota/zzz/build/exe/z/target.cc.o" [ label = "target.cc.o", color = magenta ];
   "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
@@ -848,6 +843,7 @@ digraph {
   "dakota/exe/exe.dk" [ label = "exe.dk", color = blue ];
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" [ label = "libdakota-core.dylib.ctlg" ];
   ".dkt/dakota/lib/libdakota.dylib.ctlg" [ label = "libdakota.dylib.ctlg" ];
+
   "dakota/bin/exe" -> "dakota/zzz/build/exe/exe.dk.o";
   "dakota/bin/exe" -> "dakota/zzz/build/exe/z/target.cc.o";
   "dakota/bin/exe" -> "dakota/lib/libdakota-core.dylib" [ color = green ];
