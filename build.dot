@@ -567,7 +567,6 @@ digraph {
   ".dkt/dakota/lib/libdakota-dso.dylib.ctlg.ast" -> ".dkt/dakota/lib/libdakota-dso.dylib.ctlg";
   ".dkt/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib";
 
-
   graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
@@ -791,7 +790,6 @@ digraph {
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg.ast" -> ".dkt/dakota/lib/libdakota-core.dylib.ctlg";
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
 
-
   graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
 
@@ -823,7 +821,6 @@ digraph {
   "dakota/zzz/intmd/exe-core/exe.dk.ast" -> "dakota/exe-core/exe.dk";
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg.ast" -> ".dkt/dakota/lib/libdakota-core.dylib.ctlg";
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
-
 
   graph [ rankdir = LR, dir = back, nodesep = 0 ];
   node  [ shape = rect, style = rounded, height = 0, width = 0 ];
@@ -863,5 +860,4 @@ digraph {
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
   ".dkt/dakota/lib/libdakota.dylib.ctlg.ast" -> ".dkt/dakota/lib/libdakota.dylib.ctlg";
   ".dkt/dakota/lib/libdakota.dylib.ctlg" -> "dakota/lib/libdakota.dylib";
-
 }
