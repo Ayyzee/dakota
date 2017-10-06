@@ -63,12 +63,14 @@ add_custom_command (
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source-dir}
     --var=build_dir=${build-dir}
+    --output ${target-src}
   VERBATIM
   USES_TERMINAL)
 
-include (ProcessorCount)
-ProcessorCount (processor-count)
-math (EXPR jobs "${processor-count} + 2")
+#include (ProcessorCount)
+#ProcessorCount (processor-count)
+#math (EXPR jobs "${processor-count} + 2")
+set (jobs 4)
 
 set (custom-target-hdr ${target}.custom-target-hdr)
 # phony target 'custom-target-hdr'

@@ -42,8 +42,9 @@ rm -f lib/libdakota-*
 rm -fr zzz
 make $@ -f build.mk libdakota-dso
 make $@ -f build.mk dakota-catalog
-jobs=$(getconf _NPROCESSORS_ONLN)
-jobs=$(( jobs + 2 ))
+#jobs=$(getconf _NPROCESSORS_ONLN)
+#jobs=$(( jobs + 2 ))
+jobs=4
 SECONDS=0
 make $@ -j $jobs -f build.mk libdakota
 duration=$SECONDS
