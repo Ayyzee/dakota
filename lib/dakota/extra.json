@@ -151,7 +151,6 @@
     "#int-t"=> undef,
     "#uint-t"=> undef,
     "#union"=> undef,
-    "#UNKNOWN"=> undef,
     "#va-generic-func-ptrs"=> undef,
     "#va-method"=> undef,
     "#va-method-signatures"=> undef,
