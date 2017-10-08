@@ -14,27 +14,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <cstdio>  // printf(), fprintf(), stderr
-# include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
+# include <cstdio>  // fprintf(), stdout, stderr
+# include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE, free()
+# include <string>
+# include <libgen.h> // dirname_r(), basename_r()
+//# include <sys/types.h> // sssize_t
+# include <unistd.h> // readlink()
+# include <sys/param.h> // MAXPATHLEN
 
 # include "dakota-dso.h"
 
-static str_t progname;
-
-static FUNC echo_abs_path_for_lib_name(str_t lib_name) -> int {
-  int exit_value = EXIT_SUCCESS;
-  str_t abs_path = dso_abs_path_for_lib_name(lib_name);
-  printf("%s\n", abs_path ? abs_path : lib_name);
-  if (abs_path == nullptr) {
-    fprintf(stderr, "%s: error: %s\n", progname, dso_error());
-    exit_value = EXIT_FAILURE;
-  }
-  return exit_value;
+static FUNC recursive_realpath(str_t path) -> str_t {
+  str_t result = realpath(path, nullptr); // must free()
+  if (strcmp(result, path) != 0)
+    return recursive_realpath(result);
+  return result;
 }
 FUNC main(int argc, const str_t argv[]) -> int {
-  progname = argv[0];
+  str_t progname = argv[0];
   int exit_value = EXIT_SUCCESS;
-  for (int i = 1; i < argc; i++)
-    exit_value |= echo_abs_path_for_lib_name(argv[i]);
+  for (int i = 1; i < argc; i++) {
+    str_t arg = argv[i];
+    str_t path = dso_abs_path_for_lib_name(arg);
+    path = recursive_realpath(path); // must free()
+    if (path != nullptr) {
+      char name_buf[MAXPATHLEN + 1] = "";
+      str_t name = basename_r(path, name_buf);
+      if (strcmp(arg, name) != 0) {
+        char dir_buf[MAXPATHLEN + 1]  = "";
+        char link[MAXPATHLEN + 1]  = "";
+        str_t dir = dirname_r(path, dir_buf);
+        snprintf(link, sizeof(link) - 1, "%s/%s", dir, arg);
+        str_t target = recursive_realpath(link);
+        if (target != nullptr) {
+          int cmp = strcmp(path, target);
+          free((void*)target);
+          if (cmp == 0) {
+            fprintf(stdout, "%s\n", link);
+          } else {
+            fprintf(stdout, "%s\n", path);
+          }
+        } else {
+          fprintf(stdout, "%s\n", path);
+        }
+      } else {
+        fprintf(stdout, "%s\n", path);
+      }
+    } else {
+      fprintf(stderr, "%s: error: can't find %s\n", progname, arg);
+      exit_value = EXIT_FAILURE;
+    }
+  }
   return exit_value;
 }

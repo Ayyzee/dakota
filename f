@@ -14,6 +14,7 @@ build_dir=/Users/robert/dakota/zzz/build
 cat /dev/null > build.mk
 echo "include dakota-dso/build.mk"     >> build.mk
 echo "include dakota-catalog/build.mk" >> build.mk
+echo "include dakota-find-library/build.mk" >> build.mk
 dot_files=()
 for target in ${lib_targets[@]}; do
   dakota-make --var=current_source_dir=$source_dir/$target \
@@ -37,11 +38,12 @@ if [[ $graphs -ne 0 ]]; then
   open ${dot_files[@]} build.dot
   exit
 fi
-rm -f bin/dakota-catalog
-rm -f lib/libdakota-*
+rm -f bin/dakota-catalog bin/dakota-find-library
+rm -f lib/libdakota-dso.$so_ext lib/libdakota-core.$so_ext lib/libdakota.$so_ext
 rm -fr zzz
 make $@ -f build.mk libdakota-dso
 make $@ -f build.mk dakota-catalog
+make $@ -f build.mk dakota-find-library
 #jobs=$(getconf _NPROCESSORS_ONLN)
 #jobs=$(( jobs + 2 ))
 jobs=4
