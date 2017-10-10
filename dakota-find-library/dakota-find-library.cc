@@ -14,16 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <cstdio>  // fprintf(), stdout, stderr
-# include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE, free()
-# include <string>
+# include <cstdio>  // sprintf(), fprintf(), stdout, stderr
+# include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE, realpath(), free()
+# include <cstring> // strcmp()
 # include <libgen.h> // dirname_r(), basename_r()
-//# include <sys/types.h> // sssize_t
-# include <unistd.h> // readlink()
 # include <sys/param.h> // MAXPATHLEN
 
 # include "dakota-dso.h"
 
+static FUNC shared_library_prefix() -> str_t {
+  return "lib";
+}
+static FUNC shared_library_suffix() -> str_t {
+  return ".dylib";
+}
 static FUNC recursive_realpath(str_t path) -> str_t {
   str_t result = realpath(path, nullptr); // must free()
   if (strcmp(result, path) != 0)
@@ -34,10 +38,20 @@ FUNC main(int argc, const str_t argv[]) -> int {
   str_t progname = argv[0];
   int exit_value = EXIT_SUCCESS;
   for (int i = 1; i < argc; i++) {
+    char xarg[MAXPATHLEN + 1] = "";
     str_t arg = argv[i];
-    str_t path = dso_abs_path_for_lib_name(arg);
-    path = recursive_realpath(path); // must free()
+    str_t path = dso_abs_path_for_lib_name(argv[i]);
+    if (path == nullptr) {
+      arg = xarg;
+      sprintf(xarg, "%s%s", argv[i], shared_library_suffix());
+      path = dso_abs_path_for_lib_name(xarg);
+      if (path == nullptr) {
+        sprintf(xarg, "%s%s%s", shared_library_prefix(), argv[i], shared_library_suffix());
+        path = dso_abs_path_for_lib_name(xarg);
+      }
+    }
     if (path != nullptr) {
+      path = recursive_realpath(path); // must free()
       char name_buf[MAXPATHLEN + 1] = "";
       str_t name = basename_r(path, name_buf);
       if (strcmp(arg, name) != 0) {
