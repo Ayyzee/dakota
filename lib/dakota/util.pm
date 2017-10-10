@@ -975,10 +975,7 @@ sub is_same_file {
 }
 sub is_same_src_file {
   my ($klass_ast) = @_;
-  if ($gbl_src_file && $$klass_ast{'file'}) {
-    return 1 if !$ENV{'DK_SRC_UNIQUE_HEADER'};
-    return 1 if $gbl_src_file eq &canon_path($$klass_ast{'file'});
-  }
+  return 1 if $gbl_src_file && $$klass_ast{'file'};
   return 0;
 }
 sub is_array {

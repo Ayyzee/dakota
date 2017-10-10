@@ -256,19 +256,10 @@ sub generate_src {
   my $str;
   my $strings;
   if (&is_src_decl()) {
-    return undef if !$ENV{'DK_SRC_UNIQUE_HEADER'};
-    $str = &generate_decl_defn($file_ast, $generics, $symbols, $dir, $name, $suffix);
-    $strings = [ undef,
-                 '# pragma once' . $nl,
-                 $str ];
+    return undef;
   } else {
     $str =
-      "# if !defined DK_SRC_UNIQUE_HEADER || 0 == DK_SRC_UNIQUE_HEADER" . $nl .
-      "  # include \"$target_hdr_path\"" . &ann(__FILE__, __LINE__) . $nl .
-      "# else" . $nl .
-      "  # include \"$src_hdr_path\"" . &ann(__FILE__, __LINE__) . $nl .
-      "# endif" . $nl .
-      $nl .
+      "# include \"$target_hdr_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# include \"$inc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to inc)
       $nl .
       &dk_generate_cc_footer($file_ast);
@@ -279,7 +270,8 @@ sub generate_src {
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      my $pre_output_bname = &basename($pre_output);
+      splice @$strings, 1, 0, "# line 2 \"$pre_output_bname\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -326,7 +318,8 @@ sub generate_target {
       $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
       &write_to_file_strings($pre_output_runtime, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        splice @$strings, 1, 0, "# line 2 \"$pre_output_runtime\"" . &ann(__FILE__, __LINE__) . $nl;
+        my $pre_output_runtime_bname = &basename($pre_output_runtime);
+        splice @$strings, 1, 0, "# line 2 \"$pre_output_runtime_bname\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
     $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -359,7 +352,8 @@ sub generate_target {
       $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
       &write_to_file_strings($pre_output, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+        my $pre_output_bname = &basename($pre_output);
+        splice @$strings, 1, 0, "# line 2 \"$pre_output_bname\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
     $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -405,7 +399,8 @@ sub generate_klass_funcs_and_write_to_file_converted {
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      my $pre_output_bname = &basename($pre_output);
+      splice @$strings, 1, 0, "# line 2 \"$pre_output_bname\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -423,7 +418,8 @@ sub generate_generics_and_write_to_file_converted {
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      my $pre_output_bname = &basename($pre_output);
+      splice @$strings, 1, 0, "# line 2 \"$pre_output_bname\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -2607,7 +2603,7 @@ sub has_exported_slots {
 }
 sub should_export_slots {
   my ($klass_ast) = @_;
-  return (!$ENV{'DK_SRC_UNIQUE_HEADER'} && &has_slots($klass_ast)) || &has_exported_slots($klass_ast);
+  return &has_slots($klass_ast) || &has_exported_slots($klass_ast);
 }
 sub has_methods {
   my ($klass_ast) = @_;
