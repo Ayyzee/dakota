@@ -68,11 +68,6 @@ static FUNC is_bit_set(int_t word, uint_t pos) -> bool_t {
 static FUNC is_bit_set(int_t word, int_t pos) -> bool_t {
   return is_bit_set(word, cast(uint_t)pos);
 }
-namespace dso_info {
-  TYPEALIAS slots_t = Dl_info;
-}
-TYPEALIAS dso_info_t = dso_info::slots_t;
-
 FUNC dso_open(str_t name, int_t mode) -> ptr_t {
   assert(name != nullptr);
 # if defined WIN32
@@ -93,6 +88,17 @@ FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t {
 # error "not yet implemented on win32"
 # else
   result = dlsym(handle, symbol_name);
+# endif
+  return result;
+}
+FUNC dso_addr(ptr_t addr, dso_info_t* info) -> int_t {
+  assert(addr != nullptr);
+  assert(info != nullptr);
+  int_t result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dladdr(addr, info);
 # endif
   return result;
 }
@@ -122,7 +128,7 @@ FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t {
 # if defined WIN32
 # error "not yet implemented on win32"
 # else
-  dso_info::slots_t dli = {};
+  dso_info_t dli = {};
   if (dladdr(addr, &dli) != 0 && (dli.dli_saddr == addr))
     result = dli.dli_sname;
 # endif
@@ -166,9 +172,26 @@ FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t {
 # if defined WIN32
 # error "not yet implemented on win32"
 # else
-  dso_info::slots_t dli = {};
+  dso_info_t dli = {};
   if (dladdr(addr, &dli))
     result = dli.dli_fname;
 # endif
+  return result;
+}
+FUNC dso_file_type_containing_addr(ptr_t addr) -> str_t {
+  assert(addr != nullptr);
+  str_t result = nullptr;
+  Dl_info dli = {};
+  if (dladdr(addr, &dli)) {
+    uint32_t type = (cast(const struct mach_header_64*)dli.dli_fbase)->filetype;
+    switch (type) {
+      case MH_EXECUTE:
+        result = "executable";
+        break;
+      case MH_DYLIB:
+        result = "shared-library";
+        break;
+    }
+  }
   return result;
 }

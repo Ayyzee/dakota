@@ -23,8 +23,10 @@
   # define so_import ms::dllimport
   # define so_export ms::dllexport
 # else
+  # include <dlfcn.h> // struct Dl_info
   # define so_import
   # define so_export gnu::visibility("default")
+  TYPEALIAS dso_info_t = Dl_info;
 # endif
 
 TYPEALIAS str_t = const char*;
@@ -58,4 +60,6 @@ extern "C" {
   [[so_export]] FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t;
   [[so_export]] FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t;
   [[so_export]] FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t;
+  [[so_export]] FUNC dso_addr(ptr_t addr, dso_info_t* info) -> int_t;
+  [[so_export]] FUNC dso_file_type_containing_addr(ptr_t addr) -> str_t;
 }

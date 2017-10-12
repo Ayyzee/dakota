@@ -26,8 +26,6 @@
     return "not-yet-implimented: strsignal-name(int-t) -> str-t";
   }
 # elif defined __APPLE__ && defined __MACH__
-  # include <dlfcn.h> // dladdr()
-  # include <mach-o/loader.h> // struct mach_header_64, MH_EXECUTE, MH_DYLIB
   # include <mach-o/getsect.h>
   # include <csignal>
 
@@ -39,31 +37,6 @@
   }
   inline FUNC strsignal_name(int sig) -> str_t {
     return sys_signame[sig];
-  }
-  inline FUNC dkt_abs_path_containing_addr(ptr_t addr) -> str_t {
-    assert(addr != nullptr);
-    str_t result = nullptr;
-    Dl_info dli = {};
-    if (dladdr(addr, &dli))
-      result = dli.dli_fname;
-    return result;
-  }
-  inline FUNC dkt_file_type_containing_addr(ptr_t addr) -> str_t {
-    assert(addr != nullptr);
-    str_t result = nullptr;
-    Dl_info dli = {};
-    if (dladdr(addr, &dli)) {
-      uint32_t type = (cast(const struct mach_header_64*)dli.dli_fbase)->filetype;
-      switch (type) {
-        case MH_EXECUTE:
-          result = "executable";
-          break;
-        case MH_DYLIB:
-          result = "shared-library";
-          break;
-      }
-    }
-    return result;
   }
 # else
   # error "Neither __linux__ nor (__APPLE__ && __MACH__) are defined."

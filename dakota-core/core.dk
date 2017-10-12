@@ -19,6 +19,7 @@
 # include <sys/mman.h>
 # include <syslog.h>
 # include <unistd.h>
+# include <mach-o/loader.h> // struct mach-header-64, MH-EXECUTE, MH-DYLIB
 
 # include <cassert>
 # include <cerrno>
@@ -1733,4 +1734,12 @@ static func get-klass-chain(object-t kls, char-t* buf, ssize-t buf-len) -> char-
 func dkt-get-klass-chain(object-t kls, char-t* buf, ssize-t buf-len) -> char-t* {
   buf[0] = NUL;
   return get-klass-chain(kls, buf, buf-len);
+}
+func dkt-abs-path-containing-addr(ptr-t addr) -> str-t {
+  str-t result = dso-abs-path-containing-addr(addr);
+  return result;
+}
+func dkt-file-type-containing-addr(ptr-t addr) -> symbol-t {
+  symbol-t result = dk-intern(dso-file-type-containing-addr(addr));
+  return result;
 }

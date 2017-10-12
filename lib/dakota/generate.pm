@@ -638,7 +638,7 @@ sub generate_target_runtime {
   $target_src_str .= $nl;
   $target_src_str .= "[[read-only]] static int-t zero = 0;" . $nl;
   $target_src_str .= "[[read-only]] static symbol-t name = dk-intern(dkt-abs-path-containing-addr(cast(ptr-t)&zero));" . $nl;
-  $target_src_str .= "[[read-only]] static symbol-t type = dk-intern(dkt-file-type-containing-addr(cast(ptr-t)&zero));" . $nl;
+  $target_src_str .= "[[read-only]] static symbol-t type = dkt-file-type-containing-addr(cast(ptr-t)&zero);" . $nl;
   $target_src_str .= $nl;
   #my $col;
   $target_src_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);

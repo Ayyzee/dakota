@@ -267,6 +267,9 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 [[so_export]] FUNC dkt_register_info(named_info_t*)   -> void;
 [[so_export]] FUNC dkt_deregister_info(named_info_t*) -> void;
 
+[[so_export]] FUNC dkt_abs_path_containing_addr(ptr_t addr) -> str_t;
+[[so_export]] FUNC dkt_file_type_containing_addr(ptr_t addr) -> symbol_t;
+
 // [[so_export]]           FUNC dk-va-add-all(object-t self, va-list-t args) -> object-t;
 // [[so_export, sentinel]] FUNC dk-add-all(object-t self, ...)               -> object-t;
 
