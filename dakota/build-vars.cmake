@@ -12,7 +12,6 @@ set (lib-dirs
 set (libs
 )
 set (target-libs
-  dakota-dso
   dakota-core
 )
 set (target-type shared-library)

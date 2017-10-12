@@ -596,13 +596,11 @@ digraph {
   "dakota/zzz/build/dakota/type-func.dk.o" [ label = "type-func.dk.o" ];
   "dakota/zzz/build/dakota/xml-object-output-stream.dk.o" [ label = "xml-object-output-stream.dk.o" ];
   "dakota/zzz/build/dakota/z/target.cc.o" [ label = "target.cc.o", color = magenta ];
-  "dakota/lib/libdakota-dso.dylib" [ label = "libdakota-dso.dylib", color = green ];
   "dakota/lib/libdakota-core.dylib" [ label = "libdakota-core.dylib", color = green ];
   "dakota/zzz/intmd/dakota/z/target.cc" [ label = "target.cc", color = magenta ];
   "dakota/zzz/intmd/dakota/z/target.h" [ label = "target.h", color = magenta ];
   "dakota/zzz/intmd/dakota/z/inputs.ast" [ label = "inputs.ast" ];
   "dakota/zzz/intmd/dakota/z/srcs.ast" [ label = "srcs.ast" ];
-  ".dkt/dakota/lib/libdakota-dso.dylib.ctlg.ast" [ label = "libdakota-dso.dylib.ctlg.ast" ];
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg.ast" [ label = "libdakota-core.dylib.ctlg.ast" ];
   "dakota/zzz/intmd/dakota/ascii-number-klass.dk.ast" [ label = "ascii-number-klass.dk.ast" ];
   "dakota/zzz/intmd/dakota/ascii-number.dk.ast" [ label = "ascii-number.dk.ast" ];
@@ -652,7 +650,6 @@ digraph {
   "dakota/dakota/tokenid.dk" [ label = "tokenid.dk", color = blue ];
   "dakota/dakota/type-func.dk" [ label = "type-func.dk", color = blue ];
   "dakota/dakota/xml-object-output-stream.dk" [ label = "xml-object-output-stream.dk", color = blue ];
-  ".dkt/dakota/lib/libdakota-dso.dylib.ctlg" [ label = "libdakota-dso.dylib.ctlg" ];
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" [ label = "libdakota-core.dylib.ctlg" ];
 
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/ascii-number-klass.dk.o";
@@ -680,7 +677,6 @@ digraph {
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/type-func.dk.o";
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/xml-object-output-stream.dk.o";
   "dakota/lib/libdakota.dylib" -> "dakota/zzz/build/dakota/z/target.cc.o";
-  "dakota/lib/libdakota.dylib" -> "dakota/lib/libdakota-dso.dylib" [ color = green ];
   "dakota/lib/libdakota.dylib" -> "dakota/lib/libdakota-core.dylib" [ color = green ];
   "dakota/zzz/build/dakota/z/target.cc.o" -> "dakota/zzz/intmd/dakota/z/target.cc" [ color = blue ];
   "dakota/zzz/build/dakota/z/target.cc.o" -> "dakota/zzz/intmd/dakota/z/target.h" [ color = gray, style = dashed ];
@@ -711,7 +707,6 @@ digraph {
   "dakota/zzz/intmd/dakota/z/target.h" -> "dakota/zzz/intmd/dakota/z/inputs.ast";
   "dakota/zzz/intmd/dakota/z/target.cc" -> "dakota/zzz/intmd/dakota/z/inputs.ast";
   "dakota/zzz/intmd/dakota/z/inputs.ast" -> "dakota/zzz/intmd/dakota/z/srcs.ast";
-  "dakota/zzz/intmd/dakota/z/inputs.ast" -> ".dkt/dakota/lib/libdakota-dso.dylib.ctlg.ast" [ color = red ];
   "dakota/zzz/intmd/dakota/z/inputs.ast" -> ".dkt/dakota/lib/libdakota-core.dylib.ctlg.ast" [ color = red ];
   "dakota/zzz/intmd/dakota/z/srcs.ast" -> "dakota/zzz/intmd/dakota/ascii-number-klass.dk.ast";
   "dakota/zzz/intmd/dakota/z/srcs.ast" -> "dakota/zzz/intmd/dakota/ascii-number.dk.ast";
@@ -785,8 +780,6 @@ digraph {
   "dakota/zzz/intmd/dakota/type-func.dk.ast" -> "dakota/dakota/type-func.dk";
   "dakota/zzz/build/dakota/xml-object-output-stream.dk.o" -> "dakota/dakota/xml-object-output-stream.dk" [ color = blue ];
   "dakota/zzz/intmd/dakota/xml-object-output-stream.dk.ast" -> "dakota/dakota/xml-object-output-stream.dk";
-  ".dkt/dakota/lib/libdakota-dso.dylib.ctlg.ast" -> ".dkt/dakota/lib/libdakota-dso.dylib.ctlg";
-  ".dkt/dakota/lib/libdakota-dso.dylib.ctlg" -> "dakota/lib/libdakota-dso.dylib";
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg.ast" -> ".dkt/dakota/lib/libdakota-core.dylib.ctlg";
   ".dkt/dakota/lib/libdakota-core.dylib.ctlg" -> "dakota/lib/libdakota-core.dylib";
 
