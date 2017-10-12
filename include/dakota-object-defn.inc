@@ -16,7 +16,7 @@
 
 # pragma once
 
-//FUNC $dealloc(object_t) -> object_t;
+FUNC $dealloc(object_t) -> object_t;
 REF_COUNTING_INLINE FUNC dk_dealloc(object_t obj) -> void;
 REF_COUNTING_INLINE FUNC dk_dealloc(object_t obj) -> void {
 # if defined DEBUG
