@@ -1,6 +1,7 @@
 -fsanitize=address
 -fno-common
 -fPIC
+-fvisibility=hidden
 -std=c++1z
 --debug=3
 --optimize=0
