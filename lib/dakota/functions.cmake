@@ -38,7 +38,7 @@ endfunction ()
 
 function (dk_target_lib_files output-var) # ...
   foreach (lib ${ARGN})
-    set (target-lib-file ${prefix-dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set (target-lib-file ${prefix_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
     list (APPEND target-lib-files ${target-lib-file})
   endforeach ()
   set (${output-var} "${target-lib-files}" PARENT_SCOPE)
@@ -46,7 +46,7 @@ endfunction ()
 
 function (dk_find_program output-var name)
   set (found-name NOTFOUND)
-  find_program (found-name ${name} PATHS ${prefix-dir}/bin)
+  find_program (found-name ${name} PATHS ${prefix_dir}/bin)
   if (NOT found-name)
     message (FATAL_ERROR "error: program: ${name}: find_library(): NOTFOUND")
   endif ()

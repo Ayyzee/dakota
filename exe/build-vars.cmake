@@ -2,10 +2,10 @@
 set (macros
 )
 set (bin-dirs
-  ${source-dir}/bin
+  ${source_dir}/bin
 )
 set (include-dirs
-  ${source-dir}/include
+  ${source_dir}/include
 )
 set (lib-dirs
 )
@@ -17,5 +17,5 @@ set (target-libs
 )
 set (target-type executable)
 set (srcs
-  ${CMAKE_CURRENT_SOURCE_DIR}/exe.dk
+  exe.dk
 )

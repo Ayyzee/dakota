@@ -41,6 +41,7 @@ fi
 rm -f bin/dakota-catalog bin/dakota-find-library
 rm -f lib/libdakota-dso.$so_ext lib/libdakota-core.$so_ext lib/libdakota.$so_ext
 rm -fr zzz
+#rm -f {dakota-core,dakota}/parts.txt
 make $@ -f build.mk libdakota-dso
 make $@ -f build.mk dakota-catalog
 make $@ -f build.mk dakota-find-library

@@ -2,10 +2,10 @@
 set (macros
 )
 set (include-dirs
-  ${source-dir}/include
+  ${source_dir}/include
 )
 set (install-include-files
-  ${source-dir}/include/dakota-dso.h
+  ${source_dir}/include/dakota-dso.h
 )
 set (lib-dirs
 )
@@ -16,5 +16,5 @@ set (target-libs
 )
 set (target-type shared-library)
 set (srcs
-  ${CMAKE_CURRENT_SOURCE_DIR}/dakota-dso.cc
+  dakota-dso.cc
 )

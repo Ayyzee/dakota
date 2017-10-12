@@ -1,5 +1,5 @@
 # -*- mode: cmake -*-
-include (${prefix-dir}/lib/dakota/base-cxx.cmake)
+include (${prefix_dir}/lib/dakota/base-cxx.cmake)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
 dk_append_target_property (${target} LINK_FLAGS
@@ -7,8 +7,8 @@ dk_append_target_property (${target} LINK_FLAGS
   --var=cxx=${cxx-compiler})
 target_compile_options (${target} PRIVATE
   --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-  --var=source_dir=${source-dir}
-  --var=build_dir=${build-dir}
+  --var=source_dir=${source_dir}
+  --var=build_dir=${build_dir}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-parts dakota-parts)
@@ -29,8 +29,8 @@ execute_process (
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src --path-only
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=source_dir=${source-dir}
-    --var=build_dir=${build-dir}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
@@ -38,8 +38,8 @@ target_sources (${target} PRIVATE ${target-src})
 execute_process (
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-hdr --path-only
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=source_dir=${source-dir}
-    --var=build_dir=${build-dir}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
   OUTPUT_VARIABLE target-hdr
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -61,8 +61,8 @@ add_custom_command (
   DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=source_dir=${source-dir}
-    --var=build_dir=${build-dir}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
     --output ${target-src}
   VERBATIM
   USES_TERMINAL)
@@ -87,8 +87,8 @@ add_custom_command (
   DEPENDS ${parts} ${target-libs}
   COMMAND ${dakota-make}
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=source_dir=${source-dir}
-    --var=build_dir=${build-dir}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
     --target=${target-output-path}
   VERBATIM
   USES_TERMINAL)

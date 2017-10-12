@@ -9,7 +9,6 @@
 use strict;
 use warnings;
 use sort 'stable';
-use File::Spec;
 use Cwd;
 
 my $gbl_prefix;
@@ -78,8 +77,7 @@ sub start {
   #&make_dirname($parts);
   my $outstr = '';
   foreach my $input (@{$$cmd_info{'inputs'}}) {
-    my $rel_input = File::Spec->abs2rel($input, $parts_dir);
-    $outstr .= $rel_input . $nl;
+    $outstr .= $input . $nl;
   }
   &filestr_to_file($outstr, $parts);
 }

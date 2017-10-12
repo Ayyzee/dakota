@@ -11,6 +11,7 @@ targets=(
 #rm -f ${targets[@]}
 set -o xtrace
 rm -rf zzz
+rm -f {dakota-core,dakota}/parts.txt
 export generator=ninja
 ./root-build.sh config
 ./root-build.sh dakota-dso dakota-catalog
