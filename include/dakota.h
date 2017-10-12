@@ -124,10 +124,10 @@ KLASS_NS ptr { typealias slots_t = void*; } typealias ptr_t = ptr::slots_t;
 
 # define OUT_OF_LINE_REF_COUNTING 1
 
-# if (OUT_OF_LINE_REF_COUNTING != 0)
-  # define REF_COUNTING_INLINE
-# else
+# if (OUT_OF_LINE_REF_COUNTING == 0)
   # define REF_COUNTING_INLINE inline
+# else
+  # define REF_COUNTING_INLINE
 # endif
 
 # include <dakota-object.inc>
