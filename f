@@ -44,9 +44,9 @@ rm -fr zzz
 make $@ -f build.mk libdakota-dso
 make $@ -f build.mk dakota-catalog
 make $@ -f build.mk dakota-find-library
-#jobs=$(getconf _NPROCESSORS_ONLN)
-#jobs=$(( jobs + 2 ))
-jobs=4
+threads=$(getconf _NPROCESSORS_ONLN)
+threads_per_core=2
+jobs=$(( threads / threads_per_core ))
 SECONDS=0
 make $@ -j $jobs -f build.mk libdakota
 duration=$SECONDS
