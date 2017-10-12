@@ -58,8 +58,8 @@ const dso_symbol_handle_t DSO_SYMBOL_HANDLE = {
   .DEFAULT = RTLD_DEFAULT,
   .NEXT =    RTLD_NEXT,
 };
-TYPEALIAS bool_t = bool;
-TYPEALIAS uint_t = unsigned int;
+typealias bool_t = bool;
+typealias uint_t = unsigned int;
 
 static FUNC is_bit_set(int_t word, uint_t pos) -> bool_t {
   bool_t state = word & (1 << pos);

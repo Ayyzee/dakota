@@ -17,7 +17,7 @@
 # pragma once
 
 # define FUNC      auto
-# define TYPEALIAS using
+# define typealias using
 
 # if defined _WIN32 || defined _WIN64
   # define so_import ms::dllimport
@@ -26,12 +26,12 @@
   # include <dlfcn.h> // struct Dl_info
   # define so_import
   # define so_export gnu::visibility("default")
-  TYPEALIAS dso_info_t = Dl_info;
+  typealias dso_info_t = Dl_info;
 # endif
 
-TYPEALIAS str_t = const char*;
-TYPEALIAS ptr_t = void*;
-TYPEALIAS int_t = int;
+typealias str_t = const char*;
+typealias ptr_t = void*;
+typealias int_t = int;
 
 struct dso_open_mode_t {
   // xor
