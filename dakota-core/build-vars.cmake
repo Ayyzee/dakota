@@ -15,6 +15,7 @@ set (libs
 set (target-libs
   dakota-dso
 )
+set (target dakota-core)
 set (target-type shared-library)
 set (srcs
   bit-vector.dk

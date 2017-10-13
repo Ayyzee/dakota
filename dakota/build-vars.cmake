@@ -14,6 +14,7 @@ set (libs
 set (target-libs
   dakota-core
 )
+set (target dakota)
 set (target-type shared-library)
 set (srcs
   ascii-number-klass.dk

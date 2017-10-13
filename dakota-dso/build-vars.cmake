@@ -14,6 +14,7 @@ set (libs
 )
 set (target-libs
 )
+set (target dakota-dso)
 set (target-type shared-library)
 set (srcs
   dakota-dso.cc

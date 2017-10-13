@@ -14,6 +14,7 @@ set (libs
 set (target-libs
   dakota-core
 )
+set (target exe-core)
 set (target-type executable)
 set (srcs
   exe.dk

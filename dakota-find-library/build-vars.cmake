@@ -11,6 +11,8 @@ set (libs
 set (target-libs
   dakota-dso
 )
+set (target dakota-find-library)
+set (target-type executable)
 set (srcs
   dakota-find-library.cc
 )
