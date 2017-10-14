@@ -157,6 +157,7 @@ our @EXPORT= qw(
                  path_split
                  prepend_dot_slash
                  platform
+                 realpath
                  remove_extra_whitespace
                  remove_first
                  remove_last
