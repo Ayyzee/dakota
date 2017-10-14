@@ -68,9 +68,9 @@ sub cmd_info_from_argv {
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
-  my $parts = &parts_path();
+  my $parts_path = &parts_path();
   if ($$cmd_info{'opts'}{'path-only'}) {
-    print $parts . $nl;
+    print $parts_path . $nl;
     exit 0;
   }
   my $build_vars_yaml = &current_source_dir() . '/build-vars.yaml';
@@ -96,7 +96,7 @@ sub start {
       }
     }
   }
-  &filestr_to_file($outstr, $parts);
+  &filestr_to_file($outstr, $parts_path);
 }
 unless (caller) {
   &start(\@ARGV);

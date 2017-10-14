@@ -471,7 +471,7 @@ sub make_gen_target_cmd_info {
   my $cmd_info = { 'opts' => { 'action' => $action } };
   $$cmd_info{'inputs'} = $inputs;
   $$cmd_info{'output'} = $output;
-  $$cmd_info{'parts'} = &parts(&parts_path());
+  $$cmd_info{'parts'} = &parts();
   $$cmd_info{'ast-paths'} = &ast_paths_from_parts($$cmd_info{'parts'});
   &set_root_cmd($cmd_info);
 }

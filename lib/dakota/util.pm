@@ -1451,7 +1451,8 @@ sub yaml_parse {
   return $tbl;
 }
 sub parts {
-  my ($file, $force) = @_;
+  my ($force) = @_;
+  my $file = &parts_path();
   my $file_dir = &dirname($file);
   my $result = [];
   if (-e $file) {
