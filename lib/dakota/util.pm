@@ -30,7 +30,7 @@ use sort 'stable';
 
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 
-my $nl = "\n";
+my $nl;
 my $gbl_prefix;
 my $gbl_platform;
 my $h_ext;
@@ -192,6 +192,7 @@ our @EXPORT= qw(
                  var
                  var_array
                  verbose_exec
+                 yaml_parse
  );
 use Cwd;
 use File::Spec;
@@ -1423,27 +1424,30 @@ sub scalar_from_file {
   die if ! $result;
   return $result;
 }
-sub xxx_from_yaml_file {
-  my ($file, $scalar_keys) = @_;
-  die if ! -e $file;
-  my $result = {};
-  my $filestr = &filestr_from_file($file);
-  $filestr =~ s/\n\s+-\s+/ /gs;
-  while ($filestr =~ /^([\w-]+):\s+(.+?)$/gms) {
-    my ($lhs, $rhs) = ($1, $2);
-    $$result{$lhs} = [split /\s+/, $rhs];
+# implements only a subset of yaml
+#
+# key: val
+# key:
+#  - val1
+#  - val2
+sub yaml_parse {
+  my ($path) = @_;
+  my $tbl = {};
+  my $key;
+  my $filestr = &filestr_from_file($path);
+  foreach my $line (split($nl, $filestr)) {
+    if (0) {
+    } elsif ($line =~ m/^([\w-]+): +(.+?) *$/) {
+      $$tbl{$1} = $2;
+      $key = undef;
+    } elsif ($line =~ m/^([\w-]+): *$/) {
+      $$tbl{$1} = [];
+      $key = $1;
+    } elsif ($line =~ m/^ +- +(.+?) *$/) {
+      push @{$$tbl{$key}}, $1;
+    } else { die $line . $nl; }
   }
-  if ($scalar_keys) {
-    foreach my $lhs (@$scalar_keys) {
-      $$result{$lhs} = $$result{$lhs}[0];
-    }
-  } else { # assume that every var is scalar
-    while (my ($key, $array) = each (%$result)) {
-      die if scalar @$array > 1;
-      $$result{$key} = $$array[0];
-    }
-  }
-  return $result;
+  return $tbl;
 }
 sub parts {
   my ($file, $force) = @_;
@@ -1469,7 +1473,7 @@ sub parts {
 }
 sub platform {
   my ($file) = @_;
-  my $result = &xxx_from_yaml_file($file, undef);
+  my $result = &yaml_parse($file);
   return $result;
 }
 sub filestr_from_file {
@@ -1490,6 +1494,7 @@ sub start {
   # just in case ...
 }
 BEGIN {
+  $nl = "\n";
   $gbl_prefix = &dk_prefix($0);
   $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";

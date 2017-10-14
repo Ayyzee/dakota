@@ -1,0 +1,13 @@
+macros:
+include-dirs:
+  - ${source_dir}/include
+install-include-files:
+  - ${source_dir}/include/dakota-dso.h
+lib-dirs:
+libs:
+  - dl
+target-libs:
+target: dakota-dso
+target-type: shared-library
+srcs:
+  - dakota-dso.cc

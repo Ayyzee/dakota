@@ -1,0 +1,11 @@
+macros:
+include-dirs:
+  - ${source_dir}/include
+lib-dirs:
+libs:
+target-libs:
+  - dakota-dso
+target: dakota-catalog
+target-type: executable
+srcs:
+  - dakota-catalog.cc

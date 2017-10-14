@@ -1,0 +1,14 @@
+macros:
+bin-dirs:
+  - ${source_dir}/bin
+include-dirs:
+  - ${source_dir}/include
+lib-dirs:
+libs:
+target-libs:
+  - dakota-core
+  - dakota
+target: exe
+target-type: executable
+srcs:
+  - exe.dk
