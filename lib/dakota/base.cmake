@@ -50,7 +50,6 @@ add_custom_command (
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
   COMMAND ${dakota-parts}
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    ${srcs}
     ${target-lib-files}
     ${lib-files}
   VERBATIM
