@@ -105,6 +105,7 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  int_from_str
+                 is_array
                  is_cc_path
                  is_dk_path
                  is_dk_src_path
