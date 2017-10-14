@@ -369,6 +369,8 @@ sub gen_rules {
   }
   return ($rules, $so_paths);
 }
+# ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
+# ${runtime_output_directory}/${target}${executable_suffix}
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
