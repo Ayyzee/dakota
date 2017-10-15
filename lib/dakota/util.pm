@@ -758,6 +758,10 @@ sub target_src_path {
   my $path = &target_current_intmd_dir() . '/target' . $cc_ext;
   return $path;
 }
+sub build_vars_yaml_path {
+  my $path = &current_source_dir() . '/build-vars.yaml';
+  return $path;
+}
 sub parts_path {
   my $path = &current_source_dir() . '/parts.txt';
   return $path;
@@ -1455,6 +1459,16 @@ sub parts {
   my ($force) = @_;
   my $file = &parts_path();
   my $file_dir = &dirname($file);
+  my $build_vars_yaml = &build_vars_yaml_path();
+  if (&is_out_of_date($build_vars_yaml, $file)) {
+    print STDERR "out-of-date: $file\n";
+    my $current_source_dir = &current_source_dir();
+    my $lib_output_dir = &source_dir() . '/lib';
+    $lib_output_dir = '/Users/robert/dakota/lib';
+    die if ! $lib_output_dir;
+    `dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir`;
+    die if $?;
+  }
   my $result = [];
   if (-e $file) {
     my $paths = [split /\s+/, &filestr_from_file($file)];

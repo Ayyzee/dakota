@@ -37,6 +37,9 @@ use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 use dakota::dakota;
 use dakota::parse;
 use dakota::util;
+my $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
+  or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
+my $so_ext = &var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
@@ -80,20 +83,18 @@ sub start {
     $outstr .= $input . $nl;
   }
   if (scalar @{$$cmd_info{'inputs'}}) {
-    # inputs are (target-libs, libs)
+    # inputs are (target-lib-files, lib-files)
     foreach my $input (@{$$cmd_info{'inputs'}}) {
       $outstr .= $input . $nl;
     }
   } else {
-    foreach my $key ('target-libs', 'libs') {
-      foreach my $input (@{$$build_vars{$key}}) {
-        if (-f &realpath($input) || -f &realpath(&current_source_dir() . '/' . $input)) {
-          $outstr .= $input . $nl;
-        } else {
-          my $found_lib = `dakota-find-library $input`;
-          $outstr .= $found_lib . $nl;
-        }
-      }
+    foreach my $input (@{$$build_vars{'target-libs'}}) {
+      my $target_lib_file = "$ENV{'lib_output_dir'}/lib$input$so_ext";
+      $outstr .= $target_lib_file . $nl;
+    }
+    foreach my $input (@{$$build_vars{'libs'}}) {
+      my $lib_file = `dakota-find-library $input`;
+      $outstr .= $lib_file . $nl;
     }
   }
   &filestr_to_file($outstr, $parts_path);
