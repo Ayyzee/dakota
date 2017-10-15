@@ -6,10 +6,9 @@ include-dirs:
   - ${source_dir}/include
 lib-dirs:
 libs:
-output_path: ${lib_output_dir}/${lib_prefix}dakota-core${lib_suffix}
+target-output-path: ${lib_output_dir}/${lib_prefix}dakota-core${lib_suffix}
 target-libs:
   - dakota-dso
-target: dakota-core
 target-type: shared-library
 srcs:
   - bit-vector.dk

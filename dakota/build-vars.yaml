@@ -5,10 +5,9 @@ include-dirs:
   - ${source_dir}/include
 lib-dirs:
 libs:
-output_path: ${lib_output_dir}/${lib_prefix}dakota${lib_suffix}
+target-output-path: ${lib_output_dir}/${lib_prefix}dakota${lib_suffix}
 target-libs:
   - dakota-core
-target: dakota
 target-type: shared-library
 srcs:
   - ascii-number-klass.dk

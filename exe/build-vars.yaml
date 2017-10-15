@@ -5,11 +5,10 @@ include-dirs:
   - ${source_dir}/include
 lib-dirs:
 libs:
-output_path: ${exe_output_dir}/exe${exe_suffix}
+target-output-path: ${exe_output_dir}/exe${exe_suffix}
 target-libs:
   - dakota-core
   - dakota
-target: exe
 target-type: executable
 srcs:
   - exe.dk

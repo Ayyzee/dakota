@@ -3,10 +3,9 @@ include-dirs:
   - ${source_dir}/include
 lib-dirs:
 libs:
-output_path: ${exe_output_dir}/dakota-catalog${exe_suffix}
+target-output-path: ${exe_output_dir}/dakota-catalog${exe_suffix}
 target-libs:
   - dakota-dso
-target: dakota-catalog
 target-type: executable
 srcs:
   - dakota-catalog.cc
