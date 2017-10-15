@@ -1,6 +1,6 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
-so_ext=dylib
+so_ext='.dylib'
 lib_targets=(
   dakota-core
   dakota
@@ -28,7 +28,7 @@ for target in ${lib_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
-              --target $lib_output_dir/lib$target.$so_ext
+              --target $lib_output_dir/lib$target$so_ext
   echo "include $target/build.mk" >> build.mk
   dot_files+=($target/build.dot)
 done
@@ -50,7 +50,7 @@ if [[ $graphs -ne 0 ]]; then
   exit
 fi
 rm -f bin/dakota-catalog bin/dakota-find-library bin/exe-core bin/exe
-rm -f lib/libdakota-dso.$so_ext lib/libdakota-core.$so_ext lib/libdakota.$so_ext
+rm -f lib/libdakota-dso$so_ext lib/libdakota-core$so_ext lib/libdakota$so_ext
 rm -fr zzz
 make $@ -f build.mk libdakota-dso
 make $@ -f build.mk dakota-catalog
