@@ -6,6 +6,12 @@ set (source_dir ${${PROJECT_NAME}_SOURCE_DIR})
 set (build_dir  ${${PROJECT_NAME}_BINARY_DIR})
 set (prefix_dir ${${PROJECT_NAME}_SOURCE_DIR})
 
+set (lib_output_dir ${prefix_dir}/lib)
+set (exe_output_dir ${prefix_dir}/bin)
+set (lib_prefix ${CMAKE_SHARED_LIBRARY_PREFIX})
+set (lib_suffix ${CMAKE_SHARED_LIBRARY_SUFFIX})
+set (exe_suffix ${CMAKE_EXECUTABLE_SUFFIX})
+
 add_subdirectory (dakota-dso)
 add_subdirectory (dakota-catalog)
 add_subdirectory (dakota-core)

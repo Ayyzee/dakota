@@ -38,7 +38,7 @@ endfunction ()
 
 function (dk_target_lib_files output-var) # ...
   foreach (lib ${ARGN})
-    set (target-lib-file ${prefix_dir}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${lib}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set (target-lib-file ${lib_output_dir}/${lib_prefix}${lib}${lib_suffix})
     list (APPEND target-lib-files ${target-lib-file})
   endforeach ()
   set (${output-var} "${target-lib-files}" PARENT_SCOPE)
