@@ -1467,7 +1467,7 @@ sub parts {
   my $file_dir = &dirname($file);
   my $build_vars_yaml = &build_vars_yaml_path();
   if (&is_out_of_date($build_vars_yaml, $file)) {
-    print STDERR "out-of-date: $file\n";
+    #print STDERR "out-of-date: $file\n";
     my $current_source_dir = &current_source_dir();
     my $lib_output_dir = &source_dir() . '/lib';
     $lib_output_dir = '/Users/robert/dakota/lib';

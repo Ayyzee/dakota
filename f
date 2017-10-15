@@ -23,20 +23,22 @@ rm -f */parts.txt
 rm -f {dakota-core,dakota,exe-core,exe}/build.mk
 for target in ${lib_targets[@]}; do
   current_source_dir=$source_dir/$target
-  dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
+  #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
+              --var=lib_output_dir=$lib_output_dir \
               --target $lib_output_dir/lib$target$so_ext
   echo "include $target/build.mk" >> build.mk
   dot_files+=($target/build.dot)
 done
 for target in ${exe_targets[@]}; do
   current_source_dir=$source_dir/$target
-  dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
+  #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
+              --var=lib_output_dir=$lib_output_dir \
               --target $exe_output_dir/$target
   echo "include $target/build.mk" >> build.mk
   dot_files+=($target/build.dot)
