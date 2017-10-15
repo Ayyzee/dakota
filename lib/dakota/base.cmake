@@ -66,10 +66,10 @@ add_custom_command (
   VERBATIM
   USES_TERMINAL)
 
-#include (ProcessorCount)
-#ProcessorCount (processor-count)
-#math (EXPR jobs "${processor-count} + 2")
-set (jobs 4)
+include (ProcessorCount)
+ProcessorCount (processor-count)
+set (num-threads-per-core 2)
+math (EXPR jobs "${processor-count} / ${num-threads-per-core}")
 
 set (custom-target-hdr ${target}.custom-target-hdr)
 # phony target 'custom-target-hdr'
