@@ -215,12 +215,10 @@ sub gen_make {
     "prefix :=         /Users/robert/dakota" . $nl .
     "dakota :=         /Users/robert/dakota/bin/dakota" . $nl .
     "dakota-catalog := /Users/robert/dakota/bin/dakota-catalog" . $nl .
+    "source_dir :=     $source_dir" . $nl .
+    "build_dir :=      $build_dir" . $nl .
     $nl .
     "$root_tgt \\\n$target_hdr_path : current_source_dir := $current_source_dir" . $nl .
-    $nl .
-    "$root_tgt \\\n$target_hdr_path : source_dir := $source_dir" . $nl .
-    $nl .
-    "$root_tgt \\\n$target_hdr_path : build_dir := $build_dir" . $nl .
     $nl .
     '%.ctlg :' . $nl .
     "\t" . '${dakota-catalog} --output $@ $<' . $nl .
