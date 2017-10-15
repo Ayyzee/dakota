@@ -87,7 +87,7 @@ sub start {
   } else {
     foreach my $key ('target-libs', 'libs') {
       foreach my $input (@{$$build_vars{$key}}) {
-        if (-e $input || -e &current_source_dir() . '/' . $input) {
+        if (-f &realpath($input) || -f &realpath(&current_source_dir() . '/' . $input)) {
           $outstr .= $input . $nl;
         } else {
           my $found_lib = `dakota-find-library $input`;
