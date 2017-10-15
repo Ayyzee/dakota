@@ -26,7 +26,7 @@ endfunction ()
 function (dk_find_lib_files output-var lib-dirs) # ...
   foreach (lib ${ARGN})
     set (found-lib-file NOTFOUND) # found-lib-file-NOTFOUND
-    find_library (found-lib-file ${lib} PATHS ${lib-dirs} ${prefix-path}/lib)
+    find_library (found-lib-file ${lib} PATHS ${lib-dirs} ${prefix_dir}/lib)
     if (NOT found-lib-file)
       message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
     endif ()
