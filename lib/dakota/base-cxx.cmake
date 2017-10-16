@@ -6,8 +6,8 @@ if (NOT target-type)
   set (target-type executable)
 endif ()
 
-get_filename_component (target-output-dir  ${target-output-path} DIRECTORY)
-get_filename_component (target-output-name ${target-output-path} NAME)
+get_filename_component (target-output-dir  ${target-file} DIRECTORY)
+get_filename_component (target-output-name ${target-file} NAME)
 
 if (${target-type} STREQUAL shared-library)
   add_library (${target} SHARED ${srcs})

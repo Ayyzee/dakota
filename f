@@ -38,7 +38,7 @@ for target in ${lib_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
-              --target $lib_output_dir/lib$target$so_ext
+              --target-file $lib_output_dir/lib$target$so_ext
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
@@ -57,7 +57,7 @@ for target in ${exe_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
-              --target $exe_output_dir/$target
+              --target-file $exe_output_dir/$target
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
