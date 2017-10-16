@@ -30,7 +30,7 @@ for target in ${lib_targets[@]}; do
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
   rel_build_mk=${build_mk/$HOME\/dakota\//}
-  #echo "generating $rel_build_mk"
+  if [[ ${silent:-0} == 0 ]]; then echo generating $rel_build_mk; fi
   mkdir -p $current_build_dir
   mkdir -p $current_intmd_dir/z
   #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
@@ -38,7 +38,7 @@ for target in ${lib_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
-              --target-file $lib_output_dir/lib$target$so_ext
+              --target-path $lib_output_dir/lib$target$so_ext
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
@@ -49,7 +49,7 @@ for target in ${exe_targets[@]}; do
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
   rel_build_mk=${build_mk/$HOME\/dakota\//}
-  #echo "generating $rel_build_mk"
+  if [[ ${silent:-0} == 0 ]]; then echo generating $rel_build_mk; fi
   mkdir -p $current_build_dir
   mkdir -p $current_intmd_dir/z
   #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
@@ -57,7 +57,7 @@ for target in ${exe_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
-              --target-file $exe_output_dir/$target
+              --target-path $exe_output_dir/$target
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
@@ -74,7 +74,7 @@ make $@ -j $jobs -f $source_dir/build.mk libdakota-dso
 make $@ -j $jobs -f $source_dir/build.mk dakota-catalog
 make $@ -j $jobs -f $source_dir/build.mk dakota-find-library
 SECONDS=0
-make $@ -j $jobs -f $source_dir/build.mk libdakota
+make $@ -j $jobs -f $source_dir/build.mk libdakota-core libdakota
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"
 make $@ -j $jobs -f $source_dir/build.mk exe-core exe

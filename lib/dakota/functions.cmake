@@ -25,23 +25,23 @@ endfunction ()
 
 function (dk_find_lib_files output-var lib-dirs) # ...
   foreach (lib ${ARGN})
-    set (found-lib-file NOTFOUND) # found-lib-file-NOTFOUND
-    find_library (found-lib-file ${lib} PATHS ${lib-dirs} ${prefix_dir}/lib)
-    if (NOT found-lib-file)
+    set (found-lib-path NOTFOUND) # found-lib-path-NOTFOUND
+    find_library (found-lib-path ${lib} PATHS ${lib-dirs} ${prefix_dir}/lib)
+    if (NOT found-lib-path)
       message (FATAL_ERROR "error: target: ${target}: find_library(): ${lib}")
     endif ()
-    #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib-file}")
-    list (APPEND lib-files ${found-lib-file})
+    #message ( "info: target: ${target}: find_library(): ${lib} => ${found-lib-path}")
+    list (APPEND lib-paths ${found-lib-path})
   endforeach ()
-  set (${output-var} "${lib-files}" PARENT_SCOPE)
+  set (${output-var} "${lib-paths}" PARENT_SCOPE)
 endfunction ()
 
 function (dk_target_lib_files output-var) # ...
   foreach (lib ${ARGN})
-    set (target-lib-file ${lib_output_dir}/${lib_prefix}${lib}${lib_suffix})
-    list (APPEND target-lib-files ${target-lib-file})
+    set (target-lib-path ${lib_output_dir}/${lib_prefix}${lib}${lib_suffix})
+    list (APPEND target-lib-paths ${target-lib-path})
   endforeach ()
-  set (${output-var} "${target-lib-files}" PARENT_SCOPE)
+  set (${output-var} "${target-lib-paths}" PARENT_SCOPE)
 endfunction ()
 
 function (dk_find_program output-var name)

@@ -6,13 +6,13 @@ if (NOT target-type)
   set (target-type executable)
 endif ()
 
-get_filename_component (target-output-dir  ${target-file} DIRECTORY)
-get_filename_component (target-output-name ${target-file} NAME)
+get_filename_component (target-output-dir  ${target-path} DIRECTORY)
+get_filename_component (target-output-name ${target-path} NAME)
 
 if (${target-type} STREQUAL shared-library)
   add_library (${target} SHARED ${srcs})
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${target-output-dir})
-  install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+  install (FILES ${install-include-paths} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 elseif (${target-type} STREQUAL executable)
   add_executable (${target} ${srcs})
@@ -23,11 +23,11 @@ else ()
 endif ()
 set_target_properties (${target} PROPERTIES OUTPUT_NAME ${target-output-name})
 
-dk_find_lib_files (lib-files "${lib-dirs}" ${libs}) # PATHS ...
-dk_target_lib_files (target-lib-files ${target-libs})
+dk_find_lib_files (lib-paths "${lib-dirs}" ${libs}) # PATHS ...
+dk_target_lib_files (target-lib-paths ${target-libs})
 
-target_link_libraries (${target} ${lib-files})
-target_link_libraries (${target} ${target-lib-files})
+target_link_libraries (${target} ${lib-paths})
+target_link_libraries (${target} ${target-lib-paths})
 if (DEFINED target-libs)
   add_dependencies (   ${target} ${target-libs})
 endif ()
