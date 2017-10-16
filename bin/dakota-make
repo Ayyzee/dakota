@@ -268,7 +268,7 @@ sub gen_make_body {
 sub write_build_mk {
   my ($str) = @_;
   my $output = &build_mk_path();
-  open(my $fh, '>', $output);
+  open(my $fh, '>', $output) or die;
   print $fh $str;
   close($fh);
   #print $output . $nl;
@@ -277,7 +277,7 @@ sub write_build_mk {
 sub write_build_dot {
   my ($str) = @_;
   my $output = &build_dot_path();
-  open(my $fh, '>', $output);
+  open(my $fh, '>', $output) or die;
   print $fh $str;
   close($fh);
   #print $output . $nl;
