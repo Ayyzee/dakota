@@ -11,6 +11,7 @@ exe_targets=(
 )
 prefix_dir=/Users/robert/dakota
 source_dir=/Users/robert/dakota
+intmd_dir=/Users/robert/dakota/zzz/intmd
 build_dir=/Users/robert/dakota/zzz/build
 exe_output_dir=$prefix_dir/bin
 lib_output_dir=$prefix_dir/lib
@@ -25,25 +26,37 @@ rm -f lib/libdakota-dso$so_ext lib/libdakota-core$so_ext lib/libdakota$so_ext
 rm -fr zzz
 for target in ${lib_targets[@]}; do
   current_source_dir=$source_dir/$target
+  current_build_dir=$build_dir/$target
+  current_intmd_dir=$intmd_dir/$target
+  mkdir -p $current_build_dir
+  mkdir -p $current_intmd_dir/z
+  build_mk=$current_intmd_dir/build.mk
+  build_dot=$current_intmd_dir/build.dot
   #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
               --target $lib_output_dir/lib$target$so_ext
-  echo "include $target/build.mk" >> build.mk
-  dot_files+=($target/build.dot)
+  echo "include $build_mk" >> build.mk
+  dot_files+=($build_dot)
 done
 for target in ${exe_targets[@]}; do
   current_source_dir=$source_dir/$target
+  current_build_dir=$build_dir/$target
+  current_intmd_dir=$intmd_dir/$target
+  mkdir -p $current_build_dir
+  mkdir -p $current_intmd_dir/z
+  build_mk=$current_intmd_dir/build.mk
+  build_dot=$current_intmd_dir/build.dot
   #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_output_dir=$lib_output_dir \
               --target $exe_output_dir/$target
-  echo "include $target/build.mk" >> build.mk
-  dot_files+=($target/build.dot)
+  echo "include $build_mk" >> build.mk
+  dot_files+=($build_dot)
 done
 ./merge-dots.pl ${dot_files[@]} > build.dot
 graphs="${graphs:-0}"

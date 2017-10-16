@@ -730,10 +730,10 @@ sub lib_output_dir {
   return $dir;
 }
 sub build_dot_path {
-  return &current_source_dir() . '/build.dot';
+  return &current_intmd_dir() . '/build.dot';
 }
 sub build_mk_path {
-  return &current_source_dir() . '/build.mk';
+  return &current_intmd_dir() . '/build.mk';
 }
 my $rel_target_dir_name = 'z';
 sub target_current_build_dir {
@@ -769,7 +769,7 @@ sub build_vars_yaml_path {
   return $path;
 }
 sub parts_path {
-  my $path = &current_source_dir() . '/parts.txt';
+  my $path = &current_intmd_dir() . '/parts.txt';
   return $path;
 }
 
@@ -1482,7 +1482,7 @@ sub parts {
       if (! &is_abs($path)) {
         $abs_path = &cwd() . '/' . $path;
         if (! -e $abs_path) {
-          $abs_path = $file_dir . '/' . $path;
+          $abs_path = &current_source_dir() . '/' . $path;
         }
       }
       $abs_path = &canon_path($abs_path);

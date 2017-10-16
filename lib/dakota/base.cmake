@@ -17,12 +17,16 @@ dk_find_program (dakota-make dakota-make)
 execute_process (
   COMMAND ${dakota-parts} --path-only
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
   OUTPUT_VARIABLE parts
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process (
   COMMAND ${dakota-make} --path-only
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
   OUTPUT_VARIABLE build-mk
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -50,6 +54,8 @@ add_custom_command (
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
   COMMAND ${dakota-parts}
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --var=source_dir=${source_dir}
+    --var=build_dir=${build_dir}
     ${target-lib-files}
     ${lib-files}
   VERBATIM
