@@ -11,7 +11,9 @@ all : dakota-catalog
 dakota-catalog : /Users/robert/dakota/bin/dakota-catalog
 
 /Users/robert/dakota/bin/dakota-catalog : /Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o
-	${cxx} @${prefix}/lib/dakota/linker.opts -Wl,-rpath,${prefix}/lib -o $@ $^ ${prefix}/lib/libdakota-dso.dylib
+	@echo generating $@
+	@${cxx} @${prefix}/lib/dakota/linker.opts -Wl,-rpath,${prefix}/lib -o $@ $^ ${prefix}/lib/libdakota-dso.dylib
 
 /Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o : /Users/robert/dakota/dakota-catalog/dakota-catalog.cc
-	${cxx} -c @${prefix}/lib/dakota/compiler.opts -I${prefix}/include -o $@ $<
+	@echo generating $@
+	@${cxx} -c @${prefix}/lib/dakota/compiler.opts -I${prefix}/include -o $@ $<
