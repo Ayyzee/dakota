@@ -522,7 +522,7 @@ sub start_cmd {
       &cmd_line_action_gen_target_src($$cmd_info{'inputs'}, $$cmd_info{'output'});
     } else { die; }
     my $t1 = Time::HiRes::time();
-    if (! $ENV{'silent'} && $$cmd_info{'opts'}{'action'} ne 'parse') {
+    if ($$cmd_info{'opts'}{'action'} ne 'parse') {
       my $pad = '';
       my $path = $$cmd_info{'output'};
       die if ! $path;
