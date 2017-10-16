@@ -529,7 +529,7 @@ sub start_cmd {
       if ($$cmd_info{'opts'}{'action'} eq 'merge') {
         $pad = ' ' x 9;
       }
-      if (! $ENV{'silent'}) {
+      if (! $ENV{'timings'}) {
         my $dir = &dirname(&current_intmd_dir());
         $path =~ s#^$dir/##;
         my $str = sprintf("elapsed: %4.1fs: %s: %s%s\n", $t1 - $t0, $$cmd_info{'opts'}{'action'}, $pad, $path);
