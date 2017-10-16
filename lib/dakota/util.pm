@@ -1470,7 +1470,6 @@ sub parts {
     #print STDERR "out-of-date: $file\n";
     my $current_source_dir = &current_source_dir();
     my $lib_output_dir = &source_dir() . '/lib';
-    $lib_output_dir = '/Users/robert/dakota/lib';
     die if ! $lib_output_dir;
     `dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir`;
     die if $?;
