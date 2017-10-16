@@ -72,7 +72,8 @@ threads=$(getconf _NPROCESSORS_ONLN)
 threads_per_core=2
 jobs=$(( threads / threads_per_core ))
 SECONDS=0
-make $@ -j $jobs -f $source_dir/build.mk libdakota-dso dakota-catalog dakota-find-library libdakota-core libdakota
+make $@ -j $jobs -f $source_dir/build.mk libdakota-dso dakota-catalog dakota-find-library
+make $@ -j $jobs -f $source_dir/build.mk libdakota-core libdakota
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"
 make $@ -j $jobs -f $source_dir/build.mk exe-core$exe_suffix exe$exe_suffix
