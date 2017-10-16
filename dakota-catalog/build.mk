@@ -10,10 +10,13 @@ prefix := /Users/robert/dakota
 all : dakota-catalog
 dakota-catalog : /Users/robert/dakota/bin/dakota-catalog
 
-/Users/robert/dakota/bin/dakota-catalog : /Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o
+/Users/robert/dakota/bin/dakota-catalog : \
+/Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o \
+${prefix}/lib/libdakota-dso.dylib
 	@if [[ $${silent:-0} == 0 ]]; then echo generating $@; fi
-	@${cxx} @${prefix}/lib/dakota/linker.opts -Wl,-rpath,${prefix}/lib -o $@ $^ ${prefix}/lib/libdakota-dso.dylib
+	@${cxx} @${prefix}/lib/dakota/linker.opts -Wl,-rpath,${prefix}/lib -o $@ $^
 
-/Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o : /Users/robert/dakota/dakota-catalog/dakota-catalog.cc
+/Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o : \
+/Users/robert/dakota/dakota-catalog/dakota-catalog.cc
 	@if [[ $${silent:-0} == 0 ]]; then echo generating $@; fi
 	@${cxx} -c @${prefix}/lib/dakota/compiler.opts -I${prefix}/include -o $@ $<
