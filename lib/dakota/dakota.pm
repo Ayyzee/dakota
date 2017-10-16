@@ -529,10 +529,12 @@ sub start_cmd {
       if ($$cmd_info{'opts'}{'action'} eq 'merge') {
         $pad = ' ' x 9;
       }
-      my $dir = &dirname(&current_intmd_dir());
-      $path =~ s#^$dir/##;
-      my $str = sprintf("elapsed: %4.1fs: %s: %s%s\n", $t1 - $t0, $$cmd_info{'opts'}{'action'}, $pad, $path);
-      print STDERR $str;
+      if ($ENV{'silent'}) {
+        my $dir = &dirname(&current_intmd_dir());
+        $path =~ s#^$dir/##;
+        my $str = sprintf("elapsed: %4.1fs: %s: %s%s\n", $t1 - $t0, $$cmd_info{'opts'}{'action'}, $pad, $path);
+        print STDERR $str;
+      }
     }
     return $ordered_cc_paths = [];
   } else {

@@ -397,6 +397,7 @@ sub out_path_from_in_path {
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
+  $pattern_template =~ s|([a-z])\+([a-z])|$1\\+$2|; # hackhack: added as a workaround for paths containing a +
   $pattern_replacement =~ s|\%|\%s|;
 
   my $result = &expand(&var_perl_from_make($path_in));
