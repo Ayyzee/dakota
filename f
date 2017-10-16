@@ -67,12 +67,12 @@ if [[ $graphs -ne 0 ]]; then
   open ${dot_files[@]} $source_dir/build.dot
   exit
 fi
-make $@ -f $source_dir/build.mk libdakota-dso
-make $@ -f $source_dir/build.mk dakota-catalog
-make $@ -f $source_dir/build.mk dakota-find-library
 threads=$(getconf _NPROCESSORS_ONLN)
 threads_per_core=2
 jobs=$(( threads / threads_per_core ))
+make $@ -j $jobs -f $source_dir/build.mk libdakota-dso
+make $@ -j $jobs -f $source_dir/build.mk dakota-catalog
+make $@ -j $jobs -f $source_dir/build.mk dakota-find-library
 SECONDS=0
 make $@ -j $jobs -f $source_dir/build.mk libdakota
 duration=$SECONDS
