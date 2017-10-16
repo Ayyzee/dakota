@@ -19,8 +19,10 @@ echo "include dakota-dso/build.mk"     >> build.mk
 echo "include dakota-catalog/build.mk" >> build.mk
 echo "include dakota-find-library/build.mk" >> build.mk
 dot_files=()
-rm -f */parts.txt
-rm -f {dakota-core,dakota,exe-core,exe}/build.mk
+rm -f {dakota-core,dakota,exe-core,exe}/{build.mk,build.dot,parts.txt}
+rm -f bin/dakota-catalog bin/dakota-find-library bin/exe-core bin/exe
+rm -f lib/libdakota-dso$so_ext lib/libdakota-core$so_ext lib/libdakota$so_ext
+rm -fr zzz
 for target in ${lib_targets[@]}; do
   current_source_dir=$source_dir/$target
   #dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir
@@ -49,9 +51,6 @@ if [[ $graphs -ne 0 ]]; then
   open ${dot_files[@]} build.dot
   exit
 fi
-rm -f bin/dakota-catalog bin/dakota-find-library bin/exe-core bin/exe
-rm -f lib/libdakota-dso$so_ext lib/libdakota-core$so_ext lib/libdakota$so_ext
-rm -fr zzz
 make $@ -f build.mk libdakota-dso
 make $@ -f build.mk dakota-catalog
 make $@ -f build.mk dakota-find-library
