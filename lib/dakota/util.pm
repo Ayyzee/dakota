@@ -137,6 +137,7 @@ our @EXPORT= qw(
                  kw_arg_generics
                  kw_arg_placeholders
                  kw_args_method_sig
+                 bin_dir
                  lib_dir
                  last
                  longest_common_prefix
@@ -721,6 +722,11 @@ sub source_dir {
 }
 sub build_dir {
   my $dir = $ENV{'build_dir'};
+  die if ! $dir;
+  return $dir;
+}
+sub bin_dir {
+  my $dir = $ENV{'bin_dir'};
   die if ! $dir;
   return $dir;
 }
