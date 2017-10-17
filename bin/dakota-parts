@@ -79,9 +79,9 @@ sub start {
     exit 0;
   }
   my $build_yaml = &current_source_dir() . '/build.yaml';
-  my $build_vars = &yaml_parse($build_yaml);
+  my $build = &yaml_parse($build_yaml);
   my $outstr = '';
-  foreach my $input (@{$$build_vars{'srcs'}}) {
+  foreach my $input (@{$$build{'srcs'}}) {
     $outstr .= $input . $nl;
   }
   if (scalar @{$$cmd_info{'inputs'}}) {
@@ -90,11 +90,11 @@ sub start {
       $outstr .= $input . $nl;
     }
   } else {
-    foreach my $input (@{$$build_vars{'target-libs'}}) {
+    foreach my $input (@{$$build{'target-libs'}}) {
       my $target_lib_file = &lib_dir() . "/$lib_prefix$input$lib_suffix";
       $outstr .= $target_lib_file . $nl;
     }
-    foreach my $input (@{$$build_vars{'libs'}}) {
+    foreach my $input (@{$$build{'libs'}}) {
       my $lib_file = `dakota-find-library $input`;
       $outstr .= $lib_file . $nl;
     }
