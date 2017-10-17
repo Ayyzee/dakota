@@ -1,5 +1,9 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
+finish() {
+  rm -f */build.cmake
+}
+trap finish EXIT
 targets=(
   lib/libdakota-dso.dylib  # 1
   bin/dakota-catalog       # 2
