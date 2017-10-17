@@ -51,7 +51,7 @@ file (RELATIVE_PATH rel-target-hdr ${CMAKE_CURRENT_BINARY_DIR} ${target-hdr})
 
 add_custom_command (
   OUTPUT ${parts}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build-vars.cmake
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build.cmake
   COMMAND ${dakota-parts}
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
