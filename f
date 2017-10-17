@@ -61,7 +61,7 @@ for target in ${exe_targets[@]}; do
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
-./merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
+merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
 graphs="${graphs:-0}"
 if [[ $graphs -ne 0 ]]; then
   open ${dot_files[@]} $source_dir/build.dot
