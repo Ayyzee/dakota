@@ -14,6 +14,7 @@ set (exe_suffix ${CMAKE_EXECUTABLE_SUFFIX})
 
 add_subdirectory (dakota-dso)
 add_subdirectory (dakota-catalog)
+add_subdirectory (dakota-find-library)
 add_subdirectory (dakota-core)
 add_subdirectory (dakota)
 add_subdirectory (exe-core)
