@@ -19,7 +19,7 @@
 # define FUNC      auto
 # define typealias using
 
-# if defined _WIN32 || defined _WIN64
+# if defined _WIN64
   # define so_import ms::dllimport
   # define so_export ms::dllexport
 # else

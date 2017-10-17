@@ -65,7 +65,7 @@
 # define UNBOX_ATTRS  gnu::pure,gnu::hot,gnu::nothrow
 # define INLINE_ATTRS gnu::flatten,gnu::always_inline
 
-# if defined _WIN32 || defined _WIN64
+# if defined _WIN64
   # define so_import ms::dllimport
 //# define so_hidden
   # define so_export ms::dllexport

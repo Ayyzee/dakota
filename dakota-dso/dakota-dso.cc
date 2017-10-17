@@ -70,7 +70,7 @@ static FUNC is_bit_set(int_t word, int_t pos) -> bool_t {
 }
 FUNC dso_open(str_t name, int_t mode) -> ptr_t {
   assert(name != nullptr);
-# if defined WIN32
+# if defined _WIN64
   USE(mode);
   HINSTANCE handle = LoadLibrary(name);
 # else
@@ -84,8 +84,8 @@ FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t {
   assert(handle != nullptr);
   assert(symbol_name != nullptr);
   ptr_t result;
-# if defined WIN32
-# error "not yet implemented on win32"
+# if defined _WIN64
+# error "not yet implemented on win64"
 # else
   result = dlsym(handle, symbol_name);
 # endif
@@ -95,8 +95,8 @@ FUNC dso_addr(ptr_t addr, dso_info_t* info) -> int_t {
   assert(addr != nullptr);
   assert(info != nullptr);
   int_t result;
-# if defined WIN32
-# error "not yet implemented on win32"
+# if defined _WIN64
+# error "not yet implemented on win64"
 # else
   result = dladdr(addr, info);
 # endif
@@ -105,8 +105,8 @@ FUNC dso_addr(ptr_t addr, dso_info_t* info) -> int_t {
 FUNC dso_close(ptr_t handle) -> int_t {
   assert(handle != nullptr);
   int_t result;
-# if defined WIN32
-# error "not yet implemented on win32"
+# if defined _WIN64
+# error "not yet implemented on win64"
 # else
   result = dlclose(handle);
 # endif
@@ -114,8 +114,8 @@ FUNC dso_close(ptr_t handle) -> int_t {
 }
 FUNC dso_error() -> str_t {
   str_t result;
-# if defined WIN32
-# error "not yet implemented on win32"
+# if defined _WIN64
+# error "not yet implemented on win64"
 # else
   result = dlerror();
 # endif
@@ -125,8 +125,8 @@ FUNC dso_error() -> str_t {
 FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t {
   assert(addr != nullptr);
   str_t result = nullptr;
-# if defined WIN32
-# error "not yet implemented on win32"
+# if defined _WIN64
+# error "not yet implemented on win64"
 # else
   dso_info_t dli = {};
   if (dladdr(addr, &dli) != 0 && (dli.dli_saddr == addr))
@@ -169,8 +169,8 @@ FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t {
 FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t {
   assert(addr != nullptr);
   str_t result = nullptr;
-# if defined WIN32
-# error "not yet implemented on win32"
+# if defined _WIN64
+# error "not yet implemented on win64"
 # else
   dso_info_t dli = {};
   if (dladdr(addr, &dli))
