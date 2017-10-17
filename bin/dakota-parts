@@ -39,6 +39,7 @@ use dakota::parse;
 use dakota::util;
 my $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
   or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
+my $lib_prefix = &var($gbl_platform, 'lib_prefix', undef);
 my $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
 
 use Data::Dumper;
@@ -89,7 +90,7 @@ sub start {
     }
   } else {
     foreach my $input (@{$$build_vars{'target-libs'}}) {
-      my $target_lib_file = &lib_dir() . "/lib$input$lib_suffix";
+      my $target_lib_file = &lib_dir() . "/$lib_prefix$input$lib_suffix";
       $outstr .= $target_lib_file . $nl;
     }
     foreach my $input (@{$$build_vars{'libs'}}) {

@@ -1,5 +1,5 @@
 h_ext:     .h
 cc_ext:    .cc
 o_ext:     ${CMAKE_CXX_OUTPUT_EXTENSION}
-lib_suffix:    ${CMAKE_SHARED_LIBRARY_SUFFIX}
-so_prefix: ${CMAKE_SHARED_LIBRARY_PREFIX}
+lib_prefix: ${CMAKE_SHARED_LIBRARY_PREFIX}
+lib_suffix: ${CMAKE_SHARED_LIBRARY_SUFFIX}
