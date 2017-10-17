@@ -764,8 +764,8 @@ sub target_src_path {
   my $path = &target_current_intmd_dir() . '/target' . $cc_ext;
   return $path;
 }
-sub build_vars_yaml_path {
-  my $path = &current_source_dir() . '/build-vars.yaml';
+sub build_yaml_path {
+  my $path = &current_source_dir() . '/build.yaml';
   return $path;
 }
 sub parts_path {
@@ -1465,8 +1465,8 @@ sub parts {
   my ($force) = @_;
   my $file = &parts_path();
   my $file_dir = &dirname($file);
-  my $build_vars_yaml = &build_vars_yaml_path();
-  if (&is_out_of_date($build_vars_yaml, $file)) {
+  my $build_yaml = &build_yaml_path();
+  if (&is_out_of_date($build_yaml, $file)) {
     #print STDERR "out-of-date: $file\n";
     my $current_source_dir = &current_source_dir();
     my $lib_output_dir = &source_dir() . '/lib';

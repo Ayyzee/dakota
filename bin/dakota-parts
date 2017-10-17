@@ -76,8 +76,8 @@ sub start {
     print $parts_path . $nl;
     exit 0;
   }
-  my $build_vars_yaml = &current_source_dir() . '/build-vars.yaml';
-  my $build_vars = &yaml_parse($build_vars_yaml);
+  my $build_yaml = &current_source_dir() . '/build.yaml';
+  my $build_vars = &yaml_parse($build_yaml);
   my $outstr = '';
   foreach my $input (@{$$build_vars{'srcs'}}) {
     $outstr .= $input . $nl;
