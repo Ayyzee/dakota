@@ -13,10 +13,10 @@ dakota-find-library : /Users/robert/dakota/bin/dakota-find-library
 /Users/robert/dakota/bin/dakota-find-library : \
 /Users/robert/dakota/zzz/build/dakota-find-library/dakota-find-library.cc.o \
 ${prefix}/lib/libdakota-dso.dylib
-	/usr/bin/true generating $@
+	# generating $@
 	@${cxx} @${prefix}/lib/dakota/linker.opts -Wl,-rpath,${prefix}/lib -o $@ $^
 
 /Users/robert/dakota/zzz/build/dakota-find-library/dakota-find-library.cc.o : \
 /Users/robert/dakota/dakota-find-library/dakota-find-library.cc
-	/usr/bin/true generating $@
+	# generating $@
 	@${cxx} -c @${prefix}/lib/dakota/compiler.opts -I${prefix}/include -o $@ $<

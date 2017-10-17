@@ -33,7 +33,7 @@ for target in ${lib_targets[@]}; do
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
   rel_build_mk=${build_mk/$HOME\/dakota\//}
-  if [[ ${silent:-0} == 0 ]]; then echo "generating $rel_build_mk"; fi
+  if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
   mkdir -p $current_build_dir
   mkdir -p $current_intmd_dir/z
   dakota-make --var=current_source_dir=$current_source_dir \
@@ -50,7 +50,7 @@ for target in ${exe_targets[@]}; do
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
   rel_build_mk=${build_mk/$HOME\/dakota\//}
-  if [[ ${silent:-0} == 0 ]]; then echo "generating $rel_build_mk"; fi
+  if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
   mkdir -p $current_build_dir
   mkdir -p $current_intmd_dir/z
   dakota-make --var=current_source_dir=$current_source_dir \
