@@ -6,7 +6,7 @@ install-include-files:
 lib-dirs:
 libs:
   - dl
-target-path: ${lib_output_dir}/${lib_prefix}dakota-dso${lib_suffix}
+target-path: ${lib_dir}/${lib_prefix}dakota-dso${lib_suffix}
 target-libs:
 target-type: shared-library
 srcs:

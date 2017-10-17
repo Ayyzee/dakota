@@ -38,7 +38,7 @@ endfunction ()
 
 function (dk_target_lib_files output-var) # ...
   foreach (lib ${ARGN})
-    set (target-lib-path ${lib_output_dir}/${lib_prefix}${lib}${lib_suffix})
+    set (target-lib-path ${lib_dir}/${lib_prefix}${lib}${lib_suffix})
     list (APPEND target-lib-paths ${target-lib-path})
   endforeach ()
   set (${output-var} "${target-lib-paths}" PARENT_SCOPE)

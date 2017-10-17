@@ -89,7 +89,7 @@ sub start {
     }
   } else {
     foreach my $input (@{$$build_vars{'target-libs'}}) {
-      my $target_lib_file = &lib_output_dir() . "/lib$input$so_ext";
+      my $target_lib_file = &lib_dir() . "/lib$input$so_ext";
       $outstr .= $target_lib_file . $nl;
     }
     foreach my $input (@{$$build_vars{'libs'}}) {

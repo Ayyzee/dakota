@@ -15,8 +15,8 @@ prefix_dir=/Users/robert/dakota
 source_dir=/Users/robert/dakota
 intmd_dir=/Users/robert/dakota/zzz/intmd
 build_dir=/Users/robert/dakota/zzz/build
-exe_output_dir=$prefix_dir/bin
-lib_output_dir=$prefix_dir/lib
+exe_dir=$prefix_dir/bin
+lib_dir=$prefix_dir/lib
 cat /dev/null > $source_dir/build.mk
 echo "include dakota-dso/build.mk"          >> $source_dir/build.mk
 echo "include dakota-catalog/build.mk"      >> $source_dir/build.mk
@@ -39,8 +39,8 @@ for target in ${lib_targets[@]}; do
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
-              --var=lib_output_dir=$lib_output_dir \
-              --target-path $lib_output_dir/$lib_prefix$target$lib_suffix
+              --var=lib_dir=$lib_dir \
+              --target-path $lib_dir/$lib_prefix$target$lib_suffix
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
@@ -57,8 +57,8 @@ for target in ${exe_targets[@]}; do
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
-              --var=lib_output_dir=$lib_output_dir \
-              --target-path $exe_output_dir/$target
+              --var=lib_dir=$lib_dir \
+              --target-path $exe_dir/$target
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done

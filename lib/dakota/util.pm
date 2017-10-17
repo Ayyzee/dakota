@@ -137,7 +137,7 @@ our @EXPORT= qw(
                  kw_arg_generics
                  kw_arg_placeholders
                  kw_args_method_sig
-                 lib_output_dir
+                 lib_dir
                  last
                  longest_common_prefix
                  make_dir
@@ -724,8 +724,8 @@ sub build_dir {
   die if ! $dir;
   return $dir;
 }
-sub lib_output_dir {
-  my $dir = $ENV{'lib_output_dir'};
+sub lib_dir {
+  my $dir = $ENV{'lib_dir'};
   die if ! $dir;
   return $dir;
 }
@@ -1469,9 +1469,9 @@ sub parts {
   if (&is_out_of_date($build_yaml, $file)) {
     #print STDERR "out-of-date: $file\n";
     my $current_source_dir = &current_source_dir();
-    my $lib_output_dir = &source_dir() . '/lib';
-    die if ! $lib_output_dir;
-    `dakota-parts --var=current_source_dir=$current_source_dir --var=lib_output_dir=$lib_output_dir`;
+    my $lib_dir = &source_dir() . '/lib';
+    die if ! $lib_dir;
+    `dakota-parts --var=current_source_dir=$current_source_dir --var=lib_dir=$lib_dir`;
     die if $?;
   }
   my $result = [];
