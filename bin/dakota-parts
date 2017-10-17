@@ -41,6 +41,7 @@ my $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
   or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
 my $lib_prefix = &var($gbl_platform, 'lib_prefix', undef);
 my $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
+my $exe_suffix = &var($gbl_platform, 'exe_suffix', undef);
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;

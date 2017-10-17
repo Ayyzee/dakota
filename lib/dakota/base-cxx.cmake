@@ -24,7 +24,7 @@ elseif (${target-type} STREQUAL executable)
 else ()
   message (FATAL_ERROR "error: target-type must be shared-library or executable.")
 endif ()
-set_target_properties (${target} PROPERTIES OUTPUT_NAME ${target-name}) # libxxx.so (not xxx)
+set_target_properties (${target} PROPERTIES OUTPUT_NAME ${target-name}) # aaa.exe or libxxx.so (not aaa nor xxx)
 
 dk_find_lib_files (lib-paths "${lib-dirs}" ${libs}) # PATHS ...
 dk_target_lib_files (target-lib-paths ${target-libs})
