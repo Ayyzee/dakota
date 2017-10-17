@@ -6,25 +6,25 @@ if (NOT target-type)
   set (target-type executable)
 endif ()
 
-get_filename_component (target-output-dir  ${target-path} DIRECTORY)
-get_filename_component (target-output-name ${target-path} NAME)
+get_filename_component (target-dir  ${target-path} DIRECTORY)
+get_filename_component (target-name ${target-path} NAME) # libxxx.so (not xxx)
 
 if (${target-type} STREQUAL shared-library)
   add_library (${target} SHARED ${srcs})
-  set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${target-output-dir})
-  set_target_properties (${target} PROPERTIES PREFIX "")
-  set_target_properties (${target} PROPERTIES SUFFIX "")
+  set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${target-dir})
+  set_target_properties (${target} PROPERTIES PREFIX "") # target-name already has leading 'lib'
+  set_target_properties (${target} PROPERTIES SUFFIX "") # target-name already has trailing '.so'
   install (FILES ${install-include-paths} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 elseif (${target-type} STREQUAL executable)
   add_executable (${target} ${srcs})
-  set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${target-output-dir})
-  set_target_properties (${target} PROPERTIES SUFFIX "")
+  set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${target-dir})
+  set_target_properties (${target} PROPERTIES SUFFIX "") # target-name already has trailing '.exe' (on win64)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
   message (FATAL_ERROR "error: target-type must be shared-library or executable.")
 endif ()
-set_target_properties (${target} PROPERTIES OUTPUT_NAME ${target-output-name})
+set_target_properties (${target} PROPERTIES OUTPUT_NAME ${target-name}) # libxxx.so (not xxx)
 
 dk_find_lib_files (lib-paths "${lib-dirs}" ${libs}) # PATHS ...
 dk_target_lib_files (target-lib-paths ${target-libs})
