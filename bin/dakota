@@ -29,7 +29,7 @@ use Cwd;
 
 my $gbl_prefix;
 my $gbl_platform;
-my $so_ext;
+my $lib_suffix;
 my $o_ext;
 my $cc_ext;
 my $nl = "\n";
@@ -64,7 +64,7 @@ my ( $id,  $mid,  $bid,  $tid,
 $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
   or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
 {
-  $so_ext = &dakota::util::var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
+  $lib_suffix = &dakota::util::var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
   $o_ext =  &dakota::util::var($gbl_platform, 'o_ext',  undef); # could also be .bc or .lto
   $cc_ext = &dakota::util::var($gbl_platform, 'cc_ext', undef);
 }

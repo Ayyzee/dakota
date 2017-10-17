@@ -35,7 +35,7 @@ my $current_intmd_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
-my $so_ext;
+my $lib_suffix;
 my $nl = "\n";
 
 sub dk_prefix {
@@ -76,7 +76,7 @@ my $patterns = {
   'inc_path_from_dk_path'   => '$(current_intmd_dir)/%.inc      : $(current_source_dir)/%.dk',
   'ast_path_from_dk_path'   => '$(current_intmd_dir)/%.dk.ast   : $(current_source_dir)/%.dk',
 
-  'ctlg_path_from_so_path'  => '$(current_intmd_dir)/%$(so_ext).ctlg : %$(so_ext)',
+  'ctlg_path_from_so_path'  => '$(current_intmd_dir)/%$(lib_suffix).ctlg : %$(lib_suffix)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -92,7 +92,7 @@ BEGIN {
   $h_ext = &var($gbl_platform, 'h_ext', undef);
   $cc_ext = &var($gbl_platform, 'cc_ext', undef);
   $o_ext =  &var($gbl_platform, 'o_ext', undef);
-  $so_ext = &var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
+  $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -370,7 +370,7 @@ sub expand {
   $current_intmd_dir if 0;
   $cc_ext if 0;
   $o_ext  if 0;
-  $so_ext if 0;
+  $lib_suffix if 0;
   $str =~ s/(\$\w+)/$1/eeg;
   return $str;
 }
@@ -1100,7 +1100,7 @@ sub module_import_defn {
         if (!exists $$tbl{'shared-libraries'}) {
           $$tbl{'shared-libraries'} = [];
         }
-        $rhs =~ s/\$\(so_ext\)/$so_ext/;
+        $rhs =~ s/\$\(lib_suffix\)/$lib_suffix/;
         &add_last($$tbl{'shared-libraries'}, $rhs);
       } elsif (m/^module$/) {
         my $lhs = &match(__FILE__, __LINE__, $_);

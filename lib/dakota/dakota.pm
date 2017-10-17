@@ -36,7 +36,7 @@ my $extra;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
-my $so_ext;
+my $lib_suffix;
 my $nl = "\n";
 
 sub dk_prefix {
@@ -65,7 +65,7 @@ BEGIN {
   $h_ext = &var($gbl_platform, 'h_ext', undef);
   $cc_ext = &var($gbl_platform, 'cc_ext', undef);
   $o_ext =  &var($gbl_platform, 'o_ext',  undef);
-  $so_ext = &var($gbl_platform, 'so_ext', undef); # default dynamic shared object/library extension
+  $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -390,8 +390,8 @@ sub cc_from_dk_core2 {
 sub gcc_library_from_library_name {
   my ($library_name) = @_;
   # linux and darwin so-regexs are separate
-  if ($library_name =~ m=^lib([.\w-]+)$so_ext((\.\d+)+)?$= ||
-      $library_name =~ m=^lib([.\w-]+)((\.\d+)+)?$so_ext$=) { # so-regex
+  if ($library_name =~ m=^lib([.\w-]+)$lib_suffix((\.\d+)+)?$= ||
+      $library_name =~ m=^lib([.\w-]+)((\.\d+)+)?$lib_suffix$=) { # so-regex
     my $library_name_base = $1;
     return "-l$library_name_base"; # hardhard: hardcoded use of -l (both gcc/clang use it)
   } else {

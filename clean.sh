@@ -8,3 +8,4 @@ rm -f bin/dakota-catalog$exe_suffix bin/dakota-find-library$exe_suffix
 rm -f lib/${lib_prefix}dakota-dso$lib_suffix lib/${lib_prefix}dakota-core$lib_suffix lib/${lib_prefix}dakota$lib_suffix
 rm -f bin/exe-core$exe_suffix bin/exe$exe_suffix
 rm -fr $source_dir/zzz
+find . -name "*~" -exec rm -f {} \;
