@@ -58,7 +58,7 @@ for target in ${exe_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_dir=$lib_dir \
-              --target-path $exe_dir/$target
+              --target-path $exe_dir/$target$exe_suffix
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
