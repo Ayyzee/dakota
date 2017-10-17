@@ -1,0 +1,3 @@
+out_of_line_ref_count
+generate phony target clean
+symbol => sym (dso-sym-name-for-addr())
