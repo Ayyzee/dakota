@@ -5,10 +5,9 @@ $(shell mkdir -p /Users/robert/dakota/zzz/build/dakota-dso)
 cxx :=    /usr/bin/clang++
 prefix := /Users/robert/dakota
 
-.PHONY : all libdakota-dso
+.PHONY : all
 
-all : libdakota-dso
-libdakota-dso : /Users/robert/dakota/lib/libdakota-dso.dylib
+all : /Users/robert/dakota/lib/libdakota-dso.dylib
 
 /Users/robert/dakota/lib/libdakota-dso.dylib : \
 /Users/robert/dakota/zzz/build/dakota-dso/dakota-dso.cc.o \

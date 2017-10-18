@@ -191,7 +191,6 @@ sub gen_make {
   my $result = '';
   my $root_tgt = $$rules[0][0][0];
   my $target_hdr_path = &target_hdr_path();
-  my $phony_root_tgt = &basename($root_tgt) =~ s#\.(so|dylib)$##r;
   $result .=
     '# -*- mode: makefile -*-' . $nl .
     $nl;
@@ -228,10 +227,9 @@ sub gen_make {
     "\t" . '# generating $@' . $nl .
     "\t" . '@${dakota} --action parse --output $@ $<' . $nl .
     $nl .
-    ".PHONY : all $phony_root_tgt" . $nl .
+    ".PHONY : all" . $nl .
     $nl .
-    "all : $phony_root_tgt" . $nl .
-    "$phony_root_tgt : $root_tgt" . $nl;
+    "all : $root_tgt" . $nl;
   $result .= &gen_make_body($rules);
   return $result;
 }

@@ -5,10 +5,9 @@ $(shell mkdir -p /Users/robert/dakota/zzz/build/dakota-find-library)
 cxx :=    /usr/bin/clang++
 prefix := /Users/robert/dakota
 
-.PHONY : all dakota-find-library
+.PHONY : all
 
-all : dakota-find-library
-dakota-find-library : /Users/robert/dakota/bin/dakota-find-library
+all : /Users/robert/dakota/bin/dakota-find-library
 
 /Users/robert/dakota/bin/dakota-find-library : \
 /Users/robert/dakota/zzz/build/dakota-find-library/dakota-find-library.cc.o \

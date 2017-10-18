@@ -5,10 +5,9 @@ $(shell mkdir -p /Users/robert/dakota/zzz/build/dakota-catalog)
 cxx :=    /usr/bin/clang++
 prefix := /Users/robert/dakota
 
-.PHONY : all dakota-catalog
+.PHONY : all
 
-all : dakota-catalog
-dakota-catalog : /Users/robert/dakota/bin/dakota-catalog
+all : /Users/robert/dakota/bin/dakota-catalog
 
 /Users/robert/dakota/bin/dakota-catalog : \
 /Users/robert/dakota/zzz/build/dakota-catalog/dakota-catalog.cc.o \
