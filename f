@@ -21,14 +21,25 @@ intmd_dir=/Users/robert/dakota/zzz/intmd
 build_dir=/Users/robert/dakota/zzz/build
 bin_dir=$prefix_dir/bin
 lib_dir=$prefix_dir/lib
+cc_targets=(
+  $lib_dir/${lib_prefix}dakota-dso$lib_suffix
+  $bin_dir/dakota-catalog$exe_suffix
+  $bin_dir/dakota-find-library$exe_suffix
+)
+dk_lib_targets=(
+  $lib_dir/${lib_prefix}dakota-core$lib_suffix
+  $lib_dir/${lib_prefix}dakota$lib_suffix
+)
+dk_exe_targets=(
+  $source_dir/tst1/exe$exe_suffix
+  $source_dir/tst2/exe$exe_suffix
+)
+rm -f ${cc_targets[@]} ${dk_lib_targets[@]} ${dk_exe_targets[@]}
 cat /dev/null > $source_dir/build.mk
 echo "include dakota-dso/build.mk"          >> $source_dir/build.mk
 echo "include dakota-catalog/build.mk"      >> $source_dir/build.mk
 echo "include dakota-find-library/build.mk" >> $source_dir/build.mk
 dot_files=()
-rm -f bin/dakota-catalog$exe_suffix bin/dakota-find-library$exe_suffix
-rm -f lib/${lib_prefix}dakota-dso$lib_suffix lib/${lib_prefix}dakota-core$lib_suffix lib/${lib_prefix}dakota$lib_suffix
-rm -f tst1/exe$exe_suffix tst2/exe$exe_suffix
 rm -fr $source_dir/zzz
 for target in ${lib_targets[@]}; do
   current_source_dir=$source_dir/$target
@@ -78,11 +89,12 @@ threads=$(getconf _NPROCESSORS_ONLN)
 threads_per_core=2
 jobs=$(( threads / threads_per_core ))
 SECONDS=0
-make $@ -j $jobs -f $source_dir/build.mk $lib_dir/${lib_prefix}dakota-dso$lib_suffix $bin_dir/dakota-catalog$exe_suffix $bin_dir/dakota-find-library$exe_suffix
-make $@ -j $jobs -f $source_dir/build.mk $lib_dir/${lib_prefix}dakota-core$lib_suffix $lib_dir/${lib_prefix}dakota$lib_suffix
+make $@ -j $jobs -f $source_dir/build.mk ${cc_targets[@]}
+
+make $@ -j $jobs -f $source_dir/build.mk ${dk_lib_targets[@]}
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"
-make $@ -j $jobs -f $source_dir/build.mk $source_dir/tst1/exe$exe_suffix $source_dir/tst2/exe$exe_suffix
+make $@ -j $jobs -f $source_dir/build.mk ${dk_exe_targets[@]}
 set -o xtrace
 $source_dir/tst1/exe$exe_suffix
 $source_dir/tst2/exe$exe_suffix
