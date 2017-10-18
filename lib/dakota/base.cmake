@@ -11,16 +11,7 @@ target_compile_options (${target} PRIVATE
   --var=build_dir=${build_dir}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
-dk_find_program (dakota-parts dakota-parts)
 dk_find_program (dakota-make dakota-make)
-
-execute_process (
-  COMMAND ${dakota-parts} --path-only
-    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=source_dir=${source_dir}
-    --var=build_dir=${build_dir}
-  OUTPUT_VARIABLE parts
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process (
   COMMAND ${dakota-make} --path-only
@@ -50,20 +41,8 @@ execute_process (
 file (RELATIVE_PATH rel-target-hdr ${CMAKE_CURRENT_BINARY_DIR} ${target-hdr})
 
 add_custom_command (
-  OUTPUT ${parts}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build.cmake
-  COMMAND ${dakota-parts}
-    --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
-    --var=source_dir=${source_dir}
-    --var=build_dir=${build_dir}
-    ${target-lib-paths}
-    ${lib-paths}
-  VERBATIM
-  USES_TERMINAL)
-
-add_custom_command (
   OUTPUT ${target-src}
-  DEPENDS ${parts} ${target-libs} ${custom-target-hdr}
+  DEPENDS ${target-libs} ${custom-target-hdr}
   COMMAND ${CMAKE_CXX_COMPILER} --action gen-target-src
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
@@ -80,7 +59,7 @@ math (EXPR jobs "${processor-count} / ${num-threads-per-core}")
 set (custom-target-hdr ${target}.custom-target-hdr)
 # phony target 'custom-target-hdr'
 add_custom_target (${custom-target-hdr}
-  DEPENDS ${parts} ${target-libs} ${build-mk}
+  DEPENDS ${target-libs} ${build-mk}
   COMMAND make -s -j ${jobs} -f ${build-mk} ${target-hdr}
   COMMENT "Generating ${rel-target-hdr}"
   VERBATIM
@@ -89,7 +68,7 @@ add_dependencies (${target} ${custom-target-hdr})
 
 add_custom_command (
   OUTPUT  ${build-mk}
-  DEPENDS ${parts} ${target-libs}
+  DEPENDS ${target-libs}
   COMMAND ${dakota-make}
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
