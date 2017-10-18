@@ -35,6 +35,7 @@ my $gbl_prefix;
 my $gbl_platform;
 my $h_ext;
 my $cc_ext;
+my $lib_prefix;
 my $lib_suffix;
 
 sub dk_prefix {
@@ -99,6 +100,7 @@ our @EXPORT= qw(
                  filestr_to_file
                  first
                  flatten
+                 gen_parts
                  target_srcs_ast
                  has_kw_args
                  has_kw_arg_names
@@ -1467,17 +1469,35 @@ sub yaml_parse {
   }
   return $tbl;
 }
+sub gen_parts {
+  my ($build_yaml, $parts_path) = @_;
+  my $build = &yaml_parse($build_yaml);
+  my $outstr = '';
+  foreach my $input (@{$$build{'srcs'}}) {
+    $outstr .= $input . $nl;
+  }
+  foreach my $files ('target-lib-files', 'lib-files') {
+    foreach my $input (@{$$build{$files}}) {
+      $outstr .= $input . $nl;
+    }
+  }
+  foreach my $input (@{$$build{'target-libs'}}) {
+    my $target_lib_file = &lib_dir() . "/$lib_prefix$input$lib_suffix";
+    $outstr .= $target_lib_file . $nl;
+  }
+  foreach my $input (@{$$build{'libs'}}) {
+    my $lib_file = `dakota-find-library $input`;
+    $outstr .= $lib_file . $nl;
+  }
+  &filestr_to_file($outstr, $parts_path);
+}
 sub parts {
   my ($force) = @_;
   my $parts_path = &parts_path();
   my $build_yaml = &build_yaml_path();
   if (&is_out_of_date($build_yaml, $parts_path)) {
     #print STDERR "out-of-date: $parts_path\n";
-    my $current_source_dir = &current_source_dir();
-    my $lib_dir = &source_dir() . '/lib';
-    die if ! $lib_dir;
-    `dakota-parts --var=current_source_dir=$current_source_dir --var=lib_dir=$lib_dir`;
-    die if $?;
+    &gen_parts($build_yaml, $parts_path);
   }
   die if ! -e $parts_path;
   my $result = [];
@@ -1526,6 +1546,7 @@ BEGIN {
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $h_ext = &var($gbl_platform, 'h_ext', undef);
   $cc_ext = &var($gbl_platform, 'cc_ext', undef);
+  $lib_prefix = &var($gbl_platform, 'lib_prefix', undef);
   $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
 };
 unless (caller) {

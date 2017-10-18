@@ -73,6 +73,7 @@ add_custom_command (
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
     --var=build_dir=${build_dir}
+    --var=lib_dir=${lib_dir}
     --target-path=${target-path}
   VERBATIM
   USES_TERMINAL)
