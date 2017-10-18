@@ -1476,7 +1476,7 @@ sub gen_parts {
   foreach my $input (@{$$build{'srcs'}}) {
     $outstr .= $input . $nl;
   }
-  foreach my $files ('target-lib-files', 'lib-files') {
+  foreach my $files ('target-lib-paths', 'lib-files') {
     foreach my $input (@{$$build{$files}}) {
       $outstr .= $input . $nl;
     }

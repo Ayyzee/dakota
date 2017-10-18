@@ -14,7 +14,7 @@ if (${target-type} STREQUAL shared-library)
   set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${target-dir})
   set_target_properties (${target} PROPERTIES PREFIX "") # target-name already has leading 'lib'
   set_target_properties (${target} PROPERTIES SUFFIX "") # target-name already has trailing '.so'
-  install (FILES ${install-include-paths} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+  install (FILES ${install-include-files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
   install (TARGETS ${target} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 elseif (${target-type} STREQUAL executable)
   add_executable (${target} ${srcs})
@@ -26,10 +26,10 @@ else ()
 endif ()
 set_target_properties (${target} PROPERTIES OUTPUT_NAME ${target-name}) # aaa.exe or libxxx.so (not aaa nor xxx)
 
-dk_find_lib_files (lib-paths "${lib-dirs}" ${libs}) # PATHS ...
-dk_target_lib_files (target-lib-paths ${target-libs})
+dk_find_lib_files (lib-files "${lib-dirs}" ${libs}) # PATHS ...
+dk_target_lib_paths (target-lib-paths ${target-libs})
 
-target_link_libraries (${target} ${lib-paths})
+target_link_libraries (${target} ${lib-files})
 target_link_libraries (${target} ${target-lib-paths})
 if (DEFINED target-libs)
   add_dependencies (   ${target} ${target-libs})
