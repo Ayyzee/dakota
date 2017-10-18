@@ -70,6 +70,28 @@ sub cmd_info_from_argv {
   delete $$root_cmd{'opts'}{'var'};
   return $root_cmd;
 }
+sub gen_parts {
+  my ($build_yaml, $parts_path) = @_;
+  my $build = &yaml_parse($build_yaml);
+  my $outstr = '';
+  foreach my $input (@{$$build{'srcs'}}) {
+    $outstr .= $input . $nl;
+  }
+  foreach my $files ('target-lib-files', 'lib-files') {
+    foreach my $input (@{$$build{$files}}) {
+      $outstr .= $input . $nl;
+    }
+  }
+  foreach my $input (@{$$build{'target-libs'}}) {
+    my $target_lib_file = &lib_dir() . "/$lib_prefix$input$lib_suffix";
+    $outstr .= $target_lib_file . $nl;
+  }
+  foreach my $input (@{$$build{'libs'}}) {
+    my $lib_file = `dakota-find-library $input`;
+    $outstr .= $lib_file . $nl;
+  }
+  &filestr_to_file($outstr, $parts_path);
+}
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
@@ -79,27 +101,7 @@ sub start {
     exit 0;
   }
   my $build_yaml = &current_source_dir() . '/build.yaml';
-  my $build = &yaml_parse($build_yaml);
-  my $outstr = '';
-  foreach my $input (@{$$build{'srcs'}}) {
-    $outstr .= $input . $nl;
-  }
-  if (scalar @{$$cmd_info{'inputs'}}) {
-    # inputs are (target-lib-files, lib-files)
-    foreach my $input (@{$$cmd_info{'inputs'}}) {
-      $outstr .= $input . $nl;
-    }
-  } else {
-    foreach my $input (@{$$build{'target-libs'}}) {
-      my $target_lib_file = &lib_dir() . "/$lib_prefix$input$lib_suffix";
-      $outstr .= $target_lib_file . $nl;
-    }
-    foreach my $input (@{$$build{'libs'}}) {
-      my $lib_file = `dakota-find-library $input`;
-      $outstr .= $lib_file . $nl;
-    }
-  }
-  &filestr_to_file($outstr, $parts_path);
+  &gen_parts($build_yaml, $parts_path);
 }
 unless (caller) {
   &start(\@ARGV);
