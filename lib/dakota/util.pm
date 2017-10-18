@@ -1469,32 +1469,30 @@ sub yaml_parse {
 }
 sub parts {
   my ($force) = @_;
-  my $file = &parts_path();
-  my $file_dir = &dirname($file);
+  my $parts_path = &parts_path();
   my $build_yaml = &build_yaml_path();
-  if (&is_out_of_date($build_yaml, $file)) {
-    #print STDERR "out-of-date: $file\n";
+  if (&is_out_of_date($build_yaml, $parts_path)) {
+    #print STDERR "out-of-date: $parts_path\n";
     my $current_source_dir = &current_source_dir();
     my $lib_dir = &source_dir() . '/lib';
     die if ! $lib_dir;
     `dakota-parts --var=current_source_dir=$current_source_dir --var=lib_dir=$lib_dir`;
     die if $?;
   }
+  die if ! -e $parts_path;
   my $result = [];
-  if (-e $file) {
-    my $paths = [split /\s+/, &filestr_from_file($file)];
-    foreach my $path (@$paths) {
-      my $abs_path = $path;
-      if (! &is_abs($path)) {
-        $abs_path = &cwd() . '/' . $path;
-        if (! -e $abs_path) {
-          $abs_path = &current_source_dir() . '/' . $path;
-        }
+  my $paths = [split /\s+/, &filestr_from_file($parts_path)];
+  foreach my $path (@$paths) {
+    my $abs_path = $path;
+    if (! &is_abs($path)) {
+      $abs_path = &cwd() . '/' . $path;
+      if (! -e $abs_path) {
+        $abs_path = &current_source_dir() . '/' . $path;
       }
-      $abs_path = &canon_path($abs_path);
-      die if ! $force && ! -e $abs_path;
-      &add_last($result, $abs_path);
     }
+    $abs_path = &canon_path($abs_path);
+    die if ! $force && ! -e $abs_path;
+    &add_last($result, $abs_path);
   }
   die if ! scalar @$result;
   return $result;
