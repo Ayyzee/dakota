@@ -670,9 +670,9 @@ sub set_env_vars {
     my ($key, $val) = ($1, $2);
     &check_set_env_var($key, $val);
   }
-  my $current_source_dir =      $ENV{'current_source_dir'};
-  my $source_dir = $ENV{'source_dir'};
-  my $build_dir =  $ENV{'build_dir'};
+  my $current_source_dir = $ENV{'current_source_dir'};
+  my $source_dir =         $ENV{'source_dir'};
+  my $build_dir =          $ENV{'build_dir'};
   if ($current_source_dir && $source_dir && $build_dir) {
     &dirs($current_source_dir, $source_dir, $build_dir);
   }
