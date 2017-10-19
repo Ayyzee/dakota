@@ -29,7 +29,7 @@ set (install-include-files
 )
 set (install-bin-files
   ${source_dir}/bin/dakota
-  ${source_dir}/bin/dakota-parts
+  ${source_dir}/bin/dakota-make
   ${source_dir}/bin/dakota-fixup-stderr
 )
 install (
