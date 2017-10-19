@@ -31,7 +31,6 @@ use Fcntl qw(:DEFAULT :flock);
 use sort 'stable';
 
 my $gbl_prefix;
-my $gbl_platform;
 my $extra;
 my $h_ext;
 my $cc_ext;
@@ -58,14 +57,12 @@ BEGIN {
   use dakota::util;
   use dakota::parse;
   use dakota::generate;
-  $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
-    or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
   $extra = &do_json("$gbl_prefix/lib/dakota/extra.json")
     or die "&do_json(\"$gbl_prefix/lib/dakota/extra.json\") failed: $!" . $nl;
-  $h_ext = &var($gbl_platform, 'h_ext', undef);
-  $cc_ext = &var($gbl_platform, 'cc_ext', undef);
-  $o_ext =  &var($gbl_platform, 'o_ext',  undef);
-  $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
+  $h_ext = &var('h_ext');
+  $cc_ext = &var('cc_ext');
+  $o_ext =  &var('o_ext');
+  $lib_suffix = &var('lib_suffix'); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 

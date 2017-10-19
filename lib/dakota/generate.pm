@@ -36,7 +36,6 @@ my $emacs_cxx_mode_file_variables =    '-*- mode: c++ -*-';
 my $emacs_dakota_mode_file_variables = '-*- mode: c++; mode: dakota -*-'; # fallback to c++ mode if dakota mode is not found
 
 my $gbl_prefix;
-my $gbl_platform;
 my $current_intmd_dir;
 my $h_ext;
 my $cc_ext;
@@ -61,10 +60,8 @@ BEGIN {
   use dakota::parse;
   use dakota::rewrite;
   use dakota::util;
-  $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
-    or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
-  $h_ext = &var($gbl_platform, 'h_ext', undef);
-  $cc_ext = &var($gbl_platform, 'cc_ext', undef);
+  $h_ext = &var('h_ext');
+  $cc_ext = &var('cc_ext');
 };
 my $use_new_macro_system = 0;
 

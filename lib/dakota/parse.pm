@@ -28,7 +28,6 @@ use strict;
 use warnings;
 use sort 'stable';
 
-my $gbl_platform;
 my $gbl_used;
 my $current_source_dir;
 my $current_intmd_dir;
@@ -85,14 +84,12 @@ BEGIN {
   unshift @INC, "$prefix/lib";
   use dakota::sst;
   use dakota::util;
-  $gbl_platform = &platform("$prefix/lib/dakota/platform.yaml")
-    or die "&platform(\"$prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $gbl_used = &do_json("$prefix/lib/dakota/used.json")
     or die "&do_json(\"$prefix/lib/dakota/used.json\") failed: $!\n";
-  $h_ext = &var($gbl_platform, 'h_ext', undef);
-  $cc_ext = &var($gbl_platform, 'cc_ext', undef);
-  $o_ext =  &var($gbl_platform, 'o_ext', undef);
-  $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
+  $h_ext = &var('h_ext');
+  $cc_ext = &var('cc_ext');
+  $o_ext =  &var('o_ext');
+  $lib_suffix = &var('lib_suffix'); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 

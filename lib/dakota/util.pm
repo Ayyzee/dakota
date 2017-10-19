@@ -196,7 +196,6 @@ our @EXPORT= qw(
                  target_src_path
                  use_abs_path
                  var
-                 var_array
                  verbose_exec
                  yaml_parse
  );
@@ -787,8 +786,8 @@ sub parts_path {
 # 4. compile-time default
 
 sub var {
-  my ($compiler, $lhs, $default_rhs) = @_;
-  my $result = &var_array($compiler, $lhs, $default_rhs);
+  my ($lhs, $default_rhs) = @_;
+  my $result = &var_array($gbl_platform, $lhs, $default_rhs);
   if (&is_array($result)) {
     $result = join(' ', @$result);
   }
@@ -796,15 +795,15 @@ sub var {
 }
 
 sub var_array {
-  my ($compiler, $lhs, $default_rhs) = @_;
+  my ($platform, $lhs, $default_rhs) = @_;
   my $result;
   my $env_rhs = $ENV{$lhs};
-  my $compiler_rhs = $$compiler{$lhs};
+  my $platform_rhs = $$platform{$lhs};
 
   if ($env_rhs) {
     $result = $env_rhs;
-  } elsif ($compiler_rhs) {
-    $result = $compiler_rhs;
+  } elsif ($platform_rhs) {
+    $result = $platform_rhs;
   } else {
     $result = $default_rhs;
   }
@@ -1544,10 +1543,10 @@ BEGIN {
   $gbl_prefix = &dk_prefix($0);
   $gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
-  $h_ext = &var($gbl_platform, 'h_ext', undef);
-  $cc_ext = &var($gbl_platform, 'cc_ext', undef);
-  $lib_prefix = &var($gbl_platform, 'lib_prefix', undef);
-  $lib_suffix = &var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
+  $h_ext = &var('h_ext');
+  $cc_ext = &var('cc_ext');
+  $lib_prefix = &var('lib_prefix');
+  $lib_suffix = &var('lib_suffix'); # default dynamic shared object/library extension
 };
 unless (caller) {
   &start(\@ARGV);

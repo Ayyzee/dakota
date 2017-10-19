@@ -28,10 +28,6 @@ use sort 'stable';
 use Cwd;
 
 my $gbl_prefix;
-my $gbl_platform;
-my $lib_suffix;
-my $o_ext;
-my $cc_ext;
 my $nl = "\n";
 
 sub dk_prefix {
@@ -61,13 +57,6 @@ use dakota::util;
 my ( $id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
-$gbl_platform = &platform("$gbl_prefix/lib/dakota/platform.yaml")
-  or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!" . $nl;
-{
-  $lib_suffix = &dakota::util::var($gbl_platform, 'lib_suffix', undef); # default dynamic shared object/library extension
-  $o_ext =  &dakota::util::var($gbl_platform, 'o_ext',  undef); # could also be .bc or .lto
-  $cc_ext = &dakota::util::var($gbl_platform, 'cc_ext', undef);
-}
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
