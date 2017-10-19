@@ -37,6 +37,7 @@ my $h_ext;
 my $cc_ext;
 my $lib_prefix;
 my $lib_suffix;
+my $exe_suffix;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -177,6 +178,7 @@ our @EXPORT= qw(
                  source_dir
                  scalar_from_file
                  scalar_to_file
+                 vars
                  set_env_vars
                  set_root_cmd
                  set_src_decl
@@ -654,6 +656,10 @@ sub make_dirname {
     print STDERR $0 . ': warning: skipping: make_dirname(' . $path . ')' . $nl;
   }
 }
+my $vars = {};
+sub vars {
+  return $vars;
+}
 sub check_set_env_var {
   my ($key, $val) = @_;
   die if ! $key;
@@ -661,6 +667,7 @@ sub check_set_env_var {
     die "env var $key=$ENV{$key}, can't set to $val\n" if $ENV{$key} ne $val;
   } else {
     $ENV{$key} = $val;
+    $$vars{$key} = $val;
   }
 }
 sub set_env_vars {
@@ -1547,6 +1554,7 @@ BEGIN {
   $cc_ext = &var('cc_ext');
   $lib_prefix = &var('lib_prefix');
   $lib_suffix = &var('lib_suffix'); # default dynamic shared object/library extension
+  $exe_suffix = &var('exe_suffix');
 };
 unless (caller) {
   &start(\@ARGV);
