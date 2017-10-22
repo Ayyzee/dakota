@@ -1,9 +1,10 @@
 # -*- mode: makefile -*-
 
-$(shell mkdir -p $$HOME/dakota/z/build/dakota-dso)
-
-cxx :=    /usr/bin/clang++
 prefix := ${HOME}/dakota
+
+include ${prefix}/lib/dakota/platform.mk
+
+$(shell mkdir -p $$HOME/dakota/z/build/dakota-dso)
 
 .PHONY : all
 
