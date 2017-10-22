@@ -182,6 +182,7 @@ sub gen_dot_body_edges {
 }
 sub gen_make {
   my ($rules, $so_paths) = @_;
+  my $cxx =                &var('cxx');
   my $source_dir =         &source_dir();
   my $intmd_dir =          &intmd_dir();
   my $build_dir =          &build_dir();
@@ -212,7 +213,7 @@ sub gen_make {
     $nl .
     "dakota :=         /Users/robert/dakota/bin/dakota" . $nl .
     "dakota-catalog := /Users/robert/dakota/bin/dakota-catalog" . $nl .
-    "cxx :=            /usr/bin/clang++" . $nl .
+    "cxx :=            $cxx" . $nl .
     "prefix_dir :=     /Users/robert/dakota" . $nl .
     "source_dir :=     $source_dir" . $nl .
     "build_dir :=      $build_dir" . $nl .
