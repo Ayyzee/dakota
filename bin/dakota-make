@@ -323,7 +323,7 @@ sub gen_rules {
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
-    'parse' =>               [ "# generating \$@", "\@${dakota} --action parse $all_dir_vars --output \$@ \$<" ],
+    'parse' =>               [ "# generating \$@", "\@${dakota} --action parse --output \$@ \$<" ],
     'merge' =>               [ "# generating \$@", "\@${dakota} --action merge $all_dir_vars --output \$@ \$?" ],
     'gen-target-hdr' =>      [ "# generating \$@", "\@${dakota} --action gen-target-hdr $all_dir_vars --output \$@ \$<" ],
                               #"# generating \$@", "\@${dakota} -x c++-header \@${prefix_dir}/lib/dakota/compiler.opts --var=cxx=${cxx} -I${prefix_dir}/include -Xclang -emit-pch -o \$@.pch \$@" ],
