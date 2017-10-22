@@ -371,9 +371,9 @@ sub gen_rules {
 }
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
-sub gen_make_all {
-  my ($cmd_info) = @_;
-  if ($$cmd_info{'opts'}{'path-only'}) {
+sub gen {
+  my ($parts, $path_only) = @_;
+  if ($path_only) {
     print &build_mk_path() . $nl;
     exit 0;
   }
@@ -381,7 +381,7 @@ sub gen_make_all {
   my $build_yaml = &yaml_parse(&current_source_dir() . '/build.yaml');
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
-  my ($rules, $so_paths) = &gen_rules($target_path, $$cmd_info{'parts'});
+  my ($rules, $so_paths) = &gen_rules($target_path, $parts);
   my $build_mk = &gen_make($rules, $so_paths);
   my $out_path = &write_build_mk($build_mk);
   if (1) {
@@ -396,7 +396,7 @@ sub gen_make_all {
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
-  &gen_make_all($cmd_info);
+  &gen($$cmd_info{'parts'}, $$cmd_info{'opts'}{'path-only'});
 }
 unless (caller) {
   &start(\@ARGV);
