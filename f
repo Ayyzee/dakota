@@ -47,7 +47,6 @@ for target in ${lib_targets[@]}; do
   current_build_dir=$build_dir/$target
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
-  target_path=$lib_dir/$lib_prefix$target$lib_suffix
   rel_build_mk=${build_mk/$HOME\/dakota\//}
   if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
   mkdir -p $current_build_dir
@@ -55,8 +54,7 @@ for target in ${lib_targets[@]}; do
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
-              --var=lib_dir=$lib_dir \
-              --target-path $target_path
+              --var=lib_dir=$lib_dir
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
@@ -66,7 +64,6 @@ for target in ${exe_targets[@]}; do
   current_build_dir=$build_dir/$target
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
-  target_path=$source_dir/$target/exe$exe_suffix
   rel_build_mk=${build_mk/$HOME\/dakota\//}
   if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
   mkdir -p $current_build_dir
@@ -74,8 +71,7 @@ for target in ${exe_targets[@]}; do
   dakota-make --var=current_source_dir=$current_source_dir \
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
-              --var=lib_dir=$lib_dir \
-              --target-path $target_path
+              --var=lib_dir=$lib_dir
   echo "include $build_mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done

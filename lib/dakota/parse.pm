@@ -113,6 +113,7 @@ our @EXPORT= qw(
                  cc_path_from_dk_path
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
+                 expand
                  inc_path_from_dk_path
                  init_ast_from_inputs_vars
                  h_path_from_cc_path
