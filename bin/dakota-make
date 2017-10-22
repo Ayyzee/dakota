@@ -215,18 +215,13 @@ sub gen_make {
     "\$(shell mkdir -p $current_intmd_dir/z)" . $nl .
     "\$(shell mkdir -p $current_build_dir/z)" . $nl .
     $nl .
-    "dakota :=         $dakota" . $nl .
-    "dakota-catalog := $dakota_catalog" . $nl .
-    "cxx :=            $cxx" . $nl .
-    "prefix_dir :=     $prefix_dir" . $nl .
-    $nl .
     '%.ctlg :' . $nl .
     "\t" . '# generating $@' . $nl .
-    "\t" . '@${dakota-catalog} --output $@ $<' . $nl .
+    "\t" . "\@${dakota_catalog} --output \$@ \$<" . $nl .
     $nl .
     '%.ctlg.ast : %.ctlg' . $nl .
     "\t" . '# generating $@' . $nl .
-    "\t" . '@${dakota} --action parse --output $@ $<' . $nl .
+    "\t" . "\@${dakota} --action parse --output \$@ \$<" . $nl .
     $nl .
     ".PHONY : all" . $nl .
     $nl .
@@ -317,6 +312,10 @@ sub gen_rules {
   my $target_hdr_path =        &target_hdr_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
+  my $cxx =                    &var('cxx');
+  my $dakota =                 which 'dakota';
+  my $dakota_catalog =         &dirname($dakota) . '/dakota-catalog';
+  my $prefix_dir =             $dakota =~ s#/bin/dakota##r;
   my $current_source_dir =     &current_source_dir();
   my $source_dir =             &source_dir();
   my $build_dir =              &build_dir();
@@ -324,15 +323,15 @@ sub gen_rules {
   # -dynamiclib on darwin, -shared on linux
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
-    'parse' =>               [ "# generating \$@", "\@\${dakota} --action parse $all_dir_vars --output \$@ \$<" ],
-    'merge' =>               [ "# generating \$@", "\@\${dakota} --action merge $all_dir_vars --output \$@ \$?" ],
-    'gen-target-hdr' =>      [ "# generating \$@", "\@\${dakota} --action gen-target-hdr $all_dir_vars --output \$@ \$<" ],
-                              #"# generating \$@", "\@\${dakota} -x c++-header \@\${prefix_dir}/lib/dakota/compiler.opts --var=cxx=\${cxx} -I\${prefix_dir}/include -Xclang -emit-pch -o \$@.pch \$@" ],
-    'gen-target-src' =>      [ "# generating \$@", "\@\${dakota} --action gen-target-src $all_dir_vars --output \$@ \$<" ],
-   #'compile' =>             [ "# generating \$@", "\@\${dakota} -c \@\${prefix_dir}/lib/dakota/compiler.opts -include-pch $target_hdr_path.pch $all_dir_vars --var=cxx=\${cxx} -I${current_source_dir} -I\${prefix_dir}/include -o \$@ \$<" ],
-    'compile' =>             [ "# generating \$@", "\@\${dakota} -c -DDEBUG=1 \@\${prefix_dir}/lib/dakota/compiler.opts $all_dir_vars --var=cxx=\${cxx} -I${current_source_dir} -I\${prefix_dir}/include -o \$@ \$<" ],
-    'link-shared-library' => [ "# generating \$@", "\@\${dakota} -dynamiclib \@\${prefix_dir}/lib/dakota/linker.opts --var=cxx=\${cxx} -Wl,-rpath,\${prefix_dir}/lib -install_name \@rpath/\$(notdir \$@) -o \$@ \$^" ],
-    'link-executable' =>     [ "# generating \$@", "\@\${dakota} \@\${prefix_dir}/lib/dakota/linker.opts --var=cxx=\${cxx} -Wl,-rpath,\${prefix_dir}/lib -o \$@ \$^" ],
+    'parse' =>               [ "# generating \$@", "\@${dakota} --action parse $all_dir_vars --output \$@ \$<" ],
+    'merge' =>               [ "# generating \$@", "\@${dakota} --action merge $all_dir_vars --output \$@ \$?" ],
+    'gen-target-hdr' =>      [ "# generating \$@", "\@${dakota} --action gen-target-hdr $all_dir_vars --output \$@ \$<" ],
+                              #"# generating \$@", "\@${dakota} -x c++-header \@${prefix_dir}/lib/dakota/compiler.opts --var=cxx=${cxx} -I${prefix_dir}/include -Xclang -emit-pch -o \$@.pch \$@" ],
+    'gen-target-src' =>      [ "# generating \$@", "\@${dakota} --action gen-target-src $all_dir_vars --output \$@ \$<" ],
+   #'compile' =>             [ "# generating \$@", "\@${dakota} -c \@${prefix_dir}/lib/dakota/compiler.opts -include-pch $target_hdr_path.pch $all_dir_vars --var=cxx=${cxx} -I${current_source_dir} -I${prefix_dir}/include -o \$@ \$<" ],
+    'compile' =>             [ "# generating \$@", "\@${dakota} -c -DDEBUG=1 \@${prefix_dir}/lib/dakota/compiler.opts $all_dir_vars --var=cxx=${cxx} -I${current_source_dir} -I${prefix_dir}/include -o \$@ \$<" ],
+    'link-shared-library' => [ "# generating \$@", "\@${dakota} -dynamiclib \@${prefix_dir}/lib/dakota/linker.opts --var=cxx=${cxx} -Wl,-rpath,${prefix_dir}/lib -install_name \@rpath/\$(notdir \$@) -o \$@ \$^" ],
+    'link-executable' =>     [ "# generating \$@", "\@${dakota} \@${prefix_dir}/lib/dakota/linker.opts --var=cxx=${cxx} -Wl,-rpath,${prefix_dir}/lib -o \$@ \$^" ],
   };
   my $rules = [];
   if (&is_so_path($root_tgt)) {
