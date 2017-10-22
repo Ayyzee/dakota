@@ -8,9 +8,8 @@ set (prefix_dir ${${PROJECT_NAME}_SOURCE_DIR})
 
 set (lib_dir ${prefix_dir}/lib)
 set (bin_dir ${prefix_dir}/bin)
-set (lib_prefix ${CMAKE_SHARED_LIBRARY_PREFIX})
-set (lib_suffix ${CMAKE_SHARED_LIBRARY_SUFFIX})
-set (exe_suffix ${CMAKE_EXECUTABLE_SUFFIX})
+
+include (${lib_dir}/dakota/platform.cmake)
 
 add_subdirectory (dakota-dso)
 add_subdirectory (dakota-catalog)
