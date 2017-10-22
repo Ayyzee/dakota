@@ -59,7 +59,6 @@ sub cmd_info_from_argv {
   };
   &GetOptionsFromArray($argv, $$root_cmd{'opts'},
                        'path-only',
-                       'target-path=s',
                        'var=s',
                       );
   $$root_cmd{'inputs'} = $argv; # this should always be empty
@@ -372,9 +371,8 @@ sub gen_rules {
 }
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
-sub start {
-  my ($argv) = @_;
-  my $cmd_info = &cmd_info_from_argv($argv);
+sub gen_make_all {
+  my ($cmd_info) = @_;
   if ($$cmd_info{'opts'}{'path-only'}) {
     print &build_mk_path() . $nl;
     exit 0;
@@ -394,6 +392,11 @@ sub start {
   #print STDERR &Dumper($rules);
   #print STDERR $build_mk;
   exit 0;
+}
+sub start {
+  my ($argv) = @_;
+  my $cmd_info = &cmd_info_from_argv($argv);
+  &gen_make_all($cmd_info);
 }
 unless (caller) {
   &start(\@ARGV);
