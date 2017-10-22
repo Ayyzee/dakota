@@ -686,16 +686,16 @@ sub set_env_vars {
 }
 sub dirs {
   my ($current_source_dir, $source_dir, $build_dir) = @_;
-  &check_set_env_var('current_source_dir',      $current_source_dir);
-  &check_set_env_var('source_dir', $source_dir);
-  &check_set_env_var('build_dir',  $build_dir);
+  &check_set_env_var('current_source_dir', $current_source_dir);
+  &check_set_env_var('source_dir',         $source_dir);
+  &check_set_env_var('build_dir',          $build_dir);
   my $rel_current_source_dir = $current_source_dir =~ s#^$source_dir/##r;
   my $current_build_dir = $build_dir . '/' . $rel_current_source_dir;
   my $intmd_dir = &dirname($build_dir) . '/intmd';
   my $current_intmd_dir = $intmd_dir . '/' . $rel_current_source_dir;
-  &check_set_env_var('current_build_dir',      $current_build_dir);
-  &check_set_env_var('current_intmd_dir',      $current_intmd_dir);
-  &check_set_env_var('intmd_dir', $intmd_dir);
+  &check_set_env_var('current_build_dir',  $current_build_dir);
+  &check_set_env_var('current_intmd_dir',  $current_intmd_dir);
+  &check_set_env_var('intmd_dir',          $intmd_dir);
   return ($current_intmd_dir, $current_build_dir);
 }
 sub cxx {
