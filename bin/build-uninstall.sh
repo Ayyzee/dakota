@@ -7,7 +7,7 @@ ee() {
 if [[ -e .build-dir.txt ]]; then
   build_dir=$(cat .build-dir.txt)
 else
-  build_dir=zzz/build
+  build_dir=z/build
 fi
 if [[ -e $build_dir/install_manifest.txt ]]; then
   for file in $(cat $build_dir/install_manifest.txt); do

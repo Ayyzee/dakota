@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 if [[ ! -e .build-dir.txt ]]; then
-  build_dir=zzz/build
+  build_dir=z/build
   echo $build_dir > .build-dir.txt
 fi
 build_dir=$(cat .build-dir.txt)

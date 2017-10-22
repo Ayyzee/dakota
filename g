@@ -18,7 +18,7 @@ targets=(
 )
 #rm -f ${targets[@]}
 set -o xtrace
-rm -fr zzz
+rm -fr z
 yaml2cmake.sh
 export generator=ninja
 ./root-build.sh config

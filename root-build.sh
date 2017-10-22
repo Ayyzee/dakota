@@ -5,7 +5,7 @@ PATH="~/dakota/bin:$PATH"
 if [[ $# -ge 1 && $1 == config ]]; then
   shift
   if [[ ! -e .build-dir.txt ]]; then
-    build_dir=zzz/build
+    build_dir=z/build
     echo $build_dir > .build-dir.txt
   fi
   build_dir=$(cat .build-dir.txt)
@@ -26,5 +26,5 @@ else
   build.sh $@
 fi
 
-# generator=make;  rm -fr zzz && ./root-build.sh config && ./root-build.sh all && ./root-build.sh test
-# generator=ninja; rm -fr zzz && ./root-build.sh config && ./root-build.sh all && ./root-build.sh test
+# generator=make;  rm -fr z && ./root-build.sh config && ./root-build.sh all && ./root-build.sh test
+# generator=ninja; rm -fr z && ./root-build.sh config && ./root-build.sh all && ./root-build.sh test

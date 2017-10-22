@@ -17,8 +17,8 @@ exe_targets=(
 )
 prefix_dir=/Users/robert/dakota
 source_dir=/Users/robert/dakota
-intmd_dir=/Users/robert/dakota/zzz/intmd
-build_dir=/Users/robert/dakota/zzz/build
+intmd_dir=/Users/robert/dakota/z/intmd
+build_dir=/Users/robert/dakota/z/build
 bin_dir=$prefix_dir/bin
 lib_dir=$prefix_dir/lib
 cc_targets=(
@@ -40,7 +40,7 @@ echo "include dakota-dso/build.mk"          >> $source_dir/build.mk
 echo "include dakota-catalog/build.mk"      >> $source_dir/build.mk
 echo "include dakota-find-library/build.mk" >> $source_dir/build.mk
 dot_files=()
-rm -fr $source_dir/zzz
+rm -fr $source_dir/z
 for target in ${lib_targets[@]}; do
   current_source_dir=$source_dir/$target
   current_intmd_dir=$intmd_dir/$target

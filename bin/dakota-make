@@ -212,8 +212,8 @@ sub gen_make {
     $result .= "\$(shell mkdir -p $ENV{HOME}/.dkt$dir)" . $nl;
   }
   $result .=
-    "\$(shell mkdir -p $current_intmd_dir/z)" . $nl .
-    "\$(shell mkdir -p $current_build_dir/z)" . $nl .
+    "\$(shell mkdir -p $current_intmd_dir/a)" . $nl .
+    "\$(shell mkdir -p $current_build_dir/a)" . $nl .
     $nl .
     '%.ctlg :' . $nl .
     "\t" . '# generating $@' . $nl .

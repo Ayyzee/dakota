@@ -749,7 +749,7 @@ sub build_dot_path {
 sub build_mk_path {
   return &current_intmd_dir() . '/build.mk';
 }
-my $rel_target_dir_name = 'z';
+my $rel_target_dir_name = 'a';
 sub target_current_build_dir {
   my $dir = &current_build_dir() . '/' . $rel_target_dir_name;
   return $dir;
