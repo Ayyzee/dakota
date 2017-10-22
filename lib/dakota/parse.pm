@@ -29,8 +29,6 @@ use warnings;
 use sort 'stable';
 
 my $gbl_used;
-my $current_source_dir;
-my $current_intmd_dir;
 my $h_ext;
 my $cc_ext;
 my $o_ext;
@@ -354,29 +352,18 @@ sub ast_path_from_dk_path {
   my $out_path = &out_path_from_in_path('ast_path_from_dk_path', $in_path);
   return $out_path;
 }
-sub var_perl_from_make { # convert variable syntax to perl from make
-  my ($str) = @_;
-  my $result = $str;
-  $result =~ s|\$\{(\w+)\}|\$$1|g;
-  return $result;
-}
 sub expand {
-  my ($str) = @_;
-  $current_source_dir if 0;
-  $current_intmd_dir if 0;
-  $cc_ext if 0;
-  $o_ext  if 0;
-  $lib_suffix if 0;
-  $str =~ s/(\$\w+)/$1/eeg;
-  return $str;
+  my ($var) = @_;
+  $var =~ s/\$([+\w-]+)/&var($1)/eg;
+  $var =~ s/\$\{([+\w-]+)\}/&var($1)/eg;
+  return $var;
 }
-### $s if 0;
 sub expand_tbl_values {
   my ($tbl_in, $tbl_out) = @_;
   if (!$tbl_out) { $tbl_out = {}; }
   my ($key, $val); while (($key, $val) = each (%$tbl_in)) {
     $val =~ s|\s*:\s*|:|; # just hygenic
-    $val = &expand(&var_perl_from_make($val));
+    $val = &expand($val);
     $$tbl_out{$key} = $val;
   }
   return $tbl_out;
@@ -387,16 +374,14 @@ sub out_path_from_in_path {
   if (&is_dk_path($path_in)) {
     $path_in = &prepend_dot_slash($path_in);
   }
-  $current_source_dir = &current_source_dir();
-  $current_intmd_dir = &current_intmd_dir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
-  $pattern_template =~ s|([a-z])\+([a-z])|$1\\+$2|; # hackhack: added as a workaround for paths containing a +
+ #$pattern_template =~ s|([a-z])\+([a-z])|$1\\+$2|; # hackhack: added as a workaround for paths containing a +
   $pattern_replacement =~ s|\%|\%s|;
 
-  my $result = &expand(&var_perl_from_make($path_in));
+  my $result = &expand($path_in);
   if ($result =~ m|^$pattern_template$|) {
     $result = sprintf($pattern_replacement, $1);
     $result = &expand($result);
@@ -1096,7 +1081,6 @@ sub module_import_defn {
         if (!exists $$tbl{'shared-libraries'}) {
           $$tbl{'shared-libraries'} = [];
         }
-        $rhs =~ s/\$\{lib_suffix\}/$lib_suffix/;
         &add_last($$tbl{'shared-libraries'}, $rhs);
       } elsif (m/^module$/) {
         my $lhs = &match(__FILE__, __LINE__, $_);
