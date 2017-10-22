@@ -209,16 +209,16 @@ sub generate_src_defn {
   &set_src_defn($path);
   return &generate_src($path, $file_ast, $target_inputs_ast, $target_hdr_path);
 }
-my $im_ext_for_ext = {
-  $cc_ext => "$cc_ext.dkt",
-  $h_ext => "$h_ext.dkt",
-  '.inc'   => '.inc.dkt',
+my $pre_output_ext_for_ext = {
+  $cc_ext => "$cc_ext.in",
+  $h_ext =>  "$h_ext.in",
+  '.inc' =>  '.inc.in',
 };
 sub pre_output_path_from_any_path {
   my ($path) = @_;
   $path =~ m/(\.[\w-]+)$/;
   my $ext = $1;
-  my $pre_output_ext = $$im_ext_for_ext{$ext};
+  my $pre_output_ext = $$pre_output_ext_for_ext{$ext};
   die $path if !defined $pre_output_ext;
   my $pre_output = $path =~ s/$ext$/$pre_output_ext/r;
   return $pre_output;
