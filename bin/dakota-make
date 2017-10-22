@@ -209,7 +209,7 @@ sub gen_make {
     $$dirs{$dir} = 1;
   }
   foreach my $dir (keys %$dirs) {
-    $result .= "\$(shell mkdir -p \$\$HOME/.dkt$dir)" . $nl;
+    $result .= "\$(shell mkdir -p $ENV{HOME}/.dkt$dir)" . $nl;
   }
   $result .=
     "\$(shell mkdir -p $current_intmd_dir/z)" . $nl .
