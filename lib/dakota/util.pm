@@ -672,9 +672,11 @@ sub check_set_env_var {
 }
 sub set_env_vars {
   my ($kvs) = @_;
+  my $vars = {};
   foreach my $kv (@$kvs) {
     $kv =~ /^([\w-]+)=(.*)$/;
     my ($key, $val) = ($1, $2);
+    $$vars{$key} = $val;
     &check_set_env_var($key, $val);
   }
   my $current_source_dir = $ENV{'current_source_dir'};
@@ -683,6 +685,7 @@ sub set_env_vars {
   if ($current_source_dir && $source_dir && $build_dir) {
     &dirs($current_source_dir, $source_dir, $build_dir);
   }
+  return $vars;
 }
 sub dirs {
   my ($current_source_dir, $source_dir, $build_dir) = @_;

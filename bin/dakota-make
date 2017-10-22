@@ -62,11 +62,12 @@ sub cmd_info_from_argv {
                        'var=s',
                       );
   $$root_cmd{'inputs'} = $argv; # this should always be empty
-  &set_env_vars($$root_cmd{'opts'}{'var'});
+  my $vars = &set_env_vars($$root_cmd{'opts'}{'var'});
   delete $$root_cmd{'opts'}{'var'};
   if (! $$root_cmd{'opts'}{'path-only'}) {
     my $force;
     $$root_cmd{'parts'} = &parts($force = 1);
+    $$root_cmd{'vars'} = $vars;
   }
   return $root_cmd;
 }
@@ -372,12 +373,11 @@ sub gen_rules {
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
 sub gen {
-  my ($parts, $path_only) = @_;
+  my ($vars, $parts, $path_only) = @_;
   if ($path_only) {
     print &build_mk_path() . $nl;
     exit 0;
   }
-  #print &Dumper($cmd_info);
   my $build_yaml = &yaml_parse(&current_source_dir() . '/build.yaml');
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
@@ -396,7 +396,8 @@ sub gen {
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
-  &gen($$cmd_info{'parts'}, $$cmd_info{'opts'}{'path-only'});
+  #print &Dumper($cmd_info);
+  &gen($$cmd_info{'vars'}, $$cmd_info{'parts'}, $$cmd_info{'opts'}{'path-only'});
 }
 unless (caller) {
   &start(\@ARGV);
