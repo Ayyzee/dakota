@@ -1,22 +1,23 @@
 # -*- mode: makefile -*-
 
-prefix := ${HOME}/dakota
+source_dir := ${HOME}/dakota
+prefix_dir := ${HOME}/dakota
 
-include ${prefix}/lib/dakota/platform.mk
+include ${prefix_dir}/lib/dakota/platform.mk
 
-$(shell mkdir -p $$HOME/dakota/z/build/dakota-catalog)
+$(shell mkdir -p ${source_dir}/z/build/dakota-catalog)
 
 .PHONY : all
 
-all : ${HOME}/dakota/bin/dakota-catalog
+all : ${source_dir}/bin/dakota-catalog
 
-${HOME}/dakota/bin/dakota-catalog : \
-${HOME}/dakota/z/build/dakota-catalog/dakota-catalog.cc.o \
-${prefix}/lib/libdakota-dso.dylib
+${source_dir}/bin/dakota-catalog : \
+${source_dir}/z/build/dakota-catalog/dakota-catalog.cc.o \
+${prefix_dir}/lib/libdakota-dso.dylib
 	# generating $@
-	@${cxx} @${prefix}/lib/dakota/linker.opts -Wl,-rpath,${prefix}/lib -o $@ $^
+	@${cxx} @${prefix_dir}/lib/dakota/linker.opts -Wl,-rpath,${prefix_dir}/lib -o $@ $^
 
-${HOME}/dakota/z/build/dakota-catalog/dakota-catalog.cc.o : \
-${HOME}/dakota/dakota-catalog/dakota-catalog.cc
+${source_dir}/z/build/dakota-catalog/dakota-catalog.cc.o : \
+${source_dir}/dakota-catalog/dakota-catalog.cc
 	# generating $@
-	@${cxx} -c @${prefix}/lib/dakota/compiler.opts -I${prefix}/include -o $@ $<
+	@${cxx} -c @${prefix_dir}/lib/dakota/compiler.opts -I${prefix_dir}/include -o $@ $<

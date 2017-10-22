@@ -104,9 +104,9 @@ sub gen_dot {
   $result .= &gen_dot_body($rules);
   $result .= "}" . $nl;
   if (1) { # hack to make the graph less noisy
-    my $prefix = $ENV{'HOME'};
-    $result =~ s#"$prefix/#"#g;
-    $result =~ s#\.dkt$prefix#.dkt#g;
+    my $dir = $ENV{'HOME'};
+    $result =~ s#"$dir/#"#g;
+    $result =~ s#\.dkt$dir#.dkt#g;
   }
   return $result;
 }

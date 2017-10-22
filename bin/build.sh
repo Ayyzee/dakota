@@ -10,8 +10,8 @@ if [[ $jobs -eq 0 ]]; then
   jobs=$(getconf _NPROCESSORS_ONLN)
   jobs=$(( jobs + 2 ))
 fi
-
-export PATH=$HOME/dakota/bin:$PATH
+prefix_dir=$HOME/dakota
+export PATH=$prefix_dir/bin:$PATH
 generator="${generator:-ninja}"
 generator_opts=
 if   [[ $generator == ninja ]]; then

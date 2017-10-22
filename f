@@ -17,8 +17,8 @@ exe_targets=(
 )
 prefix_dir=$HOME/dakota
 source_dir=$HOME/dakota
-intmd_dir=$HOME/dakota/z/intmd
-build_dir=$HOME/dakota/z/build
+intmd_dir=$source_dir/z/intmd
+build_dir=$source_dir/z/build
 bin_dir=$prefix_dir/bin
 lib_dir=$prefix_dir/lib
 cc_targets=(
@@ -36,9 +36,9 @@ dk_exe_targets=(
 )
 rm -f ${cc_targets[@]} ${dk_lib_targets[@]} ${dk_exe_targets[@]}
 cat /dev/null > $source_dir/build.mk
-echo "include \${HOME}/dakota/dakota-dso/build.mk"          >> $source_dir/build.mk
-echo "include \${HOME}/dakota/dakota-catalog/build.mk"      >> $source_dir/build.mk
-echo "include \${HOME}/dakota/dakota-find-library/build.mk" >> $source_dir/build.mk
+echo "include dakota-dso/build.mk"          >> $source_dir/build.mk
+echo "include dakota-catalog/build.mk"      >> $source_dir/build.mk
+echo "include dakota-find-library/build.mk" >> $source_dir/build.mk
 echo "" >> $source_dir/build.mk
 dot_files=()
 rm -fr $source_dir/z
@@ -48,7 +48,7 @@ for target in ${lib_targets[@]}; do
   current_build_dir=$build_dir/$target
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
-  rel_build_mk=${build_mk/$HOME\/dakota\//}
+  rel_build_mk=${build_mk/$source_dir\//}
   if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
   mkdir -p $current_build_dir
   mkdir -p $current_intmd_dir/z
@@ -56,7 +56,7 @@ for target in ${lib_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_dir=$lib_dir
-  echo "include \${HOME}/dakota/z/intmd/$target/build.mk" >> $source_dir/build.mk
+  echo "include z/intmd/$target/build.mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
 echo "" >> $source_dir/build.mk
@@ -66,7 +66,7 @@ for target in ${exe_targets[@]}; do
   current_build_dir=$build_dir/$target
   build_mk=$current_intmd_dir/build.mk
   build_dot=$current_intmd_dir/build.dot
-  rel_build_mk=${build_mk/$HOME\/dakota\//}
+  rel_build_mk=${build_mk/$source_dir\//}
   if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
   mkdir -p $current_build_dir
   mkdir -p $current_intmd_dir/z
@@ -74,7 +74,7 @@ for target in ${exe_targets[@]}; do
               --var=source_dir=$source_dir \
               --var=build_dir=$build_dir \
               --var=lib_dir=$lib_dir
-  echo "include \${HOME}/dakota/z/intmd/$target/build.mk" >> $source_dir/build.mk
+  echo "include z/intmd/$target/build.mk" >> $source_dir/build.mk
   dot_files+=($build_dot)
 done
 merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
