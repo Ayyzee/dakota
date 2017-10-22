@@ -4,4 +4,7 @@
 .build-dir.txt
 lib/dakota/compiler.opts
 lib/dakota/linker.opts
+lib/dakota/platform.mk
+lib/dakota/platform.pl
+lib/dakota/platform.sh
 lib/dakota/platform.yaml

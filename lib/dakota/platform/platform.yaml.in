@@ -1,7 +1,7 @@
-h_ext:      .h
-cc_ext:     .cc
-cxx:        ${CMAKE_CXX_COMPILER}
-o_ext:      ${CMAKE_CXX_OUTPUT_EXTENSION}
 lib_prefix: ${CMAKE_SHARED_LIBRARY_PREFIX}
 lib_suffix: ${CMAKE_SHARED_LIBRARY_SUFFIX}
 exe_suffix: ${CMAKE_EXECUTABLE_SUFFIX}
+cxx:        ${CMAKE_CXX_COMPILER}
+o_ext:      ${CMAKE_CXX_OUTPUT_EXTENSION}
+h_ext:      .h
+cc_ext:     .cc
