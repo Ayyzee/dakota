@@ -35,48 +35,17 @@ dk_exe_targets=(
   $source_dir/tst2/exe$exe_suffix
 )
 rm -f ${cc_targets[@]} ${dk_lib_targets[@]} ${dk_exe_targets[@]}
+dot_files=()
+rm -fr $source_dir/z
 cat /dev/null > $source_dir/build.mk
 echo "include dakota-dso/build.mk"          >> $source_dir/build.mk
 echo "include dakota-catalog/build.mk"      >> $source_dir/build.mk
 echo "include dakota-find-library/build.mk" >> $source_dir/build.mk
 echo "" >> $source_dir/build.mk
-dot_files=()
-rm -fr $source_dir/z
-for target in ${lib_targets[@]}; do
-  current_source_dir=$source_dir/$target
-  current_intmd_dir=$intmd_dir/$target
-  current_build_dir=$build_dir/$target
-  build_mk=$current_intmd_dir/build.mk
-  build_dot=$current_intmd_dir/build.dot
-  rel_build_mk=${build_mk/$source_dir\//}
-  if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
-  mkdir -p $current_build_dir
-  mkdir -p $current_intmd_dir/z
-  dakota-make --var=current_source_dir=$current_source_dir \
-              --var=source_dir=$source_dir \
-              --var=build_dir=$build_dir \
-              --var=lib_dir=$lib_dir
-  echo "include z/intmd/$target/build.mk" >> $source_dir/build.mk
-  dot_files+=($build_dot)
-done
+dakota-make --var=lib_dir=$lib_dir dakota-core dakota >> $source_dir/build.mk
 echo "" >> $source_dir/build.mk
-for target in ${exe_targets[@]}; do
-  current_source_dir=$source_dir/$target
-  current_intmd_dir=$intmd_dir/$target
-  current_build_dir=$build_dir/$target
-  build_mk=$current_intmd_dir/build.mk
-  build_dot=$current_intmd_dir/build.dot
-  rel_build_mk=${build_mk/$source_dir\//}
-  if [[ ${silent:-0} == 0 ]]; then echo "# generating $rel_build_mk"; fi
-  mkdir -p $current_build_dir
-  mkdir -p $current_intmd_dir/z
-  dakota-make --var=current_source_dir=$current_source_dir \
-              --var=source_dir=$source_dir \
-              --var=build_dir=$build_dir \
-              --var=lib_dir=$lib_dir
-  echo "include z/intmd/$target/build.mk" >> $source_dir/build.mk
-  dot_files+=($build_dot)
-done
+dakota-make --var=lib_dir=$lib_dir tst1 tst2          >> $source_dir/build.mk
+dot_files=($(echo $intmd_dir/{dakota-core,dakota,tst1,tst2}/build.dot))
 merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
 graphs="${graphs:-0}"
 if [[ $graphs -ne 0 ]]; then

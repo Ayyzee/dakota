@@ -62,6 +62,9 @@ $Data::Dumper::Useqq =     1;
 $Data::Dumper::Sortkeys =  0;
 $Data::Dumper::Indent =    1;  # default = 2
 
+use Getopt::Long qw(GetOptionsFromArray);
+$Getopt::Long::ignorecase = 0;
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
@@ -101,6 +104,7 @@ our @EXPORT= qw(
                  filestr_to_file
                  first
                  flatten
+                 get_opts_from_array
                  gen_parts
                  target_srcs_ast
                  has_kw_args
@@ -180,6 +184,7 @@ our @EXPORT= qw(
                  scalar_to_file
                  vars
                  set_env_vars
+                 set_env_vars_core
                  set_root_cmd
                  set_src_decl
                  set_src_defn
@@ -661,13 +666,25 @@ sub vars {
   return $vars;
 }
 sub check_set_env_var {
-  my ($key, $val) = @_;
+  my ($key, $val, $force) = @_;
   die if ! $key;
-  if ($ENV{$key}) {
+  if ($ENV{$key} && ! $force) {
     die "env var $key=$ENV{$key}, can't set to $val\n" if $ENV{$key} ne $val;
   } else {
     $ENV{$key} = $val;
     $$vars{$key} = $val;
+  }
+}
+sub set_env_vars_core {
+  my ($tbl, $force) = @_;
+  while (my ($key, $val) = each (%$tbl)) {
+    &check_set_env_var($key, $val, $force);
+  }
+  my $current_source_dir = $ENV{'current_source_dir'};
+  my $source_dir =         $ENV{'source_dir'};
+  my $build_dir =          $ENV{'build_dir'};
+  if ($current_source_dir && $source_dir && $build_dir) {
+    &dirs($current_source_dir, $source_dir, $build_dir, $force);
   }
 }
 sub set_env_vars {
@@ -677,29 +694,40 @@ sub set_env_vars {
     $kv =~ /^([\w-]+)=(.*)$/;
     my ($key, $val) = ($1, $2);
     $$vars{$key} = $val;
-    &check_set_env_var($key, $val);
   }
-  my $current_source_dir = $ENV{'current_source_dir'};
-  my $source_dir =         $ENV{'source_dir'};
-  my $build_dir =          $ENV{'build_dir'};
-  if ($current_source_dir && $source_dir && $build_dir) {
-    &dirs($current_source_dir, $source_dir, $build_dir);
-  }
-  return $vars;
+  &set_env_vars_core($vars);
 }
 sub dirs {
-  my ($current_source_dir, $source_dir, $build_dir) = @_;
-  &check_set_env_var('current_source_dir', $current_source_dir);
-  &check_set_env_var('source_dir',         $source_dir);
-  &check_set_env_var('build_dir',          $build_dir);
+  my ($current_source_dir, $source_dir, $build_dir, $force) = @_;
+  &check_set_env_var('current_source_dir', $current_source_dir, $force);
+  &check_set_env_var('source_dir',         $source_dir, $force);
+  &check_set_env_var('build_dir',          $build_dir, $force);
   my $rel_current_source_dir = $current_source_dir =~ s#^$source_dir/##r;
   my $current_build_dir = $build_dir . '/' . $rel_current_source_dir;
   my $intmd_dir = &dirname($build_dir) . '/intmd';
   my $current_intmd_dir = $intmd_dir . '/' . $rel_current_source_dir;
-  &check_set_env_var('current_build_dir',  $current_build_dir);
-  &check_set_env_var('current_intmd_dir',  $current_intmd_dir);
-  &check_set_env_var('intmd_dir',          $intmd_dir);
+  &check_set_env_var('current_build_dir',  $current_build_dir, $force);
+  &check_set_env_var('current_intmd_dir',  $current_intmd_dir, $force);
+  &check_set_env_var('intmd_dir',          $intmd_dir, $force);
   return ($current_intmd_dir, $current_build_dir);
+}
+sub get_opts_from_array {
+  my $argv = shift @_;
+  my $rest = \@_;
+
+  my $root_cmd = {
+    'opts' => {
+    'var' => [],
+    }
+  };
+  &GetOptionsFromArray($argv, $$root_cmd{'opts'}, @$rest);
+  $$root_cmd{'vars'} = {};
+  foreach my $kv (@{$$root_cmd{'opts'}{'var'}}) {
+    $kv =~ /^([\w-]+)=(.*)$/;
+    my ($key, $val) = ($1, $2);
+    $$root_cmd{'vars'}{$key} = $val;
+  }
+  return $root_cmd;
 }
 sub cxx {
   my $cxx = $ENV{'cxx'};
@@ -746,12 +774,6 @@ sub lib_dir {
   die if ! $dir;
   return $dir;
 }
-sub build_dot_path {
-  return &current_intmd_dir() . '/build.dot';
-}
-sub build_mk_path {
-  return &current_intmd_dir() . '/build.mk';
-}
 my $rel_target_dir_name = 'a';
 sub target_current_build_dir {
   my $dir = &current_build_dir() . '/' . $rel_target_dir_name;
@@ -783,6 +805,14 @@ sub target_src_path {
 }
 sub build_yaml_path {
   my $path = &current_source_dir() . '/build.yaml';
+  return $path;
+}
+sub build_mk_path {
+  my $path = &current_source_dir() . '/build.mk';
+  return $path;
+}
+sub build_dot_path {
+  my $path = &current_intmd_dir() . '/build.dot';
   return $path;
 }
 sub parts_path {
