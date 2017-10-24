@@ -50,6 +50,7 @@ $Data::Dumper::Indent =    1;   # default = 2
 sub cmd_info_from_argv {
   my ($argv) = @_;
   my $cmd_info = &get_opts_from_array($argv,
+                                      'output=s',
                                       'path-only',
                                       'var=s',
                                     );
@@ -247,14 +248,10 @@ sub gen_make_body {
   return $result;
 }
 sub write_build_mk {
-  my ($str) = @_;
-  my $output = &build_mk_path();
-  my $cwd = &cwd();
-  $output =~ s#^$cwd/##;
+  my ($str, $output) = @_;
   open(my $fh, '>', $output) or die;
   print $fh $str;
   close($fh);
-  print "include $output" . $nl;
   return $output;
 }
 sub write_build_dot {
@@ -263,7 +260,6 @@ sub write_build_dot {
   open(my $fh, '>', $output) or die;
   print $fh $str;
   close($fh);
-  #print $output . $nl;
   return $output;
 }
 sub gen_rules {
@@ -360,14 +356,14 @@ sub gen_rules {
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
 sub gen {
-  #my () = @_;
+  my ($output) = @_;
   my $build_yaml = &yaml_parse(&current_source_dir() . '/build.yaml');
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
   my $force;
   my ($rules, $so_paths) = &gen_rules($target_path, &parts($force = 1));
   my $build_mk = &gen_make($rules, $so_paths);
-  my $out_path = &write_build_mk($build_mk);
+  my $out_path = &write_build_mk($build_mk, $output);
   if (1) {
     my $build_dot = &gen_dot($rules, $out_path);
     &write_build_dot($build_dot);
@@ -375,13 +371,15 @@ sub gen {
   }
   #print STDERR &Dumper($rules);
   #print STDERR $build_mk;
-  return $build_mk;
 }
 sub gen_all {
-  my ($inputs) = @_;
+  my ($inputs, $name) = @_;
   my $source_dir = &cwd();
   my $build_dir = $source_dir . '/z/build';
+  my $build_files = '';
   foreach my $dir (@$inputs) {
+    my $output = "$dir/$name";
+    $build_files .= $output . $nl;
     my $current_source_dir = $source_dir . "/$dir";
     my $current_vars = {
       'current_source_dir' => $current_source_dir,
@@ -391,22 +389,26 @@ sub gen_all {
     #print STDERR &Dumper($current_vars);
     my $force;
     &set_env_vars_core($current_vars, $force = 1);
-    my $build_mk = &gen();
+    &gen($output);
+    print $output . $nl;
   }
 }
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
   #print &Dumper($cmd_info);
+  my $output = $$cmd_info{'opts'}{'output'};
   &set_env_vars_core($$cmd_info{'vars'});
   if ($$cmd_info{'opts'}{'path-only'}) {
-    print &build_mk_path() . $nl;
+    $output = &build_mk_path() if ! $output;
+    print $output . $nl;
     exit 0;
   }
+  $output = 'build.mk' if ! $output;
   if (scalar @{$$cmd_info{'inputs'}}) {
-    &gen_all($$cmd_info{'inputs'});
+    &gen_all($$cmd_info{'inputs'}, $output);
   } else {
-    &gen();
+    &gen($output);
   }
   exit 0;
 }
