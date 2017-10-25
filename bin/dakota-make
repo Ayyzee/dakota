@@ -377,10 +377,8 @@ sub gen_all {
   my ($inputs, $name) = @_;
   my $source_dir = &cwd();
   my $build_dir = $source_dir . '/z/build';
-  my $build_files = '';
   foreach my $dir (@$inputs) {
     my $output = "$dir/$name";
-    $build_files .= $output . $nl;
     my $current_source_dir = $source_dir . "/$dir";
     my $current_vars = {
       'current_source_dir' => $current_source_dir,
