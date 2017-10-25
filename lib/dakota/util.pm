@@ -774,7 +774,7 @@ sub lib_dir {
   die if ! $dir;
   return $dir;
 }
-my $rel_target_dir_name = 'a';
+my $rel_target_dir_name = 'z';
 sub target_current_build_dir {
   my $dir = &current_build_dir() . '/' . $rel_target_dir_name;
   return $dir;
