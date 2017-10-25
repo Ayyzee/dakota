@@ -42,7 +42,7 @@ exe_files=(
 rm -f ${ext_files[@]} ${lib_files[@]} ${exe_files[@]}
 dot_files=()
 rm -fr $source_dir/z
-build=foo.mk
+build=build.mk
 cat /dev/null > $build
 for ext_target in ${ext_targets[@]}; do
   echo "include $ext_target/build.mk" >> $build
