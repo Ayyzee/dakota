@@ -371,7 +371,6 @@ sub gen {
   }
   #print STDERR &Dumper($rules);
   #print STDERR $build_mk;
-  print $output . $nl;
 }
 sub gen_all {
   my ($inputs, $name) = @_;
@@ -391,6 +390,7 @@ sub gen_all {
     my $force;
     &set_env_vars_core($current_vars, $force = 1);
     &gen($output);
+    print $output . $nl;
   }
 }
 sub start {
@@ -398,13 +398,13 @@ sub start {
   my $cmd_info = &cmd_info_from_argv($argv);
   #print &Dumper($cmd_info);
   my $name = $$cmd_info{'opts'}{'output'};
+  $name = 'build.mk' if ! $name;
   &set_env_vars_core($$cmd_info{'vars'});
   if ($$cmd_info{'opts'}{'path-only'}) {
-    $name = &build_mk_path() if ! $name;
-    print $name . $nl;
+    my $dir = &current_source_dir();
+    print "$dir/$name" . $nl;
     exit 0;
   }
-  $name = 'build.mk' if ! $name;
   if (scalar @{$$cmd_info{'inputs'}}) {
     &gen_all($$cmd_info{'inputs'}, $name);
   } else {
