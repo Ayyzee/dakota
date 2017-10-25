@@ -393,6 +393,10 @@ sub gen_all {
     print $output . $nl;
   }
 }
+sub output {
+  my ($name) = @_;
+  return &current_source_dir() . '/' . $name;
+}
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
@@ -401,14 +405,13 @@ sub start {
   $name = 'build.mk' if ! $name;
   &set_env_vars_core($$cmd_info{'vars'});
   if ($$cmd_info{'opts'}{'path-only'}) {
-    my $dir = &current_source_dir();
-    print "$dir/$name" . $nl;
+    print &output($name) . $nl;
     exit 0;
   }
   if (scalar @{$$cmd_info{'inputs'}}) {
     &gen_all($$cmd_info{'inputs'}, $name);
   } else {
-    &gen($name);
+    &gen(&output($name));
   }
   exit 0;
 }

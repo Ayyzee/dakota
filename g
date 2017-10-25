@@ -2,6 +2,7 @@
 set -o errexit -o nounset -o pipefail
 finish() {
   rm -f */build.cmake
+  rm -f {dakota-core,dakota,tst1,tst2}/build.mk
 }
 trap finish EXIT
 lib_prefix=lib
