@@ -74,6 +74,16 @@ sub o_path_from_dk_path {
   my $result = &current_build_dir() . '/' . &basename($dk_path) . '.o';
   return $result;
 }
+sub mk_path_from_yaml_path {
+  my ($path) = @_;
+  $path =~ s/\.yaml$/.mk/;
+  return $path;
+}
+sub yaml_path_from_mk_path {
+  my ($path) = @_;
+  $path =~ s/\.mk$/.yaml/;
+  return $path;
+}
 sub is_exe_path {
   my ($path) = @_;
   my $state = 1;
@@ -81,7 +91,7 @@ sub is_exe_path {
   return $state;
 }
 sub gen_dot {
-  my ($rules, $out_path) = @_;
+  my ($rules) = @_;
   my $result = '';
   $result .= "digraph {" . $nl;
   $result .= "  graph [ rankdir = LR, dir = back, nodesep = 0 ];" . $nl;
@@ -247,20 +257,11 @@ sub gen_make_body {
   }
   return $result;
 }
-sub write_build_mk {
+sub write_str {
   my ($str, $output) = @_;
   open(my $fh, '>', $output) or die;
   print $fh $str;
   close($fh);
-  return $output;
-}
-sub write_build_dot {
-  my ($str) = @_;
-  my $output = &build_dot_path();
-  open(my $fh, '>', $output) or die;
-  print $fh $str;
-  close($fh);
-  return $output;
 }
 sub gen_rules {
   my ($root_tgt, $parts) = @_;
@@ -356,29 +357,29 @@ sub gen_rules {
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
 sub gen {
-  my ($output) = @_;
-  my $input = $output =~ s/\.mk$/.yaml/r;
+  my ($input, $output) = @_;
   my $build_yaml = &yaml_parse($input);
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
   my $force;
   my ($rules, $so_paths) = &gen_rules($target_path, &parts($force = 1));
   my $build_mk = &gen_make($rules, $so_paths);
-  my $out_path = &write_build_mk($build_mk, $output);
+  &write_str($build_mk, $output);
   if (1) {
-    my $build_dot = &gen_dot($rules, $out_path);
-    &write_build_dot($build_dot);
+    my $build_dot = &gen_dot($rules);
+    my $output_dot = $output =~ s/\.mk$/.dot/r;
+    &write_str($build_dot, $output_dot);
     #print $build_dot;
   }
   #print STDERR &Dumper($rules);
   #print STDERR $build_mk;
 }
 sub gen_all {
-  my ($inputs, $name) = @_;
+  my ($inputs) = @_;
   my $source_dir = &cwd();
   my $build_dir = $source_dir . '/z/build';
-  foreach my $dir (@$inputs) {
-    my $output = "$dir/$name";
+  foreach my $input (@$inputs) {
+    my $dir = &dirname($input);
     my $current_source_dir = $source_dir . "/$dir";
     my $current_vars = {
       'current_source_dir' => $current_source_dir,
@@ -386,11 +387,16 @@ sub gen_all {
       'build_dir' =>          $build_dir,
     };
     #print STDERR &Dumper($current_vars);
+    my $output = &mk_path_from_yaml_path($input);
     my $force;
     &set_env_vars_core($current_vars, $force = 1);
-    &gen($output);
+    &gen($input, $output);
     print $output . $nl;
   }
+}
+sub input {
+  my ($name) = @_;
+  return &current_source_dir() . '/' . $name;
 }
 sub output {
   my ($name) = @_;
@@ -400,17 +406,27 @@ sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
   #print &Dumper($cmd_info);
-  my $name = $$cmd_info{'opts'}{'output'};
-  $name = 'build.mk' if ! $name;
+  my $output_name = $$cmd_info{'opts'}{'output'};
+  $output_name = 'build.mk' if ! $output_name;
   &set_env_vars_core($$cmd_info{'vars'});
   if ($$cmd_info{'opts'}{'path-only'}) {
-    print &output($name) . $nl;
+    print &output($output_name) . $nl;
     exit 0;
   }
   if (scalar @{$$cmd_info{'inputs'}}) {
-    &gen_all($$cmd_info{'inputs'}, $name);
+    my $inputs = [];
+    foreach my $input (@{$$cmd_info{'inputs'}}) {
+      if (-d $input) {
+        my $input_name = &yaml_path_from_mk_path($output_name);
+        &add_last($inputs, "$input/$input_name");
+      } elsif (-f $input) {
+        &add_last($inputs, $input);
+      } else { die $0 . 'error: no-such-file: ' . $input . $nl; }
+    }
+    &gen_all($inputs);
   } else {
-    &gen(&output($name));
+    my $input_name = &yaml_path_from_mk_path($output_name);
+    &gen(&input($input_name), &output($output_name));
   }
   exit 0;
 }

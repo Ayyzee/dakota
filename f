@@ -51,9 +51,9 @@ intmd_dir=$source_dir/z/intmd
 build_dir=$source_dir/z/build
 bin_dir=$prefix_dir/bin
 lib_dir=$prefix_dir/lib
-ext_lib_files=($(lib_files ${ext_lib_targets[@]}))
-ext_exe_files=($(exe_files ${ext_exe_targets[@]}))
-lib_files=(    $(lib_files ${lib_targets[@]}))
+ext_lib_files=($(lib_files     ${ext_lib_targets[@]}))
+ext_exe_files=($(exe_files     ${ext_exe_targets[@]}))
+lib_files=(    $(lib_files     ${lib_targets[@]}))
 exe_files=(    $(tst_exe_files ${exe_targets[@]}))
 rm -f ${ext_lib_files[@]} ${ext_exe_files[@]} ${lib_files[@]} ${exe_files[@]}
 dot_files=()
@@ -69,7 +69,7 @@ for build_file in ${lib_build_files[@]}; do echo "include $build_file" >> $build
 exe_build_files=($(dakota-make --var=lib_dir=$lib_dir --output $build ${exe_targets[@]}))
 echo "" >> $build
 for build_file in ${exe_build_files[@]}; do echo "include $build_file" >> $build; done
-dot_files=($(echo $intmd_dir/{dakota-core,dakota,tst1,tst2}/build.dot))
+dot_files=($(echo {dakota-core,dakota,tst1,tst2}/build.dot))
 merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
 graphs="${graphs:-0}"
 if [[ $graphs -ne 0 ]]; then
