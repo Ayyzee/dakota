@@ -421,7 +421,7 @@ sub start {
         &add_last($inputs, "$input/$input_name");
       } elsif (-f $input) {
         &add_last($inputs, $input);
-      } else { die $0 . 'error: no-such-file: ' . $input . $nl; }
+      } else { die &basename($0) . ': error: no-such-file: ' . $input . $nl; }
     }
     &gen_all($inputs);
   } else {
