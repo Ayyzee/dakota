@@ -308,7 +308,7 @@ sub gen_rules {
   # -install_name <>, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
     'parse' =>               [ "# generating \$@", "\@${dakota} --action parse --output \$@ \$<" ],
-    'merge' =>               [ "# generating \$@", "\@${dakota} --action merge $all_dir_vars --output \$@ \$?" ],
+    'merge' =>               [ "# generating \$@", "\@${dakota} --action merge $all_dir_vars --output \$@ \$^" ], # could use $?
     'gen-target-hdr' =>      [ "# generating \$@", "\@${dakota} --action gen-target-hdr $all_dir_vars --output \$@ \$<" ],
                               #"# generating \$@", "\@${dakota} -x c++-header \@${prefix_dir}/lib/dakota/compiler.opts --var=cxx=${cxx} -I${prefix_dir}/include -Xclang -emit-pch -o \$@.pch \$@" ],
     'gen-target-src' =>      [ "# generating \$@", "\@${dakota} --action gen-target-src $all_dir_vars --output \$@ \$<" ],

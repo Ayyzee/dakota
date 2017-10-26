@@ -430,7 +430,7 @@ sub ast_paths_from_inputs {
       $srcs_ast = $input;
     }
   }
-  die if ! $srcs_ast;
+  die if ! $srcs_ast; # check use of $? in generated makefiles
   &add_last($ast_paths, $srcs_ast);
   return $ast_paths;
 }
