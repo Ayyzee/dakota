@@ -22,6 +22,7 @@
   # define DKT_UNBOX_CHECK(obj, kls)
 # else
   # define DKT_UNBOX_CHECK(obj, kls) dkt_unbox_check(obj, kls)
+  [[debug_export]] FUNC dkt_unbox_check(object_t object, object_t kls) -> void;
 # endif
 
 # define THROW throw
