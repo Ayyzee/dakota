@@ -69,7 +69,7 @@ for build_file in ${lib_build_files[@]}; do echo "include $build_file" >> $build
 exe_build_files=($(dakota-make --var=lib_dir=$lib_dir --output $build ${exe_targets[@]}))
 echo "" >> $build
 for build_file in ${exe_build_files[@]}; do echo "include $build_file" >> $build; done
-dot_files=($(echo {dakota-core,dakota,tst1,tst2}/build.dot))
+dot_files=($(echo $intmd_dir/{dakota-core,dakota,tst1,tst2}/build.dot))
 merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
 graphs="${graphs:-0}"
 if [[ $graphs -ne 0 ]]; then

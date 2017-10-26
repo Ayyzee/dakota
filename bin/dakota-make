@@ -367,7 +367,7 @@ sub gen {
   &write_str($build_mk, $output);
   if (1) {
     my $build_dot = &gen_dot($rules);
-    my $output_dot = $output =~ s/\.mk$/.dot/r;
+    my $output_dot = &build_dot_path();
     &write_str($build_dot, $output_dot);
     #print $build_dot;
   }
