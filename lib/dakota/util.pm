@@ -804,19 +804,27 @@ sub target_src_path {
   return $path;
 }
 sub build_yaml_path {
-  my $path = &current_source_dir() . '/build.yaml';
+  my ($name) = @_;
+  $name = 'build.yaml' if ! $name;
+  my $path = &current_source_dir() . '/' . $name;
   return $path;
 }
 sub build_mk_path {
-  my $path = &current_source_dir() . '/build.mk';
+  my ($name) = @_;
+  $name = 'build.mk' if ! $name;
+  my $path = &current_source_dir() . '/' . $name;
   return $path;
 }
 sub build_dot_path {
-  my $path = &current_intmd_dir() . '/build.dot';
+  my ($name) = @_;
+  $name = 'build.dot' if ! $name;
+  my $path = &current_intmd_dir() . '/' . $name;
   return $path;
 }
 sub parts_path {
-  my $path = &current_intmd_dir() . '/parts.txt';
+  my ($name) = @_;
+  $name = 'parts.txt' if ! $name;
+  my $path = &current_intmd_dir() . '/' . $name;
   return $path;
 }
 
