@@ -803,7 +803,7 @@ sub target_src_path {
   return $path;
 }
 sub target_o_path {
-  my $path = &target_current_build_dir() . '/target.cc' . $o_ext;
+  my $path = &target_current_build_dir() . '/target' . $cc_ext . $o_ext;
   return $path;
 }
 sub target_srcs_ast_path {
