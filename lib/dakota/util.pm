@@ -779,17 +779,19 @@ sub lib_dir {
   die if ! $dir;
   return $dir;
 }
-my $rel_target_dir_name = 'z';
-sub target_current_build_dir {
-  my $dir = &current_build_dir() . '/' . $rel_target_dir_name;
-  return $dir;
+sub rel_target_dir_name {
+  return 'z';
 }
 sub target_current_intmd_dir {
-  my $dir = &current_intmd_dir() . '/' . $rel_target_dir_name;
+  my $dir = &current_intmd_dir() . '/' . &rel_target_dir_name();
+  return $dir;
+}
+sub target_current_build_dir {
+  my $dir = &current_build_dir() . '/' . &rel_target_dir_name();
   return $dir;
 }
 sub rel_target_hdr_path {
-  my $rel_path = $rel_target_dir_name . '/target' . $h_ext;
+  my $rel_path = &rel_target_dir_name() . '/target' . $h_ext;
   return $rel_path;
 }
 sub target_hdr_path {

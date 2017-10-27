@@ -184,9 +184,11 @@ sub gen_make {
   foreach my $dir (keys %$dirs) {
     $result .= "\$(shell mkdir -p $ENV{HOME}/.dkt$dir)" . $nl;
   }
+  my $target_current_intmd_dir = &target_current_intmd_dir();
+  my $target_current_build_dir = &target_current_build_dir();
   $result .=
-    "\$(shell mkdir -p $current_intmd_dir/z)" . $nl .
-    "\$(shell mkdir -p $current_build_dir/z)" . $nl .
+    "\$(shell mkdir -p $target_current_intmd_dir)" . $nl .
+    "\$(shell mkdir -p $target_current_build_dir)" . $nl .
     $nl .
     '%.ctlg :' . $nl .
     "\t" . '# generating $@' . $nl .
