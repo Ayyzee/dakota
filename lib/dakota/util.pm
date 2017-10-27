@@ -163,6 +163,7 @@ our @EXPORT= qw(
                  pann
                  param_types_str
                  parts
+                 parts_from_yaml
                  parts_path
                  path_split
                  prepend_dot_slash
@@ -1563,10 +1564,10 @@ sub gen_parts {
   }
   &filestr_to_file($outstr, $parts_path);
 }
-sub parts {
-  my ($force) = @_;
+sub parts_from_yaml {
+  my ($yaml_file, $force) = @_;
   my $parts_path = &parts_path();
-  my $build_yaml = &build_yaml_path();
+  my $build_yaml = &build_yaml_path(&basename($yaml_file));
   if (&is_out_of_date($build_yaml, $parts_path)) {
     #print STDERR "out-of-date: $parts_path\n";
     &gen_parts($build_yaml, $parts_path);
@@ -1587,6 +1588,11 @@ sub parts {
     &add_last($result, $abs_path);
   }
   die if ! scalar @$result;
+  return $result;
+}
+sub parts {
+  my ($force) = @_;
+  my $result = &parts_from_yaml('build.yaml', $force);
   return $result;
 }
 sub platform {
