@@ -788,14 +788,6 @@ sub target_current_intmd_dir {
   my $dir = &current_intmd_dir() . '/' . $rel_target_dir_name;
   return $dir;
 }
-sub target_srcs_ast_path {
-  my $path = &target_current_intmd_dir() . '/srcs.ast';
-  return $path;
-}
-sub target_inputs_ast_path {
-  my $path = &target_current_intmd_dir() . '/inputs.ast';
-  return $path;
-}
 sub rel_target_hdr_path {
   my $rel_path = $rel_target_dir_name . '/target' . $h_ext;
   return $rel_path;
@@ -810,6 +802,14 @@ sub target_src_path {
 }
 sub target_o_path {
   my $path = &target_current_build_dir() . '/target.cc' . $o_ext;
+  return $path;
+}
+sub target_srcs_ast_path {
+  my $path = &target_current_intmd_dir() . '/srcs.ast';
+  return $path;
+}
+sub target_inputs_ast_path {
+  my $path = &target_current_intmd_dir() . '/inputs.ast';
   return $path;
 }
 sub build_yaml_path {
