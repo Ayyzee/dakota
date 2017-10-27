@@ -57,23 +57,6 @@ sub cmd_info_from_argv {
   $$cmd_info{'inputs'} = $argv;
   return $cmd_info;
 }
-sub target_o_path {
-  my $result = &target_current_build_dir() . '/target.cc.o';
-  return $result;
-}
-sub is_o_path {
-  my ($path) = @_;
-  return $path =~ /\.o$/;
-}
-sub is_target_o_path {
-  my ($path) = @_;
-  return $path eq &target_o_path();
-}
-sub o_path_from_dk_path {
-  my ($dk_path) = @_;
-  my $result = &current_build_dir() . '/' . &basename($dk_path) . '.o';
-  return $result;
-}
 sub mk_path_from_yaml_path {
   my ($path) = @_;
   $path =~ s/\.yaml$/.mk/;
@@ -83,12 +66,6 @@ sub yaml_path_from_mk_path {
   my ($path) = @_;
   $path =~ s/\.mk$/.yaml/;
   return $path;
-}
-sub is_exe_path {
-  my ($path) = @_;
-  my $state = 1;
-  $state = 0 if $path =~ /\..+$/;
-  return $state;
 }
 sub gen_dot {
   my ($rules) = @_;

@@ -35,6 +35,7 @@ my $gbl_prefix;
 my $gbl_platform;
 my $h_ext;
 my $cc_ext;
+my $o_ext;
 my $lib_prefix;
 my $lib_suffix;
 my $exe_suffix;
@@ -205,6 +206,10 @@ our @EXPORT= qw(
                  var
                  verbose_exec
                  yaml_parse
+                 target_o_path
+                 is_o_path
+                 is_target_o_path
+                 is_exe_path
  );
 use Cwd;
 use File::Spec;
@@ -803,6 +808,10 @@ sub target_src_path {
   my $path = &target_current_intmd_dir() . '/target' . $cc_ext;
   return $path;
 }
+sub target_o_path {
+  my $path = &target_current_build_dir() . '/target.cc' . $o_ext;
+  return $path;
+}
 sub build_yaml_path {
   my ($name) = @_;
   $name = 'build.yaml' if ! $name;
@@ -826,6 +835,20 @@ sub parts_path {
   $name = 'parts.txt' if ! $name;
   my $path = &current_intmd_dir() . '/' . $name;
   return $path;
+}
+sub is_o_path {
+  my ($path) = @_;
+  return $path =~ /\.o$/;
+}
+sub is_target_o_path {
+  my ($path) = @_;
+  return $path eq &target_o_path();
+}
+sub is_exe_path {
+  my ($path) = @_;
+  my $state = 1;
+  $state = 0 if $path =~ /\..+$/;
+  return $state;
 }
 
 # 1. cmd line
@@ -1593,6 +1616,7 @@ BEGIN {
     or die "&platform(\"$gbl_prefix/lib/dakota/platform.yaml\") failed: $!\n";
   $h_ext = &var('h_ext');
   $cc_ext = &var('cc_ext');
+  $o_ext = &var('o_ext');
   $lib_prefix = &var('lib_prefix');
   $lib_suffix = &var('lib_suffix'); # default dynamic shared object/library extension
   $exe_suffix = &var('exe_suffix');

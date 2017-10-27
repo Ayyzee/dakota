@@ -63,6 +63,11 @@ sub cc_path_from_dk_path {
   my ($path) = @_;
   return &out_path_from_in_path('cc_path_from_dk_path', $path);
 }
+sub o_path_from_dk_path {
+  my ($dk_path) = @_;
+  my $result = &current_build_dir() . '/' . &basename($dk_path) . $o_ext;
+  return $result;
+}
 sub h_path_from_src_path {
   my ($src_path) = @_;
   my $h_path = $src_path =~ s/(\.dk|$cc_ext)$/$h_ext/r;
@@ -124,6 +129,7 @@ our @EXPORT= qw(
                  ast_path_from_ctlg_path
                  ast_merge
                  argv_from_cmd_info
+                 o_path_from_dk_path
               );
 my $colon = ':'; # key/item delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
