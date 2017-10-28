@@ -149,6 +149,7 @@ klass object {
 func dkt-dump(object-t obj) -> object-t {
   return $dump(obj);
 }
+# if defined DKT_UNBOX_CHECK_ENABLED && DKT_UNBOX_CHECK_ENABLED != 0
 func dkt-unbox-check(object-t obj, object-t kls) -> void {
   if (object::_klass_) // runtime already initiated
     return;
@@ -171,6 +172,7 @@ func dkt-unbox-check(object-t obj, object-t kls) -> void {
   }
   return;
 }
+# endif
 # if (OUT_OF_LINE_REF_COUNTING != 0)
   # include <dakota-object-defn.inc>
   # include <dakota-weak-object-defn.inc>
