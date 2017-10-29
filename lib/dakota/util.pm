@@ -1560,6 +1560,7 @@ sub gen_parts {
   }
   foreach my $input (@{$$build{'libs'}}) {
     my $lib_file = `dakota-find-library $input`;
+    chomp $lib_file;
     $outstr .= $lib_file . $nl;
   }
   &filestr_to_file($outstr, $parts_path);
