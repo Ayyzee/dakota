@@ -1,3 +1,5 @@
+add target.dir (similiar to cmake) so we can build multiple targets for every current_source_dir.
+
 out_of_line_ref_count
 generate phony target clean
 symbol => sym (dso-sym-name-for-addr())
