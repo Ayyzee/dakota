@@ -3,6 +3,7 @@ include-dirs:
   - ${source_dir}/include
 lib-dirs:
 libs:
+target: dakota-find-library
 target-path: ${bin_dir}/dakota-find-library${exe_suffix}
 target-libs:
   - dakota-dso
