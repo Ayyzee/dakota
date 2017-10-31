@@ -165,7 +165,7 @@ sub gen_make {
   my $current_build_dir =  &current_build_dir();
   my $dakota =             which 'dakota';
   my $dakota_catalog =     &dirname($dakota) . '/dakota-catalog';
-  my $prefix_dir =         $dakota =~ s#/bin/dakota##r;
+  my $prefix_dir =         &dirname(&dirname($dakota));
   my $result = '';
   my $root_tgt = $$rules[0][0][0];
   my $target_hdr_path = &target_hdr_path();
@@ -278,13 +278,13 @@ sub gen_rules {
   my $cxx =                    &var('cxx');
   my $dakota =                 which 'dakota';
   my $dakota_catalog =         &dirname($dakota) . '/dakota-catalog';
-  my $prefix_dir =             $dakota =~ s#/bin/dakota##r;
+  my $prefix_dir =             &dirname(&dirname($dakota));
   my $current_source_dir =     &current_source_dir();
   my $source_dir =             &source_dir();
   my $build_dir =              &build_dir();
   my $all_dir_vars = "--var=current_source_dir=${current_source_dir} --var=source_dir=${source_dir} --var=build_dir=${build_dir}";
   # -dynamiclib on darwin, -shared on linux
-  # -install_name <>, -soname <> AND -rpath <> on linux
+  # -install_name <> on darwin, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
     'parse' =>               [ "# generating \$@", "\@${dakota} --action parse --output \$@ \$<" ],
     'merge' =>               [ "# generating \$@", "\@${dakota} --action merge $all_dir_vars --output \$@ \$^" ], # could use $?
