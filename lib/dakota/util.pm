@@ -196,6 +196,7 @@ our @EXPORT= qw(
                  sqstr_regex
                  str_from_seq
                  suffix
+                 target
                  target_current_build_dir
                  target_current_intmd_dir
                  target_inputs_ast_path
@@ -780,19 +781,24 @@ sub lib_dir {
   die if ! $dir;
   return $dir;
 }
+sub target {
+  my $name = $ENV{'target'};
+  die if ! $name;
+  return $name;
+}
 sub rel_target_dir_name {
   return 'z';
 }
 sub target_current_intmd_dir {
-  my $dir = &current_intmd_dir() . '/' . &rel_target_dir_name();
+  my $dir = &current_intmd_dir() . '/' . &target() . '/' . &rel_target_dir_name();
   return $dir;
 }
 sub target_current_build_dir {
-  my $dir = &current_build_dir() . '/' . &rel_target_dir_name();
+  my $dir = &current_build_dir() . '/' . &target() . '/' . &rel_target_dir_name();
   return $dir;
 }
 sub rel_target_hdr_path {
-  my $rel_path = &rel_target_dir_name() . '/target' . $h_ext;
+  my $rel_path = &target() . '/' . &rel_target_dir_name() . '/target' . $h_ext;
   return $rel_path;
 }
 sub target_hdr_path {
@@ -836,7 +842,7 @@ sub build_dot_path {
 sub parts_path {
   my ($name) = @_;
   $name = 'parts.txt' if ! $name;
-  my $path = &current_intmd_dir() . '/' . $name;
+  my $path = &current_intmd_dir() . '/' . &target() . '/' . $name;
   return $path;
 }
 sub is_o_path {

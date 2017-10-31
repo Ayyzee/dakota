@@ -4,11 +4,13 @@ set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 set (cxx-compiler ${CMAKE_CXX_COMPILER})
 dk_append_target_property (${target} LINK_FLAGS
   --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+  --var=target=${target}
   --var=cxx=${cxx-compiler})
 target_compile_options (${target} PRIVATE
   --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
   --var=source_dir=${source_dir}
   --var=build_dir=${build_dir}
+  --var=target=${target}
   --var=cxx=${cxx-compiler})
 dk_find_program (CMAKE_CXX_COMPILER dakota${CMAKE_EXECUTABLE_SUFFIX})
 dk_find_program (dakota-make dakota-make)
@@ -16,6 +18,7 @@ dk_find_program (dakota-make dakota-make)
 execute_process (
   COMMAND ${dakota-make} --path-only
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --var=target=${target}
   OUTPUT_VARIABLE build-mk
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -24,6 +27,7 @@ execute_process (
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
     --var=build_dir=${build_dir}
+    --var=target=${target}
   OUTPUT_VARIABLE target-src
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_sources (${target} PRIVATE ${target-src})
@@ -33,6 +37,7 @@ execute_process (
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
     --var=build_dir=${build_dir}
+    --var=target=${target}
   OUTPUT_VARIABLE target-hdr
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -45,6 +50,7 @@ add_custom_command (
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
     --var=build_dir=${build_dir}
+    --var=target=${target}
     --output ${target-src}
   VERBATIM
   USES_TERMINAL)
@@ -71,6 +77,7 @@ add_custom_command (
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
     --var=source_dir=${source_dir}
     --var=build_dir=${build_dir}
+    --var=target=${target}
     --var=lib_dir=${lib_dir}
   VERBATIM
   USES_TERMINAL)

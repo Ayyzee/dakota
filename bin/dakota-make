@@ -282,7 +282,8 @@ sub gen_rules {
   my $current_source_dir =     &current_source_dir();
   my $source_dir =             &source_dir();
   my $build_dir =              &build_dir();
-  my $all_dir_vars = "--var=current_source_dir=${current_source_dir} --var=source_dir=${source_dir} --var=build_dir=${build_dir}";
+  my $target = &var('target');
+  my $all_dir_vars = "--var=current_source_dir=${current_source_dir} --var=source_dir=${source_dir} --var=build_dir=${build_dir} --var=target=$target";
   # -dynamiclib on darwin, -shared on linux
   # -install_name <> on darwin, -soname <> AND -rpath <> on linux
   my $gbl_recipes = {
@@ -338,6 +339,7 @@ sub gen_rules {
 sub gen {
   my ($input, $output) = @_;
   my $build_yaml = &yaml_parse($input);
+  $ENV{'target'} = $$build_yaml{'target'};
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
   if (! &is_abs($target_path)) {
