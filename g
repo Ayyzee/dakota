@@ -1,7 +1,6 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 finish() {
-  rm -f */build.cmake
   rm -f {dakota-core,dakota,tst1,tst2}/build.mk
 }
 trap finish EXIT
@@ -20,7 +19,6 @@ targets=(
 #rm -f ${targets[@]}
 set -o xtrace
 rm -fr z
-yaml2cmake.sh
 export generator=ninja
 ./root-build.sh config
 ./root-build.sh dakota-dso dakota-catalog dakota-find-library

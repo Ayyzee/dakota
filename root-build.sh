@@ -18,6 +18,7 @@ if [[ $# -ge 1 && $1 == config ]]; then
   fi
   rm -fr $intmd_dir # must delete before $build_dir
   rm -fr $build_dir
+  yaml2cmake.sh
   cmake-configure.sh
   if [[ $# -ge 1 ]]; then
     build.sh $@
