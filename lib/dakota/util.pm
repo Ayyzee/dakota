@@ -830,7 +830,7 @@ sub build_yaml_path {
 sub build_mk_path {
   my ($name) = @_;
   $name = 'build.mk' if ! $name;
-  my $path = &current_source_dir() . '/' . $name;
+  my $path = &current_intmd_dir() . '/' . $name;
   return $path;
 }
 sub build_dot_path {

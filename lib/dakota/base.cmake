@@ -18,6 +18,8 @@ dk_find_program (dakota-make dakota-make)
 execute_process (
   COMMAND ${dakota-make} --path-only
     --var=current_source_dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --var=source_dir=${CMAKE_SOURCE_DIR}
+    --var=build_dir=${CMAKE_BINARY_DIR}
     --var=target=${target}
   OUTPUT_VARIABLE build-mk
   OUTPUT_STRIP_TRAILING_WHITESPACE)

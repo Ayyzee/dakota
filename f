@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 finish() {
-  rm -f {dakota-core,dakota,tst1,tst2}/build.mk
+  echo -n ""
 }
 trap finish EXIT
 lib_files() {
@@ -44,16 +44,16 @@ exe_targets=(
   tst1
   tst2
 )
-lib_target_yamls=(
-  dakota-core/build.yaml
-  dakota/build.yaml
-)
-exe_target_yamls=(
-  tst1/build.yaml
-  tst2/build.yaml
-)
 prefix_dir=$HOME/dakota
 source_dir=$HOME/dakota
+lib_target_yamls=(
+  $source_dir/dakota-core/build.yaml
+  $source_dir/dakota/build.yaml
+)
+exe_target_yamls=(
+  $source_dir/tst1/build.yaml
+  $source_dir/tst2/build.yaml
+)
 intmd_dir=$source_dir/z/intmd
 build_dir=$source_dir/z/build
 bin_dir=$prefix_dir/bin
@@ -65,34 +65,35 @@ exe_files=(    $(tst_exe_files ${exe_targets[@]}))
 rm -f ${ext_lib_files[@]} ${ext_exe_files[@]} ${lib_files[@]} ${exe_files[@]}
 dot_files=()
 rm -fr $source_dir/z
-build=build.mk
-cat /dev/null > $build
+mkdir -p $intmd_dir
+build=build
+cat /dev/null > $intmd_dir/$build.mk
 for ext_target in ${ext_lib_targets[@]} ${ext_exe_targets[@]}; do
-  echo "include $ext_target/build.mk" >> $build
+  echo "include $prefix_dir/$ext_target/build.mk" >> $intmd_dir/$build.mk
 done
 lib_build_files=($(dakota-make --var=lib_dir=$lib_dir ${lib_target_yamls[@]}))
-echo "" >> $build
-for build_file in ${lib_build_files[@]}; do echo "include $build_file" >> $build; done
+echo "" >> $intmd_dir/$build.mk
+for build_file in ${lib_build_files[@]}; do echo "include $build_file" >> $intmd_dir/$build.mk; done
 exe_build_files=($(dakota-make --var=lib_dir=$lib_dir ${exe_target_yamls[@]}))
-echo "" >> $build
-for build_file in ${exe_build_files[@]}; do echo "include $build_file" >> $build; done
+echo "" >> $intmd_dir/$build.mk
+for build_file in ${exe_build_files[@]}; do echo "include $build_file" >> $intmd_dir/$build.mk; done
 dot_files=($(echo $intmd_dir/{dakota-core,dakota,tst1,tst2}/build.dot))
-merge-dots.pl ${dot_files[@]} > $source_dir/build.dot
+merge-dots.pl ${dot_files[@]} > $intmd_dir/build.dot
 graphs="${graphs:-0}"
 if [[ $graphs -ne 0 ]]; then
-  open ${dot_files[@]} $source_dir/build.dot
+  open ${dot_files[@]} $intmd_dir/build.dot
   exit
 fi
 threads=$(getconf _NPROCESSORS_ONLN)
 threads_per_core=2
 jobs=$(( threads / threads_per_core ))
 SECONDS=0
-make $@ -j $jobs -f $build ${ext_lib_files[@]} ${ext_exe_files[@]}
+make $@ -j $jobs -C $intmd_dir -f $intmd_dir/$build.mk ${ext_lib_files[@]} ${ext_exe_files[@]}
 
-make $@ -j $jobs -f $build ${lib_files[@]}
+make $@ -j $jobs -C $intmd_dir -f $intmd_dir/$build.mk ${lib_files[@]}
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"
-make $@ -j $jobs -f $build ${exe_files[@]}
+make $@ -j $jobs -C $intmd_dir -f $intmd_dir/$build.mk ${exe_files[@]}
 for exe_file in ${exe_files[@]}; do
   echo \# $exe_file
   $exe_file

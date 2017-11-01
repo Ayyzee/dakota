@@ -59,6 +59,10 @@ sub dk_path_from_cc_path { # reverse dependency
   my $dk_path = $cc_path =~ s/$cc_ext$/.dk/r;
   return $dk_path;
 }
+sub mk_path_from_yaml_path {
+  my ($path) = @_;
+  return &out_path_from_in_path('mk_path_from_yaml_path', $path);
+}
 sub cc_path_from_dk_path {
   my ($path) = @_;
   return &out_path_from_in_path('cc_path_from_dk_path', $path);
@@ -74,6 +78,7 @@ sub h_path_from_src_path {
   return $h_path;
 }
 my $patterns = {
+  'mk_path_from_yaml_path'  => '${current_intmd_dir}/%.mk       : ${current_source_dir}/%.yaml',
   'cc_path_from_dk_path'    => '${current_intmd_dir}/%${cc_ext} : ${current_source_dir}/%.dk',
   'inc_path_from_dk_path'   => '${current_intmd_dir}/%.inc      : ${current_source_dir}/%.dk',
   'ast_path_from_dk_path'   => '${current_intmd_dir}/%.dk.ast   : ${current_source_dir}/%.dk',
@@ -130,6 +135,7 @@ our @EXPORT= qw(
                  ast_merge
                  argv_from_cmd_info
                  o_path_from_dk_path
+                 mk_path_from_yaml_path
               );
 my $colon = ':'; # key/item delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();

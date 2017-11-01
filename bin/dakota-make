@@ -56,11 +56,6 @@ sub cmd_info_from_argv {
   $$cmd_info{'inputs'} = $argv;
   return $cmd_info;
 }
-sub mk_path_from_yaml_path {
-  my ($path) = @_;
-  $path =~ s/\.yaml$/.mk/;
-  return $path;
-}
 sub gen_dot {
   my ($rules) = @_;
   my $result = '';
@@ -357,17 +352,16 @@ sub gen_all {
   my $source_dir = &cwd();
   my $build_dir = $source_dir . '/z/build';
   foreach my $input (@$inputs) {
-    my $dir = &dirname($input);
-    my $current_source_dir = $source_dir . "/$dir";
+    my $current_source_dir = &dirname($input);
     my $current_vars = {
       'current_source_dir' => $current_source_dir,
       'source_dir' =>         $source_dir,
       'build_dir' =>          $build_dir,
     };
     #print STDERR &Dumper($current_vars);
-    my $output = &mk_path_from_yaml_path($input);
     my $force;
     &set_env_vars_core($current_vars, $force = 1);
+    my $output = &mk_path_from_yaml_path($input);
     &gen($input, $output);
     print $output . $nl;
   }
@@ -378,7 +372,7 @@ sub input {
 }
 sub output {
   my ($name) = @_;
-  return &current_source_dir() . '/' . $name;
+  return &current_intmd_dir() . '/' . $name;
 }
 sub start {
   my ($argv) = @_;

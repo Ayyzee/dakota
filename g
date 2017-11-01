@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 finish() {
-  rm -f {dakota-core,dakota,tst1,tst2}/build.mk
+  echo -n ""
 }
 trap finish EXIT
 lib_prefix=lib
