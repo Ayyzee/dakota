@@ -88,12 +88,12 @@ threads=$(getconf _NPROCESSORS_ONLN)
 threads_per_core=2
 jobs=$(( threads / threads_per_core ))
 SECONDS=0
-make $@ -j $jobs -C $intmd_dir -f $intmd_dir/$build.mk ${ext_lib_files[@]} ${ext_exe_files[@]}
+make $@ -j $jobs -f $intmd_dir/$build.mk ${ext_lib_files[@]} ${ext_exe_files[@]}
 
-make $@ -j $jobs -C $intmd_dir -f $intmd_dir/$build.mk ${lib_files[@]}
+make $@ -j $jobs -f $intmd_dir/$build.mk ${lib_files[@]}
 duration=$SECONDS
 echo "duration: $(($duration / 60))m$(($duration % 60))s"
-make $@ -j $jobs -C $intmd_dir -f $intmd_dir/$build.mk ${exe_files[@]}
+make $@ -j $jobs -f $intmd_dir/$build.mk ${exe_files[@]}
 for exe_file in ${exe_files[@]}; do
   echo \# $exe_file
   $exe_file
