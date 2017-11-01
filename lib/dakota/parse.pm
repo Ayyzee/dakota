@@ -395,6 +395,7 @@ sub out_path_from_in_path {
   $pattern_replacement =~ s|\%|\%s|;
 
   my $result = &expand($path_in);
+  $result =~ s#^\./##; # hackhack
   if ($result =~ m|^$pattern_template$|) {
     $result = sprintf($pattern_replacement, $1);
     $result = &expand($result);
