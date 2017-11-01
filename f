@@ -44,6 +44,14 @@ exe_targets=(
   tst1
   tst2
 )
+lib_target_yamls=(
+  dakota-core/build.yaml
+  dakota/build.yaml
+)
+exe_target_yamls=(
+  tst1/build.yaml
+  tst2/build.yaml
+)
 prefix_dir=$HOME/dakota
 source_dir=$HOME/dakota
 intmd_dir=$source_dir/z/intmd
@@ -62,10 +70,10 @@ cat /dev/null > $build
 for ext_target in ${ext_lib_targets[@]} ${ext_exe_targets[@]}; do
   echo "include $ext_target/build.mk" >> $build
 done
-lib_build_files=($(dakota-make --var=lib_dir=$lib_dir --output $build ${lib_targets[@]}))
+lib_build_files=($(dakota-make --var=lib_dir=$lib_dir ${lib_target_yamls[@]}))
 echo "" >> $build
 for build_file in ${lib_build_files[@]}; do echo "include $build_file" >> $build; done
-exe_build_files=($(dakota-make --var=lib_dir=$lib_dir --output $build ${exe_targets[@]}))
+exe_build_files=($(dakota-make --var=lib_dir=$lib_dir ${exe_target_yamls[@]}))
 echo "" >> $build
 for build_file in ${exe_build_files[@]}; do echo "include $build_file" >> $build; done
 dot_files=($(echo $intmd_dir/{dakota-core,dakota,tst1,tst2}/build.dot))

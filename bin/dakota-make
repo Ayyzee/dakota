@@ -50,7 +50,6 @@ $Data::Dumper::Indent =    1;   # default = 2
 sub cmd_info_from_argv {
   my ($argv) = @_;
   my $cmd_info = &get_opts_from_array($argv,
-                                      'output=s',
                                       'path-only',
                                       'var=s',
                                     );
@@ -60,11 +59,6 @@ sub cmd_info_from_argv {
 sub mk_path_from_yaml_path {
   my ($path) = @_;
   $path =~ s/\.yaml$/.mk/;
-  return $path;
-}
-sub yaml_path_from_mk_path {
-  my ($path) = @_;
-  $path =~ s/\.mk$/.yaml/;
   return $path;
 }
 sub gen_dot {
@@ -390,8 +384,8 @@ sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
   #print &Dumper($cmd_info);
-  my $output_name = $$cmd_info{'opts'}{'output'};
-  $output_name = 'build.mk' if ! $output_name;
+  my $input_name =  'build.yaml';
+  my $output_name = 'build.mk';
   &set_env_vars_core($$cmd_info{'vars'});
   if ($$cmd_info{'opts'}{'path-only'}) {
     print &output($output_name) . $nl;
@@ -401,7 +395,6 @@ sub start {
     my $inputs = [];
     foreach my $input (@{$$cmd_info{'inputs'}}) {
       if (-d $input) {
-        my $input_name = &yaml_path_from_mk_path($output_name);
         &add_last($inputs, "$input/$input_name");
       } elsif (-f $input) {
         &add_last($inputs, $input);
@@ -409,7 +402,6 @@ sub start {
     }
     &gen_all($inputs);
   } else {
-    my $input_name = &yaml_path_from_mk_path($output_name);
     &gen(&input($input_name), &output($output_name));
   }
   exit 0;
