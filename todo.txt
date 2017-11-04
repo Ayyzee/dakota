@@ -1,3 +1,5 @@
+move from util.pm to dakota-make: sub parts_from_yaml() and sub gen_parts()
+
 add target.dir (similiar to cmake) so we can build multiple targets for every current_source_dir.
 
 out_of_line_ref_count

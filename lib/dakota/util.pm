@@ -1599,8 +1599,8 @@ sub parts_from_yaml {
   return $result;
 }
 sub parts {
-  my ($force) = @_;
-  my $result = &parts_from_yaml('build.yaml', $force);
+  my $filestr = &filestr_from_file(&parts_path());
+  my $result = [split($nl, $filestr)];
   return $result;
 }
 sub platform {
