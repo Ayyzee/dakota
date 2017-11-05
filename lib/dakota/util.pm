@@ -92,6 +92,8 @@ our @EXPORT= qw(
                  deep_copy
                  digsig
                  dirname
+                 dirs
+                 set_dirs
                  dk_mangle
                  dk_mangle_seq
                  dmp
@@ -682,16 +684,28 @@ sub check_set_env_var {
     $$vars{$key} = $val;
   }
 }
+sub dirs {
+  my $dirs = {};
+  $$dirs{'current_source_dir'} = $ENV{'current_source_dir'};
+  $$dirs{'source_dir'} =         $ENV{'source_dir'};
+  $$dirs{'build_dir'} =          $ENV{'build_dir'};
+  if ($$dirs{'current_source_dir'} &&
+      $$dirs{'source_dir'} &&
+      $$dirs{'build_dir'}) {
+    return $dirs;
+  }
+  return undef;
+}
 sub set_env_vars_core {
   my ($tbl, $force) = @_;
   while (my ($key, $val) = each (%$tbl)) {
     &check_set_env_var($key, $val, $force);
   }
-  my $current_source_dir = $ENV{'current_source_dir'};
-  my $source_dir =         $ENV{'source_dir'};
-  my $build_dir =          $ENV{'build_dir'};
-  if ($current_source_dir && $source_dir && $build_dir) {
-    &dirs($current_source_dir, $source_dir, $build_dir, $force);
+  if (my $dirs = &dirs()) {
+    &set_dirs($$dirs{'current_source_dir'},
+              $$dirs{'source_dir'},
+              $$dirs{'build_dir'},
+              $force);
   }
 }
 sub set_env_vars {
@@ -704,7 +718,7 @@ sub set_env_vars {
   }
   &set_env_vars_core($vars);
 }
-sub dirs {
+sub set_dirs {
   my ($current_source_dir, $source_dir, $build_dir, $force) = @_;
   &check_set_env_var('current_source_dir', $current_source_dir, $force);
   &check_set_env_var('source_dir',         $source_dir, $force);
