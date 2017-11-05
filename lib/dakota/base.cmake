@@ -21,6 +21,7 @@ execute_process (
     --var=source_dir=${source_dir}
     --var=build_dir=${build_dir}
     --var=target=${target}
+    ${CMAKE_CURRENT_SOURCE_DIR}/build.yaml
   OUTPUT_VARIABLE build-mk
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -81,5 +82,6 @@ add_custom_command (
     --var=build_dir=${build_dir}
     --var=target=${target}
     --var=lib_dir=${lib_dir}
+    ${CMAKE_CURRENT_SOURCE_DIR}/build.yaml
   VERBATIM
   USES_TERMINAL)

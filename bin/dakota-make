@@ -326,8 +326,9 @@ sub gen_rules {
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
 sub gen {
-  my ($input, $output) = @_;
-  my $build_yaml = &yaml_parse($input);
+  my ($input_path, $output_path) = @_;
+  die if ! &dirs();
+  my $build_yaml = &yaml_parse($input_path);
   $ENV{'target'} = $$build_yaml{'target'};
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
@@ -335,9 +336,9 @@ sub gen {
     $target_path = &current_source_dir() . '/' . $target_path;
   }
   my $force;
-  my ($rules, $so_paths) = &gen_rules($target_path, &parts_from_yaml($input, $force = 1));
+  my ($rules, $so_paths) = &gen_rules($target_path, &parts_from_yaml($input_path, $force = 1));
   my $build_mk = &gen_make($rules, $so_paths);
-  &write_str($build_mk, $output);
+  &write_str($build_mk, $output_path);
   if (1) {
     my $build_dot = &gen_dot($rules);
     my $output_dot = &build_dot_path();
@@ -346,60 +347,75 @@ sub gen {
   }
   #print STDERR &Dumper($rules);
   #print STDERR $build_mk;
+  return $output_path;
 }
-sub gen_all {
-  my ($inputs) = @_;
+sub set_dirs_opt {
+  my ($input_path, $force) = @_;
+  return if ! $force && &dirs();
+  my $current_source_dir = &dirname($input_path);
   my $source_dir = &cwd();
   my $build_dir = $source_dir . '/z/build';
-  foreach my $input (@$inputs) {
-    my $current_source_dir = &dirname($input);
-    my $current_vars = {
-      'current_source_dir' => $current_source_dir,
-      'source_dir' =>         $source_dir,
-      'build_dir' =>          $build_dir,
-    };
-    #print STDERR &Dumper($current_vars);
+  my $current_vars = {
+    'current_source_dir' => $current_source_dir,
+    'source_dir' =>         $source_dir,
+    'build_dir' =>          $build_dir,
+  };
+  &set_env_vars_core($current_vars, $force);
+}
+sub gen_all {
+  my ($input_paths, $path_only) = @_;
+  my $output_paths = [];
+  foreach my $input_path (@$input_paths) {
     my $force;
-    &set_env_vars_core($current_vars, $force = 1);
-    my $output = &mk_path_from_yaml_path($input);
-    &gen($input, $output);
-    print $output . $nl;
+    &set_dirs_opt($input_path, $force = 1);
+    my $output_path = &mk_path_from_yaml_path($input_path);
+    if (! $path_only) {
+      &gen($input_path, $output_path);
+    }
+    push @$output_paths, $output_path;
   }
+  return $output_paths;
 }
-sub input {
-  my ($name) = @_;
-  return &current_source_dir() . '/' . $name;
+my $default_input_name = 'build.yaml';
+sub default_input_path {
+  return &current_source_dir() . '/' . $default_input_name;
 }
-sub output {
-  my ($name) = @_;
-  return &current_intmd_dir() . '/' . $name;
+sub input_path {
+  my ($input) = @_;
+  if (-d $input) {
+    $input .= '/' . $default_input_name;
+  } elsif (! -f $input) { die &basename($0) . ': error: no-such-file: ' . $input . $nl; }
+  return $input;
 }
 sub start {
   my ($argv) = @_;
   my $cmd_info = &cmd_info_from_argv($argv);
+  my $path_only = $$cmd_info{'opts'}{'path-only'};
   #print &Dumper($cmd_info);
-  my $input_name =  'build.yaml';
-  my $output_name = 'build.mk';
   &set_env_vars_core($$cmd_info{'vars'});
-  if ($$cmd_info{'opts'}{'path-only'}) {
-    print &output($output_name) . $nl;
-    exit 0;
-  }
-  if (scalar @{$$cmd_info{'inputs'}}) {
-    my $inputs = [];
+  if (@{$$cmd_info{'inputs'}} > 1) {
+    my $input_paths = [];
     foreach my $input (@{$$cmd_info{'inputs'}}) {
-      if (-d $input) {
-        &add_last($inputs, "$input/$input_name");
-      } elsif (-f $input) {
-        &add_last($inputs, $input);
-      } else { die &basename($0) . ': error: no-such-file: ' . $input . $nl; }
+      &add_last($input_paths, &input_path($input));
     }
-    &gen_all($inputs);
+    my $output_paths = &gen_all($input_paths, $path_only);
+    print join($nl, @$output_paths);
   } else {
-    &gen(&input($input_name), &output($output_name));
+    my $input_path;
+    if (@{$$cmd_info{'inputs'}} == 1) {
+      $input_path = &input_path($$cmd_info{'inputs'}[0]);
+    } else {
+      $input_path = &default_input_path();
+    }
+    &set_dirs_opt($input_path);
+    my $output_path = &mk_path_from_yaml_path($input_path);
+    if (! $path_only) {
+      &gen($input_path, $output_path);
+    }
+    print $output_path . $nl;
   }
-  exit 0;
 }
 unless (caller) {
   &start(\@ARGV);
+  exit 0;
 }
