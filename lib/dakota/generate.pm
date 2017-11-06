@@ -3680,7 +3680,7 @@ sub generate_kw_args_method_signature_decl {
   my $method_name = &ct($$method{'name'});
   my $list_types = &arg_type::list_types($$method{'param-types'});
  #my $kw_list_types = &method::kw_list_types($method);
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name" . $pad . " { namespace __method-signature { namespace va { func $method_name($$list_types) -> const signature-t*; }}} //kw-args-method-signature" . &ann(__FILE__, __LINE__) . $nl;
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name" . $pad . " { namespace __method-signature::va { func $method_name($$list_types) -> const signature-t*; }} //kw-args-method-signature" . &ann(__FILE__, __LINE__) . $nl;
 }
 sub generate_kw_args_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3688,7 +3688,7 @@ sub generate_kw_args_method_signature_defn {
   my $method_name = &ct($$method{'name'});
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'param-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __method-signature { namespace va { func $method_name($$list_types) -> const signature-t* { //kw-args-method-signature" . &ann(__FILE__, __LINE__) . $nl;
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __method-signature::va { func $method_name($$list_types) -> const signature-t* { //kw-args-method-signature" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   my $kw_list_types = &method::kw_list_types($method);
  #$kw_list_types = &remove_extra_whitespace($kw_list_types);
@@ -3716,7 +3716,7 @@ sub generate_kw_args_method_signature_defn {
     $col . "$kw_arg_list" . $nl .
     $col . "return &result;" . $nl;
   $col = &colout($col);
-  $$scratch_str_ref .= $col . "}}}} // @$klass_name\::__method-signature\::va\::$method_name()" . $nl;
+  $$scratch_str_ref .= $col . "}}} // @$klass_name\::__method-signature\::va\::$method_name()" . $nl;
 }
 sub generate_slots_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type, $max_width) = @_;
