@@ -5,12 +5,12 @@ ee() {
   eval $1
 }
 if [[ -e .build-dir.txt ]]; then
-  build_dir=$(cat .build-dir.txt)
+  rel_build_dir=$(cat .build-dir.txt)
 else
-  build_dir=z/build
+  rel_build_dir=z/build
 fi
-if [[ -e $build_dir/install_manifest.txt ]]; then
-  for file in $(cat $build_dir/install_manifest.txt); do
+if [[ -e $rel_build_dir/install_manifest.txt ]]; then
+  for file in $(cat $rel_build_dir/install_manifest.txt); do
     ee "rm -f $file"
   done
 fi

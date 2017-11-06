@@ -54,8 +54,9 @@ exe_target_yamls=(
   $source_dir/tst1/build.yaml
   $source_dir/tst2/build.yaml
 )
-intmd_dir=$source_dir/z/intmd
-build_dir=$source_dir/z/build
+rel_build_dir=z/build
+build_dir=$source_dir/$rel_build_dir
+intmd_dir=$build_dir/../intmd
 bin_dir=$prefix_dir/bin
 lib_dir=$prefix_dir/lib
 ext_lib_files=($(lib_files     ${ext_lib_targets[@]}))
@@ -64,7 +65,7 @@ lib_files=(    $(lib_files     ${lib_targets[@]}))
 exe_files=(    $(tst_exe_files ${exe_targets[@]}))
 rm -f ${ext_lib_files[@]} ${ext_exe_files[@]} ${lib_files[@]} ${exe_files[@]}
 dot_files=()
-rm -fr $source_dir/z
+rm -fr $(dirname $build_dir)
 mkdir -p $intmd_dir
 build=build
 cat /dev/null > $intmd_dir/$build.mk

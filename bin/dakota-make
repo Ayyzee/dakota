@@ -358,7 +358,8 @@ sub set_dirs_from_input_path {
   return if ! $force && &dirs();
   my $current_source_dir = &dirname($input_path);
   my $source_dir = &cwd();
-  my $build_dir = $source_dir . '/z/build';
+  my $rel_build_dir = 'z/build';
+  my $build_dir = $source_dir . '/' . $rel_build_dir;
   my $current_vars = {
     'current_source_dir' => $current_source_dir,
     'source_dir' =>         $source_dir,

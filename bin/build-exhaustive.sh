@@ -2,15 +2,15 @@
 set -o errexit -o nounset -o pipefail
 remove-build-dir() {
   if [[ -e .build-dir.txt ]]; then
-    build_dir=$(cat .build-dir.txt)
+    rel_build_dir=$(cat .build-dir.txt)
   else
-    build_dir=z/build
+    rel_build_dir=z/build
   fi
-  rm -fr $build_dir
+  rm -fr $rel_build_dir
 }
 rootdir=..
 $rootdir/bin/build-uninstall.sh
 remove-build-dir
-rm -fr build/dkt
+rm -fr $rel_build_dir/../intmd
 $rootdir/bin/cmake-configure.sh
 $rootdir/bin/build.sh $@
