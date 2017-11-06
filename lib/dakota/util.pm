@@ -818,7 +818,7 @@ sub target_current_build_dir {
   return $dir;
 }
 sub rel_target_hdr_path {
-  my $rel_path = &target() . '/' . &rel_target_dir_name() . '/target' . $h_ext;
+  my $rel_path = &rel_target_dir_name() . '/target' . $h_ext;
   return $rel_path;
 }
 sub target_hdr_path {

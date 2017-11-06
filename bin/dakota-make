@@ -323,13 +323,17 @@ sub gen_rules {
   }
   return ($rules, $so_paths);
 }
+sub set_target {
+  my ($input_path) = @_;
+  my $build_yaml = &yaml_parse($input_path);
+  $ENV{'target'} = $$build_yaml{'target'};
+}
 # ${library_output_directory}/${shared_library_prefix}${target}${shared_library_suffix}
 # ${runtime_output_directory}/${target}${executable_suffix}
 sub gen {
   my ($input_path, $output_path) = @_;
   die if ! &dirs();
   my $build_yaml = &yaml_parse($input_path);
-  $ENV{'target'} = $$build_yaml{'target'};
   my $target_path = $$build_yaml{'target-path'};
   $target_path = &expand($target_path);
   if (! &is_abs($target_path)) {
@@ -368,6 +372,7 @@ sub gen_all {
   foreach my $input_path (@$input_paths) {
     my $force;
     &set_dirs_from_input_path($input_path, $force = 1);
+    &set_target($input_path);
     my $output_path = &mk_path_from_yaml_path($input_path);
     if (! $path_only) {
       &gen($input_path, $output_path);
@@ -408,6 +413,7 @@ sub start {
       $input_path = &default_input_path();
     }
     &set_dirs_from_input_path($input_path);
+    &set_target($input_path);
     my $output_path = &mk_path_from_yaml_path($input_path);
     if (! $path_only) {
       &gen($input_path, $output_path);

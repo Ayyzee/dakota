@@ -69,7 +69,7 @@ sub cc_path_from_dk_path {
 }
 sub o_path_from_dk_path {
   my ($dk_path) = @_;
-  my $result = &current_build_dir() . '/' . &basename($dk_path) . $o_ext;
+  my $result = &current_build_dir() . '/' . &target() . '/' . &basename($dk_path) . $o_ext;
   return $result;
 }
 sub h_path_from_src_path {
@@ -78,10 +78,11 @@ sub h_path_from_src_path {
   return $h_path;
 }
 my $patterns = {
-  'mk_path_from_yaml_path'  => '${current_intmd_dir}/%.mk       : ${current_source_dir}/%.yaml',
-  'cc_path_from_dk_path'    => '${current_intmd_dir}/%${cc_ext} : ${current_source_dir}/%.dk',
-  'inc_path_from_dk_path'   => '${current_intmd_dir}/%.inc      : ${current_source_dir}/%.dk',
-  'ast_path_from_dk_path'   => '${current_intmd_dir}/%.dk.ast   : ${current_source_dir}/%.dk',
+  'mk_path_from_yaml_path'  => '${current_intmd_dir}/%.mk : ${current_source_dir}/%.yaml',
+
+  'cc_path_from_dk_path'    => '${current_intmd_dir}/${target}/%${cc_ext} : ${current_source_dir}/%.dk',
+  'inc_path_from_dk_path'   => '${current_intmd_dir}/${target}/%.inc      : ${current_source_dir}/%.dk',
+  'ast_path_from_dk_path'   => '${current_intmd_dir}/${target}/%.dk.ast   : ${current_source_dir}/%.dk',
 };
 #print STDERR &Dumper($expanded_patterns);
 
