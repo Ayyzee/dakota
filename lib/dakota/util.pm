@@ -803,6 +803,12 @@ sub target {
 sub rel_target_dir_name {
   return 'z';
 }
+sub parts_path {
+  my ($name) = @_;
+  $name = 'parts.txt' if ! $name;
+  my $path = &current_intmd_dir() . '/' . &target() . '/' . &rel_target_dir_name() . '/' . $name;
+  return $path;
+}
 sub target_current_intmd_dir {
   my $dir = &current_intmd_dir() . '/' . &target() . '/' . &rel_target_dir_name();
   return $dir;
@@ -851,12 +857,6 @@ sub build_dot_path {
   my ($name) = @_;
   $name = 'build.dot' if ! $name;
   my $path = &current_intmd_dir() . '/' . $name;
-  return $path;
-}
-sub parts_path {
-  my ($name) = @_;
-  $name = 'parts.txt' if ! $name;
-  my $path = &current_intmd_dir() . '/' . &target() . '/' . $name;
   return $path;
 }
 sub is_o_path {
