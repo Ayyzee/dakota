@@ -82,8 +82,6 @@ my $patterns = {
   'cc_path_from_dk_path'    => '${current_intmd_dir}/%${cc_ext} : ${current_source_dir}/%.dk',
   'inc_path_from_dk_path'   => '${current_intmd_dir}/%.inc      : ${current_source_dir}/%.dk',
   'ast_path_from_dk_path'   => '${current_intmd_dir}/%.dk.ast   : ${current_source_dir}/%.dk',
-
-  'ctlg_path_from_so_path'  => '${current_intmd_dir}/%${lib_suffix}.ctlg : %${lib_suffix}',
 };
 #print STDERR &Dumper($expanded_patterns);
 
