@@ -349,7 +349,7 @@ sub gen {
   #print STDERR $build_mk;
   return $output_path;
 }
-sub set_dirs_opt {
+sub set_dirs_from_input_path {
   my ($input_path, $force) = @_;
   return if ! $force && &dirs();
   my $current_source_dir = &dirname($input_path);
@@ -367,7 +367,7 @@ sub gen_all {
   my $output_paths = [];
   foreach my $input_path (@$input_paths) {
     my $force;
-    &set_dirs_opt($input_path, $force = 1);
+    &set_dirs_from_input_path($input_path, $force = 1);
     my $output_path = &mk_path_from_yaml_path($input_path);
     if (! $path_only) {
       &gen($input_path, $output_path);
@@ -407,7 +407,7 @@ sub start {
     } else {
       $input_path = &default_input_path();
     }
-    &set_dirs_opt($input_path);
+    &set_dirs_from_input_path($input_path);
     my $output_path = &mk_path_from_yaml_path($input_path);
     if (! $path_only) {
       &gen($input_path, $output_path);
