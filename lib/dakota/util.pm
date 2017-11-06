@@ -806,7 +806,7 @@ sub rel_target_dir_name {
 sub parts_path {
   my ($name) = @_;
   $name = 'parts.txt' if ! $name;
-  my $path = &current_intmd_dir() . '/' . &target() . '/' . &rel_target_dir_name() . '/' . $name;
+  my $path = &current_intmd_dir() . '/' . &target() . '/' . $name;
   return $path;
 }
 sub target_current_intmd_dir {
