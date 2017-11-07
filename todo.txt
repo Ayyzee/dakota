@@ -1,3 +1,5 @@
+remove subs is_same_file() and is_same_src_file() since they are no longer needed with single target.h generation.
+
 move from util.pm to dakota-make: sub parts_from_yaml() and sub gen_parts()
 
 add target.dir (similiar to cmake) so we can build multiple targets for every current_source_dir.
