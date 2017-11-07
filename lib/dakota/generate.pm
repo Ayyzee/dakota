@@ -1023,7 +1023,7 @@ sub generate_va_generic_defn {
 
   if (!$$va_method{'defined?'} || &is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . ";" . &ann(__FILE__, $line) . $nl;
-  } elsif ($$va_method{'defined?'} && (&is_target_defn())) {
+  } elsif ($$va_method{'defined?'} && &is_target_defn()) {
     $$scratch_str_ref .= $col . $part;
     my $name = &last($$va_method{'name'});
     my $va_name = "_func_";
@@ -2245,7 +2245,7 @@ sub linkage_unit::generate_klasses_body_funcs {
   #foreach $method (sort method::compare values %{$$klass_ast{'methods'}})
   foreach my $method (sort method::compare values %{$$klass_ast{'methods'}}, values %{$$klass_ast{'slots-methods'}}) {
     if (&is_decl) {
-      if (&is_same_src_file($klass_ast) || &is_target()) { #rn3
+      if (&is_target()) { #rn3
         if (!&is_va($method)) {
           my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
           $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref } // DUPLICATE" . &ann(__FILE__, __LINE__) . $nl;
@@ -2293,8 +2293,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
       if (1) {
         my $va_method = &deep_copy($method);
         #$$va_method{'inline?'} = 1;
-        #if (&is_decl() || &is_same_file($klass_ast)) #rn1
-        if (&is_same_src_file($klass_ast) || &is_decl()) { #rn1
+        if (&is_decl()) { #rn1
           if (&has_kw_args($method)) { # leave, don't change to num_kw_args() (only missing-prototype warning)
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
             if (0 == &num_kw_args($va_method)) {
@@ -2312,7 +2311,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
           &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
         }
         if (&is_decl) {
-          if (&is_same_src_file($klass_ast) || &is_target()) { #rn2
+          if (&is_target()) { #rn2
               if (&num_kw_args($method)) {
                 my $other_method_decl = &kw_args_method::type_decl($method);
 
@@ -2431,7 +2430,7 @@ sub generate_slots_decls {
   my $scratch_str_ref = &global_scratch_str_ref();
   if (!&should_export_slots($klass_ast) && &has_slots_type($klass_ast)) {
     $$scratch_str_ref .= $col . "klass $klass_name {" . &slots_decl($$klass_ast{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
-    if (&is_same_src_file($klass_ast)) {
+    if (1) { # &is_same_src_file($klass_ast)
       $$scratch_str_ref .= $col .        &typealias_slots_t($klass_name) . $nl;
     } else {
       $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . $nl;
@@ -2493,7 +2492,7 @@ sub generate_exported_slots_decls {
     } else {
       $$scratch_str_ref .= &ann(__FILE__, __LINE__) . $nl;
     }
-  } elsif (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
+  } elsif (&should_export_slots($klass_ast) || &has_slots($klass_ast)) {
     if ($$struct_union_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } elsif ($$enum_set{$slots_cat}) {
@@ -2837,7 +2836,7 @@ sub linkage_unit::generate_klasses_types_before {
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
       my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
 
-      if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
+      if (&should_export_slots($klass_ast) || &has_slots($klass_ast)) {
         my $width1 = length($klass_name);
         if ($width1 > $max_width1) {
           $max_width1 = $width1;
@@ -2851,7 +2850,7 @@ sub linkage_unit::generate_klasses_types_before {
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
       my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
 
-      if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
+      if (&should_export_slots($klass_ast) || &has_slots($klass_ast)) {
         &generate_exported_slots_decls($ast, $col, $klass_path, $klass_name, $klass_ast, $max_width1, $max_width2);
       } else {
         &generate_slots_decls($ast, $col, $klass_path, $klass_name, $klass_ast);
@@ -2881,7 +2880,7 @@ sub linkage_unit::generate_klasses_types_after {
     }
     if (&has_slots_cat_info($klass_ast)) {
       if (&is_decl()) {
-        if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
+        if (&should_export_slots($klass_ast) || &has_slots($klass_ast)) {
           $$scratch_str_ref .= $col . "klass $klass_name {";
           if ($$struct_union_set{$slots_cat}) {
             &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);

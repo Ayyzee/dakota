@@ -130,8 +130,6 @@ our @EXPORT= qw(
                  is_kw_args_method
                  is_out_of_date
                  out_of_date
-                 is_same_file
-                 is_same_src_file
                  is_slots
                  is_so_path
                  is_src
@@ -941,37 +939,30 @@ sub target_srcs_ast {
   }
   return $target_srcs_ast;
 }
-my $gbl_src_file = undef;
 my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
 my $global_is_defn = undef; # klass decl vs defn
 my $global_suffix = undef;
 
 sub set_src_decl {
   my ($path) = @_;
-  my ($dir, $name, $ext) = &split_path($path, $id);
-  $gbl_src_file = &canon_path("$name.dk");
   $global_is_target =   0;
   $global_is_defn = 0;
   $global_suffix = $h_ext;
 }
 sub set_src_defn {
   my ($path) = @_;
-  my ($dir, $name, $ext) = &split_path($path, $id);
-  $gbl_src_file = &canon_path("$name.dk");
   $global_is_target =   0;
   $global_is_defn = 1;
-  $global_suffix = ".$ext";
+  $global_suffix = $cc_ext;
 }
 sub set_target_decl {
   my ($path) = @_;
-  $gbl_src_file = undef;
   $global_is_target =   1;
   $global_is_defn = 0;
   $global_suffix = $h_ext;
 }
 sub set_target_defn {
   my ($path) = @_;
-  $gbl_src_file = undef;
   $global_is_target =   1;
   $global_is_defn = 1;
   $global_suffix = $cc_ext;
@@ -1078,19 +1069,6 @@ sub is_array_type {
     $is_array_type = 1;
   }
   return $is_array_type;
-}
-sub is_same_file {
-  my ($klass_ast) = @_;
-  my $slots_file = &at($$klass_ast{'slots'}, 'file');
-  if ($gbl_src_file && $slots_file) {
-    return 1 if $gbl_src_file eq &canon_path($slots_file);
-  }
-  return 0;
-}
-sub is_same_src_file {
-  my ($klass_ast) = @_;
-  return 1 if $gbl_src_file && $$klass_ast{'file'};
-  return 0;
 }
 sub is_array {
   my ($ref) = @_;

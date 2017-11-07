@@ -558,7 +558,6 @@ sub trait {
   }
   $gbl_current_ast_scope = $$gbl_current_ast_scope{'traits'}{$construct_name};
   $$gbl_current_ast_scope{'module'} = $gbl_current_module;
-  $$gbl_current_ast_scope{'file'} = &basename($$gbl_sst_cursor{'sst'}{'file'}); # trait scope
 
   my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -826,7 +825,6 @@ sub slots {
         &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
       }
       $$gbl_current_ast_scope{'slots'}{'cat-info'} = [];
-      $$gbl_current_ast_scope{'slots'}{'file'} = &basename($$gbl_sst_cursor{'sst'}{'file'}); # slots scope
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $slots_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
@@ -1215,7 +1213,6 @@ sub klass {
   }
   $gbl_current_ast_scope = $$gbl_current_ast_scope{'klasses'}{$construct_name};
   $$gbl_current_ast_scope{'module'} = $gbl_current_module;
-  $$gbl_current_ast_scope{'file'} = &basename($$gbl_sst_cursor{'sst'}{'file'}); # klass scope
 
   my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
