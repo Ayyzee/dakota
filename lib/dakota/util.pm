@@ -203,6 +203,7 @@ our @EXPORT= qw(
                  target_current_intmd_dir
                  target_hdr_path
                  target_inputs_ast_path
+                 target_libs_ast
                  target_libs_ast_path
                  target_o_path
                  target_src_path
@@ -944,6 +945,13 @@ sub target_srcs_ast {
   }
   return $target_srcs_ast;
 }
+my $target_libs_ast;
+sub target_libs_ast {
+  if (! $target_libs_ast) {
+    $target_libs_ast = &scalar_from_file(&target_libs_ast_path());
+  }
+  return $target_libs_ast;
+}
 my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
 my $global_is_defn = undef; # klass decl vs defn
 my $global_suffix = undef;
@@ -1121,16 +1129,16 @@ sub is_kw_args_method {
   my ($method) = @_;
   return 1 if &num_kw_args($method);
   return 1 if &num_kw_arg_names($method);
-  my $state = 0;
   my ($name, $types) = &kw_args_method_sig($method);
-  my $name_str =  &str_from_seq($name);
-  my $target_srcs_ast = &target_srcs_ast();
-  my $tbl = $$target_srcs_ast{'kw-arg-generics'};
-
-  if (exists $$tbl{$name_str}) {
-    $state = 1;
+  my $name_str = &str_from_seq($name);
+  my $asts = [ &target_srcs_ast(),
+               &target_libs_ast() ];
+  foreach my $ast (@$asts) {
+    if (exists $$ast{'kw-arg-generics'}{$name_str}) {
+      return 1;
+    }
   }
-  return $state;
+  return 0
 }
 sub min { my ($x, $y) = @_; return $x <= $y ? $x : $y; }
 sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
