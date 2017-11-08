@@ -75,25 +75,26 @@ our @EXPORT= qw(
                  as_literal_symbol
                  as_literal_symbol_interior
                  at
-                 current_build_dir
+                 basename
+                 bin_dir
+                 build_dir
                  build_dot_path
                  build_mk_path
-                 current_intmd_dir
                  canon_path
-                 normalize_paths
                  colin
                  colout
                  cpp_directives
-                 cxx
-                 current_source_dir
                  ct
+                 current_build_dir
+                 current_intmd_dir
+                 current_source_dir
+                 cxx
                  decode_comments
                  decode_strings
                  deep_copy
                  digsig
                  dirname
                  dirs
-                 set_dirs
                  dk_mangle
                  dk_mangle_seq
                  dmp
@@ -107,29 +108,31 @@ our @EXPORT= qw(
                  filestr_to_file
                  first
                  flatten
-                 get_opts_from_array
                  gen_parts
-                 target_srcs_ast
-                 has_kw_args
+                 get_opts_from_array
                  has_kw_arg_names
+                 has_kw_args
+                 has_va_prefix
                  header_file_regex
                  ident_regex
                  int_from_str
-                 is_array
-                 is_cc_path
-                 is_dk_path
-                 is_dk_src_path
+                 intmd_dir
                  is_abs
+                 is_array
                  is_array_type
                  is_ast_path
                  is_box_type
+                 is_cc_path
                  is_ctlg_path
                  is_debug
                  is_decl
+                 is_dk_path
+                 is_dk_src_path
+                 is_exe_path
                  is_exported
                  is_kw_args_method
+                 is_o_path
                  is_out_of_date
-                 out_of_date
                  is_slots
                  is_so_path
                  is_src
@@ -140,14 +143,13 @@ our @EXPORT= qw(
                  is_target
                  is_target_decl
                  is_target_defn
+                 is_target_o_path
                  is_va
-                 has_va_prefix
                  kw_arg_generics
                  kw_arg_placeholders
                  kw_args_method_sig
-                 bin_dir
-                 lib_dir
                  last
+                 lib_dir
                  longest_common_prefix
                  make_dir
                  make_dirname
@@ -156,19 +158,21 @@ our @EXPORT= qw(
                  method_sig_type_regex
                  min
                  mtime
-                 basename
                  needs_hex_encoding
-                 num_kw_args
+                 normalize_paths
                  num_kw_arg_names
+                 num_kw_args
+                 out_of_date
                  pann
                  param_types_str
                  parts
                  parts_from_yaml
                  parts_path
                  path_split
-                 prepend_dot_slash
                  platform
+                 prepend_dot_slash
                  realpath
+                 rel_target_hdr_path
                  remove_extra_whitespace
                  remove_first
                  remove_last
@@ -178,13 +182,10 @@ our @EXPORT= qw(
                  replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  rewrite_scoped_int_uint
-                 build_dir
                  root_cmd
-                 intmd_dir
-                 source_dir
                  scalar_from_file
                  scalar_to_file
-                 vars
+                 set_dirs
                  set_env_vars
                  set_env_vars_core
                  set_root_cmd
@@ -192,6 +193,7 @@ our @EXPORT= qw(
                  set_src_defn
                  set_target_decl
                  set_target_defn
+                 source_dir
                  split_path
                  sqstr_regex
                  str_from_seq
@@ -199,19 +201,17 @@ our @EXPORT= qw(
                  target
                  target_current_build_dir
                  target_current_intmd_dir
-                 target_inputs_ast_path
-                 target_srcs_ast_path
-                 rel_target_hdr_path
                  target_hdr_path
+                 target_inputs_ast_path
+                 target_o_path
                  target_src_path
+                 target_srcs_ast
+                 target_srcs_ast_path
                  use_abs_path
                  var
+                 vars
                  verbose_exec
                  yaml_parse
-                 target_o_path
-                 is_o_path
-                 is_target_o_path
-                 is_exe_path
  );
 use Cwd;
 use File::Spec;

@@ -69,13 +69,13 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 target_klass_func_decls_path
-                 target_klass_func_defns_path
+                 is_target_hdr_path
+                 is_target_inputs_ast_path
+                 is_target_src_path
                  target_generic_func_decls_path
                  target_generic_func_defns_path
-                 is_target_inputs_ast_path
-                 is_target_hdr_path
-                 is_target_src_path
+                 target_klass_func_decls_path
+                 target_klass_func_defns_path
              );
 
 use Data::Dumper;

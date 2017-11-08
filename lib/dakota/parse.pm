@@ -118,23 +118,23 @@ our @EXPORT= qw(
                  add_str
                  add_symbol
                  add_trait_decl
+                 argv_from_cmd_info
                  ast_from_dk
+                 ast_merge
+                 ast_path_from_ctlg_path
+                 ast_path_from_dk_path
                  cc_path_from_dk_path
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
                  expand
-                 inc_path_from_dk_path
-                 init_ast_from_inputs_vars
                  h_path_from_cc_path
                  h_path_from_src_path
-                 target_inputs_ast
+                 inc_path_from_dk_path
+                 init_ast_from_inputs_vars
                  kw_args_translate
-                 ast_path_from_dk_path
-                 ast_path_from_ctlg_path
-                 ast_merge
-                 argv_from_cmd_info
-                 o_path_from_dk_path
                  mk_path_from_yaml_path
+                 o_path_from_dk_path
+                 target_inputs_ast
               );
 my $colon = ':'; # key/item delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
