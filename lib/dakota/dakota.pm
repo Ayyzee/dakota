@@ -128,9 +128,11 @@ sub loop_merged_ast_from_inputs {
     &add_last($ast_paths, $ast_path);
   }
   if ($$cmd_info{'opts'}{'output'}) {
-    if ($$cmd_info{'opts'}{'output'} eq &target_srcs_ast_path()) { # z/srcs.ast ($target_srcs_ast)
+    # z/srcs.ast, z/libs.ast ($target_srcs_ast, $target_libs_ast)
+    if ($$cmd_info{'opts'}{'output'} eq &target_srcs_ast_path() ||
+        $$cmd_info{'opts'}{'output'} eq &target_libs_ast_path()) {
       my $should_translate;
-      &ast_merge(&target_srcs_ast_path(), $ast_paths, $should_translate = 0);
+      &ast_merge($$cmd_info{'opts'}{'output'}, $ast_paths, $should_translate = 0);
     } elsif (1 == @{$$cmd_info{'inputs'}}) {
     } else {
       die;
@@ -450,10 +452,15 @@ sub cmd_line_action_parse {
   my ($input, $output) = @_;
   my ($ast_path, $ast) = &ast_from_dk($input, $output);
 }
+my $base_ast_names = {
+  'srcs.ast'   => 1,
+  'libs.ast'   => 1,
+  'inputs.ast' => 1,
+};
 sub cmd_line_action_merge {
   my ($inputs, $output) = @_;
   my $output_base = &basename($output);
-  die if $output_base ne 'srcs.ast' && $output_base ne 'inputs.ast';
+  die if ! $$base_ast_names{$output_base};
   if ($output_base eq 'inputs.ast') {
     my $ast_paths = &ast_paths_from_inputs($inputs);
   }

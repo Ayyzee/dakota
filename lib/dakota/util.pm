@@ -203,6 +203,7 @@ our @EXPORT= qw(
                  target_current_intmd_dir
                  target_hdr_path
                  target_inputs_ast_path
+                 target_libs_ast_path
                  target_o_path
                  target_src_path
                  target_srcs_ast
@@ -833,6 +834,10 @@ sub target_o_path {
 }
 sub target_srcs_ast_path {
   my $path = &target_current_intmd_dir() . '/srcs.ast';
+  return $path;
+}
+sub target_libs_ast_path {
+  my $path = &target_current_intmd_dir() . '/libs.ast';
   return $path;
 }
 sub target_inputs_ast_path {

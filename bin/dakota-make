@@ -264,6 +264,7 @@ sub gen_rules {
   my $target_hdr_path =        &target_hdr_path();
   my $target_inputs_ast_path = &target_inputs_ast_path();
   my $target_srcs_ast_path =   &target_srcs_ast_path();
+  my $target_libs_ast_path =   &target_libs_ast_path();
   my $cxx =                    &var('cxx');
   my $dakota =                 which 'dakota';
   my $dakota_catalog =         &dirname($dakota) . '/dakota-catalog';
@@ -301,9 +302,11 @@ sub gen_rules {
                      $$gbl_recipes{'gen-target-hdr'}]);
   &add_last($rules, [[$target_src_path], [$target_inputs_ast_path], [],
                      $$gbl_recipes{'gen-target-src'}]);
-  &add_last($rules, [[$target_inputs_ast_path], [$target_srcs_ast_path, @$so_ctlg_ast_paths], [],
+  &add_last($rules, [[$target_inputs_ast_path], [$target_srcs_ast_path, $target_libs_ast_path], [],
                      $$gbl_recipes{'merge'}]);
   &add_last($rules, [[$target_srcs_ast_path], [@$dk_ast_paths], [],
+                     $$gbl_recipes{'merge'}]);
+  &add_last($rules, [[$target_libs_ast_path], [@$so_ctlg_ast_paths], [],
                      $$gbl_recipes{'merge'}]);
   foreach my $dk_path (@$dk_paths) {
     my $dk_o_path = &o_path_from_dk_path($dk_path);
