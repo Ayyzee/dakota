@@ -1022,7 +1022,7 @@ sub generate_va_generic_defn {
   $part .= "$va_method_name($$new_arg_list_va_ref) -> $return_type";
 
   if (!$$va_method{'defined?'} || &is_src_decl() || &is_target_decl()) {
-    $$scratch_str_ref .= $col . $part . ";" . &ann(__FILE__, $line) . $nl;
+    $$scratch_str_ref .= $col . $part . ";";
   } elsif ($$va_method{'defined?'} && &is_target_defn()) {
     $$scratch_str_ref .= $col . $part;
     my $name = &last($$va_method{'name'});
@@ -1060,6 +1060,7 @@ sub generate_va_generic_defn {
   if ($klass_type) {
     $$scratch_str_ref .= " }";
   }
+  $$scratch_str_ref .= &ann(__FILE__, $line) . $nl
 }
 sub method::compare {
   my $scope;
@@ -1093,11 +1094,7 @@ sub common::print_signature {
   $$new_arg_type_list = &remove_extra_whitespace($$new_arg_type_list);
 
   my $scratch_str = "";
-  if (&is_va($generic)) {
-    $scratch_str .= $col . 'namespace va { INLINE func';
-  } else {
     $scratch_str .= $col . 'INLINE func';
-  }
   my $visibility = '';
   if (&is_exported($generic)) {
     $visibility = ' [[export]]';
@@ -1106,11 +1103,7 @@ sub common::print_signature {
   my $in = &ident_comment($generic_name);
   $scratch_str .= $visibility . " $generic_name($$new_arg_type_list) -> const signature-t*";
   if (&is_src_decl() || &is_target_decl()) {
-    if (&is_va($generic)) {
-      $scratch_str .= '; }' . $nl;
-    } else {
       $scratch_str .= ';' . $nl;
-    }
   } elsif (&is_target_defn()) {
     $scratch_str .= ' {' . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
@@ -1132,11 +1125,7 @@ sub common::print_signature {
       $col . "return &result;" . $nl;
     $col = &colout($col);
 
-    if (&is_va($generic)) {
-      $scratch_str .= $col . '}}' . $nl;
-    } else {
       $scratch_str .= $col . '}' . $nl;
-    }
   }
   return $scratch_str;
 }
@@ -1145,7 +1134,7 @@ sub common::generate_signature_defns {
   my $scratch_str = "";
   #$scratch_str .= $col . "// generate_signature_defns()" . $nl;
 
-  $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . $nl;
+  $scratch_str .= $col . 'namespace __signature::va {' . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
@@ -1199,11 +1188,7 @@ sub common::print_selector {
   $$new_arg_type_list = &remove_extra_whitespace($$new_arg_type_list);
 
   my $scratch_str = "";
-  if (&is_va($generic)) {
-    $scratch_str .= $col . 'namespace va { INLINE func';
-  } else {
     $scratch_str .= $col . 'INLINE func';
-  }
   my $visibility = '';
   if (&is_exported($generic)) {
     $visibility = ' [[export]]';
@@ -1212,11 +1197,7 @@ sub common::print_selector {
   my $in = &ident_comment($generic_name);
   $scratch_str .= $visibility . " $generic_name($$new_arg_type_list) -> selector-t*";
   if (&is_src_decl() || &is_target_decl()) {
-    if (&is_va($generic)) {
-      $scratch_str .= '; }' . $in . $nl;
-    } else {
         $scratch_str .= ';' . $in . $nl;
-    }
   } elsif (&is_target_defn()) {
     $scratch_str .= ' {' . $in . $nl;
     $col = &colin($col);
@@ -1234,11 +1215,7 @@ sub common::print_selector {
     $scratch_str .= $col . "[[read-only]] static selector-t result = $null_selector;" . $nl;
     $scratch_str .= $col . "return &result;" . $nl;
     $col = &colout($col);
-    if (&is_va($generic)) {
-      $scratch_str .= $col . '}}' . $nl;
-    } else {
       $scratch_str .= $col . '}' . $nl;
-    }
   }
   return $scratch_str;
 }
@@ -1247,7 +1224,7 @@ sub common::generate_selector_defns {
   my $scratch_str = "";
   #$scratch_str .= $col . "// generate_selector_defns()" . $nl;
 
-  $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . $nl;
+  $scratch_str .= $col . 'namespace __selector::va {' . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
