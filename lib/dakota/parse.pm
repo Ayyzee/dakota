@@ -244,29 +244,15 @@ sub is_tbl {
 }
 sub _ast_merge {
   my ($root_ast, $ast) = @_;
-  foreach my $name1 (sort keys %$ast) {
-    if (&is_tbl($$ast{$name1})) {
-      foreach my $name2 (sort keys %{$$ast{$name1}}) {
-        if (!$$ast{$name1}{$name2}) {
-          if (!exists $$root_ast{$name1}{$name2}) {
-            $$root_ast{$name1}{$name2} = undef;
-          }
-        } else {
-          if (!$$root_ast{$name1}{$name2}) {
-            $$root_ast{$name1}{$name2} = &deep_copy($$ast{$name1}{$name2});
-          } else {
-            if (&is_tbl($$ast{$name1}{$name2})) {
-              foreach my $name3 (sort keys %{$$ast{$name1}{$name2}}) {
-                if (&is_tbl($$ast{$name1}{$name2}{$name3})) {
-                  &tbl_add_info($$root_ast{$name1}{$name2}{$name3},
-                                $$ast{$name1}{$name2}{$name3});
-                }
-              }
-            } else {
-              $$root_ast{$name1}{$name2} = $$ast{$name1}{$name2};
-            }
-          }
-        }
+  foreach my $name (sort keys %$ast) {
+    if (0) {
+    } elsif (! $$root_ast{$name} && $$ast{$name}) {
+      $$root_ast{$name} = &deep_copy($$ast{$name});
+    } elsif (! exists $$root_ast{$name} && exists $$ast{$name}) {
+      $$root_ast{$name} = undef;
+    } elsif (  $$root_ast{$name} && $$ast{$name}) {
+      if (&is_tbl($$root_ast{$name}) && &is_tbl($$ast{$name})) {
+        &_ast_merge($$root_ast{$name}, $$ast{$name});
       }
     }
   }
