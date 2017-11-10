@@ -1092,9 +1092,8 @@ sub common::print_signature {
   my $new_arg_type = $$generic{'param-types'};
   my $new_arg_type_list = &arg_type::list_types($new_arg_type);
   $$new_arg_type_list = &remove_extra_whitespace($$new_arg_type_list);
-
   my $scratch_str = "";
-    $scratch_str .= $col . 'INLINE func';
+  $scratch_str .= $col . 'INLINE func';
   my $visibility = '';
   if (&is_exported($generic)) {
     $visibility = ' [[export]]';
@@ -1107,7 +1106,6 @@ sub common::print_signature {
   } elsif (&is_target_defn()) {
     $scratch_str .= ' {' . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-
     my $return_type_str = &arg::type($$generic{'return-type'});
     my $name_str;
     if (&is_va($generic)) {
@@ -1124,8 +1122,7 @@ sub common::print_signature {
       $col . "$arg_list" . $nl .
       $col . "return &result;" . $nl;
     $col = &colout($col);
-
-      $scratch_str .= $col . '}' . $nl;
+    $scratch_str .= $col . '}' . $nl;
   }
   return $scratch_str;
 }
@@ -1133,7 +1130,6 @@ sub common::generate_signature_defns {
   my ($generics, $col) = @_;
   my $scratch_str = "";
   #$scratch_str .= $col . "// generate_signature_defns()" . $nl;
-
   $scratch_str .= $col . 'namespace __signature::va {' . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
@@ -1186,9 +1182,8 @@ sub common::print_selector {
   my $new_arg_type = $$generic{'param-types'};
   my $new_arg_type_list = &arg_type::list_types($new_arg_type);
   $$new_arg_type_list = &remove_extra_whitespace($$new_arg_type_list);
-
   my $scratch_str = "";
-    $scratch_str .= $col . 'INLINE func';
+  $scratch_str .= $col . 'INLINE func';
   my $visibility = '';
   if (&is_exported($generic)) {
     $visibility = ' [[export]]';
@@ -1197,11 +1192,10 @@ sub common::print_selector {
   my $in = &ident_comment($generic_name);
   $scratch_str .= $visibility . " $generic_name($$new_arg_type_list) -> selector-t*";
   if (&is_src_decl() || &is_target_decl()) {
-        $scratch_str .= ';' . $in . $nl;
+    $scratch_str .= ';' . $in . $nl;
   } elsif (&is_target_defn()) {
     $scratch_str .= ' {' . $in . $nl;
     $col = &colin($col);
-
     my $return_type_str = &arg::type($$generic{'return-type'});
     my $name_str;
     if (&is_va($generic)) {
@@ -1211,11 +1205,10 @@ sub common::print_selector {
     }
     my $param_types_str = $$new_arg_type_list;
     my $null_selector = 0;
-
     $scratch_str .= $col . "[[read-only]] static selector-t result = $null_selector;" . $nl;
     $scratch_str .= $col . "return &result;" . $nl;
     $col = &colout($col);
-      $scratch_str .= $col . '}' . $nl;
+    $scratch_str .= $col . '}' . $nl;
   }
   return $scratch_str;
 }
@@ -1223,7 +1216,6 @@ sub common::generate_selector_defns {
   my ($generics, $col) = @_;
   my $scratch_str = "";
   #$scratch_str .= $col . "// generate_selector_defns()" . $nl;
-
   $scratch_str .= $col . 'namespace __selector::va {' . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
@@ -1237,7 +1229,6 @@ sub common::generate_selector_defns {
   }
   $col = &colout($col);
   $scratch_str .= $col . '}' . $nl;
-
   if (1) {
     $scratch_str .= "# if 0" . $nl;
     $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . $nl;
@@ -1426,9 +1417,7 @@ sub generate_va_generic_defns {
       &path::add_last($scope, $ns) if ($ns);
       my $new_generic = &deep_copy($generic);
       $$new_generic{'inline?'} = $is_inline;
-
       $$new_generic{'defined?'} = 1; # hackhack
-
       my ($klass_type, $max_width);
       &generate_va_generic_defn($new_generic, $scope, $col, $klass_type = undef, $max_width = undef, __LINE__); # object-t
       $$new_generic{'param-types'}[0] = $seq_super_t; # replace_first
@@ -3083,7 +3072,6 @@ sub address_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'param-types'});
       my $generic_name = &ct($$method{'name'});
       my $in = &ident_comment($generic_name);
-
       if (&is_va($method)) {
         $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "va::$generic_name," . $in . $nl;
       } else {
@@ -4094,7 +4082,6 @@ sub ident_comment {
 sub linkage_unit::generate_keywords {
   my ($ast) = @_;
   my $col = '';
-
   my ($symbol, $symbol_seq);
   my $symbol_keys = [sort symbol::compare keys %{$$ast{'keywords'}}];
   my $max_width = 0;
@@ -4107,7 +4094,6 @@ sub linkage_unit::generate_keywords {
     }
   }
   my $scratch_str = "";
-
   $scratch_str .= $col . 'namespace __keyword {' . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
