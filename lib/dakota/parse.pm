@@ -2183,10 +2183,10 @@ sub parse_root {
   return $gbl_root_ast;
 }
 sub add_object_methods_decls_to_klass {
-  my ($klass_ast, $methods_key, $slots_methods_key) = @_;
-  if (exists $$klass_ast{$slots_methods_key}) {
+  my ($klass_ast) = @_;
+  if (exists $$klass_ast{'slots-methods'}) {
     while (my ($slots_method_sig, $slots_method_info) =
-             each (%{$$klass_ast{$slots_methods_key}})) {
+             each (%{$$klass_ast{'slots-methods'}})) {
       if ($$slots_method_info{'defined?'}) {
         my $object_method_info =
           &dakota::generate::convert_to_object_method($slots_method_info);
@@ -2200,7 +2200,7 @@ sub add_object_methods_decls_to_klass {
           $$object_method_info{'generated?'} = 1;
           #print STDERR "$object_method_signature\n";
           #print STDERR &Dumper($object_method_info);
-          $$klass_ast{$methods_key}{$object_method_signature} =
+          $$klass_ast{'methods'}{$object_method_signature} =
             $object_method_info;
         }
       }
@@ -2215,9 +2215,7 @@ sub add_object_methods_decls {
     if (exists $$ast{$construct}) {
       while (my ($klass_name, $klass_ast) =
                each (%{$$ast{$construct}})) {
-        &add_object_methods_decls_to_klass($klass_ast,
-                                           'methods',
-                                           'slots-methods');
+        &add_object_methods_decls_to_klass($klass_ast);
       }
     }
   }
