@@ -77,9 +77,9 @@ static const char-t gbl-delimiter = '/'; // unix path delimiter
 inline func valid-str?(str_t str) -> bool-t { return str != nullptr && str[0] != NUL; }
 # define assert-valid-str(str) assert(valid-str?(str))
 
-klass assoc-node {
+klass core-node {
   slots {
-    slots-t*  next;
+    slots-t* next;
     intptr-t item;
   }
   method set-first(slots-t* slots, object-t item) -> object-t {
@@ -89,7 +89,7 @@ klass assoc-node {
   method set-all(slots-t* slots, object-t item) -> object-t {
     slots-t* node = slots;
     while (node != nullptr) {
-      assoc-node::set-first(node, item);
+      core-node::set-first(node, item);
       node = node->next;
     }
     return item;
@@ -103,13 +103,13 @@ klass assoc-node {
     return result;
   }
 }
-klass named-assoc-node-compare {
-  slots (*)(const named-assoc-node-t*, const named-assoc-node-t*) -> cmp-t;
+klass named-core-node-compare {
+  slots (*)(const named-core-node-t*, const named-core-node-t*) -> cmp-t;
 }
-klass named-assoc-node {
+klass named-core-node {
   slots {
-    symbol-t name;
-    assoc-node-t* node;
+    symbol-t     name;
+    core-node-t* node;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(s != nullptr);
@@ -121,7 +121,7 @@ klass named-assoc-node {
   }
 //   method dump(const slots-t* s) -> const slots-t* {
 //     printf("\"%s\"\n", s->name);
-//     assoc-node-t* node = s->node;
+//     core-node-t* node = s->node;
 //     while (node != nullptr) {
 //       printf("  item=%p, next=%p\n", node->item, node->next);
 //       node = node->next;
@@ -148,9 +148,9 @@ static func init-runtime-ds() -> void {
   bool-t is-ptr;
   gbl-imported-klasses-table =
     sorted-set-core::create(num-klses,
-                            ssizeof(named-assoc-node::slots-t),
+                            ssizeof(named-core-node::slots-t),
                             cast(std-compare-t)
-                            cast(named-assoc-node-compare-t)named-assoc-node::compare,
+                            cast(named-core-node-compare-t)named-core-node::compare,
                             is-ptr = false);
   gbl-klass-defns-table =
     sorted-set-core::create(num-klses,
@@ -519,19 +519,19 @@ static func each(named-info-t* root-info-list, named-info-func-t func, each-box-
   return;
 }
 static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str-ptrs);
+  core-node-t* assocs = cast(core-node-t*)named-info::at(info, #str-ptrs);
   if (assocs) {
     symbol-t* names =    cast(decltype(names))   named-info::at(info, #str-names);
     str-t*    literals = cast(decltype(literals))named-info::at(info, #str-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (assoc-node::first?(&assocs[i])) {
-      assoc-node-t& assoc = assocs[i];
+    while (core-node::first?(&assocs[i])) {
+      core-node-t& assoc = assocs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       str-t    literal = literals[i];
-      assoc-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
+      core-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -541,19 +541,19 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
   return;
 }
 static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int-ptrs);
+  core-node-t* assocs = cast(core-node-t*)named-info::at(info, #int-ptrs);
   if (assocs) {
     symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int-names);
     intmax-t*  literals = cast(decltype(literals))named-info::at(info, #int-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (assoc-node::first?(&assocs[i])) {
-      assoc-node-t& assoc = assocs[i];
+    while (core-node::first?(&assocs[i])) {
+      core-node-t& assoc = assocs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       intmax-t literal = literals[i];
-      assoc-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
+      core-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -580,12 +580,12 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
   };
   return;
 }
-static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
+static func import-klass(symbol-t kls-name, core-node-t* node) -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\",\"%p\"]", __func__, kls-name, cast(ptr-t)(node));
-  named-assoc-node-t named-node = { .name = kls-name, .node = node };
+  named-core-node-t named-node = { .name = kls-name, .node = node };
   result-t found-result = sorted-set-core::result-at(gbl-imported-klasses-table, &named-node);
-  named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.item;
+  named-core-node-t* found-named-node = cast(decltype(found-named-node))found-result.item;
 
   if (found-named-node == nullptr) {
     named-node.node->next = nullptr;
@@ -600,7 +600,7 @@ static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
   }
   return;
 }
-static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void {
+static func import-klasses(symbol-t* kls-names, core-node-t* kls-assoc) -> void {
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\",\"%p\"]",
                         __func__,
                         cast(ptr-t)(kls-names),
@@ -609,8 +609,8 @@ static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void
          (kls-assoc != nullptr));
   ssize-t i = 0;
   while (kls-names[i] != nullptr) {
-    symbol-t      name =   kls-names[i];
-    assoc-node-t* assoc = &kls-assoc[i];
+    symbol-t     name =   kls-names[i];
+    core-node-t* assoc = &kls-assoc[i];
     i++;
 //     fprintf(stderr, "\"%s\": %p\n", name, assoc->item);
     import-klass(name, assoc);
@@ -844,13 +844,13 @@ func dk-init-runtime() -> void {
     init-imported-klasses();
   return;
 }
-/*LOCAL*/ func imported-klasses-for-klass(symbol-t kls-name) -> assoc-node-t* {
+/*LOCAL*/ func imported-klasses-for-klass(symbol-t kls-name) -> core-node-t* {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%s\"]", __func__, kls-name);
-  named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
+  named-core-node-t named-node = { .name = kls-name, .node = nullptr };
   result-t node-result = sorted-set-core::result-at(gbl-imported-klasses-table, &named-node); // hackhack
-  named-assoc-node-t* found-named-node = cast(decltype(found-named-node))node-result.item;
-  assoc-node-t* result;
+  named-core-node-t* found-named-node = cast(decltype(found-named-node))node-result.item;
+  core-node-t* result;
 
   if (found-named-node == nullptr)
     result = nullptr;
@@ -1302,7 +1302,7 @@ klass registration-info {
     generic-func-t*    generic-func-ptrs;
     get-segment-data-func-t get-segment-data;
     symbol-t*          imported-klass-names;
-    assoc-node-t*      imported-klass-ptrs;
+    core-node-t*       imported-klass-ptrs;
     property-t*        interposers;
     named-info-t*      klass-defns;
     symbol-t           name;
@@ -1598,7 +1598,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       // }
       finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(kls-info, #finalize);
       if (klass-finalize != nullptr) {
-        assoc-node-t* kls-assoc = imported-klasses-for-klass(kls-name);
+        core-node-t* kls-assoc = imported-klasses-for-klass(kls-name);
         if (kls-assoc != nullptr) {
           object-t kls = *cast(object-t*)(kls-assoc->item);
           if (kls != nullptr) {
@@ -1618,7 +1618,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   return;
 }
 static func klass-for-name-simple(symbol-t name) -> object-t {
-  assoc-node-t* kls-assoc = imported-klasses-for-klass(name);
+  core-node-t* kls-assoc = imported-klasses-for-klass(name);
   // if (kls-assoc == nullptr) printf("klass='%s', not imported\n", name);
   object-t kls = nullptr;
   if (kls-assoc != nullptr)

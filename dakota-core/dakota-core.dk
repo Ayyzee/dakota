@@ -17,8 +17,6 @@
 export dakota-core {
   addr2name-pair::slots-t;
   addr2name-pair;
-  assoc-node::slots-t;
-  assoc-node;
   backward-iterating;
   bit-vector-op::slots-t;
   bit-vector-op;
@@ -40,6 +38,8 @@ export dakota-core {
   compare;
   const-info::slots-t;
   const-info;
+  core-node::slots-t;
+  core-node;
   counted-set;
   counted-set-iterator;
   deque;
@@ -137,10 +137,10 @@ export dakota-core {
   methods::slots-t;
   methods;
   missing-keyword-exception;
-  named-assoc-node-compare::slots-t;
-  named-assoc-node-compare;
-  named-assoc-node::slots-t;
-  named-assoc-node;
+  named-core-node-compare::slots-t;
+  named-core-node-compare;
+  named-core-node::slots-t;
+  named-core-node;
   named-enum-info::slots-t;
   named-enum-info;
   named-info-compare::slots-t;

@@ -571,7 +571,7 @@ sub generate_target_runtime {
   my $keys_count = keys %{$$target_srcs_ast{'klasses'}};
   if (0 == $keys_count) {
     $target_src_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
-    $target_src_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
+    $target_src_str .= $col . "static core-node-t*    imported-klass-ptrs =  nullptr;" . $nl;
   } else {
     $target_src_str .= $col . "static symbol-t[] imported-klass-names = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
@@ -583,7 +583,7 @@ sub generate_target_runtime {
     $col = &colout($col);
     $target_src_str .= $col . "};" . $nl;
     ###
-    $target_src_str .= $col . "static assoc-node-t[] imported-klass-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $target_src_str .= $col . "static core-node-t[] imported-klass-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
@@ -4162,7 +4162,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
 
-    $scratch_str .= $col . "static assoc-node-t[] __str-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static core-node-t[] __str-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
@@ -4219,7 +4219,7 @@ sub linkage_unit::generate_target_runtime_ints_seq {
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
 
-    $scratch_str .= $col . "static assoc-node-t[] __int-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static core-node-t[] __int-ptrs = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);

@@ -56,7 +56,7 @@ inline func METHOD-FOR-SELECTOR(const methods::slots-t* methods,
 
 module dakota-core;
 
-klass assoc-node;
+klass core-node;
 klass bit-vector;
 klass method-alias;
 klass named-info;
@@ -708,10 +708,10 @@ klass klass {
   }
   static func set-all-klass-ptrs(object-t self) -> void {
     (self).has-exit-time-dtor(); // hackhack: to prevent dealloc on exit()
-    assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
+    core-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
     if (null)
       set-read-write();
-    assoc-node::set-all(imported-klss, self); // write-kls-ptr
+    core-node::set-all(imported-klss, self); // write-kls-ptr
     if (null)
       set-read-only();
     return;
