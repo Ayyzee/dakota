@@ -515,19 +515,20 @@ static func each(named-info-t* root-info-list, named-info-func-t func, each-box-
   return;
 }
 static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
-  core-node-t* assocs = cast(core-node-t*)named-info::at(info, #str-ptrs);
-  if (assocs) {
+  core-node-t* ptrs = cast(core-node-t*)named-info::at(info, #str-ptrs);
+  if (ptrs) {
     symbol-t* names =    cast(decltype(names))   named-info::at(info, #str-names);
     str-t*    literals = cast(decltype(literals))named-info::at(info, #str-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (assocs[i].item) {
-      core-node-t& assoc = assocs[i];
+    while (ptrs[i].item) { // while not nullptr
+      core-node-t& node = ptrs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       str-t    literal = literals[i];
-      core-node::set-item(&assoc, box-func(literal)); // write-kls-ptr
+      object-t item = box-func(literal);
+      core-node::set-item(&node, item); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -537,19 +538,20 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
   return;
 }
 static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
-  core-node-t* assocs = cast(core-node-t*)named-info::at(info, #int-ptrs);
-  if (assocs) {
+  core-node-t* ptrs = cast(core-node-t*)named-info::at(info, #int-ptrs);
+  if (ptrs) {
     symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int-names);
     intmax-t*  literals = cast(decltype(literals))named-info::at(info, #int-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (assocs[i].item) {
-      core-node-t& assoc = assocs[i];
+    while (ptrs[i].item) { // while not nullptr
+      core-node-t& node = ptrs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       intmax-t literal = literals[i];
-      core-node::set-item(&assoc, box-func(literal)); // write-kls-ptr
+      object-t item = box-func(literal);
+      core-node::set-item(&node, item); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -596,20 +598,20 @@ static func import-klass(symbol-t kls-name, core-node-t* node) -> void {
   }
   return;
 }
-static func import-klasses(symbol-t* kls-names, core-node-t* kls-assoc) -> void {
+static func import-klasses(symbol-t* kls-names, core-node-t* kls-nodes) -> void {
   DKT-LOG-TRACE-RUNTIME("\"func\":\"%s\",\"args\":[\"%p\",\"%p\"]",
                         __func__,
                         cast(ptr-t)(kls-names),
-                        cast(ptr-t)(kls-assoc));
+                        cast(ptr-t)(kls-nodes));
   assert((kls-names != nullptr) &&
-         (kls-assoc != nullptr));
+         (kls-nodes != nullptr));
   ssize-t i = 0;
   while (kls-names[i] != nullptr) {
     symbol-t     name =   kls-names[i];
-    core-node-t* assoc = &kls-assoc[i];
+    core-node-t* nodes = &kls-nodes[i];
     i++;
-//     fprintf(stderr, "\"%s\": %p\n", name, assoc->item);
-    import-klass(name, assoc);
+//     fprintf(stderr, "\"%s\": %p\n", name, nodes->item);
+    import-klass(name, nodes);
   }
   return;
 }
@@ -678,15 +680,14 @@ static func register-klasses(named-info-t* kls-info) -> void {
 }
 /*LOCAL*/ func interposer-name-for-klass-name(symbol-t kls-name) -> symbol-t {
   property-t key = { .key = kls-name, .item = cast(intptr-t)nullptr };
-  result-t assoc-result = sorted-set-core::result-at(gbl-interposers-table, &key);
-  property-t* assoc-ptr = cast(decltype(assoc-ptr))assoc-result.item;
+  result-t ss-result = sorted-set-core::result-at(gbl-interposers-table, &key);
+  property-t* prop = cast(decltype(prop))ss-result.item;
   symbol-t result;
 
-  if (assoc-ptr == nullptr) {
+  if (prop == nullptr) {
     result = nullptr;
   } else {
-    property-t assoc = *assoc-ptr;
-    result = cast(symbol-t)(assoc.item);
+    result = cast(symbol-t)(prop->item);
   }
 //   if (result != nullptr)
 //     fprintf(stderr, "%s = %s(%s)\n", result, __func__, kls-name);
@@ -1594,9 +1595,9 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       // }
       finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(kls-info, #finalize);
       if (klass-finalize != nullptr) {
-        core-node-t* kls-assoc = imported-klasses-for-klass(kls-name);
-        if (kls-assoc != nullptr) {
-          object-t kls = *cast(object-t*)(kls-assoc->item);
+        core-node-t* kls-nodes = imported-klasses-for-klass(kls-name);
+        if (kls-nodes != nullptr) {
+          object-t kls = *cast(object-t*)(kls-nodes->item);
           if (kls != nullptr) {
             DKT-LOG-INITIAL-FINAL("\"action\":\"%s\",\"args\":[\"%s\"],\"klass\":\"%s\",\"file\":\"%s\"",
                                   "finalize", "klass", kls-name,
@@ -1614,11 +1615,11 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   return;
 }
 static func klass-for-name-simple(symbol-t name) -> object-t {
-  core-node-t* kls-assoc = imported-klasses-for-klass(name);
-  // if (kls-assoc == nullptr) printf("klass='%s', not imported\n", name);
+  core-node-t* kls-nodes = imported-klasses-for-klass(name);
+  // if (kls-nodes == nullptr) printf("klass='%s', not imported\n", name);
   object-t kls = nullptr;
-  if (kls-assoc != nullptr)
-    kls = *cast(object-t*)(kls-assoc->item);
+  if (kls-nodes != nullptr)
+    kls = *cast(object-t*)(kls-nodes->item);
   return kls; // may be nullptr
 }
 static func klass-for-name-recursive(symbol-t name, ssize-t column = 0) -> object-t {
