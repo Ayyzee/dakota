@@ -82,23 +82,19 @@ klass core-node {
     slots-t* next;
     intptr-t item;
   }
-  method set-first(slots-t* slots, object-t item) -> object-t {
+  method set-item(slots-t* slots, object-t item) -> object-t {
     *(cast(object-t*)(slots->item)) = item;
     return item;
   }
   method set-all(slots-t* slots, object-t item) -> object-t {
     slots-t* node = slots;
     while (node != nullptr) {
-      core-node::set-first(node, item);
+      core-node::set-item(node, item);
       node = node->next;
     }
     return item;
   }
-  method first?(const slots-t* slots) -> bool-t {
-    bool-t result = (slots->item != 0);
-    return result;
-  }
-  method first(const slots-t* slots) -> object-t {
+  method item(const slots-t* slots) -> object-t {
     object-t result = slots->item;
     return result;
   }
@@ -525,13 +521,13 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
     str-t*    literals = cast(decltype(literals))named-info::at(info, #str-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (core-node::first?(&assocs[i])) {
+    while (assocs[i].item) {
       core-node-t& assoc = assocs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       str-t    literal = literals[i];
-      core-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
+      core-node::set-item(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -547,13 +543,13 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
     intmax-t*  literals = cast(decltype(literals))named-info::at(info, #int-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (core-node::first?(&assocs[i])) {
+    while (assocs[i].item) {
       core-node-t& assoc = assocs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       intmax-t literal = literals[i];
-      core-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
+      core-node::set-item(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
