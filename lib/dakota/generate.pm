@@ -587,9 +587,9 @@ sub generate_target_runtime {
     $col = &colin($col);
     $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
-      $target_src_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)&$klass_name\::_klass_ }, /// &object-t" . $nl;
+      $target_src_str .= $col . "{ .next = nullptr, .item-ptr = &$klass_name\::_klass_ }, /// &object-t" . $nl;
     }
-    $target_src_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
+    $target_src_str .= $col . "{ .next = nullptr, .item-ptr = nullptr }" . $nl;
     $col = &colout($col);
     $target_src_str .= $col . "};" . $nl;
     $target_src_str .= &linkage_unit::generate_target_runtime_selectors_seq( $generics);
@@ -4166,9 +4166,9 @@ sub linkage_unit::generate_target_runtime_strs_seq {
     $col = &colin($col);
     foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
-      $scratch_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)&__literal::__str::$str_ident }," . $nl;
+      $scratch_str .= $col . "{ .next = nullptr, .item-ptr = &__literal::__str::$str_ident }," . $nl;
     }
-    $scratch_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
+    $scratch_str .= $col . "{ .next = nullptr, .item-ptr = nullptr }" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
   }
@@ -4205,7 +4205,6 @@ sub linkage_unit::generate_target_runtime_ints_seq {
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       $scratch_str .= $col . "$int," . $nl;
     }
-    $scratch_str .= $col . "0 // nullptr" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
 
@@ -4215,7 +4214,6 @@ sub linkage_unit::generate_target_runtime_ints_seq {
       my $ident = &dk_mangle($int);
       $scratch_str .= $col . "__symbol::$ident," . $nl;
     }
-    $scratch_str .= $col . "nullptr" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
 
@@ -4223,9 +4221,9 @@ sub linkage_unit::generate_target_runtime_ints_seq {
     $col = &colin($col);
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
-      $scratch_str .= $col . "{ .next = nullptr, .item = cast(intmax-t)&__literal::__int::$int_ident }," . $nl;
+      $scratch_str .= $col . "{ .next = nullptr, .item-ptr = &__literal::__int::$int_ident }," . $nl;
     }
-    $scratch_str .= $col . "{ .next = nullptr, .item = cast(intmax-t)nullptr }" . $nl;
+    $scratch_str .= $col . "{ .next = nullptr, .item-ptr = nullptr }" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
   }

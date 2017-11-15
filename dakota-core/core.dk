@@ -79,13 +79,13 @@ inline func valid-str?(str_t str) -> bool-t { return str != nullptr && str[0] !=
 
 klass core-node {
   slots {
-    slots-t* next;
-    intptr-t item;
+    slots-t*  next;
+    object-t* item-ptr;
   }
   method set-all(slots-t* slots, object-t item) -> object-t {
     slots-t* node = slots;
     while (node != nullptr) {
-      *(cast(object-t*)(node->item)) = item;
+      *(node->item-ptr) = item;
       node = node->next;
     }
     return item;
@@ -509,42 +509,28 @@ static func each(named-info-t* root-info-list, named-info-func-t func, each-box-
 static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
   core-node-t* ptrs = cast(core-node-t*)named-info::at(info, #str-ptrs);
   if (ptrs) {
-    symbol-t* names =    cast(decltype(names))   named-info::at(info, #str-names);
-    str-t*    literals = cast(decltype(literals))named-info::at(info, #str-literals);
+    str-t* literals = cast(decltype(literals))named-info::at(info, #str-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (ptrs[i].item) { // while not nullptr
-# if 0
-      symbol-t name =    names[i];
-# endif
-      str-t    literal = literals[i];
-      object-t item = box-func(literal);
+    while (ptrs[i].item-ptr) {
+      object-t item = box-func(literals[i]);
       core-node::set-all(&ptrs[i], item); // write-kls-ptr
       i++;
     }
-    assert(names[i] == nullptr);
-    assert(literals[i] == nullptr);
   }
   return;
 }
 static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
   core-node-t* ptrs = cast(core-node-t*)named-info::at(info, #int-ptrs);
   if (ptrs) {
-    symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int-names);
-    intmax-t*  literals = cast(decltype(literals))named-info::at(info, #int-literals);
+    intmax-t* literals = cast(decltype(literals))named-info::at(info, #int-literals);
     assert(literals != nullptr);
     ssize-t i = 0;
-    while (ptrs[i].item) { // while not nullptr
-# if 0
-      symbol-t name =    names[i];
-# endif
-      intmax-t literal = literals[i];
-      object-t item = box-func(literal);
+    while (ptrs[i].item-ptr) {
+      object-t item = box-func(literals[i]);
       core-node::set-all(&ptrs[i], item); // write-kls-ptr
       i++;
     }
-    assert(names[i] == nullptr);
-    assert(literals[i] == 0); // nullptr
   }
   return;
 }
@@ -1366,8 +1352,8 @@ static func symbol-name-for-addr(ptr-t addr, so-symbol-info::slots-t* info) -> s
     //printf("name: \"%s\"\n", ri.name);
 
     // imported-klasses
-    for (int-t i = 0; cast(object-t*)ri.imported-klass-ptrs[i].item != nullptr; i++) {
-      if (cast(object-t*)ri.imported-klass-ptrs[i].item == cast(object-t*)addr) {
+    for (int-t i = 0; ri.imported-klass-ptrs[i].item-ptr != nullptr; i++) {
+      if (ri.imported-klass-ptrs[i].item-ptr == cast(object-t*)addr) {
         info->fname = ri.name;
         info->sname = ri.imported-klass-names[i];
         return info;
@@ -1585,7 +1571,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       if (klass-finalize != nullptr) {
         core-node-t* kls-nodes = imported-klasses-for-klass(kls-name);
         if (kls-nodes != nullptr) {
-          object-t kls = *cast(object-t*)(kls-nodes->item);
+          object-t kls = *(kls-nodes->item-ptr);
           if (kls != nullptr) {
             DKT-LOG-INITIAL-FINAL("\"action\":\"%s\",\"args\":[\"%s\"],\"klass\":\"%s\",\"file\":\"%s\"",
                                   "finalize", "klass", kls-name,
@@ -1607,7 +1593,7 @@ static func klass-for-name-simple(symbol-t name) -> object-t {
   // if (kls-nodes == nullptr) printf("klass='%s', not imported\n", name);
   object-t kls = nullptr;
   if (kls-nodes != nullptr)
-    kls = *cast(object-t*)(kls-nodes->item);
+    kls = *(kls-nodes->item-ptr);
   return kls; // may be nullptr
 }
 static func klass-for-name-recursive(symbol-t name, ssize-t column = 0) -> object-t {
