@@ -82,21 +82,13 @@ klass core-node {
     slots-t* next;
     intptr-t item;
   }
-  method set-item(slots-t* slots, object-t item) -> object-t {
-    *(cast(object-t*)(slots->item)) = item;
-    return item;
-  }
   method set-all(slots-t* slots, object-t item) -> object-t {
     slots-t* node = slots;
     while (node != nullptr) {
-      core-node::set-item(node, item);
+      *(cast(object-t*)(node->item)) = item;
       node = node->next;
     }
     return item;
-  }
-  method item(const slots-t* slots) -> object-t {
-    object-t result = slots->item;
-    return result;
   }
 }
 klass named-core-node-compare {
@@ -522,14 +514,12 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
     assert(literals != nullptr);
     ssize-t i = 0;
     while (ptrs[i].item) { // while not nullptr
-      core-node-t& node = ptrs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       str-t    literal = literals[i];
       object-t item = box-func(literal);
-      core-node::set-item(&node, item); // write-kls-ptr
-      // loop here over chain
+      core-node::set-all(&ptrs[i], item); // write-kls-ptr
       i++;
     }
     assert(names[i] == nullptr);
@@ -545,14 +535,12 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
     assert(literals != nullptr);
     ssize-t i = 0;
     while (ptrs[i].item) { // while not nullptr
-      core-node-t& node = ptrs[i];
 # if 0
       symbol-t name =    names[i];
 # endif
       intmax-t literal = literals[i];
       object-t item = box-func(literal);
-      core-node::set-item(&node, item); // write-kls-ptr
-      // loop here over chain
+      core-node::set-all(&ptrs[i], item); // write-kls-ptr
       i++;
     }
     assert(names[i] == nullptr);
