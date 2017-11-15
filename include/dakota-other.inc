@@ -255,7 +255,10 @@ constexpr FUNC dk_hash(str_t str) -> hash_t { // Daniel J. Bernstein
 constexpr FUNC dk_hash_switch(str_t str) -> hash_t { return dk_hash(str); }
 
 constexpr FUNC dk_hash_switch(ssize_t val) -> ssize_t { return val; }
-constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
+constexpr FUNC dk_hash_switch(size_t  val) ->  size_t { return val; }
+
+constexpr FUNC dk_hash_switch(int_t  val) ->  int_t { return val; }
+constexpr FUNC dk_hash_switch(uint_t val) -> uint_t { return val; }
 
 [[so_export]] FUNC dk_intern(str_t)      -> symbol_t;
 [[so_export]] FUNC dk_intern_free(str_t) -> symbol_t;
